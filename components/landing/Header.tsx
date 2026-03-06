@@ -1,0 +1,30 @@
+"use client";
+
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+export function Header() {
+  return (
+    <header className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/[0.05]">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33] flex items-center justify-center relative overflow-hidden">
+            <svg viewBox="0 0 24 24" className="w-4 h-4 text-white fill-current">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+            </svg>
+          </div>
+          <span className="font-bold text-lg text-white tracking-tight">Raddle</span>
+        </Link>
+
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">
+            Log in
+          </Link>
+          <Button className="bg-[#ff4500] hover:bg-[#e03d00] text-white rounded-md px-4 h-9 font-medium shadow-none transition-all hidden sm:flex">
+            Start 7-day free trial
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
