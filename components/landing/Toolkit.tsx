@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Search, Shield, Bell, Target, Activity, Mail, MessageSquare, BarChart } from "lucide-react";
+import { Bot, Shield, Bell, Target, Activity, MessageSquare } from "lucide-react";
 
 export function Toolkit() {
   return (
