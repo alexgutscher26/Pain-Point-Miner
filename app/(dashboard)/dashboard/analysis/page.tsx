@@ -1,32 +1,116 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { 
   CheckCircle2, 
-  Loader2, 
-  Circle, 
   Eye, 
   ArrowRight,
-  Info,
   Clock,
   Sparkles,
   Search,
   BrainCircuit,
   BarChart4
 } from "lucide-react";
-import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
+
+interface ScraperRunInfo {
+  status: string;
+  postsFetched: number;
+}
+
+interface ScraperStatusData {
+  scraper: {
+    id: string;
+    keywords: string[];
+    subreddits: string[];
+    miningDepth?: string;
+  };
+  latestRun: ScraperRunInfo | null;
+  painPointCount: number;
+  status: string;
+}
 
 export default function AnalysisPage() {
-  const [progress, setProgress] = useState(65);
-  const [status, setStatus] = useState("Refining data patterns based on current subreddit sentiment...");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const scraperId = searchParams.get("id");
 
-  // Mock progress increment
+  const [progress, setProgress] = useState(15);
+  const [statusText, setStatusText] = useState("Initializing Reddit data pipeline...");
+  const [isDone, setIsDone] = useState(false);
+  const [stats, setStats] = useState<ScraperStatusData | null>(null);
+
+  // Poll for status
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 1 : prev));
+    if (!scraperId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/search/status?id=${scraperId}`);
+        if (!response.ok) throw new Error("Status check failed");
+        
+        const data = await response.json();
+        setStats(data);
+
+        // Map status to progress (This is a simplified approach)
+        if (data.status === 'success') {
+          setProgress(100);
+          setStatusText("Analysis complete. Found " + data.painPointCount + " pain points.");
+          setIsDone(true);
+          clearInterval(pollInterval);
+        } else {
+          // Increment progress slightly while waiting
+          setProgress((prev) => (prev < 90 ? prev + 5 : prev));
+          setStatusText("Processing posts and comments...");
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
     }, 2000);
-    return () => clearInterval(timer);
-  }, []);
+
+    return () => clearInterval(pollInterval);
+  }, [scraperId]);
+
+  // Derived step status
+  const steps = useMemo(() => {
+    const isSuccess = stats?.status === 'success';
+    const hasPoints = (stats?.painPointCount || 0) > 0;
+    
+    return [
+      {
+        icon: <Search className="w-4 h-4" />,
+        title: "Collecting Reddit posts...",
+        description: stats?.latestRun 
+          ? `Found ${stats.latestRun.postsFetched} posts across targeting subreddits.` 
+          : "Analyzing search relevance...",
+        status: stats ? 'completed' : 'in-progress'
+      },
+      {
+        icon: <BrainCircuit className="w-4 h-4" />,
+        title: "Extracting pain points...",
+        description: hasPoints 
+          ? `Discovered ${stats?.painPointCount} unique frustration markers.` 
+          : "AI is reading content for intensity and budget...",
+        status: hasPoints ? 'completed' : (stats ? 'in-progress' : 'pending')
+      },
+      {
+        icon: <Sparkles className="w-4 h-4" />,
+        title: "Grouping repeated themes...",
+        description: isSuccess 
+          ? "Clustered insights into high-value opportunities." 
+          : "Structuring data hierarchies for the final report...",
+        status: (isSuccess && hasPoints) ? 'completed' : (hasPoints ? 'in-progress' : 'pending')
+      },
+      {
+        icon: <BarChart4 className="w-4 h-4" />,
+        title: "Finalizing Report...",
+        description: isSuccess 
+          ? "Scoring market viability and difficulty scores." 
+          : "Preparing your analysis dashboard...",
+        status: isSuccess ? 'completed' : ((isSuccess || hasPoints) ? 'in-progress' : 'pending')
+      }
+    ];
+  }, [stats]);
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
@@ -40,11 +124,11 @@ export default function AnalysisPage() {
 
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-black text-white tracking-tight mb-4">
-          Analyzing Reddit Insights
+        <h2 className="text-4xl font-black text-white tracking-tight mb-4 uppercase">
+          Mining Market Secrets
         </h2>
         <p className="text-zinc-500 font-medium text-lg">
-          We&apos;re mining subreddits to identify high-value opportunities for you.
+          Our specialized algorithms are decoding the Reddit pulse for you.
         </p>
       </div>
 
@@ -56,7 +140,7 @@ export default function AnalysisPage() {
           {/* Overall Progress */}
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-               <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Overall Progress</p>
+               <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Analysis Progress</p>
                <p className="text-lg font-black text-[#ff4500]">{progress}%</p>
             </div>
             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
@@ -67,7 +151,7 @@ export default function AnalysisPage() {
             </div>
             <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-500 italic">
                <div className="w-1 h-1 rounded-full bg-[#ff4500] animate-ping"></div>
-               {status}
+               {statusText}
             </div>
           </div>
 
@@ -75,33 +159,15 @@ export default function AnalysisPage() {
           <div className="space-y-0 relative">
             <div className="absolute left-[19px] top-6 bottom-6 w-px bg-white/5"></div>
             
-            <AnalysisStep 
-              icon={<Search className="w-4 h-4" />}
-              title="Collecting Reddit posts..."
-              description="Successfully scanned 12 subreddits and archived 4,200 comments."
-              status="completed"
-            />
-            
-            <AnalysisStep 
-              icon={<BrainCircuit className="w-4 h-4" />}
-              title="Extracting pain points..."
-              description="AI engine is identifying frustration markers and common complaints."
-              status="in-progress"
-            />
-            
-            <AnalysisStep 
-              icon={<Sparkles className="w-4 h-4" />}
-              title="Grouping repeated themes..."
-              description="Clustering individual points into high-level opportunity categories."
-              status="pending"
-            />
-            
-            <AnalysisStep 
-              icon={<BarChart4 className="w-4 h-4" />}
-              title="Scoring opportunities..."
-              description="Calculating market viability and difficulty scores for each segment."
-              status="pending"
-            />
+            {steps.map((step, idx) => (
+              <AnalysisStep 
+                key={idx}
+                icon={step.icon}
+                title={step.title}
+                description={step.description}
+                status={step.status as 'completed' | 'in-progress' | 'pending'}
+              />
+            ))}
           </div>
         </div>
 
@@ -109,26 +175,39 @@ export default function AnalysisPage() {
         <div className="px-10 py-6 bg-white/2 border-t border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
              <Clock className="w-4 h-4" />
-             Expected completion: ~45 seconds
+             {isDone ? "Mining complete" : (() => {
+               const subCount = stats?.scraper.subreddits.length || 4;
+               const depthMultiplier = stats?.scraper.miningDepth === "deep" ? 3 : 1;
+               const totalSeconds = (subCount * 15) * depthMultiplier;
+               return `Expected completion: ~${totalSeconds >= 60 
+                ? `${Math.round(totalSeconds / 60)} minutes` 
+                : `${totalSeconds} seconds`}`;
+             })()}
           </div>
           <button 
-            disabled 
-            className="px-6 py-2.5 rounded-xl bg-white/5 text-zinc-500 text-[12px] font-black uppercase tracking-widest border border-white/5 flex items-center gap-2 disabled:cursor-not-allowed group transition-all"
+            disabled={!isDone}
+            onClick={() => router.push(`/dashboard/reports/${scraperId}`)}
+            className="px-6 py-2.5 rounded-xl bg-[#ff4500] text-white text-[12px] font-black uppercase tracking-widest border border-[#ff4500]/30 flex items-center gap-2 disabled:bg-white/5 disabled:text-zinc-500 disabled:border-white/5 disabled:cursor-not-allowed group transition-all"
           >
-            View Report <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            {isDone ? "View Detailed Report" : "Processing..."} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
 
       {/* Pro Tip */}
-      <div className="mt-8 w-full max-w-2xl bg-[#ff4500]/5 border border-[#ff4500]/10 rounded-2xl p-4 flex gap-4 items-start">
-         <div className="p-1.5 bg-[#ff4500]/10 rounded-lg text-[#ff4500]">
-            <Info className="w-4 h-4" />
-         </div>
-         <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
-            <span className="text-[#ff4500] font-black uppercase text-[11px] tracking-wider mr-2">Pro Tip:</span>
-            You can safely navigate away from this page. We&apos;ll email you once the report is generated.
-         </p>
+      <div className="mt-8 w-full max-w-2xl bg-[#ff4500]/5 border border-[#ff4500]/10 rounded-2xl p-6 flex gap-4 items-start relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4500]/5 blur-3xl rounded-full"></div>
+        <div className="p-2 bg-[#ff4500]/10 rounded-xl text-[#ff4500] relative z-10">
+          <Sparkles className="w-5 h-5" />
+        </div>
+        <div className="relative z-10">
+          <p className="text-[10px] font-black text-[#ff4500] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+            Intelligence Protocol Active
+          </p>
+          <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
+            Our engine is specifically hunting for <span className="text-zinc-200">Pain Intensity</span>, <span className="text-zinc-200">Budgets</span>, and <span className="text-zinc-200">Switching Costs</span>. We ignore generic comments to find high-conviction market gaps.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -162,7 +241,7 @@ function AnalysisStep({
         <div className="flex items-center gap-3 mb-1">
           <p className={`text-lg font-black tracking-tight ${status === 'pending' ? 'text-zinc-500' : 'text-zinc-100'}`}>{title}</p>
           {status === 'completed' && (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20">Completed</span>
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20">Analyzed</span>
           )}
           {status === 'in-progress' && (
             <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-[#ff4500]/10 text-[#ff4500] rounded-full border border-[#ff4500]/20">In Progress</span>

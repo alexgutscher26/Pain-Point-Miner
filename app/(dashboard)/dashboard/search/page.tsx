@@ -10,16 +10,79 @@ import {
   Lightbulb,
   CheckCircle2,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SearchPage() {
   const router = useRouter();
   const [miningDepth, setMiningDepth] = useState<"basic" | "deep">("basic");
+  const [keyword, setKeyword] = useState("");
+  const [subreddits, setSubreddits] = useState("");
+  const [customPatterns, setCustomPatterns] = useState("");
+  const [suggestedSubreddits, setSuggestedSubreddits] = useState<string[]>([]);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleStartMining = () => {
-    // In a real app, we would kick off the background job here
-    router.push("/dashboard/analysis");
+  const handleSuggestSubreddits = async () => {
+    if (!keyword || keyword.length < 3) return;
+    
+    setIsSuggesting(true);
+    try {
+      const response = await fetch("/api/search/suggest-subreddits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword })
+      });
+      const data = await response.json();
+      setSuggestedSubreddits(data.subreddits);
+    } catch (error) {
+      console.error("Error suggesting subreddits:", error);
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
+
+  const addSubreddit = (sub: string) => {
+    const current = subreddits.split(',').map(s => s.trim().replace('r/', '')).filter(Boolean);
+    if (!current.includes(sub)) {
+      setSubreddits([...current, sub].map(s => `r/${s}`).join(', '));
+    }
+  };
+
+  const handleStartMining = async () => {
+    if (!keyword) {
+      toast.error("Please enter a keyword to start mining.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          keyword,
+          subreddits,
+          customPatterns: customPatterns.split(',').map(p => p.trim()).filter(Boolean),
+          miningDepth
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to start mining");
+      }
+
+      const data = await response.json();
+      toast.success("Mining started successfully!");
+      router.push(`/dashboard/analysis?id=${data.scraperId}`);
+    } catch (error) {
+      console.error("Mining error:", error);
+      toast.error("There was an error starting the investigation.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,30 +111,97 @@ export default function SearchPage() {
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ff4500]"></div>
               </label>
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-xl opacity-0 group-focus-within:opacity-10 transition-opacity blur-md"></div>
+                <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-xl opacity-0 group-focus-within:opacity-10 transition-opacity blur-md pointer-events-none"></div>
                 <input 
                   type="text" 
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management, SaaS churn"
-                  className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
                 />
               </div>
             </div>
 
             {/* Subreddits Input */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                  Target Subreddits <span className="text-[9px] text-zinc-600">(Optional)</span>
+                </label>
+                <button 
+                  onClick={handleSuggestSubreddits}
+                  disabled={isSuggesting || !keyword}
+                  className="text-[10px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8c00] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed group/suggest"
+                >
+                  {isSuggesting ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3 h-3 group-hover/suggest:scale-125 transition-transform" />
+                  )}
+                  Auto-Suggest
+                </button>
+              </div>
+              <div className="relative group">
+                <input 
+                  type="text" 
+                  value={subreddits}
+                  onChange={(e) => setSubreddits(e.target.value)}
+                  placeholder="r/sales, r/realestate, r/entrepreneur"
+                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                />
+                <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 z-20 pointer-events-none" />
+              </div>
+
+              {suggestedSubreddits.length > 0 && (
+                <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">AI Recommended Communities</p>
+                  {suggestedSubreddits.map((sub, i) => (
+                    <button
+                      key={i}
+                      onClick={() => addSubreddit(sub)}
+                      className="px-3 py-1.5 rounded-lg bg-[#ff4500]/5 border border-[#ff4500]/20 text-[11px] font-bold text-[#ff4500] hover:bg-[#ff4500]/10 transition-all"
+                    >
+                      + r/{sub}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Common Core Communities</p>
+                {['saas', 'entrepreneur', 'startups', 'smallbusiness'].map((sub, i) => (
+                  <button
+                    key={i}
+                    onClick={() => addSubreddit(sub)}
+                    className="px-3 py-1.5 rounded-lg bg-white/2 border border-white/5 text-[11px] font-bold text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    + r/{sub}
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                Leave blank to search all relevant communities across Reddit.
+              </p>
+            </div>
+
+            {/* Custom Extraction Parameters */}
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                Target Subreddits <span className="text-[9px] text-zinc-600">(Optional)</span>
+                Custom Intelligence Patterns <span className="text-[9px] text-zinc-600">(Optional)</span>
               </label>
               <div className="relative group">
                 <input 
                   type="text" 
-                  placeholder="r/sales, r/realestate, r/entrepreneur"
-                  className="w-full bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                  value={customPatterns}
+                  onChange={(e) => setCustomPatterns(e.target.value)}
+                  placeholder="e.g. mentions of HubSpot, frustration with pricing, legal compliance, developer experience"
+                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-amber-500/30 transition-all placeholder:text-zinc-700 shadow-2xl"
                 />
-                <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600" />
+                <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500/60 z-20 pointer-events-none" />
               </div>
               <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                Leave blank to search all relevant communities across Reddit.
+                Comma-separated signals you want the AI to specifically hunt for.
               </p>
             </div>
 
@@ -132,18 +262,36 @@ export default function SearchPage() {
             <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
                  <Clock className="w-4 h-4" />
-                 Est. time: ~2 minutes
+                 Est. time: ~{(() => {
+                   const subCount = subreddits.split(',').filter(s => s.trim()).length || 4;
+                   const depthMultiplier = miningDepth === "deep" ? 3 : 1;
+                   const totalSeconds = (subCount * 15) * depthMultiplier;
+                   return totalSeconds >= 60 
+                    ? `${Math.round(totalSeconds / 60)} minutes` 
+                    : `${totalSeconds} seconds`;
+                 })()}
               </div>
               <div className="flex items-center gap-4 w-full sm:w-auto">
-                <button className="flex-1 sm:flex-none text-[12px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
+                <button 
+                  disabled={isLoading}
+                  className="flex-1 sm:flex-none text-[12px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
+                  type="button"
+                >
                   Save Draft
                 </button>
                 <button 
                   onClick={handleStartMining}
-                  className="flex-1 sm:flex-none bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#ff4500]/20 active:scale-95 group"
+                  disabled={isLoading}
+                  className="flex-1 sm:flex-none bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#ff4500]/20 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
                 >
-                  Start Mining 
-                  <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                  {isLoading ? (
+                    <>Processing <Loader2 className="w-4 h-4 animate-spin" /></>
+                  ) : (
+                    <>
+                      Start Mining 
+                      <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -191,51 +339,8 @@ export default function SearchPage() {
               </div>
             </div>
           </div>
-
-          <div className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 shadow-2xl overflow-hidden relative group">
-            <div className="absolute inset-0 bg-linear-to-b from-white/2 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <h4 className="font-black text-white text-lg mb-6 tracking-tight flex items-center gap-3">
-              <Lightbulb className="w-6 h-6 text-amber-500" />
-              Example Queries
-            </h4>
-            
-            <div className="space-y-3">
-              <ExampleCard 
-                query="&quot;remote team collaboration&quot;" 
-                insight="Found 43 high-intent pain points"
-              />
-              <ExampleCard 
-                query="&quot;shopify app development&quot;" 
-                insight="Focus on API limits & documentation"
-              />
-              <ExampleCard 
-                query="&quot;pet grooming business&quot;" 
-                insight="Highlighting scheduling conflicts"
-              />
-            </div>
-
-            <div className="mt-8 pt-8 border-t border-white/5">
-              <div className="p-4 bg-white/3 rounded-2xl border border-white/5">
-                <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
-                  Need custom parameters? Check our <span className="text-white font-black underline cursor-pointer">Documentation</span> for advanced operators.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function ExampleCard({ query, insight }: { query: string; insight: string }) {
-  return (
-    <div className="p-4 bg-[#0a0a0a] border border-white/5 rounded-2xl hover:border-[#ff4500]/30 transition-all cursor-pointer group/card">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[13px] font-bold text-[#ff4500]">{query}</p>
-        <ChevronRight className="w-3.5 h-3.5 text-zinc-700 group-hover/card:text-white transition-colors" />
-      </div>
-      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{insight}</p>
     </div>
   );
 }
