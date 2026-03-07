@@ -43,6 +43,24 @@ function dedupePosts(posts: RedditPost[]) {
   return deduped;
 }
 
+/**
+ * Execute a mining run to fetch and analyze posts from specified subreddits.
+ *
+ * This function orchestrates the mining process by generating a unique run ID, determining the limits for subreddit and post fetching based on the mining depth, and fetching posts from the specified subreddits. It then deduplicates the posts, filters them based on the mining depth, and extracts pain points from the comments of the posts. Finally, it logs the results of the mining run to the database and updates the scraper's status. In case of an error, it logs the failure and updates the scraper's error count.
+ *
+ * @param scraperId - The ID of the scraper initiating the mining run.
+ * @param keyword - The keyword to search for in the posts.
+ * @param subreddits - An array of subreddit names to fetch posts from.
+ * @param customPatterns - An array of custom patterns to identify pain points.
+ * @param miningDepth - The depth of mining, which can be "deep" or another value.
+ * @param userId - The ID of the user initiating the mining run.
+ * @param workspaceId - The ID of the workspace associated with the mining run.
+ * @param maxSubreddits - The maximum number of subreddits to fetch posts from.
+ * @param maxPostsPerSubreddit - The maximum number of posts to fetch from each subreddit.
+ * @param processingLimit - The limit on the number of posts to analyze for pain points.
+ * @returns A promise that resolves to the result of the mining run, including the run ID, number of posts fetched, comments fetched, and new pain points identified.
+ * @throws Error If an error occurs during the mining process.
+ */
 export async function executeMiningRun({
   scraperId,
   keyword,
