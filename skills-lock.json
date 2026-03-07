@@ -1,10 +1,50 @@
 {
   "version": 1,
   "skills": {
+    "ai-agents-architect": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "8a5ff990847b2c45503aa4608c6e4586121a6f5461c025790bfe36c52abdb52f"
+    },
+    "ai-product": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "4d09aa0592942b69e6347c8466868e408cdd2ce5675a960e70198ab52ec6bb16"
+    },
+    "ai-wrapper-product": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "af373b9f2c97298d67eba130688c0238ef0ba787c4929277ac2d23c01012316c"
+    },
+    "code-reviewer": {
+      "source": "google-gemini/gemini-cli",
+      "sourceType": "github",
+      "computedHash": "270f0dd1d4c15a798bad5253a309cdc2056fe5322f99ba06ca22ce50581adc02"
+    },
+    "design-principles": {
+      "source": "srbhr/Resume-Matcher",
+      "sourceType": "github",
+      "computedHash": "fafed0051790439ebb4ab301b193fa74a5b28ba97c4499fba9a1f5a8013780bd"
+    },
+    "feature-flags": {
+      "source": "facebook/react",
+      "sourceType": "github",
+      "computedHash": "e9ada4f2e4d1a77ac348da2883fa81992486ba3021d11a246b7c5f851cdd6a6c"
+    },
+    "inngest": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "398701f802cf5dc66f85d13068de77442c4599f1b98121da6f49989d2be8a70e"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
       "computedHash": "b1cc1defe03f0e8f78652b7d20e4d4e6421babc2b45835d4f361afe684dc47a2"
+    },
+    "ui-review": {
+      "source": "srbhr/Resume-Matcher",
+      "sourceType": "github",
+      "computedHash": "159a656a8dfbd608d26b2e82b60df63f268b8dfe92d9ac7b7f14d9b866735fd6"
     }
   }
 }
