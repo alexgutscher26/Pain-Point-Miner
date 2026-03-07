@@ -1,6 +1,21 @@
 {
   "version": 1,
   "skills": {
+    "Git Commit Helper": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "cb2e24c286a00d8cdfe592a59691bd49dc55b0df6b624c55de1f8ffd922621a7"
+    },
+    "Hook Development": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "4014495475aa72b0daa44a0cc67d7fa8de12b608e8927643d38fee0425b6d51f"
+    },
+    "SEO Optimizer": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "1ad7ac7488d2050dfd7d64c592a64f86f8ec9a1a871b571544b1a997031c3f38"
+    },
     "ai-agents-architect": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
@@ -31,10 +46,60 @@
       "sourceType": "github",
       "computedHash": "e9ada4f2e4d1a77ac348da2883fa81992486ba3021d11a246b7c5f851cdd6a6c"
     },
+    "git-pushing": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "02fdfd58ff35a4ae25465219be43275ce232d522776e53fa3610cf744542661f"
+    },
+    "github-actions-creator": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "54a574fdc71d7a81add02d9155358b883e904a7c339948048847f7544d19093f"
+    },
+    "github-workflow-automation": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "3c89cf28e41265132a08f73988e319fa0ed47c0e2d6b440a53bd2f0365008287"
+    },
     "inngest": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "398701f802cf5dc66f85d13068de77442c4599f1b98121da6f49989d2be8a70e"
+    },
+    "pricing-strategy": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "9095236091545fd76a752b4e8c4c036fdf56ac7e84f180427486197c8e8c710a"
+    },
+    "prisma-expert": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "7413bb3d5ee4c321d6d592786893ce1f855cd374f6554d4016f6324c355b4d3c"
+    },
+    "react-best-practices": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "11ca78c0f5ac7585286331df5ba0ba6a9f3014b0844abea7fb01de5f7933f21e"
+    },
+    "react-ui-patterns": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "60d5bc3b421fd351c0e69e4f96bae87de60ef415429a70c0691d36360c298b2b"
+    },
+    "seo": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "680cc12a17e9308b4592a2751db51615c618993f75362cb8e64207f6355a8c63"
+    },
+    "seo-audit": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "c3cc327b68800b9e3a221533a488fa62cc4292d0fd42dbdced5a0c5e2ab1df7e"
+    },
+    "seo-fundamentals": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "72650aab70956ffb5ebac7877d6631356900da0ab33e50499312a4b1c3c0aa5d"
     },
     "shadcn": {
       "source": "shadcn/ui",

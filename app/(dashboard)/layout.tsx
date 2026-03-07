@@ -3,12 +3,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
+import { SidebarLinks } from "@/components/dashboard/sidebar-links";
 import { 
-  LayoutDashboard, 
-  Search, 
-  FileText, 
-  CreditCard, 
-  Settings, 
   HelpCircle,
   Plus,
   Bell,
@@ -42,34 +38,7 @@ export default async function DashboardLayout({
               <p className="text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">Market Analysis</p>
             </div>
           </div>
-          <nav className="space-y-1.5">
-            <SidebarLink 
-              href="/dashboard" 
-              icon={<LayoutDashboard className="w-[18px] h-[18px]" />} 
-              label="Overview" 
-              active 
-            />
-            <SidebarLink 
-              href="/dashboard/search" 
-              icon={<Search className="w-[18px] h-[18px]" />} 
-              label="New Search" 
-            />
-            <SidebarLink 
-              href="/dashboard/reports" 
-              icon={<FileText className="w-[18px] h-[18px]" />} 
-              label="Reports" 
-            />
-            <SidebarLink 
-              href="/dashboard/billing" 
-              icon={<CreditCard className="w-[18px] h-[18px]" />} 
-              label="Billing" 
-            />
-            <SidebarLink 
-              href="/dashboard/settings" 
-              icon={<Settings className="w-[18px] h-[18px]" />} 
-              label="Settings" 
-            />
-          </nav>
+          <SidebarLinks />
         </div>
         
         <div className="mt-auto p-5">
@@ -134,23 +103,5 @@ export default async function DashboardLayout({
         </div>
       </main>
     </div>
-  );
-}
-
-function SidebarLink({ href, icon, label, active = false }: { href: string, icon: React.ReactNode, label: string, active?: boolean }) {
-  return (
-    <Link
-      href={href}
-      className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all font-medium text-sm group ${
-        active 
-          ? "bg-[#ff4500] text-white shadow-lg shadow-[#ff4500]/20" 
-          : "text-zinc-500 hover:text-white hover:bg-white/5"
-      }`}
-    >
-      <span className={`${active ? "text-white" : "text-zinc-500 group-hover:text-white"} transition-colors`}>
-        {icon}
-      </span>
-      {label}
-    </Link>
   );
 }
