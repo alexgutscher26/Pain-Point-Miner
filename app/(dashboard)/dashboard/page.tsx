@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Zap
 } from "lucide-react";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -154,6 +155,7 @@ export default async function DashboardPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 <ReportRow
+                  id="1"
                   keyword="Cold Email"
                   date="2 hours ago"
                   painPoint="Deliverability with new domains"
@@ -161,6 +163,7 @@ export default async function DashboardPage() {
                   status="Live"
                 />
                 <ReportRow
+                  id="2"
                   keyword="SaaS Billing"
                   date="Yesteerday"
                   painPoint="Pricing complexity for SMBs"
@@ -168,6 +171,7 @@ export default async function DashboardPage() {
                   status="Ready"
                 />
                 <ReportRow
+                  id="3"
                   keyword="SEO Audit"
                   date="2 days ago"
                   painPoint="AI content detection noise"
@@ -295,12 +299,14 @@ function MetricCard({
 }
 
 function ReportRow({
+  id,
   keyword,
   date,
   painPoint,
   score,
   status,
 }: {
+  id: string;
   keyword: string;
   date: string;
   painPoint: string;
@@ -310,26 +316,32 @@ function ReportRow({
   return (
     <tr className="hover:bg-white/2 transition-colors cursor-pointer group">
       <td className="px-8 py-6">
-        <p className="text-[15px] font-bold text-white mb-1 group-hover:text-[#ff4500] transition-colors">{keyword}</p>
-        <p className="text-[11px] text-zinc-600 font-bold uppercase tracking-wider">{date}</p>
+        <Link href={`/dashboard/reports/${id}`} className="block">
+          <p className="text-[15px] font-bold text-white mb-1 group-hover:text-[#ff4500] transition-colors">{keyword}</p>
+          <p className="text-[11px] text-zinc-600 font-bold uppercase tracking-wider">{date}</p>
+        </Link>
       </td>
       <td className="px-8 py-6">
-        <p className="text-[14px] text-zinc-400 font-medium truncate max-w-[250px]">
-          {painPoint}
-        </p>
+        <Link href={`/dashboard/reports/${id}`} className="block">
+          <p className="text-[14px] text-zinc-400 font-medium truncate max-w-[250px]">
+            {painPoint}
+          </p>
+        </Link>
       </td>
       <td className="px-8 py-6 text-center">
-        <span className="text-lg font-black text-white px-3 py-1 bg-white/5 rounded-lg border border-white/5">
-          {score}
-        </span>
+        <Link href={`/dashboard/reports/${id}`} className="block">
+          <span className="text-lg font-black text-white px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+            {score}
+          </span>
+        </Link>
       </td>
       <td className="px-8 py-6">
-        <div className="flex items-center gap-2.5">
+        <Link href={`/dashboard/reports/${id}`} className="flex items-center gap-2.5">
           <div className={`w-2 h-2 rounded-full ${status === 'Live' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
           <span className="text-[11px] font-black text-white uppercase tracking-widest">
             {status}
           </span>
-        </div>
+        </Link>
       </td>
     </tr>
   );

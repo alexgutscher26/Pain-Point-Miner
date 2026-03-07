@@ -154,12 +154,15 @@ export default function ReportsPage() {
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <button className="px-4 py-2 rounded-lg bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-[#ff4500] hover:border-[#ff4500] transition-all shadow-lg active:scale-95 group/btn">
+                      <Link 
+                        href={`/dashboard/reports/${idx + 1}`}
+                        className="px-4 py-2 rounded-lg bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-[#ff4500] hover:border-[#ff4500] transition-all shadow-lg active:scale-95 group/btn"
+                      >
                          <span className="flex items-center gap-2">
                            View Report
                            <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                          </span>
-                      </button>
+                      </Link>
                       <button className="p-2 text-zinc-600 hover:text-white transition-colors">
                         <MoreVertical className="w-5 h-5" />
                       </button>
