@@ -1,14 +1,13 @@
 
-import { fetchSubredditPosts, fetchComments } from "@/lib/reddit";
-import { extractPainPoints } from "@/lib/ai";
 import { db } from "@/lib/db";
-import { painPoint, scraper, scraperRun } from "@/lib/db/schema";
+import { scraper, scraperRun } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
+import { executeMiningRun } from "@/lib/mining-runner";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -83,12 +82,6 @@ function arraysEqual(a: string[] | null | undefined, b: string[]) {
   return left.every((value, idx) => value === b[idx]);
 }
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
-  return "Unknown error";
-}
-
 export async function POST(req: Request) {
   const authContext = await requireApiContext(req);
   if (!authContext.ok) {
@@ -161,9 +154,7 @@ export async function POST(req: Request) {
     const executeSearch = async () => {
       // 1. Create a Scraping Job record
       const scraperId = crypto.randomUUID();
-      const runId = crypto.randomUUID();
-      const startTime = new Date();
-      let scraperCreated = false;
+
       try {
         const latestMatchingScraper = await db.query.scraper.findFirst({
           where: and(
@@ -218,105 +209,27 @@ export async function POST(req: Request) {
           workspaceId,
           updatedAt: new Date(),
         });
-        scraperCreated = true;
 
-        // 2. Determine scan parameters
-        const isDeep = miningDepth === "deep";
-        const subLimit = isDeep ? 10 : 5;
-        const postsPerSub = isDeep ? 25 : 15;
-        const now = Math.floor(Date.now() / 1000);
-        const threeMonthsAgo = now - (90 * 24 * 60 * 60);
-
-        // 3. Start fetching
-        let allPosts = [];
-        for (const sub of targetSubreddits.slice(0, subLimit)) { 
-          const posts = await fetchSubredditPosts(sub, keyword, postsPerSub, 'year'); 
-          allPosts.push(...posts);
-        }
-
-        // Strictly enforce the "3 months" rule for Basic Scan
-        if (!isDeep) {
-          allPosts = allPosts.filter(p => p.created_utc >= threeMonthsAgo);
-        }
-
-        // Let's process the first few posts as a sample for the live response
-        const processingResults = [];
-        const processingLimit = isDeep ? 10 : 3;
-        
-        for (const post of allPosts.slice(0, processingLimit)) { 
-          const comments = await fetchComments(post.id, post.subreddit);
-          const points = await extractPainPoints({
-            title: post.title,
-            selftext: post.selftext,
-            url: post.url,
-            author: post.author,
-            subreddit: post.subreddit,
-            comments: comments.map(c => ({ body: c.body }))
-          }, patterns);
-
-          if (points && points.length > 0) {
-            for (const point of points) {
-              await db.insert(painPoint).values({
-                id: crypto.randomUUID(),
-                title: point.title,
-                body: point.body,
-                score: point.painIntensity,
-                urgency: point.urgency,
-                monetizationScore: point.monetizationScore,
-                marketMaturity: point.marketMaturity,
-                budget: point.budget,
-                switchingCosts: point.switchingCosts,
-                triedSolutions: point.triedSolutions,
-                userId,
-                scraperId: scraperId,
-                subreddit: post.subreddit,
-                postUrl: post.url,
-                author: post.author,
-                sentiment: point.sentiment,
-                workspaceId,
-                updatedAt: new Date(),
-              });
-              processingResults.push(point);
-            }
-          }
-        }
-
-        // Insert Scraper Run record
-        await db.insert(scraperRun).values({
-          id: runId,
-          scraperId: scraperId,
-          status: "completed",
-          startedAt: startTime,
-          finishedAt: new Date(),
-          postsFetched: allPosts.length,
-          postsMatched: allPosts.length,
-          newPainPoints: processingResults.length,
-          commentsFetched: allPosts.reduce((acc, p) => acc + (p.num_comments || 0), 0),
+        const runResult = await executeMiningRun({
+          scraperId,
+          keyword,
+          subreddits: targetSubreddits,
+          customPatterns: patterns,
+          miningDepth,
+          userId,
+          workspaceId,
+          maxPostsPerSubreddit: miningDepth === "deep" ? 25 : 15,
+          processingLimit: miningDepth === "deep" ? 10 : 3,
         });
 
         return {
           success: true as const,
           duplicate: false,
           scraperId,
-          runId,
-          count: processingResults.length,
+          runId: runResult.runId,
+          count: runResult.newPainPoints,
         };
       } catch (error) {
-        // Persist failure reason for observability/debugging when a job fails after creation.
-        if (scraperCreated) {
-          await db.insert(scraperRun).values({
-            id: runId,
-            scraperId,
-            status: "failed",
-            startedAt: startTime,
-            finishedAt: new Date(),
-            postsFetched: 0,
-            postsMatched: 0,
-            commentsFetched: 0,
-            newPainPoints: 0,
-            error: getErrorMessage(error).slice(0, 2000),
-          });
-        }
         throw error;
       }
     };

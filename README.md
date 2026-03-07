@@ -34,3 +34,25 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Scheduled Reddit Scans
+
+This project supports high-volume recurring scan runs through `POST /api/search/scheduled`.
+
+### Required server env vars
+
+- `CRON_SECRET`: shared secret used by the scheduler trigger.
+- `SCHEDULED_BATCH_LIMIT` (optional, default `5`): number of due scrapers processed per trigger.
+- `SCHEDULED_MAX_POSTS_PER_SUBREDDIT` (optional, default `180`): cap per subreddit per run.
+- `SCHEDULED_MAX_SUBREDDITS` (optional, default `10`): subreddit count cap per run.
+- `SCHEDULED_PROCESSING_LIMIT` (optional, default `8`): number of fetched posts sent to AI extraction per run.
+- `REDDIT_USER_AGENT` (optional): custom Reddit user-agent string.
+
+### GitHub Actions scheduler
+
+Workflow file: `.github/workflows/scheduled-reddit-scan.yml`
+
+Required GitHub repository secrets:
+
+- `APP_BASE_URL`: deployed app URL (e.g. `https://your-app.vercel.app`)
+- `CRON_SECRET`: same value as server `CRON_SECRET`
