@@ -5,6 +5,7 @@ import { scraper, scraperRun } from "@/lib/db/schema";
 import { and, eq, desc, gte } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { normalizeRunStatus } from "@/lib/run-status";
 
 export async function GET(req: Request) {
   const authContext = await requireApiContext(req);
@@ -89,7 +90,12 @@ export async function GET(req: Request) {
         }),
         painPoints: pps.length,
         score: opportunityScore,
-        status: latestRun?.status === 'success' ? 'Completed' : 'In Progress'
+        status: (() => {
+          const normalized = normalizeRunStatus(latestRun?.status);
+          if (normalized === "completed") return "Completed";
+          if (normalized === "failed" || normalized === "canceled") return "Failed";
+          return "In Progress";
+        })()
       };
     });
 

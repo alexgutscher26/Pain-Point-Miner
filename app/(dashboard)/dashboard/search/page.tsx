@@ -1,19 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Rocket, 
   Zap, 
   Clock, 
   Target, 
-  Lightbulb,
   CheckCircle2,
   Sparkles,
-  ChevronRight,
   Loader2
 } from "lucide-react";
 import { toast } from "sonner";
+
+const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
+
+type SearchDraft = {
+  keyword: string;
+  subreddits: string;
+  customPatterns: string;
+  miningDepth: "basic" | "deep";
+  savedAt: string;
+};
 
 export default function SearchPage() {
   const router = useRouter();
@@ -24,6 +32,24 @@ export default function SearchPage() {
   const [suggestedSubreddits, setSuggestedSubreddits] = useState<string[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const requestInFlightRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      const rawDraft = localStorage.getItem(SEARCH_DRAFT_STORAGE_KEY);
+      if (!rawDraft) return;
+
+      const parsedDraft = JSON.parse(rawDraft) as SearchDraft;
+      setKeyword(parsedDraft.keyword ?? "");
+      setSubreddits(parsedDraft.subreddits ?? "");
+      setCustomPatterns(parsedDraft.customPatterns ?? "");
+      setMiningDepth(parsedDraft.miningDepth === "deep" ? "deep" : "basic");
+      setDraftSavedAt(parsedDraft.savedAt ?? null);
+    } catch {
+      localStorage.removeItem(SEARCH_DRAFT_STORAGE_KEY);
+    }
+  }, []);
 
   const handleSuggestSubreddits = async () => {
     if (!keyword || keyword.length < 3) return;
@@ -52,11 +78,16 @@ export default function SearchPage() {
   };
 
   const handleStartMining = async () => {
+    if (requestInFlightRef.current || isLoading) {
+      return;
+    }
+
     if (!keyword) {
       toast.error("Please enter a keyword to start mining.");
       return;
     }
 
+    requestInFlightRef.current = true;
     setIsLoading(true);
     try {
       const response = await fetch("/api/search", {
@@ -75,14 +106,33 @@ export default function SearchPage() {
       }
 
       const data = await response.json();
-      toast.success("Mining started successfully!");
+      if (data?.duplicate) {
+        toast.info("Investigation already running. Redirecting to existing analysis...");
+      } else {
+        toast.success("Mining started successfully!");
+      }
       router.push(`/dashboard/analysis?id=${data.scraperId}`);
     } catch (error) {
       console.error("Mining error:", error);
       toast.error("There was an error starting the investigation.");
     } finally {
       setIsLoading(false);
+      requestInFlightRef.current = false;
     }
+  };
+
+  const handleSaveDraft = () => {
+    const draft: SearchDraft = {
+      keyword: keyword.trim(),
+      subreddits: subreddits.trim(),
+      customPatterns: customPatterns.trim(),
+      miningDepth,
+      savedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(SEARCH_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    setDraftSavedAt(draft.savedAt);
+    toast.success("Draft saved.");
   };
 
   return (
@@ -273,11 +323,12 @@ export default function SearchPage() {
               </div>
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <button 
+                  onClick={handleSaveDraft}
                   disabled={isLoading}
                   className="flex-1 sm:flex-none text-[12px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
                   type="button"
                 >
-                  Save Draft
+                  {draftSavedAt ? "Update Draft" : "Save Draft"}
                 </button>
                 <button 
                   onClick={handleStartMining}

@@ -5,6 +5,7 @@ import { and, eq, desc } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { normalizeRunStatus } from "@/lib/run-status";
 
 const searchStatusQuerySchema = z.object({
   id: z.string().uuid("Invalid scraper id"),
@@ -63,7 +64,7 @@ export async function GET(req: Request) {
         scraper: currentScraper,
         latestRun,
         painPointCount: results.length,
-        status: latestRun?.status || 'started',
+        status: normalizeRunStatus(latestRun?.status),
     }, 200, correlationId);
   } catch (error) {
     console.error("Status API Error:", error);

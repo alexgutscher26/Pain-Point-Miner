@@ -66,6 +66,18 @@ export default function ReportsPage() {
     fetchReports();
   }, [fetchReports]);
 
+  // Real-time polling while active scans exist
+  useEffect(() => {
+    const hasActiveScans = reports.some((report) => report.status === "In Progress");
+    if (!hasActiveScans) return;
+
+    const pollInterval = setInterval(() => {
+      fetchReports();
+    }, 4000);
+
+    return () => clearInterval(pollInterval);
+  }, [reports, fetchReports]);
+
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
       {/* Header Area */}
@@ -228,6 +240,11 @@ export default function ReportsPage() {
                         <div className="flex items-center gap-2 text-emerald-500">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
                           <span className="text-[11px] font-black uppercase tracking-widest">Analyzed</span>
+                        </div>
+                      ) : report.status === "Failed" ? (
+                        <div className="flex items-center gap-2 text-rose-500">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"></div>
+                          <span className="text-[11px] font-black uppercase tracking-widest">Failed</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-[#ff4500]">

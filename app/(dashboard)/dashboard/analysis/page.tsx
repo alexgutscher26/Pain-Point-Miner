@@ -38,25 +38,38 @@ export default function AnalysisPage() {
   const [progress, setProgress] = useState(15);
   const [statusText, setStatusText] = useState("Initializing Reddit data pipeline...");
   const [isDone, setIsDone] = useState(false);
+  const [hasFailed, setHasFailed] = useState(false);
   const [stats, setStats] = useState<ScraperStatusData | null>(null);
 
   // Poll for status
   useEffect(() => {
     if (!scraperId) return;
 
+    let isActive = true;
     const pollInterval = setInterval(async () => {
       try {
         const response = await fetch(`/api/search/status?id=${scraperId}`);
         if (!response.ok) throw new Error("Status check failed");
         
         const data = await response.json();
+        if (!isActive) return;
         setStats(data);
 
         // Map status to progress (This is a simplified approach)
-        if (data.status === 'success') {
+        if (data.status === 'completed') {
           setProgress(100);
           setStatusText("Analysis complete. Found " + data.painPointCount + " pain points.");
           setIsDone(true);
+          setHasFailed(false);
+          clearInterval(pollInterval);
+        } else if (data.status === "failed" || data.status === "canceled") {
+          setProgress((prev) => Math.max(prev, 95));
+          setStatusText(
+            data.status === "failed"
+              ? "Analysis failed. Please retry this scan."
+              : "Analysis was canceled."
+          );
+          setHasFailed(true);
           clearInterval(pollInterval);
         } else {
           // Increment progress slightly while waiting
@@ -68,12 +81,15 @@ export default function AnalysisPage() {
       }
     }, 2000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      isActive = false;
+      clearInterval(pollInterval);
+    };
   }, [scraperId]);
 
   // Derived step status
   const steps = useMemo(() => {
-    const isSuccess = stats?.status === 'success';
+    const isSuccess = stats?.status === 'completed';
     const hasPoints = (stats?.painPointCount || 0) > 0;
     
     return [
@@ -189,7 +205,7 @@ export default function AnalysisPage() {
             onClick={() => router.push(`/dashboard/reports/${scraperId}`)}
             className="px-6 py-2.5 rounded-xl bg-[#ff4500] text-white text-[12px] font-black uppercase tracking-widest border border-[#ff4500]/30 flex items-center gap-2 disabled:bg-white/5 disabled:text-zinc-500 disabled:border-white/5 disabled:cursor-not-allowed group transition-all"
           >
-            {isDone ? "View Detailed Report" : "Processing..."} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            {isDone ? "View Detailed Report" : hasFailed ? "Scan Failed" : "Processing..."} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>

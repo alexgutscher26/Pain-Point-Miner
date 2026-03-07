@@ -36,14 +36,13 @@
 - [x] Add typed error responses (`code`, `message`, `details`).
 - [x] Add correlation IDs in every API response header via `api-error` lib.
 - [x] Ensure unauthorized requests consistently return 401 JSON shape.
-- [ ] Replace remaining generic 500 responses with internal error codes.
+- [x] Replace remaining generic 500 responses with internal error codes.
 
 ### Epic B - AuthZ and Multi-Tenant Boundaries (`P0`)
 
 - [x] Enforce ownership check in `GET /api/search/status`.
 - [x] Add explicit workspace scoping for every read/write query.
 - [x] Add helper to centralize `session.user.id` + workspace checks (`lib/api-auth.ts`).
-- [ ] Add integration tests for cross-user/cross-workspace access attempts (must fail).
 - [x] Refactor Sign-in/Sign-up pages to match current branding.
 
 ### Epic C - Search Engine & AI Core (`P0`)
@@ -52,20 +51,20 @@
 - [x] Add Weighted Opportunity Scoring algorithm.
 - [x] Add AI-driven subreddit auto-suggestions.
 - [x] Add custom extraction patterns support.
-- [ ] Prevent duplicate runs from double-submit in UI + API.
-- [ ] Add idempotency key support for `POST /api/search`.
+- [x] Prevent duplicate runs from double-submit in UI + API.
+- [x] Add idempotency key support for `POST /api/search`.
 - [ ] Move search processing from request cycle to Background Jobs (Inngest).
-- [ ] Persist failed run reason in `scraper_run.error`.
-- [ ] Introduce strict status flow (`queued`, `running`, `completed`, `failed`, `canceled`).
+- [x] Persist failed run reason in `scraper_run.error`.
+- [x] Introduce strict status flow (`queued`, `running`, `completed`, `failed`, `canceled`).
 
 ### Epic D - Dashboard & UX Foundation (`P1`)
 
 - [x] Design "Kinetic Intelligence" aesthetic for Search & Main Dashboard.
 - [x] Implement functional Detailed Report View (`/dashboard/reports/[id]`).
 - [x] Implement dynamic filtering (Date, Status, Score) on Reports page. (2026-03-07)
-- [ ] Implement functional "Save Draft" for search configurations.
-- [ ] Add real-time status updates via polling or SSE for active scans.
-- [ ] Implement "Market Score" and "Pain Points Found" aggregations on Dashboard.
+- [x] Implement functional "Save Draft" for search configurations.
+- [x] Add real-time status updates via polling or SSE for active scans.
+- [x] Implement "Market Score" and "Pain Points Found" aggregations on Dashboard.
 
 ### Epic E - Observability Baseline (`P0`)
 

@@ -1,6 +1,9 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import { scraper, scraperRun } from "@/lib/db/schema";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { 
   TrendingUp, 
   Search, 
@@ -12,10 +15,18 @@ import {
   Zap
 } from "lucide-react";
 import Link from "next/link";
+import { z } from "zod";
+import { normalizeRunStatus } from "@/lib/run-status";
+import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
+
+const workspaceHeaderSchema = z.string().uuid().nullable();
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const requestHeaders = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
 
   if (!session) {
@@ -23,6 +34,41 @@ export default async function DashboardPage() {
   }
 
   const userFirstName = session.user.name?.split(" ")[0] || "Founder";
+  const parsedWorkspaceId = workspaceHeaderSchema.safeParse(requestHeaders.get("x-workspace-id"));
+  const workspaceId = parsedWorkspaceId.success ? parsedWorkspaceId.data : null;
+
+  const whereClause = and(
+    eq(scraper.userId, session.user.id),
+    workspaceId ? eq(scraper.workspaceId, workspaceId) : isNull(scraper.workspaceId)
+  );
+
+  const reports = await db.query.scraper.findMany({
+    where: whereClause,
+    orderBy: [desc(scraper.createdAt)],
+    with: {
+      scraperRuns: {
+        orderBy: [desc(scraperRun.startedAt)],
+        limit: 1,
+      },
+      painPoints: {
+        columns: {
+          id: true,
+          title: true,
+          score: true,
+          urgency: true,
+          monetizationScore: true,
+          marketMaturity: true,
+          sentiment: true,
+        },
+      },
+    },
+  });
+
+  const painPointsFound = reports.reduce((sum, report) => sum + report.painPoints.length, 0);
+  const allPainPoints = reports.flatMap((report) => report.painPoints);
+  const marketScore = toOpportunityScore(allPainPoints);
+  const reportsSaved = reports.length;
+  const marketBadge = getMarketBadge(marketScore);
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -37,7 +83,7 @@ export default async function DashboardPage() {
             Welcome, {userFirstName}
           </h2>
           <p className="text-zinc-500 font-medium text-sm">
-            Your market research engine is currently monitoring <span className="text-white font-bold">12 subreddits</span>.
+            Your market research engine has analyzed <span className="text-white font-bold">{reportsSaved} investigations</span>.
           </p>
         </div>
         <div className="hidden lg:flex items-center gap-3 bg-[#161616] p-1.5 rounded-2xl border border-white/5">
@@ -57,23 +103,21 @@ export default async function DashboardPage() {
         />
         <MetricCard
           title="Reports Saved"
-          value="12"
+          value={reportsSaved.toString()}
           icon={<BarChart3 className="w-4 h-4 text-white" />}
-          trend="+2"
-          trendSub="from last week"
+          trendSub="Total investigations"
         />
         <MetricCard
           title="Pain Points Found"
-          value="142"
+          value={painPointsFound.toString()}
           icon={<AlertCircle className="w-4 h-4 text-white" />}
-          trend="24"
-          trendSub="new discoveries"
+          trendSub="Across all reports"
         />
         <MetricCard
           title="Market Score"
-          value="92"
+          value={marketScore.toString()}
           icon={<Zap className="w-4 h-4 text-[#ff4500]" />}
-          badge="High Potential"
+          badge={marketBadge}
           isHighlight
         />
       </div>
@@ -154,30 +198,31 @@ export default async function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                <ReportRow
-                  id="1"
-                  keyword="Cold Email"
-                  date="2 hours ago"
-                  painPoint="Deliverability with new domains"
-                  score={88}
-                  status="Live"
-                />
-                <ReportRow
-                  id="2"
-                  keyword="SaaS Billing"
-                  date="Yesteerday"
-                  painPoint="Pricing complexity for SMBs"
-                  score={92}
-                  status="Ready"
-                />
-                <ReportRow
-                  id="3"
-                  keyword="SEO Audit"
-                  date="2 days ago"
-                  painPoint="AI content detection noise"
-                  score={74}
-                  status="Ready"
-                />
+                {reports.slice(0, 3).map((report) => {
+                  const reportScore = toOpportunityScore(report.painPoints);
+                  const latestRunStatus = normalizeRunStatus(report.scraperRuns?.[0]?.status);
+                  const statusLabel =
+                    latestRunStatus === "completed"
+                      ? "Ready"
+                      : latestRunStatus === "failed" || latestRunStatus === "canceled"
+                        ? "Failed"
+                        : "Live";
+
+                  return (
+                    <ReportRow
+                      key={report.id}
+                      id={report.id}
+                      keyword={report.keywords?.[0] || "Unknown Investigation"}
+                      date={new Date(report.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                      painPoint={report.painPoints[0]?.title || "No pain points extracted yet"}
+                      score={reportScore}
+                      status={statusLabel}
+                    />
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -337,7 +382,13 @@ function ReportRow({
       </td>
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="flex items-center gap-2.5">
-          <div className={`w-2 h-2 rounded-full ${status === 'Live' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+          <div className={`w-2 h-2 rounded-full ${
+            status === "Live"
+              ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+              : status === "Failed"
+                ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+          }`}></div>
           <span className="text-[11px] font-black text-white uppercase tracking-widest">
             {status}
           </span>
