@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { scraper, scraperRun } from "@/lib/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, gte } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 
@@ -12,14 +12,27 @@ export async function GET(req: Request) {
     return authContext.response;
   }
   const { correlationId, userId, workspaceId } = authContext.context;
+  const { searchParams } = new URL(req.url);
+  
+  const days = searchParams.get("days");
+  const statusParam = searchParams.get("status");
+  const minScore = parseInt(searchParams.get("minScore") || "0");
 
   try {
+    let whereClause = and(
+      eq(scraper.userId, userId),
+      workspaceScope(scraper.workspaceId, workspaceId)
+    );
+
+    if (days && days !== "all") {
+      const date = new Date();
+      date.setDate(date.getDate() - parseInt(days));
+      whereClause = and(whereClause, gte(scraper.createdAt, date));
+    }
+
     // Get all scrapers for the user
     const reportsRes = await db.query.scraper.findMany({
-      where: and(
-        eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId)
-      ),
+      where: whereClause,
       orderBy: [desc(scraper.createdAt)],
       with: {
         scraperRuns: {
@@ -39,7 +52,7 @@ export async function GET(req: Request) {
       }
     });
 
-    const formattedReports = (reportsRes as any[]).map(r => {
+    let formattedReports = (reportsRes as any[]).map(r => {
       const latestRun = r.scraperRuns?.[0];
       const pps = (r.painPoints || []) as { score: number, urgency: number, monetizationScore: number, marketMaturity: number, sentiment: string | null }[];
       
@@ -79,6 +92,18 @@ export async function GET(req: Request) {
         status: latestRun?.status === 'success' ? 'Completed' : 'In Progress'
       };
     });
+
+    // Apply status filter
+    if (statusParam && statusParam !== "all") {
+        formattedReports = formattedReports.filter(r => 
+            statusParam === "completed" ? r.status === "Completed" : r.status === "In Progress"
+        );
+    }
+
+    // Apply score filter
+    if (minScore > 0) {
+        formattedReports = formattedReports.filter(r => r.score >= minScore);
+    }
 
     return apiJson(formattedReports, 200, correlationId);
   } catch (error) {

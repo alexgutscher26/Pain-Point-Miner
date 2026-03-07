@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { 
   Plus, 
   Calendar, 
@@ -15,6 +15,15 @@ import {
   Database
 } from "lucide-react";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 interface Report {
     id: string;
@@ -28,22 +37,34 @@ interface Report {
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filter states
+  const [days, setDays] = useState("30");
+  const [status, setStatus] = useState("all");
+  const [minScore, setMinScore] = useState("70");
+
+  const fetchReports = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        days,
+        status,
+        minScore,
+      });
+      const response = await fetch(`/api/reports?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to fetch reports");
+      const data = await response.json();
+      setReports(data);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [days, status, minScore]);
 
   useEffect(() => {
-    async function fetchReports() {
-      try {
-        const response = await fetch("/api/reports");
-        if (!response.ok) throw new Error("Failed to fetch reports");
-        const data = await response.json();
-        setReports(data);
-      } catch (error) {
-        console.error("Error fetching reports:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
     fetchReports();
-  }, []);
+  }, [fetchReports]);
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -70,9 +91,65 @@ export default function ReportsPage() {
 
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-4 bg-[#0c0c0c] p-2 rounded-2xl border border-white/5">
-        <FilterButton icon={<Calendar className="w-4 h-4" />} label="Last 30 Days" />
-        <FilterButton icon={<Filter className="w-4 h-4" />} label="Status: All" />
-        <FilterButton icon={<Star className="w-4 h-4" />} label="Min Score: 70+" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group outline-none">
+              <Calendar className="w-4 h-4 text-zinc-500 group-hover:text-[#ff4500] transition-colors" />
+              {days === "all" ? "All Time" : `Last ${days} Days`}
+              <ChevronRight className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity w-3.5 h-3.5 rotate-90" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#0c0c0c] border-white/10 text-zinc-400">
+            <DropdownMenuLabel className="text-zinc-500">Date Range</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuRadioGroup value={days} onValueChange={setDays}>
+              <DropdownMenuRadioItem value="7" className="focus:bg-[#ff4500]/10 focus:text-white">Last 7 Days</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="30" className="focus:bg-[#ff4500]/10 focus:text-white">Last 30 Days</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="90" className="focus:bg-[#ff4500]/10 focus:text-white">Last 90 Days</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="all" className="focus:bg-[#ff4500]/10 focus:text-white">All Time</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group outline-none">
+              <Filter className="w-4 h-4 text-zinc-500 group-hover:text-[#ff4500] transition-colors" />
+              Status: {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
+              <ChevronRight className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity w-3.5 h-3.5 rotate-90" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#0c0c0c] border-white/10 text-zinc-400">
+            <DropdownMenuLabel className="text-zinc-500">Scraper Status</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
+              <DropdownMenuRadioItem value="all" className="focus:bg-[#ff4500]/10 focus:text-white">All Statuses</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="completed" className="focus:bg-[#ff4500]/10 focus:text-white">Completed</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="in-progress" className="focus:bg-[#ff4500]/10 focus:text-white">In Progress</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group outline-none">
+              <Star className="w-4 h-4 text-zinc-500 group-hover:text-[#ff4500] transition-colors" />
+              Min Score: {minScore}+
+              <ChevronRight className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity w-3.5 h-3.5 rotate-90" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#0c0c0c] border-white/10 text-zinc-400">
+            <DropdownMenuLabel className="text-zinc-500">Minimum Opportunity Score</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuRadioGroup value={minScore} onValueChange={setMinScore}>
+              <DropdownMenuRadioItem value="0" className="focus:bg-[#ff4500]/10 focus:text-white">Any Score</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="50" className="focus:bg-[#ff4500]/10 focus:text-white">50+</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="70" className="focus:bg-[#ff4500]/10 focus:text-white">70+</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="85" className="focus:bg-[#ff4500]/10 focus:text-white">85+ (High Potential)</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className="ml-auto px-4 hidden sm:block">
            <p className="text-[11px] font-bold text-zinc-600 uppercase tracking-widest">
              {isLoading ? "Counting records..." : `Showing ${reports.length} results`}
@@ -214,18 +291,6 @@ export default function ReportsPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function FilterButton({ icon, label }: { icon: React.ReactNode, label: string }) {
-  return (
-    <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group">
-       <span className="text-zinc-500 group-hover:text-[#ff4500] transition-colors">{icon}</span>
-       {label}
-       <span className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity">
-         <ChevronRight className="w-3.5 h-3.5 rotate-90" />
-       </span>
-    </button>
   );
 }
 
