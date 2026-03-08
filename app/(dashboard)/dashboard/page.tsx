@@ -92,6 +92,16 @@ export default async function DashboardPage() {
   const urgentPainPointMentions = urgentPainPoint
     ? allPainPoints.filter((point) => point.title === urgentPainPoint.title).length
     : 0;
+  const trendingReport = trendingInsight
+    ? reports.find(
+        (report) => report.keywords?.[0]?.trim().toLowerCase() === trendingInsight.key
+      )
+    : null;
+  const urgentPainPointReport = urgentPainPoint
+    ? reports.find((report) =>
+        report.painPoints.some((point) => point.title === urgentPainPoint.title)
+      )
+    : null;
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -273,7 +283,14 @@ export default async function DashboardPage() {
             <div className="space-y-8">
               <div>
                 <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Trending Niche</p>
-                <div className="flex items-center gap-4 bg-white/3 p-4 rounded-2xl border border-white/5">
+                <Link
+                  href={
+                    trendingReport
+                      ? `/dashboard/reports/${trendingReport.id}`
+                      : `/dashboard/search?keyword=${encodeURIComponent(trendingInsight?.key || "")}`
+                  }
+                  className="flex items-center gap-4 bg-white/3 p-4 rounded-2xl border border-white/5 hover:border-[#ff4500]/30 transition-colors"
+                >
                   <div className="w-12 h-12 rounded-xl bg-[#ff4500]/10 flex items-center justify-center text-[#ff4500]">
                     <Sparkles className="w-6 h-6" />
                   </div>
@@ -289,15 +306,22 @@ export default async function DashboardPage() {
                         : "Run more searches to detect trend"}
                     </p>
                   </div>
-                </div>
+                </Link>
               </div>
               <div className="pt-6 border-t border-white/10">
                 <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Urgent Pain Point</p>
-                <div className="bg-zinc-900 p-5 rounded-2xl border-l-4 border-[#ff4500]">
+                <Link
+                  href={
+                    urgentPainPointReport
+                      ? `/dashboard/reports/${urgentPainPointReport.id}`
+                      : "/dashboard/reports"
+                  }
+                  className="block bg-zinc-900 p-5 rounded-2xl border-l-4 border-[#ff4500] hover:bg-zinc-800/60 transition-colors"
+                >
                   <p className="text-[14px] text-zinc-200 font-medium italic leading-relaxed">
                     &quot;{urgentPainPoint?.title || "No high-urgency pain point detected yet."}&quot;
                   </p>
-                </div>
+                </Link>
                 <p className="text-[11px] text-zinc-500 mt-4 font-bold flex items-center gap-2">
                    <Database className="w-3.5 h-3.5" /> Found in {urgentPainPointMentions || 0} investigations
                 </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Check, Search, TrendingUp, Activity, Bell, Zap, Database, BarChart3, Users, Globe, Layout, Layers, Magnet, RotateCw, Sparkles, Rocket } from "lucide-react";
+import { ArrowRight, Check, Magnet, RotateCw } from "lucide-react";
 
 export function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
@@ -81,7 +81,9 @@ export function Pricing() {
 
         {/* Growth Plan - Featured */}
         <div className="bg-[#141414] border-2 border-[#ff4500]/40 rounded-2xl flex flex-col shadow-[0_0_40px_rgba(255,69,0,0.1)] relative overflow-hidden group scale-105 z-20">
-          <div className="absolute top-0 right-0 bg-[#ff4500] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-lg">Most Popular</div>
+          <div className="absolute top-0 right-0 bg-linear-to-r from-[#ff4500] to-[#ff571a] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-lg flex items-center gap-1.5 shadow-lg border-b border-l border-white/20">
+            <span className="text-[12px]">⭐</span> Most Popular
+          </div>
           <div className="absolute inset-0 bg-gradient-to-b from-[#ff4500]/5 to-transparent"></div>
           
           <div className="p-8 pb-6 relative z-10">
