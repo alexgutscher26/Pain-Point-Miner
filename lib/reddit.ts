@@ -115,12 +115,24 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
   throw lastError instanceof Error ? lastError : new Error("Reddit request failed");
 }
 
+/** Checks if the given error indicates a Reddit blocked error. */
 function isRedditBlockedError(error: unknown) {
   if (!(error instanceof Error)) return false;
   const message = error.message.toLowerCase();
   return message.includes("403") || message.includes("blocked");
 }
 
+/**
+ * Fetch submissions from the PullPush API based on subreddit and keyword.
+ *
+ * This function constructs a URL with search parameters for subreddit and keyword, limits the number of posts to a maximum of 250, and fetches the data from the PullPush API. It checks the response for errors and processes the JSON data, filtering and mapping it to a specific format before returning an array of RedditPost objects.
+ *
+ * @param subreddit - The subreddit to search within.
+ * @param keyword - The keyword to search for in submissions.
+ * @param maxPosts - The maximum number of posts to retrieve, capped at 250.
+ * @returns A promise that resolves to an array of RedditPost objects.
+ * @throws Error If the PullPush API response is not ok.
+ */
 async function fetchFromPullPushSubmissions(
   subreddit: string,
   keyword: string,
@@ -155,6 +167,18 @@ async function fetchFromPullPushSubmissions(
     }));
 }
 
+/**
+ * Fetch comments from the PullPush API for a given Reddit post.
+ *
+ * This function constructs a URL with query parameters based on the provided postId,
+ * makes an asynchronous request to the PullPush API, and processes the response.
+ * It filters and maps the response data to return an array of RedditComment objects,
+ * ensuring that only valid comments with required fields are included.
+ *
+ * @param postId - The ID of the Reddit post for which comments are to be fetched.
+ * @returns A promise that resolves to an array of RedditComment objects.
+ * @throws Error If the PullPush API response is not ok.
+ */
 async function fetchFromPullPushComments(postId: string): Promise<RedditComment[]> {
   const params = new URLSearchParams({
     link_id: postId,
@@ -202,6 +226,7 @@ export const fetchSubredditPosts = async (
  * This function retrieves posts from Reddit by constructing a search URL with the provided subreddit and keyword.
  * It handles pagination using the 'after' parameter and respects the specified limits for maximum posts, request limits, and delays between requests.
  * The function continues fetching until the desired number of posts is collected or no more posts are available.
+ * In case of a blocked request, it attempts to fetch posts from a fallback source.
  *
  * @param subreddit - The name of the subreddit to fetch posts from.
  * @param keyword - The keyword to search for in the subreddit posts.
@@ -290,7 +315,7 @@ export async function fetchSubredditPostsBatched(
 /**
  * Fetch comments from a Reddit post.
  *
- * This function constructs a URL to retrieve comments for a specific post in a given subreddit. It uses the fetchWithRetry function to handle network requests and retries. The response is processed to extract comment nodes, and a helper function, extractReplies, is used to recursively gather replies to comments. In case of an error during the fetch operation, it logs the error and returns an empty array.
+ * This function constructs a URL to retrieve comments for a specific post in a given subreddit. It utilizes the fetchWithRetry function to handle network requests and retries, processes the response to extract comment nodes, and employs a helper function, extractReplies, to recursively gather replies to comments. In case of a fetch error, it attempts to fetch from a fallback source and logs any encountered errors.
  *
  * @param postId - The ID of the Reddit post for which comments are to be fetched.
  * @param subreddit - The name of the subreddit containing the post.
