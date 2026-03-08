@@ -16,10 +16,25 @@
       "sourceType": "github",
       "computedHash": "1ad7ac7488d2050dfd7d64c592a64f86f8ec9a1a871b571544b1a997031c3f38"
     },
+    "add-neon-docs": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "f281548afc855d8555072664627beeb54bf8b9d3fbdf319224ba448ae498f911"
+    },
+    "agentic-engineering": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "bb94a05897dcf53c8548885da09427b0537d98dc84755d6e2e9e65111df9ae71"
+    },
     "ai-agents-architect": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "8a5ff990847b2c45503aa4608c6e4586121a6f5461c025790bfe36c52abdb52f"
+    },
+    "ai-first-engineering": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "e6a54a137c855d5ad07ab9f8f4cf2175be5ab5e56a378f876f2235a6a516b93c"
     },
     "ai-product": {
       "source": "davila7/claude-code-templates",
@@ -31,15 +46,50 @@
       "sourceType": "github",
       "computedHash": "af373b9f2c97298d67eba130688c0238ef0ba787c4929277ac2d23c01012316c"
     },
+    "analyze-github-action-logs": {
+      "source": "withastro/astro",
+      "sourceType": "github",
+      "computedHash": "53622fe02c454c2f58fc46ad3812d4c950cfb91e701e7cede8304d72f6d50797"
+    },
+    "article-writing": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "c6b3dc9b8503229a33d4adb30f5a29986c13639479d789881aa3d24dc1bbff6d"
+    },
+    "brand-guidelines": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "cf41642f38f35bcae5bbf59215f0ee629d5f6a54b4811454f6cb93bc9b12b69e"
+    },
+    "changelog-generator": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "f84bcb773a67ade28878d63103e3d4dc1f5031d6103be5107ff99c15b8d4a992"
+    },
     "code-reviewer": {
       "source": "google-gemini/gemini-cli",
       "sourceType": "github",
       "computedHash": "270f0dd1d4c15a798bad5253a309cdc2056fe5322f99ba06ca22ce50581adc02"
     },
+    "create-plan": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "304edde95edfd9ca37b1077168874e0722fba2036b510f121ce6ce2d2c3b0e37"
+    },
     "design-principles": {
       "source": "srbhr/Resume-Matcher",
       "sourceType": "github",
       "computedHash": "fafed0051790439ebb4ab301b193fa74a5b28ba97c4499fba9a1f5a8013780bd"
+    },
+    "documentation-lookup": {
+      "source": "upstash/context7",
+      "sourceType": "github",
+      "computedHash": "a15c798abfbb50a634b5be9faae295f255d8c0d90951f4701051f3a2c3949813"
+    },
+    "domain-name-brainstormer": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "d8cdaa1279f4447fdd766bed9a566346ff2e72db822b4b3695fe033701903af6"
     },
     "feature-flags": {
       "source": "facebook/react",
@@ -66,6 +116,36 @@
       "sourceType": "github",
       "computedHash": "398701f802cf5dc66f85d13068de77442c4599f1b98121da6f49989d2be8a70e"
     },
+    "neon-auth": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "50efaafcd531c19077999d7d5db2090b23471da6bfcaaa3f219be0d32d3ef94c"
+    },
+    "neon-drizzle": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "0482bc2eb4cd2a93f005843800969eb3d76f5ef32c781efab4f194b03edbd431"
+    },
+    "neon-js": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "71dd9e5c5cd2f8cac25177af9667830b8503a8dd2ee187ca1a60eb6858b5ef20"
+    },
+    "neon-serverless": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "ee61561ebb65a3df0661da68a2e11daf685f85324be3249624c0dab1036717a0"
+    },
+    "neon-toolkit": {
+      "source": "neondatabase/ai-rules",
+      "sourceType": "github",
+      "computedHash": "6403dfa5100ede655ba1b076d728bbcf6e685039ab31548eb6c330e4ad240460"
+    },
+    "powershell-windows": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "a5826d34e236673f7b06aa37c92121f31cffcd0dc405e79a63a97060114f3876"
+    },
     "pricing-strategy": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
@@ -81,10 +161,20 @@
       "sourceType": "github",
       "computedHash": "11ca78c0f5ac7585286331df5ba0ba6a9f3014b0844abea7fb01de5f7933f21e"
     },
+    "react-email": {
+      "source": "resend/react-email",
+      "sourceType": "github",
+      "computedHash": "5abde077d6f10a25727a52f8d3ad5bf8c56e8ab17c277e3de32a0a3c32bf6f06"
+    },
     "react-ui-patterns": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "60d5bc3b421fd351c0e69e4f96bae87de60ef415429a70c0691d36360c298b2b"
+    },
+    "referral-program": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "6c0e2ef66e0b8ab2f77bcc375b3c63fb75c5350db86762a0548aef25e16f8fbc"
     },
     "seo": {
       "source": "davila7/claude-code-templates",
@@ -105,6 +195,16 @@
       "source": "shadcn/ui",
       "sourceType": "github",
       "computedHash": "b1cc1defe03f0e8f78652b7d20e4d4e6421babc2b45835d4f361afe684dc47a2"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "github",
+      "computedHash": "73f561093b573e72f0bc3009e024df6c43eeb8ea0f8765e3bb68300e5ee9b9e1"
+    },
+    "twitter-algorithm-optimizer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "884dc0134ab732642c1060d581ec6016158d334a7d3da86725ddd78b7da80792"
     },
     "ui-review": {
       "source": "srbhr/Resume-Matcher",

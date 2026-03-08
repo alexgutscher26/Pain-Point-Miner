@@ -1,10 +1,10 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { painPoint, scraper, scraperRun } from "@/lib/db/schema";
+import { keywordStat, painPoint, scraper, scraperRun } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import { fetchComments, fetchSubredditPostsBatched, type RedditPost } from "@/lib/reddit";
 
-export type MiningDepth = "basic" | "deep";
+export type MiningDepth = "basic" | "deep" | "advanced";
 
 type ExecuteMiningRunInput = {
   scraperId: string;
@@ -57,10 +57,11 @@ export async function executeMiningRun({
 }: ExecuteMiningRunInput): Promise<ExecuteMiningRunResult> {
   const runId = crypto.randomUUID();
   const startTime = new Date();
-  const isDeep = miningDepth === "deep";
-  const subLimit = maxSubreddits ?? (isDeep ? 10 : 5);
-  const postsPerSub = maxPostsPerSubreddit ?? (isDeep ? 250 : 120);
-  const analyzeLimit = processingLimit ?? (isDeep ? 10 : 3);
+  const isBasic = miningDepth === "basic";
+  const isAdvanced = miningDepth === "advanced";
+  const subLimit = maxSubreddits ?? (isAdvanced ? 15 : miningDepth === "deep" ? 10 : 5);
+  const postsPerSub = maxPostsPerSubreddit ?? (isAdvanced ? 350 : miningDepth === "deep" ? 250 : 120);
+  const analyzeLimit = processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
 
   try {
     let allPosts: RedditPost[] = [];
@@ -76,7 +77,7 @@ export async function executeMiningRun({
 
     allPosts = dedupePosts(allPosts);
 
-    if (!isDeep) {
+    if (isBasic) {
       const nowSeconds = Math.floor(Date.now() / 1_000);
       const threeMonthsAgo = nowSeconds - 90 * 24 * 60 * 60;
       allPosts = allPosts.filter((post) => post.created_utc >= threeMonthsAgo);
@@ -122,6 +123,8 @@ export async function executeMiningRun({
           postUrl: post.url,
           author: post.author,
           sentiment: point.sentiment,
+          commentCount: comments.length,
+          mentionCount: 1,
           workspaceId,
           updatedAt: new Date(),
         });
@@ -140,6 +143,26 @@ export async function executeMiningRun({
       commentsFetched,
       newPainPoints,
     });
+
+    await db
+      .insert(keywordStat)
+      .values({
+        id: crypto.randomUUID(),
+        keyword: keyword.toLowerCase(),
+        painPointsFound: newPainPoints,
+        lastMatchedAt: newPainPoints > 0 ? new Date() : null,
+        scraperId,
+        userId,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: [keywordStat.scraperId, keywordStat.keyword],
+        set: {
+          painPointsFound: newPainPoints,
+          lastMatchedAt: newPainPoints > 0 ? new Date() : null,
+          updatedAt: new Date(),
+        },
+      });
 
     await db
       .update(scraper)

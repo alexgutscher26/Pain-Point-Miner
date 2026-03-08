@@ -19,13 +19,15 @@ type SearchDraft = {
   keyword: string;
   subreddits: string;
   customPatterns: string;
-  miningDepth: "basic" | "deep";
+  miningDepth: "basic" | "deep" | "advanced";
   savedAt: string;
 };
 
+type MiningDepth = SearchDraft["miningDepth"];
+
 export default function SearchPage() {
   const router = useRouter();
-  const [miningDepth, setMiningDepth] = useState<"basic" | "deep">("basic");
+  const [miningDepth, setMiningDepth] = useState<MiningDepth>("basic");
   const [keyword, setKeyword] = useState("");
   const [subreddits, setSubreddits] = useState("");
   const [customPatterns, setCustomPatterns] = useState("");
@@ -44,7 +46,13 @@ export default function SearchPage() {
       setKeyword(parsedDraft.keyword ?? "");
       setSubreddits(parsedDraft.subreddits ?? "");
       setCustomPatterns(parsedDraft.customPatterns ?? "");
-      setMiningDepth(parsedDraft.miningDepth === "deep" ? "deep" : "basic");
+      setMiningDepth(
+        parsedDraft.miningDepth === "advanced"
+          ? "advanced"
+          : parsedDraft.miningDepth === "deep"
+            ? "deep"
+            : "basic"
+      );
       setDraftSavedAt(parsedDraft.savedAt ?? null);
     } catch {
       localStorage.removeItem(SEARCH_DRAFT_STORAGE_KEY);
@@ -260,7 +268,7 @@ export default function SearchPage() {
               <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
                 Mining Depth
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
                   onClick={() => setMiningDepth("basic")}
                   className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group ${
@@ -305,6 +313,26 @@ export default function SearchPage() {
                     </div>
                   )}
                 </button>
+
+                <button 
+                  onClick={() => setMiningDepth("advanced")}
+                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group ${
+                    miningDepth === "advanced" 
+                      ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]" 
+                      : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
+                  }`}
+                >
+                  <div className={`p-3 rounded-xl ${miningDepth === "advanced" ? "bg-violet-500 text-white" : "bg-white/5 text-zinc-500"}`}>
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className={`font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "advanced" ? "text-white" : "text-zinc-400"}`}>Advanced Clustering</p>
+                    <p className="text-zinc-500 text-[11px] font-bold">Deep scan + advanced pain-point clustering</p>
+                  </div>
+                  <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${miningDepth === "advanced" ? "border-[#ff4500]" : "border-zinc-800"}`}>
+                    {miningDepth === "advanced" && <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>}
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -314,7 +342,7 @@ export default function SearchPage() {
                  <Clock className="w-4 h-4" />
                  Est. time: ~{(() => {
                    const subCount = subreddits.split(',').filter(s => s.trim()).length || 4;
-                   const depthMultiplier = miningDepth === "deep" ? 3 : 1;
+                   const depthMultiplier = miningDepth === "advanced" ? 5 : miningDepth === "deep" ? 3 : 1;
                    const totalSeconds = (subCount * 15) * depthMultiplier;
                    return totalSeconds >= 60 
                     ? `${Math.round(totalSeconds / 60)} minutes` 

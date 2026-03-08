@@ -145,7 +145,7 @@ export function Pricing() {
               <FeatureItem label="Deep Reddit thread analysis" />
               <FeatureItem label="AI-generated SaaS opportunities" />
               <FeatureItem label="Trend detection & tracking" />
-              <FeatureItem label="Team workspace (up to 5 users)" />
+              <FeatureItem label="Team workspace (coming soon)" />
               <FeatureItem label="API access (coming soon)" />
               <FeatureItem label="Priority support" />
             </ul>

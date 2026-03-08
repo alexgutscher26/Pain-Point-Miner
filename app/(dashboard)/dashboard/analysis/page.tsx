@@ -193,7 +193,12 @@ export default function AnalysisPage() {
              <Clock className="w-4 h-4" />
              {isDone ? "Mining complete" : (() => {
                const subCount = stats?.scraper.subreddits.length || 4;
-               const depthMultiplier = stats?.scraper.miningDepth === "deep" ? 3 : 1;
+               const depthMultiplier =
+                 stats?.scraper.miningDepth === "advanced"
+                   ? 5
+                   : stats?.scraper.miningDepth === "deep"
+                     ? 3
+                     : 1;
                const totalSeconds = (subCount * 15) * depthMultiplier;
                return `Expected completion: ~${totalSeconds >= 60 
                 ? `${Math.round(totalSeconds / 60)} minutes` 

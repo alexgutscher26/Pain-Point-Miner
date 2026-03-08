@@ -6,6 +6,7 @@ import { and, eq, desc, gte } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
+import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 
 export async function GET(req: Request) {
   const authContext = await requireApiContext(req);
@@ -17,6 +18,8 @@ export async function GET(req: Request) {
   
   const days = searchParams.get("days");
   const statusParam = searchParams.get("status");
+  const savedOnly = searchParams.get("savedOnly") === "true";
+  const categoryParam = searchParams.get("category");
   const minScore = parseInt(searchParams.get("minScore") || "0");
 
   try {
@@ -53,9 +56,39 @@ export async function GET(req: Request) {
       }
     });
 
+    const trendHistoryRows = await db.query.scraper.findMany({
+      where: and(
+        eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId)
+      ),
+      orderBy: [desc(scraper.createdAt)],
+      with: {
+        painPoints: {
+          columns: { id: true },
+        },
+      },
+    });
+
+    const trendInsights = buildLatestTrendInsights(
+      trendHistoryRows
+        .map((row) => {
+          const keyword = row.keywords?.[0]?.trim().toLowerCase();
+          if (!keyword) return null;
+          return {
+            key: keyword,
+            value: row.painPoints.length,
+            createdAt: row.createdAt,
+          };
+        })
+        .filter((row): row is { key: string; value: number; createdAt: Date } => Boolean(row))
+    );
+    const trendByKeyword = new Map(trendInsights.map((trend) => [trend.key, trend]));
+
     let formattedReports = (reportsRes as any[]).map(r => {
       const latestRun = r.scraperRuns?.[0];
       const pps = (r.painPoints || []) as { score: number, urgency: number, monetizationScore: number, marketMaturity: number, sentiment: string | null }[];
+      const keywordKey = (r.keywords?.[0] || "").trim().toLowerCase();
+      const trend = keywordKey ? trendByKeyword.get(keywordKey) : undefined;
       
       // Calculate VERY SMART Opportunity Score (Weighted Multi-Factor)
       let opportunityScore = 0;
@@ -90,6 +123,30 @@ export async function GET(req: Request) {
         }),
         painPoints: pps.length,
         score: opportunityScore,
+        saved: r.reportSaved ?? false,
+        category: r.reportCategory || "Uncategorized",
+        savedAt: r.reportSavedAt
+          ? new Date(r.reportSavedAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : null,
+        trend: trend
+          ? {
+              direction: trend.direction,
+              delta: trend.delta,
+              percentChange: Math.round(trend.percentChange),
+              label:
+                trend.direction === "new"
+                  ? "New signal"
+                  : trend.direction === "up"
+                    ? `${formatTrendChangePercent(trend.percentChange)} momentum`
+                    : trend.direction === "down"
+                      ? `${formatTrendChangePercent(trend.percentChange)} cooling`
+                      : "Stable trend",
+            }
+          : null,
         status: (() => {
           const normalized = normalizeRunStatus(latestRun?.status);
           if (normalized === "completed") return "Completed";
@@ -109,6 +166,14 @@ export async function GET(req: Request) {
     // Apply score filter
     if (minScore > 0) {
         formattedReports = formattedReports.filter(r => r.score >= minScore);
+    }
+    if (savedOnly) {
+      formattedReports = formattedReports.filter((r) => r.saved);
+    }
+    if (categoryParam && categoryParam !== "all") {
+      formattedReports = formattedReports.filter(
+        (r) => r.category.toLowerCase() === categoryParam.toLowerCase()
+      );
     }
 
     return apiJson(formattedReports, 200, correlationId);

@@ -18,6 +18,7 @@ import Link from "next/link";
 import { z } from "zod";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
+import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
 
@@ -69,6 +70,28 @@ export default async function DashboardPage() {
   const marketScore = toOpportunityScore(allPainPoints);
   const reportsSaved = reports.length;
   const marketBadge = getMarketBadge(marketScore);
+  const keywordTrendInsights = buildLatestTrendInsights(
+    reports
+      .map((report) => {
+        const keyword = report.keywords?.[0]?.trim().toLowerCase();
+        if (!keyword) return null;
+        return {
+          key: keyword,
+          value: report.painPoints.length,
+          createdAt: report.createdAt,
+        };
+      })
+      .filter((row): row is { key: string; value: number; createdAt: Date } => Boolean(row))
+  );
+  const trendingInsight = keywordTrendInsights[0] ?? null;
+  const trendingTags = keywordTrendInsights.slice(0, 3).map((trend) => `#${trend.key.replace(/\s+/g, "-")}`);
+  const urgentPainPoint =
+    [...allPainPoints].sort(
+      (left, right) => (right.urgency ?? 0) - (left.urgency ?? 0) || right.score - left.score
+    )[0] ?? null;
+  const urgentPainPointMentions = urgentPainPoint
+    ? allPainPoints.filter((point) => point.title === urgentPainPoint.title).length
+    : 0;
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -165,7 +188,7 @@ export default async function DashboardPage() {
             {/* Quick tags */}
             <div className="flex items-center justify-center gap-4 mt-6">
                <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Trending:</p>
-               {['#saas', '#marketing', '#devops'].map((tag) => (
+               {(trendingTags.length > 0 ? trendingTags : ["#saas", "#marketing", "#devops"]).map((tag) => (
                  <button key={tag} className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest">
                    {tag}
                  </button>
@@ -244,8 +267,16 @@ export default async function DashboardPage() {
                     <Sparkles className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[15px] font-bold text-white">AI-driven SEO</p>
-                    <p className="text-[12px] text-zinc-500">+124% mention volume</p>
+                    <p className="text-[15px] font-bold text-white">
+                      {trendingInsight?.key || "No trend yet"}
+                    </p>
+                    <p className="text-[12px] text-zinc-500">
+                      {trendingInsight
+                        ? trendingInsight.direction === "new"
+                          ? "New trend detected"
+                          : `${formatTrendChangePercent(trendingInsight.percentChange)} mention volume`
+                        : "Run more searches to detect trend"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -253,11 +284,11 @@ export default async function DashboardPage() {
                 <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Urgent Pain Point</p>
                 <div className="bg-zinc-900 p-5 rounded-2xl border-l-4 border-[#ff4500]">
                   <p className="text-[14px] text-zinc-200 font-medium italic leading-relaxed">
-                    &quot;Pricing is too complex for small teams - we just want a flat rate.&quot;
+                    &quot;{urgentPainPoint?.title || "No high-urgency pain point detected yet."}&quot;
                   </p>
                 </div>
                 <p className="text-[11px] text-zinc-500 mt-4 font-bold flex items-center gap-2">
-                   <Database className="w-3.5 h-3.5" /> Found in 4 independent subreddits
+                   <Database className="w-3.5 h-3.5" /> Found in {urgentPainPointMentions || 0} investigations
                 </p>
               </div>
             </div>

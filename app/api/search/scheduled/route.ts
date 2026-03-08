@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { scraper } from "@/lib/db/schema";
 import { executeMiningRun } from "@/lib/mining-runner";
 import { isScraperDue, parsePositiveIntFromEnv } from "@/lib/scheduler";
+import type { MiningDepth } from "@/lib/mining-runner";
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
@@ -29,6 +30,12 @@ function isAuthorized(req: Request) {
   if (!provided) return false;
 
   return safeSecretEquals(secret, provided);
+}
+
+function normalizeMiningDepth(depth: string | null | undefined): MiningDepth {
+  if (depth === "advanced") return "advanced";
+  if (depth === "deep") return "deep";
+  return "basic";
 }
 
 export async function POST(req: Request) {
@@ -106,7 +113,7 @@ export async function POST(req: Request) {
           keyword,
           subreddits,
           customPatterns: row.customPatterns ?? [],
-          miningDepth: row.miningDepth === "deep" ? "deep" : "basic",
+          miningDepth: normalizeMiningDepth(row.miningDepth),
           userId: row.userId,
           workspaceId: row.workspaceId,
           maxSubreddits,
