@@ -83,11 +83,17 @@ type CardTab = "signals" | "community" | "build";
 type IntensityFilter = "all" | "high" | "medium";
 type SentimentFilter = "all" | "frustrated" | "neutral";
 
+/**
+ * Derives a build idea from a given pain point.
+ */
 function deriveBuildIdea(pain: PainPoint) {
   const base = pain.title.replace(/\s+leads?\s+to\s+/i, " ");
   return `${base} Assistant`;
 }
 
+/**
+ * Derives the target user based on the provided pain point.
+ */
 function deriveTargetUser(pain: PainPoint) {
   if (pain.subreddits.length > 0) {
     return `Teams active in r/${pain.subreddits[0]}`;
@@ -95,6 +101,9 @@ function deriveTargetUser(pain: PainPoint) {
   return "Ops and product teams actively handling this pain";
 }
 
+/**
+ * Derives MVP features based on a given pain point.
+ */
 function deriveMvpFeatures(pain: PainPoint) {
   const features: string[] = [];
   features.push(`Signal dashboard for "${pain.title}"`);
@@ -107,10 +116,23 @@ function deriveMvpFeatures(pain: PainPoint) {
   return features.slice(0, 3);
 }
 
+/**
+ * Replaces escaped newline characters in a string with actual newlines.
+ */
 function renderMultiline(text: string) {
   return text.replace(/\\n/g, "\n");
 }
 
+/**
+ * Normalizes a keyword by trimming whitespace and ensuring its length is within specified limits.
+ *
+ * The function first trims the input string and replaces multiple spaces with a single space.
+ * It then checks the length of the normalized string: if it is between 2 and 120 characters, it returns the normalized string.
+ * If the length exceeds 120 characters, it truncates the string to 120 characters.
+ * If the normalized string is shorter than 2 characters, it returns an empty string.
+ *
+ * @param input - The string to be normalized.
+ */
 function normalizeKeyword(input: string) {
   const normalized = input.trim().replace(/\s+/g, " ");
   if (normalized.length >= 2 && normalized.length <= 120) {
@@ -122,6 +144,13 @@ function normalizeKeyword(input: string) {
   return "";
 }
 
+/**
+ * Render the report detail page with comprehensive analysis and insights.
+ *
+ * This function fetches report details based on the report ID from the URL parameters, manages loading and saving states, and handles user interactions such as category changes, data exports, and rerunning investigations. It applies filters to pain points and manages pagination for displaying results. The UI is structured to provide a detailed view of the report, including metrics, pain points, and community insights.
+ *
+ * @returns {JSX.Element} The rendered report detail page component.
+ */
 export default function ReportDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -241,6 +270,14 @@ export default function ReportDetailPage() {
     }
   }
 
+  /**
+   * Handles the process of rerunning an investigation based on report data.
+   *
+   * The function checks if a rerun is already in progress or if report data is available. It normalizes the keyword from the report data, collects unique subreddits, and sanitizes custom patterns. A request is then sent to the API to initiate the rerun, with error handling for failed requests. If the rerun is successful, it navigates to the analysis dashboard; otherwise, it displays an error message.
+   *
+   * @returns {Promise<void>} A promise that resolves when the rerun process is complete.
+   * @throws Error If the API request fails or if an error occurs during the rerun process.
+   */
   async function handleRunAgain() {
     if (!reportData || isRerunning) return;
     setIsRerunning(true);
@@ -340,10 +377,16 @@ export default function ReportDetailPage() {
     return activeTabsByPain[painId] ?? "signals";
   }
 
+  /**
+   * Sets the active tab for a given pain ID.
+   */
   function setActiveTab(painId: string, tab: CardTab) {
     setActiveTabsByPain((prev) => ({ ...prev, [painId]: tab }));
   }
 
+  /**
+   * Applies the selected filters and resets the pain points page.
+   */
   function handleApplyFilters() {
     setIntensityFilterApplied(intensityFilterDraft);
     setSentimentFilterApplied(sentimentFilterDraft);
@@ -858,6 +901,9 @@ export default function ReportDetailPage() {
   );
 }
 
+/**
+ * Renders an info square component displaying an icon, label, and value.
+ */
 function InfoSquare({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string, color: string }) {
     return (
         <div className="bg-white/2 border border-white/5 p-4 rounded-2xl flex items-start gap-3 min-h-[82px]">
