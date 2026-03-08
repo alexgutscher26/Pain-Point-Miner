@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { ArrowRight, Check, Magnet, RotateCw } from "lucide-react";
 
+/**
+ * Renders the pricing section of the application with options for monthly and yearly plans.
+ */
 export function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
 
