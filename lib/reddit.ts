@@ -36,10 +36,26 @@ type RedditListingResponse = {
   };
 };
 
+/**
+ * Pauses execution for a specified number of milliseconds.
+ */
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Fetch a resource with retry logic for handling transient errors.
+ *
+ * The function attempts to fetch the specified URL multiple times if the response indicates a retriable error (HTTP status 429 or 5xx).
+ * It uses an AbortController to implement a timeout for each request and waits progressively longer between retries.
+ * If all attempts fail, it throws the last encountered error or a generic failure message.
+ *
+ * @param url - The URL to fetch.
+ * @param init - The options for the fetch request.
+ * @param retries - The maximum number of retry attempts (default is MAX_RETRIES).
+ * @returns The response from the fetch call if successful.
+ * @throws Error If all retry attempts fail.
+ */
 async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETRIES) {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
@@ -71,6 +87,9 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
   throw lastError instanceof Error ? lastError : new Error("Reddit request failed");
 }
 
+/**
+ * Fetches posts from a specified subreddit containing a keyword.
+ */
 export const fetchSubredditPosts = async (
   subreddit: string,
   keyword: string,
@@ -84,6 +103,22 @@ export const fetchSubredditPosts = async (
   return posts.slice(0, limit);
 };
 
+/**
+ * Fetch posts from a specified subreddit in batches based on a keyword.
+ *
+ * This function retrieves posts from Reddit by constructing a search URL with the provided subreddit and keyword.
+ * It handles pagination using the 'after' parameter and respects the specified limits for maximum posts, request limits, and delays between requests.
+ * The function continues fetching until the desired number of posts is collected or no more posts are available.
+ *
+ * @param subreddit - The name of the subreddit to fetch posts from.
+ * @param keyword - The keyword to search for in the subreddit posts.
+ * @param options - Optional parameters to customize the fetching behavior.
+ * @param options.maxPosts - The maximum number of posts to fetch (default is 25, capped at 2000).
+ * @param options.time - The time range for the posts (default is "all").
+ * @param options.delayMs - The delay in milliseconds between requests (default is 250ms).
+ * @param options.requestLimit - The maximum number of posts to request per API call (default is 100).
+ * @returns A promise that resolves to an array of RedditPost objects.
+ */
 export async function fetchSubredditPostsBatched(
   subreddit: string,
   keyword: string,
@@ -146,6 +181,15 @@ export async function fetchSubredditPostsBatched(
   }
 };
 
+/**
+ * Fetch comments from a Reddit post.
+ *
+ * This function constructs a URL to retrieve comments for a specific post in a given subreddit. It uses the fetchWithRetry function to handle network requests and retries. The response is processed to extract comment nodes, and a helper function, extractReplies, is used to recursively gather replies to comments. In case of an error during the fetch operation, it logs the error and returns an empty array.
+ *
+ * @param postId - The ID of the Reddit post for which comments are to be fetched.
+ * @param subreddit - The name of the subreddit containing the post.
+ * @returns A promise that resolves to an array of RedditComment objects.
+ */
 export const fetchComments = async (postId: string, subreddit: string): Promise<RedditComment[]> => {
   try {
     const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json`;

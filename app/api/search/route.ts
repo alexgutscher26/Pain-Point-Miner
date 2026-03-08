@@ -87,6 +87,17 @@ function arraysEqual(a: string[] | null | undefined, b: string[]) {
   return left.every((value, idx) => value === b[idx]);
 }
 
+/**
+ * Handles the POST request for initiating a search operation.
+ *
+ * This function first validates the API context and checks for an idempotency key. It then parses the JSON payload and validates the request structure.
+ * If the payload is valid, it checks for existing scraper jobs to prevent duplicate submissions within a specified time window.
+ * If no duplicates are found, it creates a new scraping job and executes the mining run, returning the results or an error response as necessary.
+ *
+ * @param req - The incoming request object containing the search parameters and headers.
+ * @returns A response object containing the result of the search operation or an error response.
+ * @throws Error If an internal error occurs during the processing of the request.
+ */
 export async function POST(req: Request) {
   const authContext = await requireApiContext(req);
   if (!authContext.ok) {
@@ -163,6 +174,22 @@ export async function POST(req: Request) {
 
     const patterns = customPatterns.map((pattern) => pattern.trim()).filter(Boolean);
 
+    /**
+     * Execute a search operation for scraping data.
+     *
+     * This function creates a Scraping Job record and checks for existing scrapers to avoid duplicates within a specified time window.
+     * If a matching scraper is found, it verifies various parameters such as keywords, mining depth, subreddits, and patterns.
+     * If no duplicates are found, it inserts a new scraper record and initiates a mining run, returning the results of the operation.
+     *
+     * @param {string} userId - The ID of the user initiating the search.
+     * @param {string} workspaceId - The ID of the workspace associated with the search.
+     * @param {string} keyword - The keyword to search for.
+     * @param {string[]} targetSubreddits - The list of subreddits to target for scraping.
+     * @param {string[]} patterns - The custom patterns to use for scraping.
+     * @param {string} miningDepth - The depth of mining to perform (e.g., "deep" or "shallow").
+     * @returns {Promise<{ success: true, duplicate: boolean, scraperId: string, runId: string | null, count: number }>} The result of the search operation.
+     * @throws {Error} If an error occurs during the execution of the search.
+     */
     const executeSearch = async () => {
       // 1. Create a Scraping Job record
       const scraperId = crypto.randomUUID();

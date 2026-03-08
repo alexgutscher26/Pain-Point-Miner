@@ -12,6 +12,9 @@ const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
 });
 
+/**
+ * Compares two strings in a timing-safe manner.
+ */
 function safeSecretEquals(expected: string, provided: string) {
   const expectedBuffer = Buffer.from(expected);
   const providedBuffer = Buffer.from(provided);
