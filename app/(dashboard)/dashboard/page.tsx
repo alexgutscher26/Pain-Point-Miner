@@ -206,9 +206,12 @@ export default async function DashboardPage() {
                <div className="w-2 h-2 rounded-full bg-[#ff4500]"></div>
                <h4 className="font-black text-white text-lg tracking-tight">Recent Investigations</h4>
             </div>
-            <a className="text-[12px] font-bold text-zinc-500 hover:text-[#ff4500] transition-colors uppercase tracking-widest" href="#">
+            <Link
+              className="text-[12px] font-bold text-zinc-500 hover:text-[#ff4500] transition-colors uppercase tracking-widest"
+              href="/dashboard/reports"
+            >
               View All
-            </a>
+            </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -221,31 +224,39 @@ export default async function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {reports.slice(0, 3).map((report) => {
-                  const reportScore = toOpportunityScore(report.painPoints);
-                  const latestRunStatus = normalizeRunStatus(report.scraperRuns?.[0]?.status);
-                  const statusLabel =
-                    latestRunStatus === "completed"
-                      ? "Ready"
-                      : latestRunStatus === "failed" || latestRunStatus === "canceled"
-                        ? "Failed"
-                        : "Live";
+                {reports.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-10 text-center text-zinc-500 text-sm font-medium">
+                      No investigations yet. Run your first analysis to populate this table.
+                    </td>
+                  </tr>
+                ) : (
+                  reports.slice(0, 3).map((report) => {
+                    const reportScore = toOpportunityScore(report.painPoints);
+                    const latestRunStatus = normalizeRunStatus(report.scraperRuns?.[0]?.status);
+                    const statusLabel =
+                      latestRunStatus === "completed"
+                        ? "Ready"
+                        : latestRunStatus === "failed" || latestRunStatus === "canceled"
+                          ? "Failed"
+                          : "Live";
 
-                  return (
-                    <ReportRow
-                      key={report.id}
-                      id={report.id}
-                      keyword={report.keywords?.[0] || "Unknown Investigation"}
-                      date={new Date(report.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                      painPoint={report.painPoints[0]?.title || "No pain points extracted yet"}
-                      score={reportScore}
-                      status={statusLabel}
-                    />
-                  );
-                })}
+                    return (
+                      <ReportRow
+                        key={report.id}
+                        id={report.id}
+                        keyword={report.keywords?.[0] || "Unknown Investigation"}
+                        date={new Date(report.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        painPoint={report.painPoints[0]?.title || "No pain points extracted yet"}
+                        score={reportScore}
+                        status={statusLabel}
+                      />
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
