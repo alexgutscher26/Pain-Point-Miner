@@ -13,6 +13,15 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+/**
+ * Generate Drizzle migrations by executing the drizzle-kit generate command.
+ *
+ * This function logs the process of generating migrations, handles any warnings or errors that may occur,
+ * and provides troubleshooting steps based on the error messages. It returns true if the migration generation
+ * is successful and false if it fails, while also logging relevant information to the console.
+ *
+ * @returns A promise that resolves to true if migration generation is successful, or false if it fails.
+ */
 async function generateSchema() {
   console.log('🔄 Generating Drizzle migrations...\n');
 
