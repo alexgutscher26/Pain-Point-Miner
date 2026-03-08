@@ -21,6 +21,14 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
+/**
+ * Run database migrations using Drizzle.
+ *
+ * This function initializes a SQL client and a Drizzle instance, then applies migrations from the specified folder.
+ * It logs the migration status and provides troubleshooting information in case of errors, including connection issues, migration conflicts, and SQL syntax errors.
+ *
+ * @returns A promise that resolves to true if all migrations are applied successfully, or false if an error occurs.
+ */
 async function runMigrations() {
   console.log('🔄 Running Drizzle migrations...\n');
 
