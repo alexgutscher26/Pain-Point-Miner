@@ -5,10 +5,29 @@ import { and, eq, desc } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
 });
+const updateReportSchema = z.object({
+  saved: z.boolean(),
+  category: z
+    .string()
+    .trim()
+    .min(1, "Category is required")
+    .max(50, "Category must be 50 characters or less")
+    .optional(),
+});
+
+interface SaaSOpportunity {
+  title: string;
+  problemStatement: string;
+  targetCustomer: string;
+  valueProposition: string;
+  launchAngle: string;
+  score: number;
+}
 
 export async function GET(
   req: Request,
@@ -53,6 +72,7 @@ export async function GET(
     }
 
     const latestRun = currentScraper.scraperRuns?.[0];
+    const currentKeyword = (currentScraper.keywords?.[0] || "").trim().toLowerCase();
 
     interface DBPainPoint {
       id: string;
@@ -64,12 +84,41 @@ export async function GET(
       marketMaturity: number;
       subreddit: string;
       sentiment: string;
+      mentionCount: number;
+      commentCount: number;
       budget?: string;
       switchingCosts?: string;
       triedSolutions?: string[];
     }
 
     const painPoints = currentScraper.painPoints as unknown as DBPainPoint[];
+
+    const trendHistoryRows = await db.query.scraper.findMany({
+      where: and(
+        eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId)
+      ),
+      orderBy: [desc(scraper.createdAt)],
+      with: {
+        painPoints: {
+          columns: { id: true },
+        },
+      },
+    });
+
+    const trendInsight = buildLatestTrendInsights(
+      trendHistoryRows
+        .map((row) => {
+          const keyword = row.keywords?.[0]?.trim().toLowerCase();
+          if (!keyword) return null;
+          return {
+            key: keyword,
+            value: row.painPoints.length,
+            createdAt: row.createdAt,
+          };
+        })
+        .filter((row): row is { key: string; value: number; createdAt: Date } => Boolean(row))
+    ).find((trend) => trend.key === currentKeyword);
     
     // Calculate VERY SMART Opportunity Score (Weighted Multi-Factor)
     let opportunityScore = 0;
@@ -95,6 +144,37 @@ export async function GET(
     }
 
     const scoreLabel = opportunityScore >= 80 ? "High Growth Potential" : opportunityScore >= 50 ? "Solid Opportunity" : "Niche Requirement";
+    const totalMentions = painPoints.reduce(
+      (sum, point) => sum + Math.max(1, point.mentionCount || 0),
+      0
+    );
+    const saasOpportunities: SaaSOpportunity[] = painPoints
+      .map((pp) => {
+        const weightedScore = Math.round(
+          ((pp.score || 0) * 0.35 +
+            (pp.urgency || 0) * 0.25 +
+            (pp.monetizationScore || 0) * 0.3 +
+            (pp.marketMaturity || 0) * 0.1) * 10
+        );
+
+        const stageLabel =
+          (pp.marketMaturity || 0) <= 3
+            ? "Blue-ocean niche"
+            : (pp.marketMaturity || 0) >= 8
+              ? "Disrupt existing incumbents"
+              : "Focused category entrant";
+
+        return {
+          title: `${pp.title} Copilot`,
+          problemStatement: pp.body,
+          targetCustomer: `Users active in r/${pp.subreddit} reporting ${pp.sentiment} workflow friction`,
+          valueProposition: `Reduce manual effort around "${pp.title}" with an automation-first workflow and measurable time savings`,
+          launchAngle: `${stageLabel} with urgency ${pp.urgency || 0}/10 and monetization signal ${pp.monetizationScore || 0}/10`,
+          score: Math.min(Math.max(weightedScore, 0), 100),
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
 
     // Format the response to match what the frontend expects
     const response = {
@@ -104,7 +184,27 @@ export async function GET(
           day: 'numeric', 
           year: 'numeric' 
       }),
+      reportId: currentScraper.id,
+      saved: currentScraper.reportSaved ?? false,
+      category: currentScraper.reportCategory || "Uncategorized",
       customPatterns: currentScraper.customPatterns || [],
+      trend: trendInsight
+        ? {
+            direction: trendInsight.direction,
+            delta: trendInsight.delta,
+            percentChange: Math.round(trendInsight.percentChange),
+            previous: trendInsight.previous,
+            current: trendInsight.current,
+            label:
+              trendInsight.direction === "new"
+                ? "New demand signal"
+                : trendInsight.direction === "up"
+                  ? `${formatTrendChangePercent(trendInsight.percentChange)} vs previous run`
+                  : trendInsight.direction === "down"
+                    ? `${formatTrendChangePercent(trendInsight.percentChange)} vs previous run`
+                    : "No major change vs previous run",
+          }
+        : null,
       metrics: [
         { 
             label: "Pain Points", 
@@ -131,10 +231,10 @@ export async function GET(
             bg: "bg-[#ff4500]/10" 
         },
         { 
-            label: "Top Source", 
-            value: currentScraper.subreddits?.[0] || "Reddit", 
-            sub: "Primary community", 
-            icon: "Users", 
+            label: "Mentions", 
+            value: totalMentions.toString(), 
+            sub: "Mention count insights", 
+            icon: "Users",
             color: "text-emerald-500", 
             bg: "bg-emerald-500/10" 
         },
@@ -146,7 +246,7 @@ export async function GET(
         intensity: pp.score,
         monetization: pp.monetizationScore,
         maturity: pp.marketMaturity,
-        mentions: 1, 
+        mentions: Math.max(1, pp.mentionCount || 0),
         description: pp.body,
         subreddits: [pp.subreddit],
         sentiment: pp.sentiment,
@@ -159,12 +259,82 @@ export async function GET(
             "Solution for " + pp.title,
             "Cost-effective alternative to existing tools"
         ]
-      }))
+      })),
+      saasOpportunities,
     };
 
     return apiJson(response, 200, correlationId);
   } catch (error) {
     console.error("Report Detail API Error:", error);
+    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authContext = await requireApiContext(req);
+  if (!authContext.ok) {
+    return authContext.response;
+  }
+  const { correlationId, userId, workspaceId } = authContext.context;
+
+  const parsedParams = reportParamsSchema.safeParse(await params);
+  if (!parsedParams.success) {
+    return apiError(
+      400,
+      "VALIDATION_ERROR",
+      "Invalid route parameters",
+      parsedParams.error.flatten(),
+      correlationId
+    );
+  }
+  const body = await req.json().catch(() => null);
+  const parsedBody = updateReportSchema.safeParse(body);
+  if (!parsedBody.success) {
+    return apiError(
+      400,
+      "VALIDATION_ERROR",
+      "Invalid request body",
+      parsedBody.error.flatten(),
+      correlationId
+    );
+  }
+
+  const { id } = parsedParams.data;
+  const { saved, category } = parsedBody.data;
+
+  try {
+    const updated = await db
+      .update(scraper)
+      .set({
+        reportSaved: saved,
+        reportSavedAt: saved ? new Date() : null,
+        reportCategory: category ?? "Uncategorized",
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(scraper.id, id),
+          eq(scraper.userId, userId),
+          workspaceScope(scraper.workspaceId, workspaceId)
+        )
+      )
+      .returning({
+        id: scraper.id,
+        reportSaved: scraper.reportSaved,
+        reportSavedAt: scraper.reportSavedAt,
+        reportCategory: scraper.reportCategory,
+      });
+
+    if (updated.length === 0) {
+      return apiError(404, "NOT_FOUND", "Report not found", undefined, correlationId);
+    }
+
+    return apiJson(updated[0], 200, correlationId);
+  } catch (error) {
+    console.error("Report update API Error:", error);
     return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
   }
 }

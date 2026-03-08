@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { scraper } from "@/lib/db/schema";
 import { executeMiningRun } from "@/lib/mining-runner";
 import { isScraperDue, parsePositiveIntFromEnv } from "@/lib/scheduler";
+import type { MiningDepth } from "@/lib/mining-runner";
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
@@ -34,15 +35,12 @@ function isAuthorized(req: Request) {
   return safeSecretEquals(secret, provided);
 }
 
-/**
- * Handles the POST request for scheduling scrapers.
- *
- * This function first checks for authorization and validates query parameters. It retrieves configuration values from the environment and queries the database for running scrapers. It filters due scrapers based on their last run time and frequency, executes mining runs for each due scraper, and aggregates the results. Finally, it returns a summary of the scraping operation or an error response if any issues occur during processing.
- *
- * @param req - The incoming request object containing the necessary parameters for processing.
- * @returns A JSON response containing the status of the scraping operation and relevant statistics.
- * @throws Error If an internal error occurs during the execution of the scraping process.
- */
+function normalizeMiningDepth(depth: string | null | undefined): MiningDepth {
+  if (depth === "advanced") return "advanced";
+  if (depth === "deep") return "deep";
+  return "basic";
+}
+
 export async function POST(req: Request) {
   const correlationId = getCorrelationId(req);
 
@@ -118,7 +116,7 @@ export async function POST(req: Request) {
           keyword,
           subreddits,
           customPatterns: row.customPatterns ?? [],
-          miningDepth: row.miningDepth === "deep" ? "deep" : "basic",
+          miningDepth: normalizeMiningDepth(row.miningDepth),
           userId: row.userId,
           workspaceId: row.workspaceId,
           maxSubreddits,

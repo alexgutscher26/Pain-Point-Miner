@@ -32,6 +32,9 @@ interface Report {
     painPoints: number;
     score: number;
     status: string;
+    saved: boolean;
+    category: string;
+    savedAt: string | null;
 }
 
 export default function ReportsPage() {
@@ -42,6 +45,8 @@ export default function ReportsPage() {
   const [days, setDays] = useState("30");
   const [status, setStatus] = useState("all");
   const [minScore, setMinScore] = useState("70");
+  const [savedOnly, setSavedOnly] = useState("false");
+  const [category, setCategory] = useState("all");
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
@@ -50,6 +55,8 @@ export default function ReportsPage() {
         days,
         status,
         minScore,
+        savedOnly,
+        category,
       });
       const response = await fetch(`/api/reports?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch reports");
@@ -60,7 +67,7 @@ export default function ReportsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [days, status, minScore]);
+  }, [days, status, minScore, savedOnly, category]);
 
   useEffect(() => {
     fetchReports();
@@ -162,6 +169,47 @@ export default function ReportsPage() {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group outline-none">
+              <Star className="w-4 h-4 text-zinc-500 group-hover:text-[#ff4500] transition-colors" />
+              {savedOnly === "true" ? "Saved Only" : "All Reports"}
+              <ChevronRight className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity w-3.5 h-3.5 rotate-90" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#0c0c0c] border-white/10 text-zinc-400">
+            <DropdownMenuLabel className="text-zinc-500">Saved Filter</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuRadioGroup value={savedOnly} onValueChange={setSavedOnly}>
+              <DropdownMenuRadioItem value="false" className="focus:bg-[#ff4500]/10 focus:text-white">All Reports</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="true" className="focus:bg-[#ff4500]/10 focus:text-white">Saved Only</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="px-4 py-2.5 rounded-xl bg-[#111] border border-white/5 text-[12px] font-bold text-zinc-400 hover:text-white hover:border-white/10 transition-all flex items-center gap-2 group outline-none">
+              <Filter className="w-4 h-4 text-zinc-500 group-hover:text-[#ff4500] transition-colors" />
+              Category: {category === "all" ? "All" : category}
+              <ChevronRight className="ml-1 opacity-40 group-hover:opacity-100 transition-opacity w-3.5 h-3.5 rotate-90" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#0c0c0c] border-white/10 text-zinc-400">
+            <DropdownMenuLabel className="text-zinc-500">Category</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuRadioGroup value={category} onValueChange={setCategory}>
+              <DropdownMenuRadioItem value="all" className="focus:bg-[#ff4500]/10 focus:text-white">All Categories</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Uncategorized" className="focus:bg-[#ff4500]/10 focus:text-white">Uncategorized</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Product" className="focus:bg-[#ff4500]/10 focus:text-white">Product</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Marketing" className="focus:bg-[#ff4500]/10 focus:text-white">Marketing</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Growth" className="focus:bg-[#ff4500]/10 focus:text-white">Growth</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Operations" className="focus:bg-[#ff4500]/10 focus:text-white">Operations</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Customer Success" className="focus:bg-[#ff4500]/10 focus:text-white">Customer Success</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className="ml-auto px-4 hidden sm:block">
            <p className="text-[11px] font-bold text-zinc-600 uppercase tracking-widest">
              {isLoading ? "Counting records..." : `Showing ${reports.length} results`}
@@ -201,6 +249,7 @@ export default function ReportsPage() {
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Created Date</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Pain Points</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Top Score</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Category</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Status</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 text-right">Actions</th>
               </tr>
@@ -232,6 +281,18 @@ export default function ReportsPage() {
                         : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                     }`}>
                       {report.score}/100
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-zinc-300">
+                        {report.category}
+                      </span>
+                      {report.saved && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest">
+                          Saved
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-8 py-6">

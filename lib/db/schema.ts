@@ -211,6 +211,9 @@ export const scraper = pgTable("scraper", {
 	subreddits: text().array(),
 	customPatterns: text().array().default(sql`'{}'::text[]`),
 	miningDepth: text().default('basic').notNull(),
+	reportSaved: boolean().default(false).notNull(),
+	reportCategory: text().default('Uncategorized').notNull(),
+	reportSavedAt: timestamp({ precision: 3, mode: 'date' }),
 	workspaceId: text(),
 	deletedAt: timestamp({ precision: 3, mode: 'date' }),
 }, (table) => [

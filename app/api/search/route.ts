@@ -13,6 +13,11 @@ const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
 const CUSTOM_PATTERN_MAX_COUNT = 20;
 const CUSTOM_PATTERN_MAX_LENGTH = 120;
+const MAX_SUBREDDITS_BY_DEPTH = {
+  basic: 10,
+  deep: 10,
+  advanced: 15,
+} as const;
 const DUPLICATE_SUBMISSION_WINDOW_MS = 30_000;
 const IDEMPOTENCY_KEY_HEADER = "idempotency-key";
 
@@ -66,7 +71,7 @@ const searchPayloadSchema = z.object({
         .array(customPatternItemSchema)
         .max(CUSTOM_PATTERN_MAX_COUNT, `Too many custom patterns (max ${CUSTOM_PATTERN_MAX_COUNT})`)
     ),
-  miningDepth: z.enum(["basic", "deep"]).optional().default("basic"),
+  miningDepth: z.enum(["basic", "deep", "advanced"]).optional().default("basic"),
 });
 
 const idempotencyKeySchema = z
@@ -143,7 +148,14 @@ export async function POST(req: Request) {
       .map((sub) => sub.trim())
       .filter(Boolean);
 
-    const normalizedSubreddits = z.array(subredditTokenSchema).max(10, "Too many subreddits (max 10)").safeParse(rawSubreddits);
+    const maxSubredditsForDepth = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
+    const normalizedSubreddits = z
+      .array(subredditTokenSchema)
+      .max(
+        maxSubredditsForDepth,
+        `Too many subreddits (max ${maxSubredditsForDepth})`
+      )
+      .safeParse(rawSubreddits);
 
     if (!normalizedSubreddits.success) {
       return apiError(
@@ -245,8 +257,10 @@ export async function POST(req: Request) {
           miningDepth,
           userId,
           workspaceId,
-          maxPostsPerSubreddit: miningDepth === "deep" ? 25 : 15,
-          processingLimit: miningDepth === "deep" ? 10 : 3,
+          maxPostsPerSubreddit:
+            miningDepth === "advanced" ? 40 : miningDepth === "deep" ? 25 : 15,
+          processingLimit:
+            miningDepth === "advanced" ? 20 : miningDepth === "deep" ? 10 : 3,
         });
 
         return {
