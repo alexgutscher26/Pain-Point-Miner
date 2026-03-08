@@ -24,6 +24,17 @@ const workspaceHeaderSchema = z.string().uuid().nullable();
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Render the dashboard page with user-specific insights and metrics.
+ *
+ * This function retrieves the user's session and workspace information, checks for session validity,
+ * and fetches reports related to the user's activities. It processes the reports to calculate various
+ * metrics, including pain points found and market scores, and prepares the data for rendering the
+ * dashboard UI. The function also handles the display of trending insights and urgent pain points.
+ *
+ * @returns A JSX element representing the dashboard page.
+ * @throws Error If the session is not valid, the user is redirected to the sign-in page.
+ */
 export default async function DashboardPage() {
   const requestHeaders = await headers();
   const session = await auth.api.getSession({
