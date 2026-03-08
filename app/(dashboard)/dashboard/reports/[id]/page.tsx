@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { 
+  ChevronLeft,
   ChevronRight, 
   MessageSquare, 
   TrendingUp, 
@@ -21,7 +22,7 @@ import {
   Sparkles
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface PainPoint {
@@ -77,14 +78,66 @@ interface ReportData {
     }[];
 }
 
+const PAIN_POINTS_PER_PAGE = 5;
+type CardTab = "signals" | "community" | "build";
+type IntensityFilter = "all" | "high" | "medium";
+type SentimentFilter = "all" | "frustrated" | "neutral";
+
+function deriveBuildIdea(pain: PainPoint) {
+  const base = pain.title.replace(/\s+leads?\s+to\s+/i, " ");
+  return `${base} Assistant`;
+}
+
+function deriveTargetUser(pain: PainPoint) {
+  if (pain.subreddits.length > 0) {
+    return `Teams active in r/${pain.subreddits[0]}`;
+  }
+  return "Ops and product teams actively handling this pain";
+}
+
+function deriveMvpFeatures(pain: PainPoint) {
+  const features: string[] = [];
+  features.push(`Signal dashboard for "${pain.title}"`);
+  features.push("Automated playbooks with step-by-step interventions");
+  if (pain.triedSolutions && pain.triedSolutions.length > 0) {
+    features.push(`Alternative to "${pain.triedSolutions[0]}" with measurable outcomes`);
+  } else {
+    features.push("Experiment tracker to compare interventions by impact");
+  }
+  return features.slice(0, 3);
+}
+
+function renderMultiline(text: string) {
+  return text.replace(/\\n/g, "\n");
+}
+
+function normalizeKeyword(input: string) {
+  const normalized = input.trim().replace(/\s+/g, " ");
+  if (normalized.length >= 2 && normalized.length <= 120) {
+    return normalized;
+  }
+  if (normalized.length > 120) {
+    return normalized.slice(0, 120).trim();
+  }
+  return "";
+}
+
 export default function ReportDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRerunning, setIsRerunning] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Uncategorized");
+  const [painPointsPage, setPainPointsPage] = useState(1);
+  const [activeTabsByPain, setActiveTabsByPain] = useState<Record<string, CardTab>>({});
+  const [intensityFilterDraft, setIntensityFilterDraft] = useState<IntensityFilter>("all");
+  const [sentimentFilterDraft, setSentimentFilterDraft] = useState<SentimentFilter>("all");
+  const [intensityFilterApplied, setIntensityFilterApplied] = useState<IntensityFilter>("all");
+  const [sentimentFilterApplied, setSentimentFilterApplied] = useState<SentimentFilter>("all");
 
   const categoryOptions = [
     "Uncategorized",
@@ -103,6 +156,11 @@ export default function ReportDetailPage() {
         const data = await response.json();
         setReportData(data);
         setSelectedCategory(data.category || "Uncategorized");
+        setPainPointsPage(1);
+        setIntensityFilterDraft("all");
+        setSentimentFilterDraft("all");
+        setIntensityFilterApplied("all");
+        setSentimentFilterApplied("all");
       } catch (error) {
         console.error("Error fetching report details:", error);
       } finally {
@@ -158,6 +216,166 @@ export default function ReportDetailPage() {
     }
   }
 
+  function handleExportData() {
+    if (!reportData) return;
+    try {
+      const safeTitle = reportData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const filename = `${safeTitle || "report"}-${reportData.reportId}.json`;
+      const payload = JSON.stringify(reportData, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Report exported.");
+    } catch (error) {
+      console.error("Error exporting report:", error);
+      toast.error("Unable to export report.");
+    }
+  }
+
+  async function handleRunAgain() {
+    if (!reportData || isRerunning) return;
+    setIsRerunning(true);
+
+    try {
+      const keyword =
+        normalizeKeyword(reportData.title) ||
+        normalizeKeyword(reportData.topPainPoints[0]?.title ?? "") ||
+        "saas";
+
+      const subredditSet = new Set<string>();
+      reportData.topPainPoints.forEach((pain) => {
+        pain.subreddits.forEach((sub) => {
+          const cleaned = sub
+            .replace(/^r\//i, "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^\w]/g, "");
+          if (/^[a-z0-9_]{2,21}$/.test(cleaned)) subredditSet.add(cleaned);
+        });
+      });
+
+      const sanitizedPatterns = (reportData.customPatterns ?? [])
+        .map((pattern) => pattern.trim())
+        .filter((pattern) => pattern.length > 0 && pattern.length <= 120)
+        .slice(0, 20);
+
+      const requestBody = {
+        keyword,
+        subreddits: Array.from(subredditSet)
+          .slice(0, 15)
+          .map((sub) => `r/${sub}`)
+          .join(", "),
+        customPatterns: sanitizedPatterns,
+        miningDepth: "deep" as const,
+      };
+
+      let response = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        // Retry with a minimal payload in case saved report metadata is invalid.
+        response = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            keyword,
+            subreddits: "",
+            customPatterns: [],
+            miningDepth: "deep",
+          }),
+        });
+      }
+
+      if (!response.ok) {
+        const statusPrefix = `Run again failed (${response.status})`;
+        let errorMessage = statusPrefix;
+        try {
+          const raw = await response.text();
+          if (raw) {
+            try {
+              const errorPayload = JSON.parse(raw);
+              if (typeof errorPayload?.message === "string" && errorPayload.message.length > 0) {
+                errorMessage = `${statusPrefix}: ${errorPayload.message}`;
+              } else {
+                errorMessage = `${statusPrefix}: ${raw.slice(0, 180)}`;
+              }
+            } catch {
+              errorMessage = `${statusPrefix}: ${raw.slice(0, 180)}`;
+            }
+          }
+        } catch {
+          // Ignore parsing failures and keep generic message.
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      if (data?.duplicate) {
+        toast.info("Investigation already running. Redirecting to existing analysis...");
+      } else {
+        toast.success("Investigation started.");
+      }
+      router.push(`/dashboard/analysis?id=${data.scraperId}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to run investigation again.";
+      toast.error(message);
+    } finally {
+      setIsRerunning(false);
+    }
+  }
+
+  function getActiveTab(painId: string): CardTab {
+    return activeTabsByPain[painId] ?? "signals";
+  }
+
+  function setActiveTab(painId: string, tab: CardTab) {
+    setActiveTabsByPain((prev) => ({ ...prev, [painId]: tab }));
+  }
+
+  function handleApplyFilters() {
+    setIntensityFilterApplied(intensityFilterDraft);
+    setSentimentFilterApplied(sentimentFilterDraft);
+    setPainPointsPage(1);
+  }
+
+  useEffect(() => {
+    if (!reportData) return;
+    const totalFiltered = reportData.topPainPoints.filter((pain) => {
+      const matchesIntensity =
+        intensityFilterApplied === "all"
+          ? true
+          : intensityFilterApplied === "high"
+            ? pain.intensity >= 8
+            : pain.intensity >= 5;
+
+      const normalizedSentiment = pain.sentiment.toLowerCase();
+      const matchesSentiment =
+        sentimentFilterApplied === "all"
+          ? true
+          : sentimentFilterApplied === "frustrated"
+            ? normalizedSentiment.includes("frustrated") || normalizedSentiment.includes("desperate")
+            : normalizedSentiment.includes("neutral") || normalizedSentiment.includes("explor");
+
+      return matchesIntensity && matchesSentiment;
+    }).length;
+    const totalPages = Math.max(1, Math.ceil(totalFiltered / PAIN_POINTS_PER_PAGE));
+    if (painPointsPage > totalPages) {
+      setPainPointsPage(totalPages);
+    }
+  }, [intensityFilterApplied, painPointsPage, reportData, sentimentFilterApplied]);
+
   const iconMap: Record<string, React.ReactNode> = {
     AlertTriangle: <AlertTriangle className="w-4 h-4" />,
     MessageSquare: <MessageSquare className="w-4 h-4" />,
@@ -185,6 +403,31 @@ export default function ReportDetailPage() {
       </div>
     );
   }
+
+  const filteredPainPoints = reportData.topPainPoints.filter((pain) => {
+    const matchesIntensity =
+      intensityFilterApplied === "all"
+        ? true
+        : intensityFilterApplied === "high"
+          ? pain.intensity >= 8
+          : pain.intensity >= 5;
+
+    const normalizedSentiment = pain.sentiment.toLowerCase();
+    const matchesSentiment =
+      sentimentFilterApplied === "all"
+        ? true
+        : sentimentFilterApplied === "frustrated"
+          ? normalizedSentiment.includes("frustrated") || normalizedSentiment.includes("desperate")
+          : normalizedSentiment.includes("neutral") || normalizedSentiment.includes("explor");
+
+    return matchesIntensity && matchesSentiment;
+  });
+
+  const totalPainPoints = filteredPainPoints.length;
+  const totalPainPointPages = Math.max(1, Math.ceil(totalPainPoints / PAIN_POINTS_PER_PAGE));
+  const startPainPointIndex = (painPointsPage - 1) * PAIN_POINTS_PER_PAGE;
+  const endPainPointIndex = Math.min(startPainPointIndex + PAIN_POINTS_PER_PAGE, totalPainPoints);
+  const visiblePainPoints = filteredPainPoints.slice(startPainPointIndex, endPainPointIndex);
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-700">
@@ -225,7 +468,7 @@ export default function ReportDetailPage() {
           <select
             value={selectedCategory}
             onChange={(event) => handleCategoryChange(event.target.value)}
-            className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all"
+            className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all [&>option]:bg-white [&>option]:text-black"
           >
             {categoryOptions.map((categoryOption) => (
               <option key={categoryOption} value={categoryOption}>
@@ -240,11 +483,20 @@ export default function ReportDetailPage() {
           >
              {isSaving ? "Saving..." : reportData.saved ? "Saved" : "Save Report"}
           </button>
-          <button className="px-5 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleExportData}
+            className="px-5 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2"
+          >
              Export Data
           </button>
-          <button className="bg-[#ff4500] hover:bg-[#ff571a] text-white px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#ff4500]/20 active:scale-95 group min-w-[140px]">
-             Run Again
+          <button
+            type="button"
+            onClick={handleRunAgain}
+            disabled={isRerunning}
+            className="bg-[#ff4500] hover:bg-[#ff571a] text-white px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#ff4500]/20 active:scale-95 group min-w-[140px] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+             {isRerunning ? "Running..." : "Run Again"}
           </button>
         </div>
       </div>
@@ -298,8 +550,8 @@ export default function ReportDetailPage() {
           )}
 
           <div className="space-y-6">
-            {reportData.topPainPoints.map((pain, idx) => (
-              <div key={idx} className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 space-y-8 hover:border-[#ff4500]/20 transition-all group shadow-2xl relative overflow-hidden">
+            {visiblePainPoints.map((pain) => (
+              <div key={pain.id} className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 space-y-8 hover:border-[#ff4500]/20 transition-all group shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff4500]/2 rounded-full blur-[80px] -mr-32 -mt-32"></div>
                 
                 {/* Pain Header */}
@@ -341,63 +593,151 @@ export default function ReportDetailPage() {
                   </div>
                 </div>
 
-                {/* Algo Specific Intel */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 relative z-10">
-                   <InfoSquare icon={<DollarSign className="w-3.5 h-3.5" />} label="Budget" value={pain.budget || "Unseen"} color="text-emerald-500" />
-                   <InfoSquare icon={<ArrowRightLeft className="w-3.5 h-3.5" />} label="Switching" value={pain.switchingCosts || "Low friction"} color="text-amber-500" />
-                   <InfoSquare icon={<Wrench className="w-3.5 h-3.5" />} label="Tried" value={pain.triedSolutions && pain.triedSolutions.length > 0 ? (pain.triedSolutions.length).toString() : "0"} color="text-blue-500" />
-                   <InfoSquare icon={<TrendingUp className="w-3.5 h-3.5" />} label="Pay Signal" value={`${pain.monetization || 0}/10`} color="text-violet-500" />
-                   <InfoSquare icon={<BarChart3 className="w-3.5 h-3.5" />} label="Stage" value={pain.maturity && pain.maturity < 4 ? "Blue Ocean" : pain.maturity && pain.maturity > 7 ? "Disruption" : "Scaling"} color="text-rose-500" />
+                {/* Tabs */}
+                <div className="flex flex-wrap items-center gap-2 relative z-10">
+                  {[
+                    { key: "signals", label: "Signals" },
+                    { key: "community", label: "Community Pulse" },
+                    { key: "build", label: "What to Build" },
+                  ].map((tab) => {
+                    const isActive = getActiveTab(pain.id) === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        onClick={() => setActiveTab(pain.id, tab.key as CardTab)}
+                        className={`px-3 py-2 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${
+                          isActive
+                            ? "bg-[#ff4500]/20 border-[#ff4500]/40 text-[#ff4500]"
+                            : "bg-zinc-900 border-white/10 text-zinc-400 hover:bg-white/5"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Community Voices */}
-                <div className="space-y-4 relative z-10">
-                   <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Community Pulse</p>
-                   {pain.communityVoices.map((voice, i) => (
-                    <div key={i} className="bg-white/2 border border-white/5 p-6 rounded-2xl border-l-4 border-l-[#ff4500]">
-                      <p className="text-[14px] text-zinc-300 italic font-medium leading-relaxed">
-                        &quot;{voice}&quot;
+                {getActiveTab(pain.id) === "signals" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3 relative z-10">
+                     <InfoSquare icon={<DollarSign className="w-3.5 h-3.5" />} label="Budget" value={pain.budget || "Unseen"} color="text-emerald-500" />
+                     <InfoSquare icon={<ArrowRightLeft className="w-3.5 h-3.5" />} label="Switching" value={pain.switchingCosts || "Low friction"} color="text-amber-500" />
+                     <InfoSquare icon={<Wrench className="w-3.5 h-3.5" />} label="Tried" value={pain.triedSolutions && pain.triedSolutions.length > 0 ? (pain.triedSolutions.length).toString() : "0"} color="text-blue-500" />
+                     <InfoSquare icon={<TrendingUp className="w-3.5 h-3.5" />} label="Pay Signal" value={`${pain.monetization || 0}/10`} color="text-violet-500" />
+                     <InfoSquare icon={<BarChart3 className="w-3.5 h-3.5" />} label="Stage" value={pain.maturity && pain.maturity < 4 ? "Blue Ocean" : pain.maturity && pain.maturity > 7 ? "Disruption" : "Scaling"} color="text-rose-500" />
+                  </div>
+                )}
+
+                {getActiveTab(pain.id) === "community" && (
+                  <div className="space-y-4 relative z-10">
+                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Community Pulse</p>
+                     {pain.communityVoices.map((voice, i) => (
+                      <div key={i} className="bg-white/2 border border-white/5 p-6 rounded-2xl border-l-4 border-l-[#ff4500]">
+                        <p className="text-[14px] text-zinc-300 italic font-medium leading-relaxed">
+                          &quot;{voice}&quot;
+                        </p>
+                      </div>
+                     ))}
+                  </div>
+                )}
+
+                {getActiveTab(pain.id) === "build" && (
+                  <div className="space-y-6 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="p-6 rounded-3xl bg-blue-500/5 border border-blue-500/10 space-y-4 shadow-inner">
+                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                           <BarChart3 className="w-4 h-4" /> Marketing Language
+                        </p>
+                        <div className="space-y-2">
+                           {pain.triedSolutions && pain.triedSolutions.length > 0 ? (
+                             pain.triedSolutions.map((sol, i) => (
+                               <div key={i} className="flex items-center gap-3 text-zinc-400 font-medium">
+                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30"></div>
+                                 User tried &quot;{sol}&quot;
+                               </div>
+                             ))
+                           ) : (
+                             <p className="text-zinc-600 text-xs italic font-medium">No tools mentioned specifically.</p>
+                           )}
+                        </div>
+                      </div>
+                      <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 space-y-4 shadow-inner">
+                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                           <Lightbulb className="w-4 h-4" /> Suggested Angles
+                        </p>
+                        <div className="space-y-2">
+                           {pain.angles.map((angle, i) => (
+                             <div key={i} className="flex items-center gap-3 text-zinc-400 font-medium">
+                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></div>
+                               {angle}
+                             </div>
+                           ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6 rounded-3xl bg-[#ff4500]/5 border border-[#ff4500]/15 space-y-4">
+                      <p className="text-[10px] font-black text-[#ff4500] uppercase tracking-widest">
+                        What to Build
                       </p>
-                    </div>
-                   ))}
-                </div>
-
-                {/* Insight Grids */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                  <div className="p-6 rounded-3xl bg-blue-500/5 border border-blue-500/10 space-y-4 shadow-inner">
-                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                       <BarChart3 className="w-4 h-4" /> Marketing Language
-                    </p>
-                    <div className="space-y-2">
-                       {pain.triedSolutions && pain.triedSolutions.length > 0 ? (
-                         pain.triedSolutions.map((sol, i) => (
-                           <div key={i} className="flex items-center gap-3 text-zinc-400 font-medium">
-                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30"></div>
-                             User tried &quot;{sol}&quot;
-                           </div>
-                         ))
-                       ) : (
-                         <p className="text-zinc-600 text-xs italic font-medium">No tools mentioned specifically.</p>
-                       )}
+                      <h5 className="text-lg font-black text-white tracking-tight">
+                        {deriveBuildIdea(pain)}
+                      </h5>
+                      <p className="text-[12px] text-zinc-300 font-medium">
+                        Build for: <span className="text-white">{deriveTargetUser(pain)}</span>
+                      </p>
+                      <div className="space-y-2">
+                        {deriveMvpFeatures(pain).map((feature) => (
+                          <div key={feature} className="flex items-start gap-3 text-zinc-300 text-[13px] font-medium">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#ff4500] mt-2"></div>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 space-y-4 shadow-inner">
-                    <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                       <Lightbulb className="w-4 h-4" /> Suggested Angles
-                    </p>
-                    <div className="space-y-2">
-                       {pain.angles.map((angle, i) => (
-                         <div key={i} className="flex items-center gap-3 text-zinc-400 font-medium">
-                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></div>
-                           {angle}
-                         </div>
-                       ))}
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
+
+          {totalPainPoints === 0 && (
+            <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 text-center">
+              <p className="text-[11px] font-black uppercase tracking-widest text-zinc-500">
+                No frustrations match the selected filters
+              </p>
+            </div>
+          )}
+
+          {totalPainPoints > PAIN_POINTS_PER_PAGE && (
+            <div className="flex items-center justify-between px-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                Showing {startPainPointIndex + 1}-{endPainPointIndex} of {totalPainPoints}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPainPointsPage((prev) => Math.max(1, prev - 1))}
+                  disabled={painPointsPage === 1}
+                  className="px-3 py-2 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  Prev
+                </button>
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-2">
+                  Page {painPointsPage} / {totalPainPointPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPainPointsPage((prev) => Math.min(totalPainPointPages, prev + 1))}
+                  disabled={painPointsPage === totalPainPointPages}
+                  className="px-3 py-2 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-all flex items-center gap-1"
+                >
+                  Next
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Sidebar Intel */}
@@ -412,21 +752,33 @@ export default function ReportDetailPage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Filter by Intensity</label>
-                    <select className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold">
-                      <option>All Intensity Levels</option>
-                      <option>High Core Pain (8+)</option>
-                      <option>Medium Friction (5+)</option>
+                    <select
+                      value={intensityFilterDraft}
+                      onChange={(event) => setIntensityFilterDraft(event.target.value as IntensityFilter)}
+                      className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold [&>option]:bg-white [&>option]:text-black"
+                    >
+                      <option value="all">All Intensity Levels</option>
+                      <option value="high">High Core Pain (8+)</option>
+                      <option value="medium">Medium Friction (5+)</option>
                     </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Sentiment Filter</label>
-                    <select className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold">
-                      <option>All Sentiment Types</option>
-                      <option>Frustrated / Desperate</option>
-                      <option>Neutral Explorations</option>
+                    <select
+                      value={sentimentFilterDraft}
+                      onChange={(event) => setSentimentFilterDraft(event.target.value as SentimentFilter)}
+                      className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold [&>option]:bg-white [&>option]:text-black"
+                    >
+                      <option value="all">All Sentiment Types</option>
+                      <option value="frustrated">Frustrated / Desperate</option>
+                      <option value="neutral">Neutral Explorations</option>
                     </select>
                   </div>
-                  <button className="w-full bg-[#ff4500] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#ff571a] transition-all active:scale-[0.98] shadow-lg shadow-[#ff4500]/20">
+                  <button
+                    type="button"
+                    onClick={handleApplyFilters}
+                    className="w-full bg-[#ff4500] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#ff571a] transition-all active:scale-[0.98] shadow-lg shadow-[#ff4500]/20"
+                  >
                     Apply Filter Logic
                   </button>
                 </div>
@@ -472,10 +824,10 @@ export default function ReportDetailPage() {
                        <p className="text-sm font-black text-white leading-tight">{opp.title}</p>
                        <span className="text-[10px] font-black uppercase tracking-widest text-[#ff4500]">{opp.score}/100</span>
                      </div>
-                     <p className="text-xs text-zinc-400 font-medium leading-relaxed">{opp.problemStatement}</p>
+                     <p className="text-xs text-zinc-400 font-medium leading-relaxed whitespace-pre-line">{renderMultiline(opp.problemStatement)}</p>
                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">ICP: {opp.targetCustomer}</p>
-                     <p className="text-xs text-zinc-300 font-medium leading-relaxed">{opp.valueProposition}</p>
-                     <p className="text-[11px] text-zinc-500 font-bold leading-relaxed">{opp.launchAngle}</p>
+                     <p className="text-xs text-zinc-300 font-medium leading-relaxed whitespace-pre-line">{renderMultiline(opp.valueProposition)}</p>
+                     <p className="text-[11px] text-zinc-500 font-bold leading-relaxed whitespace-pre-line">{renderMultiline(opp.launchAngle)}</p>
                    </div>
                  ))}
                </div>
@@ -508,13 +860,15 @@ export default function ReportDetailPage() {
 
 function InfoSquare({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string, color: string }) {
     return (
-        <div className="bg-white/2 border border-white/5 p-4 rounded-2xl flex items-center gap-4">
-            <div className={`p-2 rounded-lg bg-zinc-900 border border-white/5 ${color}`}>
+        <div className="bg-white/2 border border-white/5 p-4 rounded-2xl flex items-start gap-3 min-h-[82px]">
+            <div className={`p-2 rounded-lg bg-zinc-900 border border-white/5 ${color} shrink-0`}>
                 {icon}
             </div>
-            <div>
+            <div className="min-w-0">
                 <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{label}</p>
-                <p className={`text-sm font-black text-white uppercase truncate max-w-[120px]`}>{value}</p>
+                <p className="text-sm font-black text-white leading-tight break-words whitespace-normal">
+                  {value}
+                </p>
             </div>
         </div>
     );

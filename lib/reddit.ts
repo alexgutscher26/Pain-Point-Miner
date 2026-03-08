@@ -36,6 +36,34 @@ type RedditListingResponse = {
   };
 };
 
+type PullPushListingResponse = {
+  data?: Array<{
+    id?: string;
+    title?: string;
+    selftext?: string;
+    author?: string;
+    score?: number;
+    subreddit?: string;
+    url?: string;
+    permalink?: string;
+    num_comments?: number;
+    created_utc?: number;
+    created?: number;
+  }>;
+};
+
+type PullPushCommentResponse = {
+  data?: Array<{
+    id?: string;
+    body?: string;
+    author?: string;
+    score?: number;
+    permalink?: string;
+    created_utc?: number;
+    created?: number;
+  }>;
+};
+
 /**
  * Pauses execution for a specified number of milliseconds.
  */
@@ -85,6 +113,71 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
   }
 
   throw lastError instanceof Error ? lastError : new Error("Reddit request failed");
+}
+
+function isRedditBlockedError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  return message.includes("403") || message.includes("blocked");
+}
+
+async function fetchFromPullPushSubmissions(
+  subreddit: string,
+  keyword: string,
+  maxPosts: number
+): Promise<RedditPost[]> {
+  const size = Math.max(1, Math.min(250, maxPosts));
+  const params = new URLSearchParams({
+    subreddit,
+    q: keyword,
+    size: String(size),
+    sort: "desc",
+    sort_type: "score",
+  });
+  const response = await fetch(`https://api.pullpush.io/reddit/search/submission/?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`PullPush API returned ${response.status}: ${response.statusText}`);
+  }
+  const data = (await response.json()) as PullPushListingResponse;
+  const rows = data.data ?? [];
+  return rows
+    .filter((row): row is NonNullable<typeof row> & { id: string; title: string } => Boolean(row?.id && row?.title))
+    .map((row) => ({
+      id: row.id,
+      title: row.title,
+      selftext: row.selftext ?? "",
+      author: row.author ?? "unknown",
+      score: row.score ?? 0,
+      subreddit: row.subreddit ?? subreddit,
+      url: row.url ?? (row.permalink ? `https://www.reddit.com${row.permalink}` : ""),
+      num_comments: row.num_comments ?? 0,
+      created_utc: row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+    }));
+}
+
+async function fetchFromPullPushComments(postId: string): Promise<RedditComment[]> {
+  const params = new URLSearchParams({
+    link_id: postId,
+    size: "200",
+    sort: "desc",
+    sort_type: "score",
+  });
+  const response = await fetch(`https://api.pullpush.io/reddit/search/comment/?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`PullPush API returned ${response.status}: ${response.statusText}`);
+  }
+  const data = (await response.json()) as PullPushCommentResponse;
+  const rows = data.data ?? [];
+  return rows
+    .filter((row): row is NonNullable<typeof row> & { id: string; body: string } => Boolean(row?.id && row?.body))
+    .map((row) => ({
+      id: row.id,
+      body: row.body,
+      author: row.author ?? "unknown",
+      score: row.score ?? 0,
+      permalink: row.permalink ? `https://www.reddit.com${row.permalink}` : "",
+      created_utc: row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+    }));
 }
 
 /**
@@ -176,6 +269,19 @@ export async function fetchSubredditPostsBatched(
 
     return posts;
   } catch (error) {
+    if (isRedditBlockedError(error)) {
+      try {
+        const fallbackPosts = await fetchFromPullPushSubmissions(
+          subreddit,
+          keyword,
+          Math.max(1, Math.min(2_000, options?.maxPosts ?? 25))
+        );
+        return fallbackPosts;
+      } catch (fallbackError) {
+        console.error(`Error fetching posts from fallback source for r/${subreddit}:`, fallbackError);
+        return [];
+      }
+    }
     console.error(`Error fetching posts from r/${subreddit}:`, error);
     return [];
   }
@@ -224,6 +330,14 @@ export const fetchComments = async (postId: string, subreddit: string): Promise<
       ];
     });
   } catch (error) {
+    if (isRedditBlockedError(error)) {
+      try {
+        return await fetchFromPullPushComments(postId);
+      } catch (fallbackError) {
+        console.error(`Error fetching comments from fallback source for post ${postId}:`, fallbackError);
+        return [];
+      }
+    }
     console.error(`Error fetching comments for post ${postId}:`, error);
     return [];
   }

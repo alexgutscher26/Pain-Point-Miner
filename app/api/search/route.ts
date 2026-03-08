@@ -48,9 +48,15 @@ const searchPayloadSchema = z.object({
   keyword: z
     .string()
     .trim()
-    .transform((value) => value.replace(/\s+/g, " "))
     .min(KEYWORD_MIN_LENGTH, `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`)
-    .max(KEYWORD_MAX_LENGTH, `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`),
+    .max(KEYWORD_MAX_LENGTH, `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`)
+    .transform((value) => value.replace(/\s+/g, " "))
+    .pipe(
+      z
+        .string()
+        .min(KEYWORD_MIN_LENGTH, `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`)
+        .max(KEYWORD_MAX_LENGTH, `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`)
+    ),
   subreddits: z
     .string()
     .optional()
