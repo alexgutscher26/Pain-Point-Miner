@@ -29,6 +29,11 @@ jobs:
           fi
 
           BASE_URL="${APP_BASE_URL%/}"
+          if [[ "$BASE_URL" == http://localhost* ]] || [[ "$BASE_URL" == https://localhost* ]] || [[ "$BASE_URL" == http://127.0.0.1* ]] || [[ "$BASE_URL" == https://127.0.0.1* ]]; then
+            echo "APP_BASE_URL points to localhost/127.0.0.1, which is unreachable from GitHub-hosted runners. Set APP_BASE_URL to your deployed app URL."
+            exit 1
+          fi
+
           curl --fail-with-body --show-error --silent \
             --request POST \
             --url "$BASE_URL/api/search/scheduled?limit=5" \
