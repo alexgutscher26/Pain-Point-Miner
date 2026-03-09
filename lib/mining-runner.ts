@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { keywordStat, painPoint, painPointComment, scraper, scraperRun } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import { fetchComments, fetchSubredditPostsBatched, type RedditPost } from "@/lib/reddit";
+import { clusterPainPoint } from "@/lib/clustering";
 
 export type MiningDepth = "basic" | "deep" | "advanced";
 
@@ -89,18 +90,50 @@ export async function executeMiningRun({
   const analyzeLimit = processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
 
   try {
+    // Insert a scraperRun record upfront so SSE can track progress
+    await db.insert(scraperRun).values({
+      id: runId,
+      scraperId,
+      status: "scanning",
+      startedAt: startTime,
+      finishedAt: startTime, // placeholder, updated on completion
+      postsFetched: 0,
+      postsMatched: 0,
+      commentsFetched: 0,
+      newPainPoints: 0,
+    });
+
     let allPosts: RedditPost[] = [];
     const targetSubreddits = subreddits.slice(0, Math.max(1, subLimit));
 
-    for (const sub of targetSubreddits) {
-      const posts = await fetchSubredditPostsBatched(sub, keyword, {
-        maxPosts: postsPerSub,
-        time: "year",
-      });
-      allPosts.push(...posts);
+    const subredditFetchResults = await Promise.allSettled(
+      targetSubreddits.map((sub) =>
+        fetchSubredditPostsBatched(sub, keyword, {
+          maxPosts: postsPerSub,
+          time: "year",
+        })
+      )
+    );
+
+    for (const result of subredditFetchResults) {
+      if (result.status === "fulfilled") {
+        allPosts.push(...result.value);
+      } else {
+        console.error("Subreddit fetch failed:", result.reason);
+      }
     }
 
     allPosts = dedupePosts(allPosts);
+
+    // Update phase: scanning → extracting
+    await db
+      .update(scraperRun)
+      .set({
+        status: "extracting",
+        postsFetched: allPosts.length,
+        postsMatched: allPosts.length,
+      })
+      .where(eq(scraperRun.id, runId));
 
     if (isBasic) {
       const nowSeconds = Math.floor(Date.now() / 1_000);
@@ -196,20 +229,36 @@ export async function executeMiningRun({
           await db.insert(painPointComment).values(commentRows);
         }
         newPainPoints += 1;
+
+        // Fire-and-forget: embed + cluster this pain point
+        void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
+          console.error(`Embedding/clustering failed for ${painPointId}:`, err)
+        );
       }
     }
 
-    await db.insert(scraperRun).values({
-      id: runId,
-      scraperId,
-      status: "completed",
-      startedAt: startTime,
-      finishedAt: new Date(),
-      postsFetched: allPosts.length,
-      postsMatched: allPosts.length,
-      commentsFetched,
-      newPainPoints,
-    });
+    // Update phase: extracting → clustering
+    await db
+      .update(scraperRun)
+      .set({
+        status: "clustering",
+        commentsFetched,
+        newPainPoints,
+      })
+      .where(eq(scraperRun.id, runId));
+
+    // Update phase: clustering → completed
+    await db
+      .update(scraperRun)
+      .set({
+        status: "completed",
+        finishedAt: new Date(),
+        postsFetched: allPosts.length,
+        postsMatched: allPosts.length,
+        commentsFetched,
+        newPainPoints,
+      })
+      .where(eq(scraperRun.id, runId));
 
     await db
       .insert(keywordStat)
@@ -251,18 +300,29 @@ export async function executeMiningRun({
     };
   } catch (error) {
     const errorMessage = getErrorMessage(error).slice(0, 2_000);
-    await db.insert(scraperRun).values({
-      id: runId,
-      scraperId,
-      status: "failed",
-      startedAt: startTime,
-      finishedAt: new Date(),
-      postsFetched: 0,
-      postsMatched: 0,
-      commentsFetched: 0,
-      newPainPoints: 0,
-      error: errorMessage,
-    });
+    // Upsert: update if the scanning row already exists, insert otherwise
+    await db
+      .insert(scraperRun)
+      .values({
+        id: runId,
+        scraperId,
+        status: "failed",
+        startedAt: startTime,
+        finishedAt: new Date(),
+        postsFetched: 0,
+        postsMatched: 0,
+        commentsFetched: 0,
+        newPainPoints: 0,
+        error: errorMessage,
+      })
+      .onConflictDoUpdate({
+        target: scraperRun.id,
+        set: {
+          status: "failed",
+          finishedAt: new Date(),
+          error: errorMessage,
+        },
+      });
 
     await db
       .update(scraper)

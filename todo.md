@@ -40,12 +40,12 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **High Priority Implementation**
 
-- [ ] **Parallelized Scraping Engine**: Refactor `mining-runner.ts` to fetch comments for multiple posts concurrently using `Promise.allSettled`.
-- [ ] **Semantic Embedding Pipeline**:
-  - [ ] Auto-generate vector embeddings for every new `painPoint` using OpenAI/OpenRouter embeddings.
-  - [ ] Implement a clustering worker to group similar pain points into a `painPointCluster` automatically.
-  - [ ] Update `findSimilarPainPoints` logic to use semantic search (PGVector) instead of simple keyword matching.
-- [ ] **Mission Control UI**: Real-time scan progress via Server-Sent Events (SSE). Show live status: "Scanning r/SaaS...", "Extracted 4 opportunities...".
+- [x] **Parallelized Scraping Engine**: Refactor `mining-runner.ts` to fetch comments for multiple posts concurrently using `Promise.allSettled`.
+- [x] **Semantic Embedding Pipeline**:
+  - [x] Auto-generate vector embeddings for every new `painPoint` using OpenAI/OpenRouter embeddings.
+  - [x] Implement a clustering worker to group similar pain points into a `painPointCluster` automatically.
+  - [x] Update `findSimilarPainPoints` logic to use semantic search (PGVector) instead of simple keyword matching.
+- [x] **Mission Control UI**: Real-time scan progress via Server-Sent Events (SSE). Show live status: "Scanning r/SaaS...", "Extracted 4 opportunities...".
 
 ### **Data & Scraper Logic**
 

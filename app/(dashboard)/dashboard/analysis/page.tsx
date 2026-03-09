@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { 
   CheckCircle2, 
   Eye, 
@@ -12,121 +12,74 @@ import {
   BarChart4
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
-
-interface ScraperRunInfo {
-  status: string;
-  postsFetched: number;
-}
-
-interface ScraperStatusData {
-  scraper: {
-    id: string;
-    keywords: string[];
-    subreddits: string[];
-    miningDepth?: string;
-  };
-  latestRun: ScraperRunInfo | null;
-  painPointCount: number;
-  status: string;
-}
+import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const scraperId = searchParams.get("id");
 
-  const [progress, setProgress] = useState(15);
-  const [statusText, setStatusText] = useState("Initializing Reddit data pipeline...");
-  const [isDone, setIsDone] = useState(false);
-  const [hasFailed, setHasFailed] = useState(false);
-  const [stats, setStats] = useState<ScraperStatusData | null>(null);
+  const {
+    phase,
+    message: statusText,
+    progress,
+    painPointCount,
+    postsFetched,
+    subreddits,
+    isDone,
+    hasFailed,
+  } = useMiningStream(scraperId);
 
-  // Poll for status
-  useEffect(() => {
-    if (!scraperId) return;
-
-    let isActive = true;
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/search/status?id=${scraperId}`);
-        if (!response.ok) throw new Error("Status check failed");
-        
-        const data = await response.json();
-        if (!isActive) return;
-        setStats(data);
-
-        // Map status to progress (This is a simplified approach)
-        if (data.status === 'completed') {
-          setProgress(100);
-          setStatusText("Analysis complete. Found " + data.painPointCount + " pain points.");
-          setIsDone(true);
-          setHasFailed(false);
-          clearInterval(pollInterval);
-        } else if (data.status === "failed" || data.status === "canceled") {
-          setProgress((prev) => Math.max(prev, 95));
-          setStatusText(
-            data.status === "failed"
-              ? "Analysis failed. Please retry this scan."
-              : "Analysis was canceled."
-          );
-          setHasFailed(true);
-          clearInterval(pollInterval);
-        } else {
-          // Increment progress slightly while waiting
-          setProgress((prev) => (prev < 90 ? prev + 5 : prev));
-          setStatusText("Processing posts and comments...");
-        }
-      } catch (error) {
-        console.error("Polling error:", error);
-      }
-    }, 2000);
-
-    return () => {
-      isActive = false;
-      clearInterval(pollInterval);
-    };
-  }, [scraperId]);
-
-  // Derived step status
+  // Derive step status from the live SSE phase
   const steps = useMemo(() => {
-    const isSuccess = stats?.status === 'completed';
-    const hasPoints = (stats?.painPointCount || 0) > 0;
-    
+    const phaseOrder: MiningPhase[] = ["scanning", "extracting", "clustering", "completed"];
+    const currentIdx = phaseOrder.indexOf(phase);
+
+    function stepStatus(stepPhase: MiningPhase): "completed" | "in-progress" | "pending" {
+      const stepIdx = phaseOrder.indexOf(stepPhase);
+      if (phase === "completed" || phase === "failed" || phase === "canceled") return "completed";
+      if (currentIdx > stepIdx) return "completed";
+      if (currentIdx === stepIdx) return "in-progress";
+      return "pending";
+    }
+
     return [
       {
         icon: <Search className="w-4 h-4" />,
         title: "Collecting Reddit posts...",
-        description: stats?.latestRun 
-          ? `Found ${stats.latestRun.postsFetched} posts across targeting subreddits.` 
-          : "Analyzing search relevance...",
-        status: stats ? 'completed' : 'in-progress'
+        description: postsFetched > 0
+          ? `Found ${postsFetched} posts across ${subreddits.length > 0 ? subreddits.map(s => `r/${s}`).slice(0, 3).join(", ") : "target subreddits"}.`
+          : subreddits.length > 0
+            ? `Scanning r/${subreddits[0]}${subreddits.length > 1 ? ` and ${subreddits.length - 1} more...` : "..."}`
+            : "Analyzing search relevance...",
+        status: stepStatus("scanning"),
       },
       {
         icon: <BrainCircuit className="w-4 h-4" />,
         title: "Extracting pain points...",
-        description: hasPoints 
-          ? `Discovered ${stats?.painPointCount} unique frustration markers.` 
+        description: painPointCount > 0
+          ? `Discovered ${painPointCount} unique frustration markers.`
           : "AI is reading content for intensity and budget...",
-        status: hasPoints ? 'completed' : (stats ? 'in-progress' : 'pending')
+        status: stepStatus("extracting"),
       },
       {
         icon: <Sparkles className="w-4 h-4" />,
-        title: "Grouping repeated themes...",
-        description: isSuccess 
-          ? "Clustered insights into high-value opportunities." 
+        title: "Clustering repeated themes...",
+        description: phase === "completed" || phase === "clustering"
+          ? `Clustered ${painPointCount} insights into high-value opportunities.`
           : "Structuring data hierarchies for the final report...",
-        status: (isSuccess && hasPoints) ? 'completed' : (hasPoints ? 'in-progress' : 'pending')
+        status: stepStatus("clustering"),
       },
       {
         icon: <BarChart4 className="w-4 h-4" />,
         title: "Finalizing Report...",
-        description: isSuccess 
-          ? "Scoring market viability and difficulty scores." 
+        description: isDone
+          ? "Scoring market viability and difficulty scores."
           : "Preparing your analysis dashboard...",
-        status: isSuccess ? 'completed' : ((isSuccess || hasPoints) ? 'in-progress' : 'pending')
-      }
+        status: stepStatus("completed"),
+      },
     ];
-  }, [stats]);
+  }, [phase, postsFetched, painPointCount, subreddits, isDone]);
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
@@ -191,19 +144,7 @@ export default function AnalysisPage() {
         <div className="px-10 py-6 bg-white/2 border-t border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
              <Clock className="w-4 h-4" />
-             {isDone ? "Mining complete" : (() => {
-               const subCount = stats?.scraper.subreddits.length || 4;
-               const depthMultiplier =
-                 stats?.scraper.miningDepth === "advanced"
-                   ? 5
-                   : stats?.scraper.miningDepth === "deep"
-                     ? 3
-                     : 1;
-               const totalSeconds = (subCount * 15) * depthMultiplier;
-               return `Expected completion: ~${totalSeconds >= 60 
-                ? `${Math.round(totalSeconds / 60)} minutes` 
-                : `${totalSeconds} seconds`}`;
-             })()}
+             {isDone ? "Mining complete" : `${progress}% — ${statusText}`}
           </div>
           <button 
             disabled={!isDone}

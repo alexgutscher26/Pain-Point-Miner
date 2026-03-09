@@ -3,6 +3,9 @@ import { z } from "zod";
 export const runStatusSchema = z.enum([
   "queued",
   "running",
+  "scanning",
+  "extracting",
+  "clustering",
   "completed",
   "failed",
   "canceled",
