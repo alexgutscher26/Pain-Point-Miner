@@ -7,6 +7,8 @@ import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
+import { getPlanEntitlements } from "@/lib/plan-gating";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
@@ -145,7 +147,7 @@ export async function GET(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {
@@ -160,6 +162,13 @@ export async function GET(
   const { id } = parsedParams.data;
 
   try {
+    const plan = await resolveCurrentPlan({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    const entitlements = getPlanEntitlements(plan);
+
     const currentScraper = await db.query.scraper.findFirst({
       where: and(
         eq(scraper.id, id),
@@ -295,7 +304,8 @@ export async function GET(
       category: currentScraper.reportCategory || "Uncategorized",
       customPatterns: currentScraper.customPatterns || [],
       trend: trendInsight
-        ? {
+        ? entitlements.hasTrendDetection
+          ? {
             direction: trendInsight.direction,
             delta: trendInsight.delta,
             percentChange: Math.round(trendInsight.percentChange),
@@ -307,9 +317,10 @@ export async function GET(
                 : trendInsight.direction === "up"
                   ? `${formatTrendChangePercent(trendInsight.percentChange)} vs previous run`
                   : trendInsight.direction === "down"
-                    ? `${formatTrendChangePercent(trendInsight.percentChange)} vs previous run`
-                    : "No major change vs previous run",
-          }
+                  ? `${formatTrendChangePercent(trendInsight.percentChange)} vs previous run`
+                  : "No major change vs previous run",
+            }
+          : null
         : null,
       metrics: [
         { 
@@ -397,7 +408,7 @@ export async function GET(
             "Cost-effective alternative to existing tools"
         ]
       })),
-      saasOpportunities,
+      saasOpportunities: entitlements.hasSaasOpportunities ? saasOpportunities : [],
     };
 
     return apiJson(response, 200, correlationId);
@@ -415,7 +426,7 @@ export async function PATCH(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {
@@ -443,6 +454,26 @@ export async function PATCH(
   const { saved, category } = parsedBody.data;
 
   try {
+    const plan = await resolveCurrentPlan({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    const entitlements = getPlanEntitlements(plan);
+
+    if (saved && !entitlements.canSaveReports) {
+      return apiError(
+        403,
+        "PLAN_UPGRADE_REQUIRED",
+        `Saving reports is available on Growth and Pro plans. Current plan: ${plan}.`,
+        {
+          plan,
+          canSaveReports: entitlements.canSaveReports,
+        },
+        correlationId
+      );
+    }
+
     const updated = await db
       .update(scraper)
       .set({

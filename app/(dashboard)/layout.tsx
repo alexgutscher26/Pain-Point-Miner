@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 import { 
   HelpCircle,
   Plus,
@@ -16,13 +17,26 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const requestHeaders = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
 
   if (!session) {
     redirect("/sign-in");
   }
+  const plan = await resolveCurrentPlan({
+    userId: session.user.id,
+    email: session.user.email,
+    requestHeaders,
+  });
+  const planLabel = `${plan.charAt(0).toUpperCase()}${plan.slice(1)} Plan`;
+  const upgradeMessage =
+    plan === "pro"
+      ? "You have full access to all features."
+      : plan === "growth"
+        ? "Upgrade to Pro for unlimited scans and deep analysis."
+        : "Upgrade to Growth or Pro for advanced features.";
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-[#ff4500]/30 antialiased">
@@ -46,9 +60,9 @@ export default async function DashboardLayout({
             <div className="absolute top-0 right-0 w-20 h-20 bg-[#ff4500]/10 blur-2xl rounded-full -mr-10 -mt-10"></div>
             <div className="flex items-center gap-2 mb-2 relative z-10">
               <Crown className="w-4 h-4 text-[#ff4500]" />
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#ff4500]">Free Plan</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#ff4500]">{planLabel}</p>
             </div>
-            <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">Upgrade to Pro for unlimited scans and AI analysis.</p>
+            <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">{upgradeMessage}</p>
             <button className="w-full bg-[#ff4500] hover:bg-[#e63e00] text-white text-[11px] font-bold py-2.5 rounded-lg transition-all shadow-lg shadow-[#ff4500]/20 uppercase tracking-widest relative z-10">
               Upgrade Now
             </button>

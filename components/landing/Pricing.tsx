@@ -106,7 +106,7 @@ export function Pricing() {
             <SectionHeader icon={<RotateCw className="w-3.5 h-3.5" />} label="ENGAGE" spotlight />
             <ul className="space-y-4">
               <FeatureItem label="Advanced pain-point clustering" />
-              <FeatureItem label="Opportunity scoring" spotlight />
+              <FeatureItem label="Opportunity scoring" />
               <FeatureItem label="Sentiment analysis" />
               <FeatureItem label="Save and organize reports" />
               <FeatureItem label="Export full insights" />

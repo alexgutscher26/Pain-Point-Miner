@@ -19,6 +19,8 @@ import { normalizeRunStatus } from "@/lib/run-status";
 import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-hero";
+import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
 const dashboardWindowSchema = z.enum(["realtime", "30d"]).default("realtime");
@@ -41,6 +43,27 @@ export default async function DashboardPage({
   }
 
   const userFirstName = session.user.name?.split(" ")[0] || "Founder";
+  const plan = await resolveCurrentPlan({
+    userId: session.user.id,
+    email: session.user.email,
+    requestHeaders,
+  });
+  const usageSummary = getMonthlyUsageSummary(plan, await getMonthlyScanUsage(session.user.id));
+  const searchesRemainingLabel =
+    usageSummary.monthlyScansLimit === null
+      ? "Unlimited"
+      : `${usageSummary.monthlyScansUsed}/${usageSummary.monthlyScansLimit}`;
+  const searchesProgress =
+    usageSummary.monthlyScansLimit === null
+      ? 0
+      : Math.min(
+          100,
+          Math.round((usageSummary.monthlyScansUsed / usageSummary.monthlyScansLimit) * 100)
+        );
+  const searchesSubtext =
+    usageSummary.monthlyScansLimit === null
+      ? "No monthly cap on Pro"
+      : `${usageSummary.monthlyScansRemaining ?? 0} scans remaining this month`;
   const parsedWorkspaceId = workspaceHeaderSchema.safeParse(requestHeaders.get("x-workspace-id"));
   const workspaceId = parsedWorkspaceId.success ? parsedWorkspaceId.data : null;
   const parsedWindow = dashboardWindowSchema.safeParse(
@@ -163,11 +186,11 @@ export default async function DashboardPage({
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title="Searches Remaining"
-          value="2/3"
+          title="Monthly Scans"
+          value={searchesRemainingLabel}
           icon={<Search className="w-4 h-4 text-white" />}
-          progress={66}
-          subtext="Resets in 12 days"
+          progress={searchesProgress}
+          subtext={searchesSubtext}
         />
         <MetricCard
           title="Reports Saved"

@@ -13,6 +13,7 @@ const workspaceHeaderSchema = z.string().uuid("Invalid workspace id").nullable()
 type ApiContext = {
   correlationId: string;
   userId: string;
+  userEmail: string;
   workspaceId: string | null;
 };
 
@@ -79,6 +80,7 @@ export async function requireApiContext(req: Request) {
     context: {
       correlationId,
       userId: session.user.id,
+      userEmail: session.user.email,
       workspaceId,
     } satisfies ApiContext,
   };

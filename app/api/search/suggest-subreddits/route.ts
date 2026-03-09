@@ -2,6 +2,8 @@
 import { apiJson } from "@/lib/api-error";
 import { requireApiContext } from "@/lib/api-auth";
 import { z } from "zod";
+import { getPlanEntitlements } from "@/lib/plan-gating";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 const suggestPayloadSchema = z.object({
   keyword: z.string().trim().min(3).max(120),
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
 
   try {
     const payload = await req.json().catch(() => null);
@@ -30,13 +32,23 @@ export async function POST(req: Request) {
       return apiJson({ subreddits: [] }, 200, correlationId);
     }
     const { keyword, locale, count } = parsedPayload.data;
+    const plan = await resolveCurrentPlan({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    const entitlements = getPlanEntitlements(plan);
+    const cappedCount =
+      entitlements.maxSubredditsPerSearch === null
+        ? count
+        : Math.min(count, entitlements.maxSubredditsPerSearch);
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       throw new Error("API key not configured");
     }
 
-    const prompt = `You are a Reddit growth expert. Suggest ${count} highly active and relevant subreddits for the niche: "${keyword}" for users in ${locale}. 
+    const prompt = `You are a Reddit growth expert. Suggest ${cappedCount} highly active and relevant subreddits for the niche: "${keyword}" for users in ${locale}. 
     Focus on communities where users post frustration, questions, and seek solutions.
     Return ONLY a JSON array of strings (the subreddit names without r/). 
     Example: ["saas", "entrepreneur", "startups"]`;
@@ -65,7 +77,7 @@ export async function POST(req: Request) {
           .filter((result) => result.success)
           .map((result) => result.data)
           .filter((value, index, arr) => arr.indexOf(value) === index)
-          .slice(0, count)
+          .slice(0, cappedCount)
       : [];
 
     return apiJson({ subreddits }, 200, correlationId);

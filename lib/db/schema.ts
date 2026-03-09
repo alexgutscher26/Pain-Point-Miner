@@ -147,11 +147,15 @@ export const user = pgTable("user", {
 	name: text().notNull(),
 	email: text().notNull(),
 	emailVerified: boolean().notNull(),
+	username: text(),
+	displayUsername: text(),
+	stripeCustomerId: text(),
 	image: text(),
 	createdAt: timestamp({ precision: 3, mode: 'date' }).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'date' }).notNull(),
 }, (table) => [
 	uniqueIndex("user_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	uniqueIndex("user_username_key").using("btree", table.username.asc().nullsLast().op("text_ops")),
 ]);
 
 export const session = pgTable("session", {
@@ -191,7 +195,34 @@ export const account = pgTable("account", {
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: "account_userId_fkey"
-		}).onUpdate("cascade").onDelete("cascade"),
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const subscription = pgTable("subscription", {
+	id: text().primaryKey().notNull(),
+	plan: text().notNull(),
+	referenceId: text().notNull(),
+	stripeCustomerId: text(),
+	stripeSubscriptionId: text(),
+	status: text().default('incomplete').notNull(),
+	periodStart: timestamp({ precision: 3, mode: 'date' }),
+	periodEnd: timestamp({ precision: 3, mode: 'date' }),
+	trialStart: timestamp({ precision: 3, mode: 'date' }),
+	trialEnd: timestamp({ precision: 3, mode: 'date' }),
+	cancelAtPeriodEnd: boolean().default(false),
+	cancelAt: timestamp({ precision: 3, mode: 'date' }),
+	canceledAt: timestamp({ precision: 3, mode: 'date' }),
+	endedAt: timestamp({ precision: 3, mode: 'date' }),
+	seats: integer(),
+	billingInterval: text(),
+	stripeScheduleId: text(),
+	limits: jsonb(),
+	createdAt: timestamp({ precision: 3, mode: 'date' }).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'date' }).notNull(),
+}, (table) => [
+	index("subscription_referenceId_idx").using("btree", table.referenceId.asc().nullsLast().op("text_ops")),
+	index("subscription_stripeCustomerId_idx").using("btree", table.stripeCustomerId.asc().nullsLast().op("text_ops")),
+	index("subscription_stripeSubscriptionId_idx").using("btree", table.stripeSubscriptionId.asc().nullsLast().op("text_ops")),
 ]);
 
 export const scraper = pgTable("scraper", {

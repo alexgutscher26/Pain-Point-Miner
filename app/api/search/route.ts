@@ -8,6 +8,8 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
+import { getMonthlyScanUsage, getPlanEntitlements, isDepthAllowed } from "@/lib/plan-gating";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -141,7 +143,7 @@ export async function POST(req: Request) {
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
   const rawIdempotencyKey = req.headers.get(IDEMPOTENCY_KEY_HEADER);
   let idempotencyKey: string | null = null;
 
@@ -180,13 +182,49 @@ export async function POST(req: Request) {
     }
 
     const { keyword, subreddits, customPatterns, miningDepth } = parsedPayload.data;
+    const plan = await resolveCurrentPlan({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    const entitlements = getPlanEntitlements(plan);
+
+    if (!isDepthAllowed(plan, miningDepth)) {
+      return apiError(
+        403,
+        "PLAN_UPGRADE_REQUIRED",
+        `Your ${plan} plan does not include ${miningDepth} mining depth. Upgrade to continue.`,
+        {
+          plan,
+          allowedMiningDepths: entitlements.allowedMiningDepths,
+        },
+        correlationId
+      );
+    }
+
+    const monthlyScansUsed = await getMonthlyScanUsage(userId);
+    if (entitlements.monthlyScans !== null && monthlyScansUsed >= entitlements.monthlyScans) {
+      return apiError(
+        403,
+        "PLAN_LIMIT_REACHED",
+        `You have reached your monthly scan limit (${entitlements.monthlyScans}) for the ${plan} plan.`,
+        {
+          plan,
+          monthlyScansUsed,
+          monthlyScansLimit: entitlements.monthlyScans,
+        },
+        correlationId
+      );
+    }
 
     const rawSubreddits = subreddits
       .split(",")
       .map((sub) => sub.trim())
       .filter(Boolean);
 
-    const maxSubredditsForDepth = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
+    const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
+    const planLimit = entitlements.maxSubredditsPerSearch ?? depthLimit;
+    const maxSubredditsForDepth = Math.min(depthLimit, planLimit);
     const normalizedSubreddits = z
       .array(subredditTokenSchema)
       .max(

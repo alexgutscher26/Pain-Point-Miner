@@ -9,7 +9,8 @@ import {
   Target, 
   CheckCircle2,
   Sparkles,
-  Loader2
+  Loader2,
+  Lock
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,6 +25,22 @@ type SearchDraft = {
 };
 
 type MiningDepth = SearchDraft["miningDepth"];
+type BillingEntitlementsResponse = {
+  plan: "starter" | "growth" | "pro";
+  entitlements: {
+    monthlyScans: number | null;
+    maxSubredditsPerSearch: number | null;
+    allowedMiningDepths: MiningDepth[];
+    canSaveReports: boolean;
+    hasTrendDetection: boolean;
+    hasSaasOpportunities: boolean;
+  };
+  usage: {
+    monthlyScansUsed: number;
+    monthlyScansLimit: number | null;
+    monthlyScansRemaining: number | null;
+  };
+};
 
 const DEFAULT_SUBREDDIT_COUNT = 5;
 const DEFAULT_MIN_SCORE = 70;
@@ -50,11 +67,14 @@ export default function SearchPage() {
   const [defaultSubredditCount, setDefaultSubredditCount] = useState(DEFAULT_SUBREDDIT_COUNT);
   const [minimumOpportunityScore, setMinimumOpportunityScore] = useState(DEFAULT_MIN_SCORE);
   const [defaultLocale, setDefaultLocale] = useState(DEFAULT_LOCALE);
+  const [billing, setBilling] = useState<BillingEntitlementsResponse | null>(null);
   const requestInFlightRef = useRef(false);
+  const planSubredditCap = billing?.entitlements.maxSubredditsPerSearch ?? 10;
+  const normalizedVisibleCommunityCount = Math.max(1, Math.min(defaultSubredditCount, planSubredditCap));
   const localeCommunities =
     COMMON_SUBREDDITS_BY_LOCALE[defaultLocale.trim().toLowerCase()] ??
     COMMON_SUBREDDITS_BY_LOCALE[DEFAULT_LOCALE.toLowerCase()];
-  const visibleCommunities = localeCommunities.slice(0, Math.max(1, Math.min(defaultSubredditCount, 10)));
+  const visibleCommunities = localeCommunities.slice(0, normalizedVisibleCommunityCount);
 
   useEffect(() => {
     try {
@@ -118,6 +138,31 @@ export default function SearchPage() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function loadBillingEntitlements() {
+      try {
+        const response = await fetch("/api/billing/entitlements");
+        if (!response.ok) return;
+        const data = (await response.json()) as BillingEntitlementsResponse;
+        if (!cancelled) {
+          setBilling(data);
+          setMiningDepth((current) =>
+            data.entitlements.allowedMiningDepths.includes(current)
+              ? current
+              : data.entitlements.allowedMiningDepths[0] ?? "basic"
+          );
+        }
+      } catch {
+        // Keep page usable even if plan data cannot be loaded.
+      }
+    }
+    void loadBillingEntitlements();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleSuggestSubreddits = async () => {
     if (!keyword || keyword.length < 3) return;
     
@@ -158,6 +203,22 @@ export default function SearchPage() {
       return;
     }
 
+    const allowedDepths = billing?.entitlements.allowedMiningDepths ?? ["basic"];
+    if (!allowedDepths.includes(miningDepth)) {
+      toast.error("This mining depth is not available on your current plan.");
+      return;
+    }
+
+    const subredditCount = subreddits
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean).length;
+    const maxSubreddits = billing?.entitlements.maxSubredditsPerSearch;
+    if (maxSubreddits !== null && maxSubreddits !== undefined && subredditCount > maxSubreddits) {
+      toast.error(`Your current plan supports up to ${maxSubreddits} subreddits per search.`);
+      return;
+    }
+
     requestInFlightRef.current = true;
     setIsLoading(true);
     try {
@@ -173,7 +234,8 @@ export default function SearchPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to start mining");
+        const errorPayload = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(errorPayload?.message ?? "Failed to start mining");
       }
 
       const data = await response.json();
@@ -185,7 +247,7 @@ export default function SearchPage() {
       router.push(`/dashboard/analysis?id=${data.scraperId}`);
     } catch (error) {
       console.error("Mining error:", error);
-      toast.error("There was an error starting the investigation.");
+      toast.error(error instanceof Error ? error.message : "There was an error starting the investigation.");
     } finally {
       setIsLoading(false);
       requestInFlightRef.current = false;
@@ -356,7 +418,8 @@ export default function SearchPage() {
 
                 <button 
                   onClick={() => setMiningDepth("deep")}
-                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group ${
+                  disabled={billing ? !billing.entitlements.allowedMiningDepths.includes("deep") : false}
+                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "deep" 
                       ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]" 
                       : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
@@ -374,14 +437,17 @@ export default function SearchPage() {
                   </div>
                   {miningDepth !== "deep" && (
                     <div className="absolute top-0 right-0 p-2">
-                       <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20">Pro</span>
+                       <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20">
+                         {billing && !billing.entitlements.allowedMiningDepths.includes("deep") ? "Pro" : "Deep"}
+                       </span>
                     </div>
                   )}
                 </button>
 
                 <button 
                   onClick={() => setMiningDepth("advanced")}
-                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group ${
+                  disabled={billing ? !billing.entitlements.allowedMiningDepths.includes("advanced") : false}
+                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "advanced" 
                       ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]" 
                       : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
@@ -397,8 +463,22 @@ export default function SearchPage() {
                   <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${miningDepth === "advanced" ? "border-[#ff4500]" : "border-zinc-800"}`}>
                     {miningDepth === "advanced" && <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>}
                   </div>
+                  {billing && !billing.entitlements.allowedMiningDepths.includes("advanced") ? (
+                    <div className="absolute top-0 right-0 p-2">
+                      <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20">
+                        <Lock className="w-2.5 h-2.5" />
+                        Growth+
+                      </span>
+                    </div>
+                  ) : null}
                 </button>
               </div>
+              {billing ? (
+                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                  Plan: {billing.plan.toUpperCase()} | Monthly scans: {billing.usage.monthlyScansUsed}
+                  {billing.usage.monthlyScansLimit === null ? "/Unlimited" : `/${billing.usage.monthlyScansLimit}`}
+                </p>
+              ) : null}
             </div>
 
             {/* Footer Actions */}

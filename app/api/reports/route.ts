@@ -8,13 +8,15 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
+import { getPlanEntitlements } from "@/lib/plan-gating";
+import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 export async function GET(req: Request) {
   const authContext = await requireApiContext(req);
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
   const { searchParams } = new URL(req.url);
   
   const days = searchParams.get("days");
@@ -24,6 +26,13 @@ export async function GET(req: Request) {
   const minScore = parseInt(searchParams.get("minScore") || "0");
 
   try {
+    const plan = await resolveCurrentPlan({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    const entitlements = getPlanEntitlements(plan);
+
     let whereClause = and(
       eq(scraper.userId, userId),
       workspaceScope(scraper.workspaceId, workspaceId)
@@ -159,7 +168,8 @@ export async function GET(req: Request) {
             })
           : null,
         trend: trend
-          ? {
+          ? entitlements.hasTrendDetection
+            ? {
               direction: trend.direction,
               delta: trend.delta,
               percentChange: Math.round(trend.percentChange),
@@ -169,9 +179,10 @@ export async function GET(req: Request) {
                   : trend.direction === "up"
                     ? `${formatTrendChangePercent(trend.percentChange)} momentum`
                     : trend.direction === "down"
-                      ? `${formatTrendChangePercent(trend.percentChange)} cooling`
-                      : "Stable trend",
-            }
+                  ? `${formatTrendChangePercent(trend.percentChange)} cooling`
+                  : "Stable trend",
+              }
+            : null
           : null,
         status: (() => {
           const normalized = normalizeRunStatus(latestRun?.status);
