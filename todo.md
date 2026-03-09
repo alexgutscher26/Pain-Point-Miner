@@ -110,15 +110,11 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Monetization Strategy**
 
-- [ ] **Tiered Subscriptions**:
-  - [ ] **Free**: 5 searches/mo, 3 subreddits.
-  - [ ] **Pro ($29/mo)**: Unlimited searches, Pain Alerts, Data Export.
-  - [ ] **Enterprise**: Custom subreddits, priority concurrency.
 - [ ] **Stripe Usage Billing**: Connect 1 "Advanced Scan" to a credit-based consumption model.
 
 ### **Growth Engine**
 
-- [ ] **Social Proof & FOMO**: Implement a "⭐ Most Popular" badge for top-performing niches/plans on the landing page to drive conversion.
+- [x] **Social Proof & FOMO**: Implement a "⭐ Most Popular" badge for top-performing niches/plans on the landing page to drive conversion.
 - [ ] **Viral Report Engine**: Public "Shareable URL" for reports with SEO-optimized meta tags.
 - [ ] **Programmatic SEO**: Auto-generate landing pages for niches (e.g., `rpp.ai/opportunities/saas-monitoring`).
 - [ ] **Referral Loop**: "Invite a friend, get 10 Deep Mines for free".

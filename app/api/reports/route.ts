@@ -7,6 +7,7 @@ import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
+import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
 
 export async function GET(req: Request) {
   const authContext = await requireApiContext(req);
@@ -50,8 +51,19 @@ export async function GET(req: Request) {
                 urgency: true,
                 monetizationScore: true,
                 marketMaturity: true,
-                sentiment: true
-            }
+                sentiment: true,
+                commentCount: true,
+                mentionCount: true,
+            },
+            with: {
+              painPointComments: {
+                columns: {
+                  score: true,
+                },
+                orderBy: (comment, { desc }) => [desc(comment.score)],
+                limit: 5,
+              },
+            },
         }
       }
     });
@@ -86,32 +98,45 @@ export async function GET(req: Request) {
 
     let formattedReports = (reportsRes as any[]).map(r => {
       const latestRun = r.scraperRuns?.[0];
-      const pps = (r.painPoints || []) as { score: number, urgency: number, monetizationScore: number, marketMaturity: number, sentiment: string | null }[];
+      const pps = (r.painPoints || []) as Array<{
+        score: number;
+        urgency: number;
+        monetizationScore: number;
+        marketMaturity: number;
+        sentiment: string | null;
+        commentCount: number;
+        mentionCount: number;
+        painPointComments?: Array<{ score: number }>;
+      }>;
       const keywordKey = (r.keywords?.[0] || "").trim().toLowerCase();
       const trend = keywordKey ? trendByKeyword.get(keywordKey) : undefined;
-      
-      // Calculate VERY SMART Opportunity Score (Weighted Multi-Factor)
-      let opportunityScore = 0;
-      if (pps.length > 0) {
-          const factors = pps.map(p => {
-              const pain = (p.score || 0) * 0.35;
-              const urgency = (p.urgency || 0) * 0.25;
-              const monetization = (p.monetizationScore || 0) * 0.30;
-              
-              let maturityBonus = 0;
-              if ((p.marketMaturity || 0) <= 3) maturityBonus = 10;
-              else if ((p.marketMaturity || 0) >= 8) maturityBonus = 8;
-              else maturityBonus = 4;
-              
-              const sentimentMap: Record<string, number> = { 'desperate': 1.1, 'frustrated': 1.05, 'angry': 1.15, 'neutral': 1.0, 'curious': 0.95 };
-              const modifier = sentimentMap[p.sentiment || ''] || 1.0;
-              
-              return ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
-          });
+      const enrichedPainPoints = pps.map((point) => {
+        const topCommentScores = (point.painPointComments ?? [])
+          .map((comment) => comment.score ?? 0)
+          .slice(0, 3);
+        const upvoteSignal =
+          topCommentScores.length > 0
+            ? Math.round(
+                topCommentScores.reduce((sum, score) => sum + Math.max(0, score), 0) /
+                  topCommentScores.length
+              )
+            : 0;
+        return {
+          ...point,
+          upvoteSignal,
+        };
+      });
 
-          opportunityScore = Math.round(factors.reduce((a, b) => a + b, 0) / factors.length);
-          opportunityScore = Math.min(Math.max(opportunityScore, 0), 100);
-      }
+      const opportunityScore = toOpportunityScore(enrichedPainPoints);
+      const validationScore =
+        enrichedPainPoints.length > 0
+          ? Math.round(
+              enrichedPainPoints.reduce(
+                (sum, point) => sum + toValidationScore(point),
+                0
+              ) / enrichedPainPoints.length
+            )
+          : 0;
 
       return {
         id: r.id,
@@ -123,6 +148,7 @@ export async function GET(req: Request) {
         }),
         painPoints: pps.length,
         score: opportunityScore,
+        validationScore,
         saved: r.reportSaved ?? false,
         category: r.reportCategory || "Uncategorized",
         savedAt: r.reportSavedAt
@@ -155,6 +181,13 @@ export async function GET(req: Request) {
         })()
       };
     });
+
+    formattedReports = formattedReports.sort(
+      (a, b) =>
+        b.score - a.score ||
+        b.validationScore - a.validationScore ||
+        b.painPoints - a.painPoints
+    );
 
     // Apply status filter
     if (statusParam && statusParam !== "all") {

@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { keywordStat, painPoint, scraper, scraperRun } from "@/lib/db/schema";
+import { keywordStat, painPoint, painPointComment, scraper, scraperRun } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import { fetchComments, fetchSubredditPostsBatched, type RedditPost } from "@/lib/reddit";
 
@@ -41,6 +41,13 @@ function dedupePosts(posts: RedditPost[]) {
     deduped.push(post);
   }
   return deduped;
+}
+
+function cleanCommentBody(text: string) {
+  return text
+    .replace(/\s+/g, " ")
+    .replace(/^["'`]+|["'`]+$/g, "")
+    .trim();
 }
 
 /**
@@ -104,10 +111,28 @@ export async function executeMiningRun({
     let commentsFetched = 0;
     let newPainPoints = 0;
     const patterns = customPatterns.map((pattern) => pattern.trim()).filter(Boolean);
+    const postsToAnalyze = allPosts.slice(0, Math.max(1, analyzeLimit));
+    const commentsByPostId = new Map<string, Awaited<ReturnType<typeof fetchComments>>>();
 
-    for (const post of allPosts.slice(0, Math.max(1, analyzeLimit))) {
-      const comments = await fetchComments(post.id, post.subreddit);
-      commentsFetched += comments.length;
+    const commentFetchResults = await Promise.allSettled(
+      postsToAnalyze.map(async (post) => ({
+        postId: post.id,
+        comments: await fetchComments(post.id, post.subreddit),
+      }))
+    );
+
+    for (const result of commentFetchResults) {
+      if (result.status !== "fulfilled") {
+        console.error("Comment scrape failed for one analyzed post:", result.reason);
+        continue;
+      }
+
+      commentsByPostId.set(result.value.postId, result.value.comments);
+      commentsFetched += result.value.comments.length;
+    }
+
+    for (const post of postsToAnalyze) {
+      const comments = commentsByPostId.get(post.id) ?? [];
 
       const points = await extractPainPoints(
         {
@@ -124,8 +149,9 @@ export async function executeMiningRun({
       if (!points || points.length === 0) continue;
 
       for (const point of points) {
+        const painPointId = crypto.randomUUID();
         await db.insert(painPoint).values({
-          id: crypto.randomUUID(),
+          id: painPointId,
           title: point.title,
           body: point.body,
           score: point.painIntensity,
@@ -146,6 +172,29 @@ export async function executeMiningRun({
           workspaceId,
           updatedAt: new Date(),
         });
+
+        const commentRows = comments
+          .filter((comment) => {
+            const body = cleanCommentBody(comment.body ?? "");
+            if (!body) return false;
+            const normalized = body.toLowerCase();
+            return normalized !== "[deleted]" && normalized !== "[removed]";
+          })
+          .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+          .slice(0, 12)
+          .map((comment) => ({
+            id: crypto.randomUUID(),
+            body: cleanCommentBody(comment.body),
+            author: comment.author || "unknown",
+            score: comment.score ?? 0,
+            commentUrl: comment.permalink || null,
+            painScore: point.painIntensity ?? 0,
+            painPointId,
+          }));
+
+        if (commentRows.length > 0) {
+          await db.insert(painPointComment).values(commentRows);
+        }
         newPainPoints += 1;
       }
     }

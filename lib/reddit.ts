@@ -26,8 +26,23 @@ type RedditTimeRange = "hour" | "day" | "week" | "month" | "year" | "all";
 const DEFAULT_USER_AGENT =
   process.env.REDDIT_USER_AGENT ??
   "RPPScanner/1.0 (+https://github.com; contact: ops@example.com)";
+const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID?.trim();
+const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET?.trim();
 const DEFAULT_TIMEOUT_MS = 15_000;
 const MAX_RETRIES = 3;
+const TOKEN_EXPIRY_SAFETY_SECONDS = 30;
+
+type RedditTokenResponse = {
+  access_token?: string;
+  expires_in?: number;
+};
+
+type CachedToken = {
+  token: string;
+  expiresAtEpochSeconds: number;
+};
+
+let cachedToken: CachedToken | null = null;
 
 type RedditListingResponse = {
   data?: {
@@ -113,6 +128,92 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
   }
 
   throw lastError instanceof Error ? lastError : new Error("Reddit request failed");
+}
+
+function hasOAuthCredentials() {
+  return Boolean(REDDIT_CLIENT_ID && REDDIT_CLIENT_SECRET);
+}
+
+async function getRedditAccessToken(forceRefresh = false): Promise<string | null> {
+  if (!hasOAuthCredentials()) return null;
+
+  const nowSeconds = Math.floor(Date.now() / 1_000);
+  if (!forceRefresh && cachedToken && cachedToken.expiresAtEpochSeconds > nowSeconds + TOKEN_EXPIRY_SAFETY_SECONDS) {
+    return cachedToken.token;
+  }
+
+  const basicAuth = Buffer.from(`${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}`).toString("base64");
+  const response = await fetchWithRetry(
+    "https://www.reddit.com/api/v1/access_token",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": DEFAULT_USER_AGENT,
+      },
+      body: "grant_type=client_credentials",
+    },
+    1
+  );
+
+  const payload = (await response.json()) as RedditTokenResponse;
+  if (!payload.access_token) {
+    throw new Error("Failed to obtain Reddit access token");
+  }
+
+  const expiresIn = payload.expires_in ?? 3_600;
+  cachedToken = {
+    token: payload.access_token,
+    expiresAtEpochSeconds: nowSeconds + Math.max(60, expiresIn),
+  };
+  return cachedToken.token;
+}
+
+async function fetchRedditResponse(url: string): Promise<Response> {
+  const authToken = await getRedditAccessToken();
+
+  if (authToken) {
+    const oauthUrl = url.replace("https://www.reddit.com", "https://oauth.reddit.com");
+
+    try {
+      const response = await fetchWithRetry(oauthUrl, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "User-Agent": DEFAULT_USER_AGENT,
+        },
+      });
+      return response;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        (error.message.includes("401") || error.message.toLowerCase().includes("unauthorized"))
+      ) {
+        const refreshedToken = await getRedditAccessToken(true);
+        if (refreshedToken) {
+          return fetchWithRetry(oauthUrl, {
+            headers: {
+              Authorization: `Bearer ${refreshedToken}`,
+              "User-Agent": DEFAULT_USER_AGENT,
+            },
+          });
+        }
+      }
+
+      if (
+        error instanceof Error &&
+        (error.message.includes("403") || error.message.toLowerCase().includes("forbidden"))
+      ) {
+        throw error;
+      }
+    }
+  }
+
+  return fetchWithRetry(url, {
+    headers: {
+      "User-Agent": DEFAULT_USER_AGENT,
+    },
+  });
 }
 
 function isRedditBlockedError(error: unknown) {
@@ -242,11 +343,7 @@ export async function fetchSubredditPostsBatched(
       if (after) params.set("after", after);
 
       const url = `https://www.reddit.com/r/${subreddit}/search.json?${params.toString()}`;
-      const response = await fetchWithRetry(url, {
-        headers: {
-          "User-Agent": DEFAULT_USER_AGENT,
-        },
-      });
+      const response = await fetchRedditResponse(url);
 
       const data = (await response.json()) as RedditListingResponse;
       const children = data.data?.children ?? [];
@@ -299,11 +396,7 @@ export async function fetchSubredditPostsBatched(
 export const fetchComments = async (postId: string, subreddit: string): Promise<RedditComment[]> => {
   try {
     const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json`;
-    const response = await fetchWithRetry(url, {
-      headers: {
-        "User-Agent": DEFAULT_USER_AGENT,
-      }
-    });
+    const response = await fetchRedditResponse(url);
 
     const data = await response.json();
     const commentNodes = data[1].data.children;

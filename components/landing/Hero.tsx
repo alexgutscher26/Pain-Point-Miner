@@ -1,10 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { Globe, ArrowRight, Search } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Search } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
+
+const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
 
 export function Hero() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [website, setWebsite] = useState("");
+
+  const handleHeroSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const keyword = website.trim();
+    if (!keyword) return;
+
+    try {
+      localStorage.setItem(
+        SEARCH_DRAFT_STORAGE_KEY,
+        JSON.stringify({
+          keyword,
+          subreddits: "",
+          customPatterns: "",
+          miningDepth: "basic",
+          savedAt: new Date().toISOString(),
+        }),
+      );
+    } catch {
+      // Continue without draft persistence if storage is unavailable.
+    }
+
+    if (session) {
+      router.push("/dashboard/search");
+      return;
+    }
+
+    router.push("/sign-up");
+  };
 
   return (
     <section className="w-full pt-32 pb-20 px-6 flex flex-col items-center bg-[#0a0a0a]">
@@ -38,7 +73,7 @@ export function Hero() {
             Reddit Pain-Point Miner analyzes real conversations to extract underlying problems so you can validate ideas and find underserved niches.
           </p>
 
-          <form onSubmit={(e) => { e.preventDefault(); }} className="w-full max-w-[560px] mb-10 mx-auto">
+          <form onSubmit={handleHeroSubmit} className="w-full max-w-[560px] mb-10 mx-auto">
              <div className="w-full flex items-center bg-[#0a0a0a] border border-white/10 rounded-full p-1.5 focus-within:border-zinc-700 transition-colors shadow-sm relative overflow-hidden">
                 <div className="flex items-center gap-2 pl-4 pr-3 text-zinc-400 flex-none opacity-80 h-10 w-auto">
                    <Search className="w-5 h-5"/>

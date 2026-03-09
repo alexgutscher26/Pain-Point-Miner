@@ -255,7 +255,7 @@ export async function POST(req: Request) {
           updatedAt: new Date(),
         });
 
-        const runResult = await executeMiningRun({
+        void executeMiningRun({
           scraperId,
           keyword,
           subreddits: targetSubreddits,
@@ -267,14 +267,17 @@ export async function POST(req: Request) {
             miningDepth === "advanced" ? 40 : miningDepth === "deep" ? 25 : 15,
           processingLimit:
             miningDepth === "advanced" ? 20 : miningDepth === "deep" ? 10 : 3,
+        }).catch((error) => {
+          console.error(`Async mining run failed for scraper ${scraperId}:`, error);
         });
 
         return {
           success: true as const,
           duplicate: false,
           scraperId,
-          runId: runResult.runId,
-          count: runResult.newPainPoints,
+          runId: null,
+          count: 0,
+          status: "running" as const,
         };
       } catch (error) {
         throw error;

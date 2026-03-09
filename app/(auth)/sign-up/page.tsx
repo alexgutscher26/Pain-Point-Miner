@@ -35,14 +35,14 @@ export default function SignUpPage() {
       email,
       password,
       name,
-      callbackURL: "/dashboard",
+      callbackURL: "/dashboard/search",
     });
 
     if (authError) {
       setError(authError.message ?? "Failed to create account. Please try again.");
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      router.push("/dashboard/search");
     }
   }
 

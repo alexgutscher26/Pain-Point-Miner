@@ -44,7 +44,7 @@ export default function ReportsPage() {
   // Filter states
   const [days, setDays] = useState("30");
   const [status, setStatus] = useState("all");
-  const [minScore, setMinScore] = useState("70");
+  const [minScore, setMinScore] = useState("0");
   const [savedOnly, setSavedOnly] = useState("false");
   const [category, setCategory] = useState("all");
 

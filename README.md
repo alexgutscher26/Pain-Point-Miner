@@ -47,6 +47,8 @@ This project supports high-volume recurring scan runs through `POST /api/search/
 - `SCHEDULED_MAX_SUBREDDITS` (optional, default `10`): subreddit count cap per run.
 - `SCHEDULED_PROCESSING_LIMIT` (optional, default `8`): number of fetched posts sent to AI extraction per run.
 - `REDDIT_USER_AGENT` (optional): custom Reddit user-agent string.
+- `REDDIT_CLIENT_ID` (optional, recommended): Reddit app client ID for OAuth API access.
+- `REDDIT_CLIENT_SECRET` (optional, recommended): Reddit app client secret for OAuth API access.
 
 ### GitHub Actions scheduler
 

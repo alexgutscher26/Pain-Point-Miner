@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Rocket, 
   Zap, 
@@ -27,6 +27,7 @@ type MiningDepth = SearchDraft["miningDepth"];
 
 export default function SearchPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [miningDepth, setMiningDepth] = useState<MiningDepth>("basic");
   const [keyword, setKeyword] = useState("");
   const [subreddits, setSubreddits] = useState("");
@@ -58,6 +59,12 @@ export default function SearchPage() {
       localStorage.removeItem(SEARCH_DRAFT_STORAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    const keywordFromQuery = searchParams.get("keyword")?.trim() ?? "";
+    if (!keywordFromQuery) return;
+    setKeyword((current) => (current.trim().length > 0 ? current : keywordFromQuery));
+  }, [searchParams]);
 
   const handleSuggestSubreddits = async () => {
     if (!keyword || keyword.length < 3) return;

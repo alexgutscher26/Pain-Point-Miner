@@ -6,6 +6,7 @@ import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
+import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
@@ -27,6 +28,113 @@ interface SaaSOpportunity {
   valueProposition: string;
   launchAngle: string;
   score: number;
+}
+
+type UserLanguageSection = {
+  label: string;
+  summary: string;
+  examples: string[];
+};
+
+type UserLanguageReport = {
+  overview: string;
+  sections: UserLanguageSection[];
+};
+
+function cleanQuote(text: string) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function dedupeQuotes(quotes: string[], max = 4) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const quote of quotes) {
+    const normalized = quote.toLowerCase();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    result.push(quote);
+    if (result.length >= max) break;
+  }
+  return result;
+}
+
+function buildUserLanguageReport(
+  point: Pick<DBPainPoint, "title" | "body" | "triedSolutions"> & { quotes: string[] }
+): UserLanguageReport {
+  const primary = cleanQuote(point.body || "");
+  const rawQuotes = point.quotes
+    .map((q) => cleanQuote(q))
+    .filter(Boolean);
+
+  const allQuotes = dedupeQuotes([primary, ...rawQuotes], 10);
+
+  const problemKeywords =
+    /(can't|cannot|struggl|frustrat|pain|hard|manual|annoy|hate|broken|stuck|time[- ]consuming|tedious)/i;
+  const outcomeKeywords =
+    /(need|want|wish|looking for|would pay|save time|faster|automate|easier|streamline|simpler)/i;
+  const workaroundKeywords =
+    /(tried|using|used|tool|workaround|alternative|not working|still|switch)/i;
+
+  const problemExamples = dedupeQuotes(allQuotes.filter((q) => problemKeywords.test(q)), 3);
+  const outcomeExamples = dedupeQuotes(allQuotes.filter((q) => outcomeKeywords.test(q)), 3);
+  const workaroundExamples = dedupeQuotes(
+    [
+      ...allQuotes.filter((q) => workaroundKeywords.test(q)),
+      ...(point.triedSolutions ?? []).map((s) => `Tried: ${s}`),
+    ],
+    3
+  );
+
+  return {
+    overview:
+      problemExamples[0] ??
+      outcomeExamples[0] ??
+      primary ??
+      "Users describe this issue as repeated workflow friction.",
+    sections: [
+      {
+        label: "How Users Describe The Pain",
+        summary: "Exact language users use when describing what is broken or frustrating.",
+        examples: problemExamples.length > 0 ? problemExamples : dedupeQuotes(allQuotes, 3),
+      },
+      {
+        label: "Desired Outcome Language",
+        summary: "Phrases showing what users actually want to happen.",
+        examples: outcomeExamples.length > 0 ? outcomeExamples : dedupeQuotes(allQuotes.slice(0, 3), 3),
+      },
+      {
+        label: "Current Workarounds",
+        summary: "Mentions of attempted tools, hacks, and failed alternatives.",
+        examples:
+          workaroundExamples.length > 0
+            ? workaroundExamples
+            : point.triedSolutions && point.triedSolutions.length > 0
+              ? point.triedSolutions.slice(0, 3).map((s) => `Tried: ${s}`)
+              : ["No clear workaround language captured yet."],
+      },
+    ],
+  };
+}
+
+interface DBPainPoint {
+  id: string;
+  title: string;
+  body: string;
+  score: number;
+  urgency: number;
+  monetizationScore: number;
+  marketMaturity: number;
+  subreddit: string;
+  sentiment: string;
+  mentionCount: number;
+  commentCount: number;
+  budget?: string;
+  switchingCosts?: string;
+  triedSolutions?: string[];
+  painPointComments?: Array<{
+    body: string;
+    score: number;
+  }>;
 }
 
 export async function GET(
@@ -63,7 +171,18 @@ export async function GET(
           orderBy: [desc(scraperRun.startedAt)],
           limit: 1,
         },
-        painPoints: true,
+        painPoints: {
+          with: {
+            painPointComments: {
+              columns: {
+                body: true,
+                score: true,
+              },
+              orderBy: (comment, { desc }) => [desc(comment.score)],
+              limit: 12,
+            },
+          },
+        },
       }
     });
 
@@ -73,23 +192,6 @@ export async function GET(
 
     const latestRun = currentScraper.scraperRuns?.[0];
     const currentKeyword = (currentScraper.keywords?.[0] || "").trim().toLowerCase();
-
-    interface DBPainPoint {
-      id: string;
-      title: string;
-      body: string;
-      score: number; // painIntensity
-      urgency: number;
-      monetizationScore: number;
-      marketMaturity: number;
-      subreddit: string;
-      sentiment: string;
-      mentionCount: number;
-      commentCount: number;
-      budget?: string;
-      switchingCosts?: string;
-      triedSolutions?: string[];
-    }
 
     const painPoints = currentScraper.painPoints as unknown as DBPainPoint[];
 
@@ -120,28 +222,32 @@ export async function GET(
         .filter((row): row is { key: string; value: number; createdAt: Date } => Boolean(row))
     ).find((trend) => trend.key === currentKeyword);
     
-    // Calculate VERY SMART Opportunity Score (Weighted Multi-Factor)
-    let opportunityScore = 0;
-    if (painPoints.length > 0) {
-        const factors = painPoints.map(p => {
-          const pain = (p.score || 0) * 0.35;
-          const urgency = (p.urgency || 0) * 0.25;
-          const monetization = (p.monetizationScore || 0) * 0.30;
-          
-          let maturityBonus = 0;
-          if ((p.marketMaturity || 0) <= 3) maturityBonus = 10;
-          else if ((p.marketMaturity || 0) >= 8) maturityBonus = 8;
-          else maturityBonus = 4;
-          
-          const sentimentMap: Record<string, number> = { 'desperate': 1.1, 'frustrated': 1.05, 'angry': 1.15, 'neutral': 1.0, 'curious': 0.95 };
-          const modifier = sentimentMap[p.sentiment] || 1.0;
-          
-          return ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
-        });
-
-        opportunityScore = Math.round(factors.reduce((a, b) => a + b, 0) / factors.length);
-        opportunityScore = Math.min(Math.max(opportunityScore, 0), 100);
-    }
+    const enrichedPainPoints = painPoints.map((point) => {
+      const topCommentScores = (point.painPointComments ?? [])
+        .map((comment) => comment.score ?? 0)
+        .slice(0, 3);
+      const upvoteSignal =
+        topCommentScores.length > 0
+          ? Math.round(
+              topCommentScores.reduce((sum, score) => sum + Math.max(0, score), 0) /
+                topCommentScores.length
+            )
+          : 0;
+      return {
+        ...point,
+        upvoteSignal,
+      };
+    });
+    const opportunityScore = toOpportunityScore(enrichedPainPoints);
+    const validationScore =
+      enrichedPainPoints.length > 0
+        ? Math.round(
+            enrichedPainPoints.reduce(
+              (sum, point) => sum + toValidationScore(point),
+              0
+            ) / enrichedPainPoints.length
+          )
+        : 0;
 
     const scoreLabel = opportunityScore >= 80 ? "High Growth Potential" : opportunityScore >= 50 ? "Solid Opportunity" : "Niche Requirement";
     const totalMentions = painPoints.reduce(
@@ -238,10 +344,32 @@ export async function GET(
             color: "text-emerald-500", 
             bg: "bg-emerald-500/10" 
         },
+        {
+            label: "Validation",
+            value: `${validationScore}/100`,
+            sub: "Upvotes + comments + mentions",
+            icon: "BarChart3",
+            color: "text-sky-500",
+            bg: "bg-sky-500/10"
+        },
       ],
-      topPainPoints: painPoints.map((pp) => ({
+      topPainPoints: enrichedPainPoints
+        .sort(
+          (a, b) =>
+            toValidationScore(b) - toValidationScore(a) ||
+            (b.urgency ?? 0) - (a.urgency ?? 0) ||
+            (b.score ?? 0) - (a.score ?? 0)
+        )
+        .map((pp) => ({
+        userLanguage: buildUserLanguageReport({
+          title: pp.title,
+          body: pp.body,
+          triedSolutions: pp.triedSolutions,
+          quotes: (pp.painPointComments ?? []).map((comment) => comment.body),
+        }),
         id: pp.id,
         title: pp.title,
+        validationScore: toValidationScore(pp),
         urgency: pp.urgency >= 8 ? "Extreme Urgency" : pp.urgency >= 5 ? "High Urgency" : "Medium/Low",
         intensity: pp.score,
         monetization: pp.monetizationScore,
@@ -253,7 +381,16 @@ export async function GET(
         budget: pp.budget,
         switchingCosts: pp.switchingCosts,
         triedSolutions: pp.triedSolutions || [],
-        communityVoices: [pp.body], 
+        communityVoices:
+          (pp.painPointComments ?? [])
+            .map((comment) => cleanQuote(comment.body))
+            .filter(Boolean)
+            .slice(0, 3).length > 0
+            ? (pp.painPointComments ?? [])
+                .map((comment) => cleanQuote(comment.body))
+                .filter(Boolean)
+                .slice(0, 3)
+            : [pp.body],
         language: pp.triedSolutions || [],
         angles: [
             "Solution for " + pp.title,

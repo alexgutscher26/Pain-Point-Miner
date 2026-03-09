@@ -4,7 +4,25 @@ export type DashboardPainPoint = {
   monetizationScore: number | null;
   marketMaturity: number | null;
   sentiment: string | null;
+  mentionCount?: number | null;
+  commentCount?: number | null;
+  upvoteSignal?: number | null;
 };
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function toNormalizedSignal(value: number) {
+  return clamp((Math.log1p(Math.max(0, value)) / Math.log(101)) * 100, 0, 100);
+}
+
+export function toValidationScore(point: Pick<DashboardPainPoint, "upvoteSignal" | "commentCount" | "mentionCount">) {
+  const upvotes = toNormalizedSignal(point.upvoteSignal ?? 0);
+  const comments = toNormalizedSignal(point.commentCount ?? 0);
+  const mentions = toNormalizedSignal(point.mentionCount ?? 0);
+  return Math.round(upvotes * 0.4 + comments * 0.35 + mentions * 0.25);
+}
 
 export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
   if (painPoints.length === 0) return 0;
@@ -27,12 +45,14 @@ export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
       curious: 0.95,
     };
     const modifier = sentimentMap[point.sentiment || ""] || 1.0;
+    const validation = toValidationScore(point);
 
-    return ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
+    const base = ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
+    return base * 0.75 + validation * 0.25;
   });
 
   const average = Math.round(factors.reduce((a, b) => a + b, 0) / factors.length);
-  return Math.min(Math.max(average, 0), 100);
+  return clamp(average, 0, 100);
 }
 
 export function getMarketBadge(marketScore: number) {

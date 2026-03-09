@@ -3,11 +3,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { scraper, scraperRun } from "@/lib/db/schema";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, gte, isNull } from "drizzle-orm";
 import { 
   TrendingUp, 
   Search, 
-  ArrowRight, 
   Sparkles, 
   Database,
   BarChart3,
@@ -19,13 +18,20 @@ import { z } from "zod";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
+import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-hero";
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
+const dashboardWindowSchema = z.enum(["realtime", "30d"]).default("realtime");
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const requestHeaders = await headers();
+  const resolvedSearchParams = (await searchParams) ?? {};
   const session = await auth.api.getSession({
     headers: requestHeaders,
   });
@@ -37,10 +43,21 @@ export default async function DashboardPage() {
   const userFirstName = session.user.name?.split(" ")[0] || "Founder";
   const parsedWorkspaceId = workspaceHeaderSchema.safeParse(requestHeaders.get("x-workspace-id"));
   const workspaceId = parsedWorkspaceId.success ? parsedWorkspaceId.data : null;
+  const parsedWindow = dashboardWindowSchema.safeParse(
+    typeof resolvedSearchParams.window === "string" ? resolvedSearchParams.window : undefined
+  );
+  const selectedWindow = parsedWindow.success ? parsedWindow.data : "realtime";
+  const windowFromDate = new Date();
+  if (selectedWindow === "30d") {
+    windowFromDate.setDate(windowFromDate.getDate() - 30);
+  } else {
+    windowFromDate.setHours(windowFromDate.getHours() - 24);
+  }
 
   const whereClause = and(
     eq(scraper.userId, session.user.id),
-    workspaceId ? eq(scraper.workspaceId, workspaceId) : isNull(scraper.workspaceId)
+    workspaceId ? eq(scraper.workspaceId, workspaceId) : isNull(scraper.workspaceId),
+    gte(scraper.createdAt, windowFromDate)
   );
 
   const reports = await db.query.scraper.findMany({
@@ -120,8 +137,26 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="hidden lg:flex items-center gap-3 bg-[#161616] p-1.5 rounded-2xl border border-white/5">
-           <button className="px-4 py-2 bg-[#ff4500] text-white text-[12px] font-bold rounded-xl shadow-lg">Realtime</button>
-           <button className="px-4 py-2 text-zinc-500 text-[12px] font-bold">Past 30 Days</button>
+          <Link
+            href="/dashboard?window=realtime"
+            className={`px-4 py-2 text-[12px] font-bold rounded-xl ${
+              selectedWindow === "realtime"
+                ? "bg-[#ff4500] text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300 transition-colors"
+            }`}
+          >
+            Realtime
+          </Link>
+          <Link
+            href="/dashboard?window=30d"
+            className={`px-4 py-2 text-[12px] font-bold rounded-xl ${
+              selectedWindow === "30d"
+                ? "bg-[#ff4500] text-white shadow-lg"
+                : "text-zinc-500 hover:text-zinc-300 transition-colors"
+            }`}
+          >
+            Past 30 Days
+          </Link>
         </div>
       </div>
 
@@ -156,57 +191,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Main Action Block */}
-      <div className="relative group">
-        {/* Glow & Mesh Background */}
-        <div className="absolute inset-0 bg-linear-to-b from-[#ff4500]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-[32px] blur-3xl -z-10"></div>
-        <div className="relative overflow-hidden rounded-[32px] bg-[#0c0c0c] border border-white/5 p-12 flex flex-col items-center text-center shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-          {/* Subtle Grid / Mesh overlay could go here */}
-          <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/15 to-transparent"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#ff4500]/5 blur-[100px] rounded-full -mr-32 -mt-32 group-hover:bg-[#ff4500]/10 transition-colors duration-1000"></div>
-          
-          <div className="relative mb-8">
-            <div className="absolute inset-0 bg-[#ff4500] blur-2xl opacity-20 scale-150 animate-pulse"></div>
-            <div className="relative w-14 h-14 bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-[#ff4500] border border-[#ff4500]/30 shadow-[0_0_20px_rgba(255,69,0,0.15)] group-hover:border-[#ff4500] transition-colors duration-500">
-               <Sparkles className="w-7 h-7" />
-            </div>
-          </div>
-          
-          <h3 className="text-3xl font-black text-white mb-4 tracking-tighter leading-none">
-            Scale your validation with <span className="bg-linear-to-r from-[#ff4500] to-[#ff8c00] bg-clip-text text-transparent italic">Reddit Intel</span>
-          </h3>
-          <p className="text-zinc-500 max-w-lg mb-10 text-[15px] font-medium leading-relaxed">
-            Uncover high-intent pain points and &quot;workarounds&quot; that signal 
-            profitable SaaS opportunities in minutes, not weeks.
-          </p>
-          
-          <div className="w-full max-w-xl relative group/search">
-            <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-2xl opacity-0 group-focus-within/search:opacity-10 blur-md transition-opacity duration-500"></div>
-            <div className="relative flex items-center bg-[#111] border border-white/10 rounded-2xl p-1.5 focus-within:border-[#ff4500]/30 transition-all shadow-2xl">
-              <span className="pl-4 pr-2 text-zinc-500 shrink-0">
-                <Search className="w-5 h-5 group-focus-within/search:text-[#ff4500] transition-colors" />
-              </span>
-              <input
-                className="w-full bg-transparent border-none text-white px-2 py-3.5 focus:ring-0 outline-none text-base font-medium placeholder-zinc-700"
-                placeholder="Search niche, e.g. 'cold email deliverability'..."
-                type="text"
-              />
-              <button className="shrink-0 whitespace-nowrap bg-[#ff4500] hover:bg-[#ff571a] active:scale-[0.98] text-white px-7 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all flex items-center gap-2.5 shadow-lg shadow-[#ff4500]/20">
-                Begin Analysis <ArrowRight className="w-4 h-4 group-hover/search:translate-x-1 transition-transform" />
-              </button>
-            </div>
-            
-            {/* Quick tags */}
-            <div className="flex items-center justify-center gap-4 mt-6">
-               <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Trending:</p>
-               {(trendingTags.length > 0 ? trendingTags : ["#saas", "#marketing", "#devops"]).map((tag) => (
-                 <button key={tag} className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest">
-                   {tag}
-                 </button>
-               ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <DashboardSearchHero trendingTags={trendingTags} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Reports Table */}
@@ -327,17 +312,6 @@ export default async function DashboardPage() {
                 </p>
               </div>
             </div>
-          </div>
-          <div className="bg-linear-to-br from-[#ff4500] to-[#b33100] rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden group cursor-pointer">
-            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <Zap className="w-8 h-8 text-white/50 mb-6" />
-            <h4 className="font-black text-xl mb-3 tracking-tight">Pro Insight</h4>
-            <p className="text-[15px] text-white/80 leading-relaxed mb-6 font-medium">
-              &quot;Workarounds&quot; often reveal high-value pain points that users are currently paying to solve inefficiently.
-            </p>
-            <button className="text-[12px] font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all">
-              Try workaround filter <ArrowRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

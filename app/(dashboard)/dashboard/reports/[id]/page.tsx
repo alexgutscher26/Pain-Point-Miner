@@ -28,6 +28,7 @@ import { toast } from "sonner";
 interface PainPoint {
     id: string;
     title: string;
+    validationScore?: number;
     urgency: string;
     intensity: number;
     monetization: number;
@@ -38,6 +39,14 @@ interface PainPoint {
     sentiment: string;
     communityVoices: string[];
     language: string[];
+    userLanguage?: {
+      overview: string;
+      sections: {
+        label: string;
+        summary: string;
+        examples: string[];
+      }[];
+    };
     angles: string[];
     budget?: string;
     switchingCosts?: string;
@@ -381,6 +390,7 @@ export default function ReportDetailPage() {
     MessageSquare: <MessageSquare className="w-4 h-4" />,
     Star: <Star className="w-4 h-4" />,
     Users: <Users className="w-4 h-4" />,
+    BarChart3: <BarChart3 className="w-4 h-4" />,
   };
 
   if (isLoading) {
@@ -575,6 +585,12 @@ export default function ReportDetailPage() {
                          <MessageSquare className="w-3.5 h-3.5" />
                          {pain.mentions} mentions
                        </div>
+                       {typeof pain.validationScore === "number" && (
+                         <div className="flex items-center gap-1.5 text-sky-400">
+                           <BarChart3 className="w-3.5 h-3.5" />
+                           Validation {pain.validationScore}/100
+                         </div>
+                       )}
                        {pain.subreddits.map((sub, i) => (
                          <div key={i} className="flex items-center gap-1.5 text-zinc-500">
                            <Users className="w-3.5 h-3.5" />
@@ -631,12 +647,43 @@ export default function ReportDetailPage() {
                 {getActiveTab(pain.id) === "community" && (
                   <div className="space-y-4 relative z-10">
                      <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Community Pulse</p>
+                     {pain.userLanguage && (
+                       <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-5 space-y-3">
+                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                           Language Overview
+                         </p>
+                         <p className="text-sm text-zinc-300 font-medium leading-relaxed">
+                           &quot;{pain.userLanguage.overview}&quot;
+                         </p>
+                       </div>
+                     )}
                      {pain.communityVoices.map((voice, i) => (
                       <div key={i} className="bg-white/2 border border-white/5 p-6 rounded-2xl border-l-4 border-l-[#ff4500]">
                         <p className="text-[14px] text-zinc-300 italic font-medium leading-relaxed">
                           &quot;{voice}&quot;
                         </p>
                       </div>
+                     ))}
+                     {pain.userLanguage?.sections?.map((section, sectionIdx) => (
+                       <div
+                         key={`${pain.id}-lang-${sectionIdx}`}
+                         className="bg-white/2 border border-white/5 p-6 rounded-2xl space-y-3"
+                       >
+                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                           {section.label}
+                         </p>
+                         <p className="text-xs text-zinc-500 font-medium">{section.summary}</p>
+                         <div className="space-y-2">
+                           {section.examples.map((example, exampleIdx) => (
+                             <p
+                               key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}`}
+                               className="text-sm text-zinc-300 font-medium leading-relaxed"
+                             >
+                               - &quot;{example}&quot;
+                             </p>
+                           ))}
+                         </div>
+                       </div>
                      ))}
                   </div>
                 )}
