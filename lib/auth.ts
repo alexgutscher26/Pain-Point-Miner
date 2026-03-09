@@ -24,6 +24,13 @@ const stripeSubscriptionEnabled =
     Boolean(stripePriceGrowthMonthly) &&
     Boolean(stripePriceProMonthly);
 const usernamePluginEnabled = process.env.USERNAME_PLUGIN_ENABLED === "true";
+const sentinelApiUrl = process.env.BETTER_AUTH_API_URL;
+const sentinelKvUrl = process.env.BETTER_AUTH_KV_URL;
+const sentinelApiKey = process.env.BETTER_AUTH_API_KEY;
+const sentinelEnabled =
+    Boolean(sentinelApiUrl && /^https?:\/\//i.test(sentinelApiUrl)) &&
+    Boolean(sentinelKvUrl) &&
+    Boolean(sentinelApiKey);
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -80,11 +87,15 @@ export const auth = betterAuth({
                   }),
               ]
             : []),
-        sentinel({
-            apiUrl: process.env.BETTER_AUTH_API_URL,
-            kvUrl: process.env.BETTER_AUTH_KV_URL,
-            apiKey: process.env.BETTER_AUTH_API_KEY,
-        }),
+        ...(sentinelEnabled
+            ? [
+                  sentinel({
+                      apiUrl: sentinelApiUrl,
+                      kvUrl: sentinelKvUrl,
+                      apiKey: sentinelApiKey,
+                  }),
+              ]
+            : []),
         ...(stripePluginEnabled
             ? [
                   stripePlugin({

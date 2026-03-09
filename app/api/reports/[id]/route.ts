@@ -8,7 +8,7 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
 import { getPlanEntitlements } from "@/lib/plan-gating";
-import { resolveCurrentPlan } from "@/lib/plan-resolver";
+import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
@@ -162,6 +162,22 @@ export async function GET(
   const { id } = parsedParams.data;
 
   try {
+    const planContext = await resolvePlanContext({
+      userId,
+      email: userEmail,
+      requestHeaders: req.headers,
+    });
+    if (planContext.planPurchaseRequired) {
+      return apiError(
+        403,
+        "PLAN_REQUIRED",
+        "Your free trial has ended. Purchase a plan to continue.",
+        {
+          trialEnded: true,
+        },
+        correlationId
+      );
+    }
     const plan = await resolveCurrentPlan({
       userId,
       email: userEmail,

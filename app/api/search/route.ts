@@ -9,7 +9,7 @@ import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
 import { getMonthlyScanUsage, getPlanEntitlements, isDepthAllowed } from "@/lib/plan-gating";
-import { resolveCurrentPlan } from "@/lib/plan-resolver";
+import { resolvePlanContext } from "@/lib/plan-resolver";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -182,11 +182,23 @@ export async function POST(req: Request) {
     }
 
     const { keyword, subreddits, customPatterns, miningDepth } = parsedPayload.data;
-    const plan = await resolveCurrentPlan({
+    const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
       requestHeaders: req.headers,
     });
+    if (planContext.planPurchaseRequired) {
+      return apiError(
+        403,
+        "PLAN_REQUIRED",
+        "Your free trial has ended. Purchase a plan to continue.",
+        {
+          trialEnded: true,
+        },
+        correlationId
+      );
+    }
+    const plan = planContext.plan;
     const entitlements = getPlanEntitlements(plan);
 
     if (!isDepthAllowed(plan, miningDepth)) {

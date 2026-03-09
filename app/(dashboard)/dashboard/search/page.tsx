@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Rocket, 
@@ -13,6 +14,14 @@ import {
   Lock
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
 
@@ -41,6 +50,10 @@ type BillingEntitlementsResponse = {
     monthlyScansRemaining: number | null;
   };
 };
+type PlanErrorCode =
+  | "PLAN_REQUIRED"
+  | "PLAN_LIMIT_REACHED"
+  | "PLAN_UPGRADE_REQUIRED";
 
 const DEFAULT_SUBREDDIT_COUNT = 5;
 const DEFAULT_MIN_SCORE = 70;
@@ -68,6 +81,10 @@ export default function SearchPage() {
   const [minimumOpportunityScore, setMinimumOpportunityScore] = useState(DEFAULT_MIN_SCORE);
   const [defaultLocale, setDefaultLocale] = useState(DEFAULT_LOCALE);
   const [billing, setBilling] = useState<BillingEntitlementsResponse | null>(null);
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [planDialogMessage, setPlanDialogMessage] = useState(
+    "Your free trial has ended. Purchase a plan to continue."
+  );
   const requestInFlightRef = useRef(false);
   const planSubredditCap = billing?.entitlements.maxSubredditsPerSearch ?? 10;
   const normalizedVisibleCommunityCount = Math.max(1, Math.min(defaultSubredditCount, planSubredditCap));
@@ -234,7 +251,21 @@ export default function SearchPage() {
       });
 
       if (!response.ok) {
-        const errorPayload = (await response.json().catch(() => null)) as { message?: string } | null;
+        const errorPayload = (await response.json().catch(() => null)) as
+          | { code?: string; message?: string }
+          | null;
+        const code = errorPayload?.code as PlanErrorCode | undefined;
+        if (
+          code === "PLAN_REQUIRED" ||
+          code === "PLAN_LIMIT_REACHED" ||
+          code === "PLAN_UPGRADE_REQUIRED"
+        ) {
+          setPlanDialogMessage(
+            errorPayload?.message ?? "Your free trial has ended. Purchase a plan to continue."
+          );
+          setPlanDialogOpen(true);
+          return;
+        }
         throw new Error(errorPayload?.message ?? "Failed to start mining");
       }
 
@@ -270,6 +301,29 @@ export default function SearchPage() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full">
+      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
+        <DialogContent className="bg-[#111] border border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black">Plan Required</DialogTitle>
+            <DialogDescription className="text-zinc-300">{planDialogMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setPlanDialogOpen(false)}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-bold"
+            >
+              Close
+            </button>
+            <Link
+              href="/dashboard/billing"
+              className="px-4 py-2 rounded-lg bg-[#ff4500] text-white text-sm font-bold"
+            >
+              Purchase Plan
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Main Form Area */}
         <div className="lg:col-span-2 space-y-10">

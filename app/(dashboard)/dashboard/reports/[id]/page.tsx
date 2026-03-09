@@ -24,6 +24,14 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PainPoint {
     id: string;
@@ -174,6 +182,10 @@ export default function ReportDetailPage() {
   const [sentimentFilterDraft, setSentimentFilterDraft] = useState<SentimentFilter>("all");
   const [intensityFilterApplied, setIntensityFilterApplied] = useState<IntensityFilter>("all");
   const [sentimentFilterApplied, setSentimentFilterApplied] = useState<SentimentFilter>("all");
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [planDialogMessage, setPlanDialogMessage] = useState(
+    "Your free trial has ended. Purchase a plan to continue."
+  );
 
   const categoryOptions = [
     "Uncategorized",
@@ -223,7 +235,24 @@ export default function ReportDetailPage() {
           category: categoryToPersist,
         }),
       });
-      if (!response.ok) throw new Error("Failed to update report");
+      if (!response.ok) {
+        const errorPayload = (await response.json().catch(() => null)) as
+          | { code?: string; message?: string }
+          | null;
+        const code = errorPayload?.code;
+        if (
+          code === "PLAN_REQUIRED" ||
+          code === "PLAN_LIMIT_REACHED" ||
+          code === "PLAN_UPGRADE_REQUIRED"
+        ) {
+          setPlanDialogMessage(
+            errorPayload?.message ?? "Your free trial has ended. Purchase a plan to continue."
+          );
+          setPlanDialogOpen(true);
+          return;
+        }
+        throw new Error(errorPayload?.message ?? "Failed to update report");
+      }
       const data = await response.json();
       setReportData((prev) =>
         prev
@@ -342,6 +371,19 @@ export default function ReportDetailPage() {
           if (raw) {
             try {
               const errorPayload = JSON.parse(raw);
+              if (
+                errorPayload?.code === "PLAN_REQUIRED" ||
+                errorPayload?.code === "PLAN_LIMIT_REACHED" ||
+                errorPayload?.code === "PLAN_UPGRADE_REQUIRED"
+              ) {
+                setPlanDialogMessage(
+                  typeof errorPayload?.message === "string"
+                    ? errorPayload.message
+                    : "Your free trial has ended. Purchase a plan to continue."
+                );
+                setPlanDialogOpen(true);
+                return;
+              }
               if (typeof errorPayload?.message === "string" && errorPayload.message.length > 0) {
                 errorMessage = `${statusPrefix}: ${errorPayload.message}`;
               } else {
@@ -468,6 +510,29 @@ export default function ReportDetailPage() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-700">
+      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
+        <DialogContent className="bg-[#111] border border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black">Plan Required</DialogTitle>
+            <DialogDescription className="text-zinc-300">{planDialogMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setPlanDialogOpen(false)}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-bold"
+            >
+              Close
+            </button>
+            <Link
+              href="/dashboard/billing"
+              className="px-4 py-2 rounded-lg bg-[#ff4500] text-white text-sm font-bold"
+            >
+              Purchase Plan
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Breadcrumbs & Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">

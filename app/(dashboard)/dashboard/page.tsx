@@ -20,7 +20,7 @@ import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
 import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
 import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-hero";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
-import { resolveCurrentPlan } from "@/lib/plan-resolver";
+import { resolvePlanContext } from "@/lib/plan-resolver";
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
 const dashboardWindowSchema = z.enum(["realtime", "30d"]).default("realtime");
@@ -43,11 +43,12 @@ export default async function DashboardPage({
   }
 
   const userFirstName = session.user.name?.split(" ")[0] || "Founder";
-  const plan = await resolveCurrentPlan({
+  const planContext = await resolvePlanContext({
     userId: session.user.id,
     email: session.user.email,
     requestHeaders,
   });
+  const plan = planContext.plan;
   const usageSummary = getMonthlyUsageSummary(plan, await getMonthlyScanUsage(session.user.id));
   const searchesRemainingLabel =
     usageSummary.monthlyScansLimit === null
@@ -145,6 +146,24 @@ export default async function DashboardPage({
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
+      {planContext.trialActive && (planContext.trialDaysRemaining ?? 0) <= 1 ? (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+              Trial Ending Soon
+            </p>
+            <p className="text-sm text-amber-100 font-semibold">
+              Your free trial ends in 1 day. Purchase a paid plan to continue using all features.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/billing"
+            className="shrink-0 px-4 py-2 rounded-lg bg-[#ff4500] text-white text-xs font-black uppercase tracking-widest"
+          >
+            Purchase Plan
+          </Link>
+        </div>
+      ) : null}
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowRight, Check, Magnet, RotateCw } from "lucide-react";
 
 export function Pricing() {
@@ -71,9 +72,12 @@ export function Pricing() {
           </div>
 
           <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-white/[0.01]">
-             <button className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4">
+             <Link
+               href={`/sign-up?plan=starter&billing=${isYearly ? "yearly" : "monthly"}`}
+               className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4"
+             >
                Get Started
-             </button>
+             </Link>
              <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Best for:</p>
              <p className="text-[13px] text-zinc-400 font-medium leading-tight">Early-stage founders validating first ideas.</p>
           </div>
@@ -115,9 +119,12 @@ export function Pricing() {
           </div>
 
           <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-[#ff4500]/5">
-             <button className="w-full h-11 rounded-lg bg-[#ff4500] hover:bg-[#ff571a] border border-[#ff4500] text-white font-extrabold text-[14px] transition-all shadow-lg shadow-[#ff4500]/20 flex items-center justify-center gap-2 mb-4">
+             <Link
+               href={`/sign-up?plan=growth&billing=${isYearly ? "yearly" : "monthly"}`}
+               className="w-full h-11 rounded-lg bg-[#ff4500] hover:bg-[#ff571a] border border-[#ff4500] text-white font-extrabold text-[14px] transition-all shadow-lg shadow-[#ff4500]/20 flex items-center justify-center gap-2 mb-4"
+             >
                Get Started <ArrowRight className="w-4 h-4" />
-             </button>
+             </Link>
              <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-widest mb-1">Best for:</p>
              <p className="text-[13px] text-zinc-300 font-semibold leading-tight">Indie hackers and SaaS founders building products.</p>
           </div>
@@ -154,9 +161,12 @@ export function Pricing() {
           </div>
 
           <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-white/[0.01]">
-             <button className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4">
+             <Link
+               href={`/sign-up?plan=pro&billing=${isYearly ? "yearly" : "monthly"}`}
+               className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4"
+             >
                Get Started
-             </button>
+             </Link>
              <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Best for:</p>
              <p className="text-[13px] text-zinc-400 font-medium leading-tight">Startup teams, agencies, and product researchers.</p>
           </div>
@@ -165,10 +175,9 @@ export function Pricing() {
 
       <div className="border border-[#7a281c] bg-[#140a08] rounded-xl px-12 py-8 max-w-[700px] w-full flex flex-col items-center justify-center shadow-lg text-center mt-6 mx-4 relative overflow-hidden">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
-          <h4 className="text-[18px] font-extrabold text-white tracking-tight mb-2">Start with a 3-day free trial</h4>
-          <p className="text-[13px] text-zinc-400 font-medium leading-relaxed max-w-[500px]">
-            We scan thousands of Reddit posts daily to find your opportunities — that&apos;s not cheap, so we keep trials short. But 3 days is enough to see the value.
-          </p>
+          <h4 className="text-[18px] font-extrabold text-white tracking-tight mb-2">
+            Start your 3-day free trial. No credit card required.
+          </h4>
       </div>
     </section>
   );

@@ -18,11 +18,6 @@ export default async function BillingPage() {
   }
 
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
-  const stripeSubscriptionConfigured = Boolean(
-    process.env.STRIPE_SUBSCRIPTION_ENABLED === "true" &&
-      process.env.STRIPE_PRICE_GROWTH_MONTHLY &&
-      process.env.STRIPE_PRICE_PRO_MONTHLY
-  );
   const plan = await resolveCurrentPlan({
     userId: session.user.id,
     email: session.user.email,
@@ -34,7 +29,6 @@ export default async function BillingPage() {
   return (
     <BillingPageClient
       stripeConfigured={stripeConfigured}
-      stripeSubscriptionConfigured={stripeSubscriptionConfigured}
       plan={plan}
       entitlements={entitlements}
       usage={usage}

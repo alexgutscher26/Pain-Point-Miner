@@ -35,7 +35,6 @@ export default function SignUpPage() {
       email,
       password,
       name,
-      callbackURL: "/dashboard/search",
     });
 
     if (authError) {
