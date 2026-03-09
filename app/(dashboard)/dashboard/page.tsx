@@ -208,8 +208,8 @@ export default async function DashboardPage({
               View All
             </Link>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-hidden">
+            <table className="w-full table-fixed text-left border-collapse">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
                   <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em]">Investigation</th>
@@ -402,7 +402,7 @@ function ReportRow({
     <tr className="hover:bg-white/2 transition-colors cursor-pointer group">
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-[15px] font-bold text-white mb-1 group-hover:text-[#ff4500] transition-colors">{keyword}</p>
+          <p className="text-[15px] font-bold text-white mb-1 break-words group-hover:text-[#ff4500] transition-colors">{keyword}</p>
           <p className="text-[11px] text-zinc-600 font-bold uppercase tracking-wider">{date}</p>
         </Link>
       </td>

@@ -1,6 +1,6 @@
 
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
+import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
@@ -20,6 +20,25 @@ const MAX_SUBREDDITS_BY_DEPTH = {
 } as const;
 const DUPLICATE_SUBMISSION_WINDOW_MS = 30_000;
 const IDEMPOTENCY_KEY_HEADER = "idempotency-key";
+const DEFAULT_SUBREDDIT_COUNT = 5;
+const DEFAULT_LOCALE = "United States";
+
+const LOCALE_SUBREDDIT_MAP: Record<string, string[]> = {
+  "united states": ["entrepreneur", "saas", "sales", "startups", "smallbusiness", "marketing", "freelance"],
+  "united kingdom": ["ukbusiness", "entrepreneur", "smallbusinessuk", "startups", "marketing", "freelanceuk"],
+  canada: ["canadabusiness", "entrepreneur", "startups", "smallbusiness", "marketing"],
+  australia: ["ausfinance", "entrepreneur", "startups", "smallbusiness", "marketing"],
+  india: ["startups_india", "entrepreneur", "india", "smallbusiness", "marketing"],
+};
+
+type DashboardLayoutSettings = {
+  settings?: {
+    scanDefaults?: {
+      defaultSubredditCount?: number;
+      defaultLocale?: string;
+    };
+  };
+};
 
 const subredditTokenSchema = z
   .string()
@@ -91,6 +110,19 @@ function arraysEqual(a: string[] | null | undefined, b: string[]) {
   const left = a ?? [];
   if (left.length !== b.length) return false;
   return left.every((value, idx) => value === b[idx]);
+}
+
+function parseDashboardLayout(input: unknown): DashboardLayoutSettings {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return {};
+  }
+  return input as DashboardLayoutSettings;
+}
+
+function resolveFallbackSubreddits(locale: string, count: number) {
+  const normalizedLocale = locale.trim().toLowerCase();
+  const byLocale = LOCALE_SUBREDDIT_MAP[normalizedLocale] ?? LOCALE_SUBREDDIT_MAP[DEFAULT_LOCALE.toLowerCase()];
+  return byLocale.slice(0, Math.max(1, count));
 }
 
 /**
@@ -173,10 +205,24 @@ export async function POST(req: Request) {
       );
     }
 
+    const preferences = await db.query.userPreferences.findFirst({
+      where: eq(userPreferences.userId, userId),
+      columns: {
+        dashboardLayout: true,
+      },
+    });
+    const parsedLayout = parseDashboardLayout(preferences?.dashboardLayout);
+    const scanDefaults = parsedLayout.settings?.scanDefaults;
+    const preferredSubredditCount = Math.min(
+      Math.max(scanDefaults?.defaultSubredditCount ?? DEFAULT_SUBREDDIT_COUNT, 1),
+      maxSubredditsForDepth
+    );
+    const preferredLocale = scanDefaults?.defaultLocale?.trim() || DEFAULT_LOCALE;
+
     const targetSubreddits =
       normalizedSubreddits.data.length > 0
         ? normalizedSubreddits.data
-        : ["entrepreneur", "saas", "sales", "startups"];
+        : resolveFallbackSubreddits(preferredLocale, preferredSubredditCount);
 
     const patterns = customPatterns.map((pattern) => pattern.trim()).filter(Boolean);
 

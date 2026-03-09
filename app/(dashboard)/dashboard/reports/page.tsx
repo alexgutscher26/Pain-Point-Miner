@@ -6,7 +6,6 @@ import {
   Calendar, 
   Filter, 
   Star, 
-  MoreVertical, 
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
@@ -47,6 +46,37 @@ export default function ReportsPage() {
   const [minScore, setMinScore] = useState("0");
   const [savedOnly, setSavedOnly] = useState("false");
   const [category, setCategory] = useState("all");
+  const [defaultsHydrated, setDefaultsHydrated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function hydrateDefaults() {
+      try {
+        const response = await fetch("/api/settings");
+        if (!response.ok) return;
+        const data = (await response.json()) as { minimumOpportunityScore?: number };
+        if (cancelled) return;
+
+        const score = data.minimumOpportunityScore;
+        if (typeof score === "number") {
+          const normalized = Math.max(0, Math.min(100, Math.round(score))).toString();
+          setMinScore(normalized);
+        }
+      } catch {
+        // Ignore hydration errors and continue with baseline filter defaults.
+      } finally {
+        if (!cancelled) {
+          setDefaultsHydrated(true);
+        }
+      }
+    }
+
+    void hydrateDefaults();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
@@ -70,8 +100,9 @@ export default function ReportsPage() {
   }, [days, status, minScore, savedOnly, category]);
 
   useEffect(() => {
+    if (!defaultsHydrated) return;
     fetchReports();
-  }, [fetchReports]);
+  }, [fetchReports, defaultsHydrated]);
 
   // Real-time polling while active scans exist
   useEffect(() => {
@@ -219,7 +250,7 @@ export default function ReportsPage() {
 
       {/* Reports Table Card */}
       <div className="bg-[#0c0c0c] border border-white/5 rounded-[32px] overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto min-h-[300px]">
+        <div className="overflow-x-hidden min-h-[300px]">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
                <Loader2 className="w-8 h-8 text-[#ff4500] animate-spin" />
@@ -242,7 +273,7 @@ export default function ReportsPage() {
                </Link>
             </div>
           ) : (
-          <table className="w-full text-left border-collapse">
+          <table className="w-full table-fixed text-left border-collapse">
             <thead>
               <tr className="border-b border-white/5 bg-white/2">
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Keyword / Niche</th>
@@ -258,11 +289,13 @@ export default function ReportsPage() {
               {reports.map((report) => (
                 <tr key={report.id} className="group hover:bg-white/2 transition-colors">
                   <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-white/5 shadow-inner bg-[#ff4500]/5 text-[#ff4500]`}>
                         <Search className="w-4 h-4" />
                       </div>
-                      <p className="font-black text-white text-[15px] tracking-tight group-hover:text-[#ff4500] transition-colors uppercase">{report.niche}</p>
+                      <p className="min-w-0 break-words font-black text-white text-[15px] tracking-tight group-hover:text-[#ff4500] transition-colors uppercase">
+                        {report.niche}
+                      </p>
                     </div>
                   </td>
                   <td className="px-8 py-6">
@@ -326,9 +359,6 @@ export default function ReportsPage() {
                            <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                          </span>
                       </Link>
-                      <button className="p-2 text-zinc-600 hover:text-white transition-colors">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -347,24 +377,6 @@ export default function ReportsPage() {
              <PaginationButton disabled icon={<ChevronLeft className="w-4 h-4" />} />
              <PaginationButton active label="1" />
              <PaginationButton icon={<ChevronRight className="w-4 h-4" />} />
-          </div>
-        </div>
-      </div>
-
-      {/* Pro CTA Banner */}
-      <div className="relative group p-10 rounded-[32px] overflow-hidden bg-[#0c0c0c] border border-white/5 text-center shadow-2xl">
-        <div className="absolute inset-0 bg-[#ff4500]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 blur-3xl"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
-        
-        <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-          <h3 className="text-2xl font-black text-white tracking-tight">Looking for deeper insights?</h3>
-          <p className="text-zinc-500 font-medium leading-relaxed">
-            Get unlimited searches, AI-powered pain point summarization, and direct Slack integration with the <span className="text-white font-black underline cursor-pointer decoration-[#ff4500] underline-offset-4">Enterprise Plan</span>.
-          </p>
-          <div className="pt-4">
-            <button className="bg-white hover:bg-zinc-200 text-black px-10 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-widest transition-all shadow-xl hover:shadow-white/10 active:scale-95">
-               Talk to Sales
-            </button>
           </div>
         </div>
       </div>

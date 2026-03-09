@@ -25,6 +25,17 @@ type SearchDraft = {
 
 type MiningDepth = SearchDraft["miningDepth"];
 
+const DEFAULT_SUBREDDIT_COUNT = 5;
+const DEFAULT_MIN_SCORE = 70;
+const DEFAULT_LOCALE = "United States";
+const COMMON_SUBREDDITS_BY_LOCALE: Record<string, string[]> = {
+  "united states": ["saas", "entrepreneur", "startups", "smallbusiness", "sales", "marketing", "freelance"],
+  "united kingdom": ["ukbusiness", "smallbusinessuk", "entrepreneur", "startups", "marketing"],
+  canada: ["canadabusiness", "entrepreneur", "startups", "smallbusiness", "marketing"],
+  australia: ["ausfinance", "entrepreneur", "startups", "smallbusiness", "marketing"],
+  india: ["startups_india", "entrepreneur", "smallbusiness", "marketing", "india"],
+};
+
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,7 +47,14 @@ export default function SearchPage() {
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [defaultSubredditCount, setDefaultSubredditCount] = useState(DEFAULT_SUBREDDIT_COUNT);
+  const [minimumOpportunityScore, setMinimumOpportunityScore] = useState(DEFAULT_MIN_SCORE);
+  const [defaultLocale, setDefaultLocale] = useState(DEFAULT_LOCALE);
   const requestInFlightRef = useRef(false);
+  const localeCommunities =
+    COMMON_SUBREDDITS_BY_LOCALE[defaultLocale.trim().toLowerCase()] ??
+    COMMON_SUBREDDITS_BY_LOCALE[DEFAULT_LOCALE.toLowerCase()];
+  const visibleCommunities = localeCommunities.slice(0, Math.max(1, Math.min(defaultSubredditCount, 10)));
 
   useEffect(() => {
     try {
@@ -66,6 +84,40 @@ export default function SearchPage() {
     setKeyword((current) => (current.trim().length > 0 ? current : keywordFromQuery));
   }, [searchParams]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDefaults() {
+      try {
+        const response = await fetch("/api/settings");
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          defaultSubredditCount?: number;
+          minimumOpportunityScore?: number;
+          defaultLocale?: string;
+        };
+        if (cancelled) return;
+
+        if (typeof data.defaultSubredditCount === "number") {
+          setDefaultSubredditCount(Math.max(1, Math.min(25, Math.round(data.defaultSubredditCount))));
+        }
+        if (typeof data.minimumOpportunityScore === "number") {
+          setMinimumOpportunityScore(Math.max(0, Math.min(100, Math.round(data.minimumOpportunityScore))));
+        }
+        if (typeof data.defaultLocale === "string" && data.defaultLocale.trim().length > 0) {
+          setDefaultLocale(data.defaultLocale.trim());
+        }
+      } catch {
+        // Keep UI usable with fallback defaults if settings cannot be loaded.
+      }
+    }
+
+    void loadDefaults();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleSuggestSubreddits = async () => {
     if (!keyword || keyword.length < 3) return;
     
@@ -74,7 +126,11 @@ export default function SearchPage() {
       const response = await fetch("/api/search/suggest-subreddits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword })
+        body: JSON.stringify({
+          keyword,
+          locale: defaultLocale,
+          count: Math.max(1, Math.min(defaultSubredditCount, 15)),
+        })
       });
       const data = await response.json();
       setSuggestedSubreddits(data.subreddits);
@@ -203,7 +259,7 @@ export default function SearchPage() {
                   ) : (
                     <Sparkles className="w-3 h-3 group-hover/suggest:scale-125 transition-transform" />
                   )}
-                  Auto-Suggest
+                  Auto-Suggest ({Math.max(1, Math.min(defaultSubredditCount, 15))})
                 </button>
               </div>
               <div className="relative group">
@@ -233,8 +289,10 @@ export default function SearchPage() {
               )}
 
               <div className="flex flex-wrap gap-2">
-                <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Common Core Communities</p>
-                {['saas', 'entrepreneur', 'startups', 'smallbusiness'].map((sub, i) => (
+                <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                  Common Core Communities ({defaultLocale})
+                </p>
+                {visibleCommunities.map((sub, i) => (
                   <button
                     key={i}
                     onClick={() => addSubreddit(sub)}
@@ -246,7 +304,7 @@ export default function SearchPage() {
               </div>
 
               <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                Leave blank to search all relevant communities across Reddit.
+                Leave blank to use your default locale and subreddit count from settings.
               </p>
             </div>
 
@@ -348,13 +406,18 @@ export default function SearchPage() {
               <div className="flex items-center gap-3 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
                  <Clock className="w-4 h-4" />
                  Est. time: ~{(() => {
-                   const subCount = subreddits.split(',').filter(s => s.trim()).length || 4;
+                   const subCount =
+                     subreddits.split(',').filter(s => s.trim()).length ||
+                     Math.max(1, Math.min(defaultSubredditCount, 10));
                    const depthMultiplier = miningDepth === "advanced" ? 5 : miningDepth === "deep" ? 3 : 1;
                    const totalSeconds = (subCount * 15) * depthMultiplier;
                    return totalSeconds >= 60 
                     ? `${Math.round(totalSeconds / 60)} minutes` 
                     : `${totalSeconds} seconds`;
                  })()}
+              </div>
+              <div className="text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
+                Min score default: {minimumOpportunityScore}+
               </div>
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <button 

@@ -120,6 +120,33 @@ function renderMultiline(text: string) {
   return text.replace(/\\n/g, "\n");
 }
 
+function formatPainDescription(description: string) {
+  const normalized = renderMultiline(description).replace(/\r\n/g, "\n").trim();
+  const cleaned = normalized.replace(/\*([^*\n]+)\*/g, "$1");
+
+  const explicitParagraphs = cleaned
+    .split(/\n{2,}/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (explicitParagraphs.length > 1) {
+    return explicitParagraphs;
+  }
+
+  const sentenceList = cleaned
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .filter(Boolean);
+  if (sentenceList.length <= 2) {
+    return [cleaned];
+  }
+
+  const paragraphs: string[] = [];
+  for (let i = 0; i < sentenceList.length; i += 2) {
+    paragraphs.push(sentenceList.slice(i, i + 2).join(" "));
+  }
+  return paragraphs;
+}
+
 function normalizeKeyword(input: string) {
   const normalized = input.trim().replace(/\s+/g, " ");
   if (normalized.length >= 2 && normalized.length <= 120) {
@@ -577,9 +604,13 @@ export default function ReportDetailPage() {
                         {pain.urgency}
                       </span>
                     </div>
-                    <p className="text-zinc-400 font-medium leading-relaxed max-w-2xl bg-[#111]/30 p-4 rounded-xl border border-white/5">
-                      {pain.description}
-                    </p>
+                    <div className="max-w-2xl bg-[#111]/30 p-4 rounded-xl border border-white/5 space-y-3">
+                      {formatPainDescription(pain.description).map((paragraph, idx) => (
+                        <p key={`${pain.id}-desc-${idx}`} className="text-zinc-400 font-medium leading-relaxed">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
                     <div className="flex flex-wrap items-center gap-4 text-[11px] font-black uppercase tracking-widest">
                        <div className="flex items-center gap-1.5 text-[#ff4500]">
                          <MessageSquare className="w-3.5 h-3.5" />
@@ -652,16 +683,27 @@ export default function ReportDetailPage() {
                          <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
                            Language Overview
                          </p>
-                         <p className="text-sm text-zinc-300 font-medium leading-relaxed">
-                           &quot;{pain.userLanguage.overview}&quot;
-                         </p>
+                         <div className="space-y-2">
+                           {formatPainDescription(pain.userLanguage.overview).map((paragraph, idx) => (
+                             <p key={`${pain.id}-overview-${idx}`} className="text-sm text-zinc-300 font-medium leading-relaxed">
+                               {paragraph}
+                             </p>
+                           ))}
+                         </div>
                        </div>
                      )}
                      {pain.communityVoices.map((voice, i) => (
                       <div key={i} className="bg-white/2 border border-white/5 p-6 rounded-2xl border-l-4 border-l-[#ff4500]">
-                        <p className="text-[14px] text-zinc-300 italic font-medium leading-relaxed">
-                          &quot;{voice}&quot;
-                        </p>
+                        <div className="space-y-2">
+                          {formatPainDescription(voice).map((paragraph, paragraphIdx) => (
+                            <p
+                              key={`${pain.id}-voice-${i}-${paragraphIdx}`}
+                              className="text-[14px] text-zinc-300 italic font-medium leading-relaxed"
+                            >
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
                       </div>
                      ))}
                      {pain.userLanguage?.sections?.map((section, sectionIdx) => (
@@ -672,15 +714,28 @@ export default function ReportDetailPage() {
                          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                            {section.label}
                          </p>
-                         <p className="text-xs text-zinc-500 font-medium">{section.summary}</p>
+                         <div className="space-y-2">
+                           {formatPainDescription(section.summary).map((paragraph, idx) => (
+                             <p
+                               key={`${pain.id}-lang-${sectionIdx}-summary-${idx}`}
+                               className="text-xs text-zinc-500 font-medium leading-relaxed"
+                             >
+                               {paragraph}
+                             </p>
+                           ))}
+                         </div>
                          <div className="space-y-2">
                            {section.examples.map((example, exampleIdx) => (
-                             <p
-                               key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}`}
-                               className="text-sm text-zinc-300 font-medium leading-relaxed"
-                             >
-                               - &quot;{example}&quot;
-                             </p>
+                             <div key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}`} className="space-y-1">
+                               {formatPainDescription(example).map((paragraph, paragraphIdx) => (
+                                 <p
+                                   key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}-${paragraphIdx}`}
+                                   className="text-sm text-zinc-300 font-medium leading-relaxed"
+                                 >
+                                   {paragraphIdx === 0 ? `- ${paragraph}` : paragraph}
+                                 </p>
+                               ))}
+                             </div>
                            ))}
                          </div>
                        </div>
@@ -871,34 +926,42 @@ export default function ReportDetailPage() {
                        <p className="text-sm font-black text-white leading-tight">{opp.title}</p>
                        <span className="text-[10px] font-black uppercase tracking-widest text-[#ff4500]">{opp.score}/100</span>
                      </div>
-                     <p className="text-xs text-zinc-400 font-medium leading-relaxed whitespace-pre-line">{renderMultiline(opp.problemStatement)}</p>
+                     <div className="space-y-2">
+                       {formatPainDescription(opp.problemStatement).map((paragraph, paragraphIdx) => (
+                         <p
+                           key={`opp-${idx}-problem-${paragraphIdx}`}
+                           className="text-xs text-zinc-400 font-medium leading-relaxed"
+                         >
+                           {paragraph}
+                         </p>
+                       ))}
+                     </div>
                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">ICP: {opp.targetCustomer}</p>
-                     <p className="text-xs text-zinc-300 font-medium leading-relaxed whitespace-pre-line">{renderMultiline(opp.valueProposition)}</p>
-                     <p className="text-[11px] text-zinc-500 font-bold leading-relaxed whitespace-pre-line">{renderMultiline(opp.launchAngle)}</p>
+                     <div className="space-y-2">
+                       {formatPainDescription(opp.valueProposition).map((paragraph, paragraphIdx) => (
+                         <p
+                           key={`opp-${idx}-value-${paragraphIdx}`}
+                           className="text-xs text-zinc-300 font-medium leading-relaxed"
+                         >
+                           {paragraph}
+                         </p>
+                       ))}
+                     </div>
+                     <div className="space-y-2">
+                       {formatPainDescription(opp.launchAngle).map((paragraph, paragraphIdx) => (
+                         <p
+                           key={`opp-${idx}-launch-${paragraphIdx}`}
+                           className="text-[11px] text-zinc-500 font-bold leading-relaxed"
+                         >
+                           {paragraph}
+                         </p>
+                       ))}
+                     </div>
                    </div>
                  ))}
                </div>
              </div>
            )}
-
-           {/* Pro Unlock Card */}
-           <div className="relative group rounded-[32px] overflow-hidden bg-linear-to-br from-[#111] to-black border border-white/5 p-8 shadow-2xl">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4500]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10 space-y-6">
-                <div className="w-12 h-12 bg-[#ff4500] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#ff4500]/20">
-                   <Lock className="w-6 h-6" />
-                </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-black text-white tracking-tight uppercase">Unlock Core Strategy</h4>
-                  <p className="text-[13px] text-zinc-500 font-medium leading-relaxed">
-                    Access competitor breakdown charts, verified lead emails from Reddit users, and ready-to-run marketing copy.
-                  </p>
-                </div>
-                <button className="w-full bg-white text-black py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-zinc-200 transition-all active:scale-[0.98]">
-                   Upgrade to Enterprise
-                </button>
-              </div>
-           </div>
         </div>
       </div>
     </div>
