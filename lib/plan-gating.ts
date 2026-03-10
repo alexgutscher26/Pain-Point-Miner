@@ -41,7 +41,11 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
   },
 };
 
-const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing", "past_due"]);
+const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
+  "active",
+  "trialing",
+  "past_due",
+]);
 const PLAN_ORDER: Record<BillingPlan, number> = {
   starter: 1,
   growth: 2,
@@ -69,19 +73,24 @@ function parsePlanOverrides(raw: string | undefined) {
   if (!raw) return {};
   try {
     const parsed = JSON.parse(raw) as Record<string, string>;
-    return Object.entries(parsed).reduce<Record<string, BillingPlan>>((acc, [key, value]) => {
-      const resolved = planFromString(value);
-      if (resolved) {
-        acc[key.trim().toLowerCase()] = resolved;
-      }
-      return acc;
-    }, {});
+    return Object.entries(parsed).reduce<Record<string, BillingPlan>>(
+      (acc, [key, value]) => {
+        const resolved = planFromString(value);
+        if (resolved) {
+          acc[key.trim().toLowerCase()] = resolved;
+        }
+        return acc;
+      },
+      {},
+    );
   } catch {
     return {};
   }
 }
 
-export function normalizeBillingPlan(input: string | null | undefined): BillingPlan {
+export function normalizeBillingPlan(
+  input: string | null | undefined,
+): BillingPlan {
   return planFromString(input) ?? "starter";
 }
 
@@ -114,7 +123,8 @@ export function resolvePlanForIdentity(input: {
 
   const hasTrialingSubscription =
     input.subscriptions?.some(
-      (subscription) => (subscription.status ?? "").toLowerCase() === "trialing"
+      (subscription) =>
+        (subscription.status ?? "").toLowerCase() === "trialing",
     ) ?? false;
   if (hasTrialingSubscription) {
     return "pro";
@@ -123,7 +133,9 @@ export function resolvePlanForIdentity(input: {
   const activePlans =
     input.subscriptions
       ?.filter((subscription) =>
-        ACTIVE_SUBSCRIPTION_STATUSES.has((subscription.status ?? "").toLowerCase())
+        ACTIVE_SUBSCRIPTION_STATUSES.has(
+          (subscription.status ?? "").toLowerCase(),
+        ),
       )
       .map((subscription) => planFromString(subscription.plan))
       .filter((plan): plan is BillingPlan => Boolean(plan)) ?? [];
@@ -133,7 +145,7 @@ export function resolvePlanForIdentity(input: {
   }
 
   return activePlans.reduce((highest, current) =>
-    PLAN_ORDER[current] > PLAN_ORDER[highest] ? current : highest
+    PLAN_ORDER[current] > PLAN_ORDER[highest] ? current : highest,
   );
 }
 
@@ -150,11 +162,15 @@ export async function getMonthlyScanUsage(userId: string, now = new Date()) {
   return result[0]?.total ?? 0;
 }
 
-export function getMonthlyUsageSummary(plan: BillingPlan, monthlyScansUsed: number) {
+export function getMonthlyUsageSummary(
+  plan: BillingPlan,
+  monthlyScansUsed: number,
+) {
   const limit = PLAN_ENTITLEMENTS[plan].monthlyScans;
   return {
     monthlyScansUsed,
     monthlyScansLimit: limit,
-    monthlyScansRemaining: limit === null ? null : Math.max(limit - monthlyScansUsed, 0),
+    monthlyScansRemaining:
+      limit === null ? null : Math.max(limit - monthlyScansUsed, 0),
   };
 }

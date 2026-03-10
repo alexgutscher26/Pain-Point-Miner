@@ -8,6 +8,7 @@ description: Add a new sound effect to @remotion/sfx
 Sound effects must first be added to the [remotion.media](https://github.com/remotion-dev/remotion.media) repository. The source of truth is `generate.ts` in that repo. A sound effect must exist there before it can be added to `@remotion/sfx`.
 
 Sound effects must be:
+
 - WAV format
 - CC0 (Creative Commons 0) licensed
 - Normalized to peak at -3dB
@@ -35,12 +36,13 @@ In the `remotion-dev/remotion.media` repo:
 Use camelCase for the variable name. Avoid JavaScript reserved words (e.g. use `uiSwitch` not `switch`).
 
 ```ts
-export const mySound = 'https://remotion.media/my-sound.wav';
+export const mySound = "https://remotion.media/my-sound.wav";
 ```
 
 ### 3. Create a doc page at `packages/docs/docs/sfx/<name>.mdx`
 
 Follow the pattern of existing pages (e.g. `whip.mdx`). Include:
+
 - Frontmatter with `image`, `title` (camelCase export name), `crumb: '@remotion/sfx'`
 - `<AvailableFrom>` tag with the next release version
 - `<PlayButton>` import and usage
@@ -68,11 +70,11 @@ cd packages/sfx && bun run make
 
 ## Naming conventions
 
-| File name | Export name |
-|-----------|------------|
-| `my-sound.wav` | `mySound` |
-| `switch.wav` | `uiSwitch` (reserved word) |
-| `page-turn.wav` | `pageTurn` |
+| File name       | Export name                |
+| --------------- | -------------------------- |
+| `my-sound.wav`  | `mySound`                  |
+| `switch.wav`    | `uiSwitch` (reserved word) |
+| `page-turn.wav` | `pageTurn`                 |
 
 ## Version
 

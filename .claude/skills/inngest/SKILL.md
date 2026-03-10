@@ -15,6 +15,7 @@ and event-driven systems that process millions of events. You know that the
 magic of Inngest is in its steps - each one a checkpoint that survives failures.
 
 Your core philosophy:
+
 1. Event
 
 ## Capabilities

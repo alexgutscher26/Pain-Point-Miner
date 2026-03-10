@@ -1,4 +1,3 @@
-
 import { db } from "@/lib/db";
 import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
@@ -8,7 +7,11 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
-import { getMonthlyScanUsage, getPlanEntitlements, isDepthAllowed } from "@/lib/plan-gating";
+import {
+  getMonthlyScanUsage,
+  getPlanEntitlements,
+  isDepthAllowed,
+} from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 
 const KEYWORD_MIN_LENGTH = 2;
@@ -26,11 +29,44 @@ const DEFAULT_SUBREDDIT_COUNT = 5;
 const DEFAULT_LOCALE = "United States";
 
 const LOCALE_SUBREDDIT_MAP: Record<string, string[]> = {
-  "united states": ["entrepreneur", "saas", "sales", "startups", "smallbusiness", "marketing", "freelance"],
-  "united kingdom": ["ukbusiness", "entrepreneur", "smallbusinessuk", "startups", "marketing", "freelanceuk"],
-  canada: ["canadabusiness", "entrepreneur", "startups", "smallbusiness", "marketing"],
-  australia: ["ausfinance", "entrepreneur", "startups", "smallbusiness", "marketing"],
-  india: ["startups_india", "entrepreneur", "india", "smallbusiness", "marketing"],
+  "united states": [
+    "entrepreneur",
+    "saas",
+    "sales",
+    "startups",
+    "smallbusiness",
+    "marketing",
+    "freelance",
+  ],
+  "united kingdom": [
+    "ukbusiness",
+    "entrepreneur",
+    "smallbusinessuk",
+    "startups",
+    "marketing",
+    "freelanceuk",
+  ],
+  canada: [
+    "canadabusiness",
+    "entrepreneur",
+    "startups",
+    "smallbusiness",
+    "marketing",
+  ],
+  australia: [
+    "ausfinance",
+    "entrepreneur",
+    "startups",
+    "smallbusiness",
+    "marketing",
+  ],
+  india: [
+    "startups_india",
+    "entrepreneur",
+    "india",
+    "smallbusiness",
+    "marketing",
+  ],
 };
 
 type DashboardLayoutSettings = {
@@ -52,7 +88,7 @@ const subredditTokenSchema = z
       .replace(/^r\//i, "")
       .replace(/^@+/, "")
       .replace(/[^\w]/g, "")
-      .toLowerCase()
+      .toLowerCase(),
   )
   .pipe(z.string().regex(/^[a-z0-9_]{2,21}$/, "Invalid subreddit name"));
 
@@ -62,21 +98,33 @@ const customPatternItemSchema = z
   .min(1, "Pattern cannot be empty")
   .max(
     CUSTOM_PATTERN_MAX_LENGTH,
-    `Pattern must be at most ${CUSTOM_PATTERN_MAX_LENGTH} characters`
+    `Pattern must be at most ${CUSTOM_PATTERN_MAX_LENGTH} characters`,
   );
 
 const searchPayloadSchema = z.object({
   keyword: z
     .string()
     .trim()
-    .min(KEYWORD_MIN_LENGTH, `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`)
-    .max(KEYWORD_MAX_LENGTH, `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`)
+    .min(
+      KEYWORD_MIN_LENGTH,
+      `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`,
+    )
+    .max(
+      KEYWORD_MAX_LENGTH,
+      `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`,
+    )
     .transform((value) => value.replace(/\s+/g, " "))
     .pipe(
       z
         .string()
-        .min(KEYWORD_MIN_LENGTH, `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`)
-        .max(KEYWORD_MAX_LENGTH, `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`)
+        .min(
+          KEYWORD_MIN_LENGTH,
+          `Keyword must be at least ${KEYWORD_MIN_LENGTH} characters`,
+        )
+        .max(
+          KEYWORD_MAX_LENGTH,
+          `Keyword must be at most ${KEYWORD_MAX_LENGTH} characters`,
+        ),
     ),
   subreddits: z
     .string()
@@ -92,13 +140,21 @@ const searchPayloadSchema = z.object({
       if (!value) return [];
       return value.split(",");
     })
-    .transform((patterns) => patterns.map((pattern) => pattern.trim()).filter(Boolean))
+    .transform((patterns) =>
+      patterns.map((pattern) => pattern.trim()).filter(Boolean),
+    )
     .pipe(
       z
         .array(customPatternItemSchema)
-        .max(CUSTOM_PATTERN_MAX_COUNT, `Too many custom patterns (max ${CUSTOM_PATTERN_MAX_COUNT})`)
+        .max(
+          CUSTOM_PATTERN_MAX_COUNT,
+          `Too many custom patterns (max ${CUSTOM_PATTERN_MAX_COUNT})`,
+        ),
     ),
-  miningDepth: z.enum(["basic", "deep", "advanced"]).optional().default("basic"),
+  miningDepth: z
+    .enum(["basic", "deep", "advanced"])
+    .optional()
+    .default("basic"),
 });
 
 const idempotencyKeySchema = z
@@ -123,7 +179,9 @@ function parseDashboardLayout(input: unknown): DashboardLayoutSettings {
 
 function resolveFallbackSubreddits(locale: string, count: number) {
   const normalizedLocale = locale.trim().toLowerCase();
-  const byLocale = LOCALE_SUBREDDIT_MAP[normalizedLocale] ?? LOCALE_SUBREDDIT_MAP[DEFAULT_LOCALE.toLowerCase()];
+  const byLocale =
+    LOCALE_SUBREDDIT_MAP[normalizedLocale] ??
+    LOCALE_SUBREDDIT_MAP[DEFAULT_LOCALE.toLowerCase()];
   return byLocale.slice(0, Math.max(1, count));
 }
 
@@ -148,14 +206,15 @@ export async function POST(req: Request) {
   let idempotencyKey: string | null = null;
 
   if (rawIdempotencyKey) {
-    const parsedIdempotencyKey = idempotencyKeySchema.safeParse(rawIdempotencyKey);
+    const parsedIdempotencyKey =
+      idempotencyKeySchema.safeParse(rawIdempotencyKey);
     if (!parsedIdempotencyKey.success) {
       return apiError(
         400,
         "VALIDATION_ERROR",
         "Invalid idempotency key",
         parsedIdempotencyKey.error.flatten(),
-        correlationId
+        correlationId,
       );
     }
     idempotencyKey = parsedIdempotencyKey.data;
@@ -166,7 +225,13 @@ export async function POST(req: Request) {
     try {
       rawBody = await req.json();
     } catch {
-      return apiError(400, "INVALID_JSON", "Invalid JSON payload", undefined, correlationId);
+      return apiError(
+        400,
+        "INVALID_JSON",
+        "Invalid JSON payload",
+        undefined,
+        correlationId,
+      );
     }
 
     const parsedPayload = searchPayloadSchema.safeParse(rawBody);
@@ -177,11 +242,12 @@ export async function POST(req: Request) {
         "VALIDATION_ERROR",
         "Invalid request payload",
         parsedPayload.error.flatten(),
-        correlationId
+        correlationId,
       );
     }
 
-    const { keyword, subreddits, customPatterns, miningDepth } = parsedPayload.data;
+    const { keyword, subreddits, customPatterns, miningDepth } =
+      parsedPayload.data;
     const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
@@ -195,7 +261,7 @@ export async function POST(req: Request) {
         {
           trialEnded: true,
         },
-        correlationId
+        correlationId,
       );
     }
     const plan = planContext.plan;
@@ -210,12 +276,15 @@ export async function POST(req: Request) {
           plan,
           allowedMiningDepths: entitlements.allowedMiningDepths,
         },
-        correlationId
+        correlationId,
       );
     }
 
     const monthlyScansUsed = await getMonthlyScanUsage(userId);
-    if (entitlements.monthlyScans !== null && monthlyScansUsed >= entitlements.monthlyScans) {
+    if (
+      entitlements.monthlyScans !== null &&
+      monthlyScansUsed >= entitlements.monthlyScans
+    ) {
       return apiError(
         403,
         "PLAN_LIMIT_REACHED",
@@ -225,7 +294,7 @@ export async function POST(req: Request) {
           monthlyScansUsed,
           monthlyScansLimit: entitlements.monthlyScans,
         },
-        correlationId
+        correlationId,
       );
     }
 
@@ -241,7 +310,7 @@ export async function POST(req: Request) {
       .array(subredditTokenSchema)
       .max(
         maxSubredditsForDepth,
-        `Too many subreddits (max ${maxSubredditsForDepth})`
+        `Too many subreddits (max ${maxSubredditsForDepth})`,
       )
       .safeParse(rawSubreddits);
 
@@ -251,7 +320,7 @@ export async function POST(req: Request) {
         "VALIDATION_ERROR",
         "Invalid subreddits input",
         normalizedSubreddits.error.flatten(),
-        correlationId
+        correlationId,
       );
     }
 
@@ -264,17 +333,23 @@ export async function POST(req: Request) {
     const parsedLayout = parseDashboardLayout(preferences?.dashboardLayout);
     const scanDefaults = parsedLayout.settings?.scanDefaults;
     const preferredSubredditCount = Math.min(
-      Math.max(scanDefaults?.defaultSubredditCount ?? DEFAULT_SUBREDDIT_COUNT, 1),
-      maxSubredditsForDepth
+      Math.max(
+        scanDefaults?.defaultSubredditCount ?? DEFAULT_SUBREDDIT_COUNT,
+        1,
+      ),
+      maxSubredditsForDepth,
     );
-    const preferredLocale = scanDefaults?.defaultLocale?.trim() || DEFAULT_LOCALE;
+    const preferredLocale =
+      scanDefaults?.defaultLocale?.trim() || DEFAULT_LOCALE;
 
     const targetSubreddits =
       normalizedSubreddits.data.length > 0
         ? normalizedSubreddits.data
         : resolveFallbackSubreddits(preferredLocale, preferredSubredditCount);
 
-    const patterns = customPatterns.map((pattern) => pattern.trim()).filter(Boolean);
+    const patterns = customPatterns
+      .map((pattern) => pattern.trim())
+      .filter(Boolean);
 
     /**
      * Execute a search operation for scraping data.
@@ -300,7 +375,7 @@ export async function POST(req: Request) {
         const latestMatchingScraper = await db.query.scraper.findFirst({
           where: and(
             eq(scraper.userId, userId),
-            workspaceScope(scraper.workspaceId, workspaceId)
+            workspaceScope(scraper.workspaceId, workspaceId),
           ),
           orderBy: [desc(scraper.createdAt)],
           with: {
@@ -317,8 +392,14 @@ export async function POST(req: Request) {
             DUPLICATE_SUBMISSION_WINDOW_MS;
           const isSameKeyword = latestMatchingScraper.keywords?.[0] === keyword;
           const isSameDepth = latestMatchingScraper.miningDepth === miningDepth;
-          const isSameSubreddits = arraysEqual(latestMatchingScraper.subreddits, targetSubreddits);
-          const isSamePatterns = arraysEqual(latestMatchingScraper.customPatterns, patterns);
+          const isSameSubreddits = arraysEqual(
+            latestMatchingScraper.subreddits,
+            targetSubreddits,
+          );
+          const isSamePatterns = arraysEqual(
+            latestMatchingScraper.customPatterns,
+            patterns,
+          );
 
           if (
             isWithinDuplicateWindow &&
@@ -364,7 +445,10 @@ export async function POST(req: Request) {
           processingLimit:
             miningDepth === "advanced" ? 20 : miningDepth === "deep" ? 10 : 3,
         }).catch((error) => {
-          console.error(`Async mining run failed for scraper ${scraperId}:`, error);
+          console.error(
+            `Async mining run failed for scraper ${scraperId}:`,
+            error,
+          );
         });
 
         return {
@@ -383,16 +467,24 @@ export async function POST(req: Request) {
     const result = idempotencyKey
       ? await runWithIdempotency(
           `${userId}:${workspaceId ?? "personal"}:${idempotencyKey}`,
-          executeSearch
+          executeSearch,
         )
       : { result: await executeSearch(), replayed: false };
 
     const response = apiJson(result.result, 200, correlationId);
-    response.headers.set("x-idempotency-replayed", result.replayed ? "true" : "false");
+    response.headers.set(
+      "x-idempotency-replayed",
+      result.replayed ? "true" : "false",
+    );
     return response;
-
   } catch (error) {
     console.error("Search API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

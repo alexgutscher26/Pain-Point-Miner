@@ -13,7 +13,9 @@ export const runStatusSchema = z.enum([
 
 export type RunStatus = z.infer<typeof runStatusSchema>;
 
-export function normalizeRunStatus(status: string | null | undefined): RunStatus {
+export function normalizeRunStatus(
+  status: string | null | undefined,
+): RunStatus {
   if (!status) return "running";
 
   const legacyMap: Record<string, RunStatus> = {

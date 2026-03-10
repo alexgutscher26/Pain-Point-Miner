@@ -27,7 +27,9 @@ function isAuthorized(req: Request) {
   if (!secret) return false;
 
   const authHeader = req.headers.get("authorization") ?? "";
-  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  const bearer = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
   const direct = req.headers.get("x-cron-secret")?.trim() ?? "";
   const provided = bearer || direct;
   if (!provided) return false;
@@ -45,7 +47,13 @@ export async function POST(req: Request) {
   const correlationId = getCorrelationId(req);
 
   if (!isAuthorized(req)) {
-    return apiError(401, "UNAUTHORIZED", "Unauthorized scheduler trigger", undefined, correlationId);
+    return apiError(
+      401,
+      "UNAUTHORIZED",
+      "Unauthorized scheduler trigger",
+      undefined,
+      correlationId,
+    );
   }
 
   const { searchParams } = new URL(req.url);
@@ -59,14 +67,31 @@ export async function POST(req: Request) {
       "VALIDATION_ERROR",
       "Invalid query parameters",
       parsedQuery.error.flatten(),
-      correlationId
+      correlationId,
     );
   }
 
-  const batchLimit = parsedQuery.data.limit ?? parsePositiveIntFromEnv(process.env.SCHEDULED_BATCH_LIMIT, 5, 1, 50);
-  const maxPostsPerSubreddit = parsePositiveIntFromEnv(process.env.SCHEDULED_MAX_POSTS_PER_SUBREDDIT, 180, 10, 500);
-  const processingLimit = parsePositiveIntFromEnv(process.env.SCHEDULED_PROCESSING_LIMIT, 8, 1, 40);
-  const maxSubreddits = parsePositiveIntFromEnv(process.env.SCHEDULED_MAX_SUBREDDITS, 10, 1, 20);
+  const batchLimit =
+    parsedQuery.data.limit ??
+    parsePositiveIntFromEnv(process.env.SCHEDULED_BATCH_LIMIT, 5, 1, 50);
+  const maxPostsPerSubreddit = parsePositiveIntFromEnv(
+    process.env.SCHEDULED_MAX_POSTS_PER_SUBREDDIT,
+    180,
+    10,
+    500,
+  );
+  const processingLimit = parsePositiveIntFromEnv(
+    process.env.SCHEDULED_PROCESSING_LIMIT,
+    8,
+    1,
+    40,
+  );
+  const maxSubreddits = parsePositiveIntFromEnv(
+    process.env.SCHEDULED_MAX_SUBREDDITS,
+    10,
+    1,
+    20,
+  );
 
   try {
     const allRunning = await db
@@ -90,7 +115,9 @@ export async function POST(req: Request) {
     const dueScrapers = allRunning
       .filter((row) => {
         const keyword = row.keywords?.[0];
-        return Boolean(keyword) && isScraperDue(row.lastRunAt, row.frequency, now);
+        return (
+          Boolean(keyword) && isScraperDue(row.lastRunAt, row.frequency, now)
+        );
       })
       .slice(0, batchLimit);
 
@@ -140,10 +167,16 @@ export async function POST(req: Request) {
         ...summary,
       },
       200,
-      correlationId
+      correlationId,
     );
   } catch (error) {
     console.error("Scheduled scan API error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

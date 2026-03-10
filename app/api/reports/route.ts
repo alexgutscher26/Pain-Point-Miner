@@ -6,7 +6,10 @@ import { and, eq, desc, gte } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
-import { buildLatestTrendInsights, formatTrendChangePercent } from "@/lib/trend-detection";
+import {
+  buildLatestTrendInsights,
+  formatTrendChangePercent,
+} from "@/lib/trend-detection";
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
@@ -18,7 +21,7 @@ export async function GET(req: Request) {
   }
   const { correlationId, userId, userEmail, workspaceId } = authContext.context;
   const { searchParams } = new URL(req.url);
-  
+
   const days = searchParams.get("days");
   const statusParam = searchParams.get("status");
   const savedOnly = searchParams.get("savedOnly") === "true";
@@ -35,7 +38,7 @@ export async function GET(req: Request) {
 
     let whereClause = and(
       eq(scraper.userId, userId),
-      workspaceScope(scraper.workspaceId, workspaceId)
+      workspaceScope(scraper.workspaceId, workspaceId),
     );
 
     if (days && days !== "all") {
@@ -54,33 +57,33 @@ export async function GET(req: Request) {
           limit: 1,
         },
         painPoints: {
-            columns: {
-                id: true,
+          columns: {
+            id: true,
+            score: true,
+            urgency: true,
+            monetizationScore: true,
+            marketMaturity: true,
+            sentiment: true,
+            commentCount: true,
+            mentionCount: true,
+          },
+          with: {
+            painPointComments: {
+              columns: {
                 score: true,
-                urgency: true,
-                monetizationScore: true,
-                marketMaturity: true,
-                sentiment: true,
-                commentCount: true,
-                mentionCount: true,
-            },
-            with: {
-              painPointComments: {
-                columns: {
-                  score: true,
-                },
-                orderBy: (comment, { desc }) => [desc(comment.score)],
-                limit: 5,
               },
+              orderBy: (comment, { desc }) => [desc(comment.score)],
+              limit: 5,
             },
-        }
-      }
+          },
+        },
+      },
     });
 
     const trendHistoryRows = await db.query.scraper.findMany({
       where: and(
         eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId)
+        workspaceScope(scraper.workspaceId, workspaceId),
       ),
       orderBy: [desc(scraper.createdAt)],
       with: {
@@ -101,11 +104,15 @@ export async function GET(req: Request) {
             createdAt: row.createdAt,
           };
         })
-        .filter((row): row is { key: string; value: number; createdAt: Date } => Boolean(row))
+        .filter((row): row is { key: string; value: number; createdAt: Date } =>
+          Boolean(row),
+        ),
     );
-    const trendByKeyword = new Map(trendInsights.map((trend) => [trend.key, trend]));
+    const trendByKeyword = new Map(
+      trendInsights.map((trend) => [trend.key, trend]),
+    );
 
-    let formattedReports = (reportsRes as any[]).map(r => {
+    let formattedReports = (reportsRes as any[]).map((r) => {
       const latestRun = r.scraperRuns?.[0];
       const pps = (r.painPoints || []) as Array<{
         score: number;
@@ -126,8 +133,10 @@ export async function GET(req: Request) {
         const upvoteSignal =
           topCommentScores.length > 0
             ? Math.round(
-                topCommentScores.reduce((sum, score) => sum + Math.max(0, score), 0) /
-                  topCommentScores.length
+                topCommentScores.reduce(
+                  (sum, score) => sum + Math.max(0, score),
+                  0,
+                ) / topCommentScores.length,
               )
             : 0;
         return {
@@ -142,18 +151,18 @@ export async function GET(req: Request) {
           ? Math.round(
               enrichedPainPoints.reduce(
                 (sum, point) => sum + toValidationScore(point),
-                0
-              ) / enrichedPainPoints.length
+                0,
+              ) / enrichedPainPoints.length,
             )
           : 0;
 
       return {
         id: r.id,
         niche: r.keywords?.[0] || "Unknown Investigation",
-        date: new Date(r.createdAt).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
+        date: new Date(r.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         }),
         painPoints: pps.length,
         score: opportunityScore,
@@ -170,26 +179,27 @@ export async function GET(req: Request) {
         trend: trend
           ? entitlements.hasTrendDetection
             ? {
-              direction: trend.direction,
-              delta: trend.delta,
-              percentChange: Math.round(trend.percentChange),
-              label:
-                trend.direction === "new"
-                  ? "New signal"
-                  : trend.direction === "up"
-                    ? `${formatTrendChangePercent(trend.percentChange)} momentum`
-                    : trend.direction === "down"
-                  ? `${formatTrendChangePercent(trend.percentChange)} cooling`
-                  : "Stable trend",
+                direction: trend.direction,
+                delta: trend.delta,
+                percentChange: Math.round(trend.percentChange),
+                label:
+                  trend.direction === "new"
+                    ? "New signal"
+                    : trend.direction === "up"
+                      ? `${formatTrendChangePercent(trend.percentChange)} momentum`
+                      : trend.direction === "down"
+                        ? `${formatTrendChangePercent(trend.percentChange)} cooling`
+                        : "Stable trend",
               }
             : null
           : null,
         status: (() => {
           const normalized = normalizeRunStatus(latestRun?.status);
           if (normalized === "completed") return "Completed";
-          if (normalized === "failed" || normalized === "canceled") return "Failed";
+          if (normalized === "failed" || normalized === "canceled")
+            return "Failed";
           return "In Progress";
-        })()
+        })(),
       };
     });
 
@@ -197,32 +207,40 @@ export async function GET(req: Request) {
       (a, b) =>
         b.score - a.score ||
         b.validationScore - a.validationScore ||
-        b.painPoints - a.painPoints
+        b.painPoints - a.painPoints,
     );
 
     // Apply status filter
     if (statusParam && statusParam !== "all") {
-        formattedReports = formattedReports.filter(r => 
-            statusParam === "completed" ? r.status === "Completed" : r.status === "In Progress"
-        );
+      formattedReports = formattedReports.filter((r) =>
+        statusParam === "completed"
+          ? r.status === "Completed"
+          : r.status === "In Progress",
+      );
     }
 
     // Apply score filter
     if (minScore > 0) {
-        formattedReports = formattedReports.filter(r => r.score >= minScore);
+      formattedReports = formattedReports.filter((r) => r.score >= minScore);
     }
     if (savedOnly) {
       formattedReports = formattedReports.filter((r) => r.saved);
     }
     if (categoryParam && categoryParam !== "all") {
       formattedReports = formattedReports.filter(
-        (r) => r.category.toLowerCase() === categoryParam.toLowerCase()
+        (r) => r.category.toLowerCase() === categoryParam.toLowerCase(),
       );
     }
 
     return apiJson(formattedReports, 200, correlationId);
   } catch (error) {
     console.error("Reports API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

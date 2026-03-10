@@ -63,23 +63,29 @@ export const workspaceRelations = relations(workspace, ({ one, many }) => ({
   painPointEmbeddings: many(painPointEmbedding),
 }));
 
-export const workspaceMemberRelations = relations(workspaceMember, ({ one }) => ({
-  workspace: one(workspace, {
-    fields: [workspaceMember.workspaceId],
-    references: [workspace.id],
+export const workspaceMemberRelations = relations(
+  workspaceMember,
+  ({ one }) => ({
+    workspace: one(workspace, {
+      fields: [workspaceMember.workspaceId],
+      references: [workspace.id],
+    }),
+    user: one(user, {
+      fields: [workspaceMember.userId],
+      references: [user.id],
+    }),
   }),
-  user: one(user, {
-    fields: [workspaceMember.userId],
-    references: [user.id],
-  }),
-}));
+);
 
-export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
-  user: one(user, {
-    fields: [userPreferences.userId],
-    references: [user.id],
+export const userPreferencesRelations = relations(
+  userPreferences,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userPreferences.userId],
+      references: [user.id],
+    }),
   }),
-}));
+);
 
 export const scraperRelations = relations(scraper, ({ one, many }) => ({
   user: one(user, {
@@ -134,36 +140,45 @@ export const painPointRelations = relations(painPoint, ({ one, many }) => ({
   painPointEmbeddings: many(painPointEmbedding),
 }));
 
-export const painPointCommentRelations = relations(painPointComment, ({ one }) => ({
-  painPoint: one(painPoint, {
-    fields: [painPointComment.painPointId],
-    references: [painPoint.id],
+export const painPointCommentRelations = relations(
+  painPointComment,
+  ({ one }) => ({
+    painPoint: one(painPoint, {
+      fields: [painPointComment.painPointId],
+      references: [painPoint.id],
+    }),
   }),
-}));
+);
 
-export const painPointClusterRelations = relations(painPointCluster, ({ one, many }) => ({
-  user: one(user, {
-    fields: [painPointCluster.userId],
-    references: [user.id],
+export const painPointClusterRelations = relations(
+  painPointCluster,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [painPointCluster.userId],
+      references: [user.id],
+    }),
+    workspace: one(workspace, {
+      fields: [painPointCluster.workspaceId],
+      references: [workspace.id],
+    }),
+    painPoints: many(painPoint),
   }),
-  workspace: one(workspace, {
-    fields: [painPointCluster.workspaceId],
-    references: [workspace.id],
-  }),
-  painPoints: many(painPoint),
-}));
+);
 
-export const painPointEmbeddingRelations = relations(painPointEmbedding, ({ one }) => ({
-  painPoint: one(painPoint, {
-    fields: [painPointEmbedding.painPointId],
-    references: [painPoint.id],
+export const painPointEmbeddingRelations = relations(
+  painPointEmbedding,
+  ({ one }) => ({
+    painPoint: one(painPoint, {
+      fields: [painPointEmbedding.painPointId],
+      references: [painPoint.id],
+    }),
+    user: one(user, {
+      fields: [painPointEmbedding.userId],
+      references: [user.id],
+    }),
+    workspace: one(workspace, {
+      fields: [painPointEmbedding.workspaceId],
+      references: [workspace.id],
+    }),
   }),
-  user: one(user, {
-    fields: [painPointEmbedding.userId],
-    references: [user.id],
-  }),
-  workspace: one(workspace, {
-    fields: [painPointEmbedding.workspaceId],
-    references: [workspace.id],
-  }),
-}));
+);

@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { 
-  CheckCircle2, 
-  Eye, 
+import {
+  CheckCircle2,
+  Eye,
   ArrowRight,
   Clock,
   Sparkles,
   Search,
   BrainCircuit,
-  BarChart4
+  BarChart4,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
@@ -32,12 +32,20 @@ export default function AnalysisPage() {
 
   // Derive step status from the live SSE phase
   const steps = useMemo(() => {
-    const phaseOrder: MiningPhase[] = ["scanning", "extracting", "clustering", "completed"];
+    const phaseOrder: MiningPhase[] = [
+      "scanning",
+      "extracting",
+      "clustering",
+      "completed",
+    ];
     const currentIdx = phaseOrder.indexOf(phase);
 
-    function stepStatus(stepPhase: MiningPhase): "completed" | "in-progress" | "pending" {
+    function stepStatus(
+      stepPhase: MiningPhase,
+    ): "completed" | "in-progress" | "pending" {
       const stepIdx = phaseOrder.indexOf(stepPhase);
-      if (phase === "completed" || phase === "failed" || phase === "canceled") return "completed";
+      if (phase === "completed" || phase === "failed" || phase === "canceled")
+        return "completed";
       if (currentIdx > stepIdx) return "completed";
       if (currentIdx === stepIdx) return "in-progress";
       return "pending";
@@ -47,27 +55,37 @@ export default function AnalysisPage() {
       {
         icon: <Search className="w-4 h-4" />,
         title: "Collecting Reddit posts...",
-        description: postsFetched > 0
-          ? `Found ${postsFetched} posts across ${subreddits.length > 0 ? subreddits.map(s => `r/${s}`).slice(0, 3).join(", ") : "target subreddits"}.`
-          : subreddits.length > 0
-            ? `Scanning r/${subreddits[0]}${subreddits.length > 1 ? ` and ${subreddits.length - 1} more...` : "..."}`
-            : "Analyzing search relevance...",
+        description:
+          postsFetched > 0
+            ? `Found ${postsFetched} posts across ${
+                subreddits.length > 0
+                  ? subreddits
+                      .map((s) => `r/${s}`)
+                      .slice(0, 3)
+                      .join(", ")
+                  : "target subreddits"
+              }.`
+            : subreddits.length > 0
+              ? `Scanning r/${subreddits[0]}${subreddits.length > 1 ? ` and ${subreddits.length - 1} more...` : "..."}`
+              : "Analyzing search relevance...",
         status: stepStatus("scanning"),
       },
       {
         icon: <BrainCircuit className="w-4 h-4" />,
         title: "Extracting pain points...",
-        description: painPointCount > 0
-          ? `Discovered ${painPointCount} unique frustration markers.`
-          : "AI is reading content for intensity and budget...",
+        description:
+          painPointCount > 0
+            ? `Discovered ${painPointCount} unique frustration markers.`
+            : "AI is reading content for intensity and budget...",
         status: stepStatus("extracting"),
       },
       {
         icon: <Sparkles className="w-4 h-4" />,
         title: "Clustering repeated themes...",
-        description: phase === "completed" || phase === "clustering"
-          ? `Clustered ${painPointCount} insights into high-value opportunities.`
-          : "Structuring data hierarchies for the final report...",
+        description:
+          phase === "completed" || phase === "clustering"
+            ? `Clustered ${painPointCount} insights into high-value opportunities.`
+            : "Structuring data hierarchies for the final report...",
         status: stepStatus("clustering"),
       },
       {
@@ -87,7 +105,7 @@ export default function AnalysisPage() {
       <div className="relative mb-8">
         <div className="absolute inset-0 bg-[#ff4500] blur-3xl opacity-20 scale-150 animate-pulse"></div>
         <div className="relative w-20 h-20 bg-[#0c0c0c] rounded-3xl flex items-center justify-center text-[#ff4500] border border-[#ff4500]/30 shadow-2xl">
-           <Eye className="w-10 h-10 animate-pulse" />
+          <Eye className="w-10 h-10 animate-pulse" />
         </div>
       </div>
 
@@ -104,37 +122,39 @@ export default function AnalysisPage() {
       {/* Progress Card */}
       <div className="w-full bg-[#111] rounded-[32px] border border-white/5 shadow-2xl overflow-hidden relative">
         <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#ff4500]/20 to-transparent"></div>
-        
+
         <div className="p-10 space-y-10">
           {/* Overall Progress */}
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-               <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Analysis Progress</p>
-               <p className="text-lg font-black text-[#ff4500]">{progress}%</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                Analysis Progress
+              </p>
+              <p className="text-lg font-black text-[#ff4500]">{progress}%</p>
             </div>
             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-               <div 
-                 className="h-full bg-[#ff4500] rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(255,69,0,0.4)]"
-                 style={{ width: `${progress}%` }}
-               ></div>
+              <div
+                className="h-full bg-[#ff4500] rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(255,69,0,0.4)]"
+                style={{ width: `${progress}%` }}
+              ></div>
             </div>
             <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-500 italic">
-               <div className="w-1 h-1 rounded-full bg-[#ff4500] animate-ping"></div>
-               {statusText}
+              <div className="w-1 h-1 rounded-full bg-[#ff4500] animate-ping"></div>
+              {statusText}
             </div>
           </div>
 
           {/* Timeline Steps */}
           <div className="space-y-0 relative">
             <div className="absolute left-[19px] top-6 bottom-6 w-px bg-white/5"></div>
-            
+
             {steps.map((step, idx) => (
-              <AnalysisStep 
+              <AnalysisStep
                 key={idx}
                 icon={step.icon}
                 title={step.title}
                 description={step.description}
-                status={step.status as 'completed' | 'in-progress' | 'pending'}
+                status={step.status as "completed" | "in-progress" | "pending"}
               />
             ))}
           </div>
@@ -143,15 +163,20 @@ export default function AnalysisPage() {
         {/* Footer info */}
         <div className="px-10 py-6 bg-white/2 border-t border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
-             <Clock className="w-4 h-4" />
-             {isDone ? "Mining complete" : `${progress}% — ${statusText}`}
+            <Clock className="w-4 h-4" />
+            {isDone ? "Mining complete" : `${progress}% — ${statusText}`}
           </div>
-          <button 
+          <button
             disabled={!isDone}
             onClick={() => router.push(`/dashboard/reports/${scraperId}`)}
             className="px-6 py-2.5 rounded-xl bg-[#ff4500] text-white text-[12px] font-black uppercase tracking-widest border border-[#ff4500]/30 flex items-center gap-2 disabled:bg-white/5 disabled:text-zinc-500 disabled:border-white/5 disabled:cursor-not-allowed group transition-all"
           >
-            {isDone ? "View Detailed Report" : hasFailed ? "Scan Failed" : "Processing..."} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            {isDone
+              ? "View Detailed Report"
+              : hasFailed
+                ? "Scan Failed"
+                : "Processing..."}{" "}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
@@ -167,7 +192,11 @@ export default function AnalysisPage() {
             Intelligence Protocol Active
           </p>
           <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
-            Our engine is specifically hunting for <span className="text-zinc-200">Pain Intensity</span>, <span className="text-zinc-200">Budgets</span>, and <span className="text-zinc-200">Switching Costs</span>. We ignore generic comments to find high-conviction market gaps.
+            Our engine is specifically hunting for{" "}
+            <span className="text-zinc-200">Pain Intensity</span>,{" "}
+            <span className="text-zinc-200">Budgets</span>, and{" "}
+            <span className="text-zinc-200">Switching Costs</span>. We ignore
+            generic comments to find high-conviction market gaps.
           </p>
         </div>
       </div>
@@ -175,41 +204,55 @@ export default function AnalysisPage() {
   );
 }
 
-function AnalysisStep({ 
-  icon, 
-  title, 
-  description, 
-  status 
-}: { 
-  icon: React.ReactNode, 
-  title: string, 
-  description: string, 
-  status: 'completed' | 'in-progress' | 'pending' 
+function AnalysisStep({
+  icon,
+  title,
+  description,
+  status,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  status: "completed" | "in-progress" | "pending";
 }) {
   return (
-    <div className={`flex gap-6 p-5 transition-all duration-500 ${status === 'pending' ? 'opacity-40 grayscale' : 'opacity-100'}`}>
+    <div
+      className={`flex gap-6 p-5 transition-all duration-500 ${status === "pending" ? "opacity-40 grayscale" : "opacity-100"}`}
+    >
       <div className="relative z-10">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 ${
-          status === 'completed' 
-            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' 
-            : status === 'in-progress'
-              ? 'bg-[#ff4500]/20 border-[#ff4500]/50 text-[#ff4500] shadow-[0_0_15px_rgba(255,69,0,0.2)] animate-pulse'
-              : 'bg-white/5 border-white/5 text-zinc-600'
-        }`}>
-          {status === 'completed' ? <CheckCircle2 className="w-5 h-5" /> : icon}
+        <div
+          className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 ${
+            status === "completed"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+              : status === "in-progress"
+                ? "bg-[#ff4500]/20 border-[#ff4500]/50 text-[#ff4500] shadow-[0_0_15px_rgba(255,69,0,0.2)] animate-pulse"
+                : "bg-white/5 border-white/5 text-zinc-600"
+          }`}
+        >
+          {status === "completed" ? <CheckCircle2 className="w-5 h-5" /> : icon}
         </div>
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-3 mb-1">
-          <p className={`text-lg font-black tracking-tight ${status === 'pending' ? 'text-zinc-500' : 'text-zinc-100'}`}>{title}</p>
-          {status === 'completed' && (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20">Analyzed</span>
+          <p
+            className={`text-lg font-black tracking-tight ${status === "pending" ? "text-zinc-500" : "text-zinc-100"}`}
+          >
+            {title}
+          </p>
+          {status === "completed" && (
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20">
+              Analyzed
+            </span>
           )}
-          {status === 'in-progress' && (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-[#ff4500]/10 text-[#ff4500] rounded-full border border-[#ff4500]/20">In Progress</span>
+          {status === "in-progress" && (
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-[#ff4500]/10 text-[#ff4500] rounded-full border border-[#ff4500]/20">
+              In Progress
+            </span>
           )}
         </div>
-        <p className="text-zinc-500 text-sm font-medium leading-relaxed max-w-lg">{description}</p>
+        <p className="text-zinc-500 text-sm font-medium leading-relaxed max-w-lg">
+          {description}
+        </p>
       </div>
     </div>
   );

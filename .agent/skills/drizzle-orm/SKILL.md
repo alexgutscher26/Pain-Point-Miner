@@ -30,9 +30,9 @@ Query 1000 rows with 3 date columns = 3000 function calls doing nothing.
 ```typescript
 // Runtime overhead for identity functions
 customType<{ data: DateTimeString; driverParam: DateTimeString }>({
-	dataType: () => 'text',
-	toDriver: (value) => value, // called on every write
-	fromDriver: (value) => value, // called on every read
+  dataType: () => "text",
+  toDriver: (value) => value, // called on every write
+  fromDriver: (value) => value, // called on every read
 });
 ```
 
@@ -59,8 +59,8 @@ Only when data genuinely transforms between app and database:
 ```typescript
 // JSON: object ↔ string - actual transformation
 customType<{ data: UserPrefs; driverParam: string }>({
-	toDriver: (value) => JSON.stringify(value),
-	fromDriver: (value) => JSON.parse(value),
+  toDriver: (value) => JSON.stringify(value),
+  fromDriver: (value) => JSON.parse(value),
 });
 ```
 
@@ -77,7 +77,7 @@ Instead of parsing `DateTimeString` into `Temporal.ZonedDateTime` at the databas
 ```typescript
 // Bad: parse on every read, re-serialize at API boundaries
 customType<{ data: Temporal.ZonedDateTime; driverParam: string }>({
-	fromDriver: (value) => fromDateTimeString(value),
+  fromDriver: (value) => fromDateTimeString(value),
 });
 ```
 

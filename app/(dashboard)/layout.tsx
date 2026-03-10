@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -6,13 +7,25 @@ import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
 import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
-import { 
-  HelpCircle,
-  Plus,
-  Bell,
-  Crown,
-  LayoutDashboard
-} from "lucide-react";
+import { HelpCircle, Plus, Bell, Crown, LayoutDashboard } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Dashboard",
+    template: "%s | Dashboard | Pain-Point Miner",
+  },
+  description: "Private workspace for searches, reports, and account settings.",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
+};
 
 export default async function DashboardLayout({
   children,
@@ -47,24 +60,34 @@ export default async function DashboardLayout({
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-[#ff4500] rounded-xl p-2 text-white shadow-[0_0_20px_rgba(255,69,0,0.3)]">
-              <span className="material-symbols-outlined block text-2xl font-bold">query_stats</span>
+              <span className="material-symbols-outlined block text-2xl font-bold">
+                query_stats
+              </span>
             </div>
             <div>
-              <h1 className="text-[17px] font-black leading-tight tracking-tight">Pain Miner</h1>
-              <p className="text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">Market Analysis</p>
+              <h1 className="text-[17px] font-black leading-tight tracking-tight">
+                Pain Miner
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">
+                Market Analysis
+              </p>
             </div>
           </div>
           <SidebarLinks />
         </div>
-        
+
         <div className="mt-auto p-5">
           <div className="bg-[#161616] rounded-2xl p-4 border border-white/5 mb-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-20 h-20 bg-[#ff4500]/10 blur-2xl rounded-full -mr-10 -mt-10"></div>
             <div className="flex items-center gap-2 mb-2 relative z-10">
               <Crown className="w-4 h-4 text-[#ff4500]" />
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#ff4500]">{planLabel}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#ff4500]">
+                {planLabel}
+              </p>
             </div>
-            <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">{upgradeMessage}</p>
+            <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">
+              {upgradeMessage}
+            </p>
             <button className="w-full bg-[#ff4500] hover:bg-[#e63e00] text-white text-[11px] font-bold py-2.5 rounded-lg transition-all shadow-lg shadow-[#ff4500]/20 uppercase tracking-widest relative z-10">
               Upgrade Now
             </button>
@@ -78,7 +101,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </aside>
-      
+
       {/* Main Content */}
       <main className="relative flex min-h-screen flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {/* Decorative elements */}
@@ -87,7 +110,10 @@ export default async function DashboardLayout({
         {/* Topbar */}
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[#0a0a0a]/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
-            <DashboardMobileNav userName={session.user.name ?? "Founder"} planLabel={planLabel} />
+            <DashboardMobileNav
+              userName={session.user.name ?? "Founder"}
+              planLabel={planLabel}
+            />
             <div className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-zinc-400 max-sm:hidden">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
               System Active
@@ -98,7 +124,10 @@ export default async function DashboardLayout({
             </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-6">
-            <Link href="/dashboard/search" className="bg-white hover:bg-zinc-200 text-black px-3 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg whitespace-nowrap">
+            <Link
+              href="/dashboard/search"
+              className="bg-white hover:bg-zinc-200 text-black px-3 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg whitespace-nowrap"
+            >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">New Scan</span>
               <span className="sm:hidden">Scan</span>
@@ -109,20 +138,24 @@ export default async function DashboardLayout({
             </button>
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="text-right hidden sm:block">
-                <p className="text-[13px] font-bold text-white leading-none mb-1">{session.user.name}</p>
-                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Founder</p>
+                <p className="text-[13px] font-bold text-white leading-none mb-1">
+                  {session.user.name}
+                </p>
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+                  Founder
+                </p>
               </div>
               <div className="h-10 w-10 rounded-xl bg-[#ff4500] flex items-center justify-center text-white border border-white/10 shadow-lg shadow-[#ff4500]/20 overflow-hidden group-hover:scale-105 transition-transform">
-                <span className="text-sm font-black">{session.user.name?.charAt(0) || "U"}</span>
+                <span className="text-sm font-black">
+                  {session.user.name?.charAt(0) || "U"}
+                </span>
               </div>
             </div>
           </div>
         </header>
 
         {/* Dynamic Content */}
-        <div className="relative flex-1">
-           {children}
-        </div>
+        <div className="relative flex-1">{children}</div>
       </main>
     </div>
   );

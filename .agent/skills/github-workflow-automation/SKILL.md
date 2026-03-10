@@ -560,7 +560,7 @@ async function smartCherryPick(commitHash: string, targetBranch: string) {
 
   // Check for potential conflicts
   const targetDiff = await exec(
-    `git diff ${targetBranch}...HEAD -- ${affectedFiles}`
+    `git diff ${targetBranch}...HEAD -- ${affectedFiles}`,
   );
 
   // AI analysis
@@ -578,7 +578,7 @@ async function smartCherryPick(commitHash: string, targetBranch: string) {
   if (analysis.willConflict) {
     // Create branch for manual resolution
     await exec(
-      `git checkout -b cherry-pick-${commitHash.slice(0, 7)} ${targetBranch}`
+      `git checkout -b cherry-pick-${commitHash.slice(0, 7)} ${targetBranch}`,
     );
     const result = await exec(`git cherry-pick ${commitHash}`, {
       allowFail: true,

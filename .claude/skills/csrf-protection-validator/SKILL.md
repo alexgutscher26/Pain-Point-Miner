@@ -19,6 +19,7 @@ This skill provides automated assistance for csrf protection validator tasks wit
 ## When to Use
 
 This skill activates automatically when you:
+
 - Mention "csrf protection validator" in your request
 - Ask about csrf protection validator patterns or best practices
 - Need help with essential security skills covering authentication, input validation, secure coding practices, and basic vulnerability detection.

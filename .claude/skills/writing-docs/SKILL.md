@@ -19,8 +19,8 @@ Documentation lives in `packages/docs/docs` as `.mdx` files.
 ```md
 ---
 image: /generated/articles-docs-my-package-my-api.png
-title: '<MyComponent>'
-crumb: '@remotion/my-package'
+title: "<MyComponent>"
+crumb: "@remotion/my-package"
 ---
 ```
 
@@ -56,7 +56,7 @@ Use `twoslash` to check snippets against TypeScript:
 
 ````md
 ```ts twoslash
-import {useCurrentFrame} from 'remotion';
+import { useCurrentFrame } from "remotion";
 const frame = useCurrentFrame();
 ```
 ````
@@ -67,7 +67,7 @@ Use `// ---cut---` to hide setup code - only content below is displayed:
 
 ````md
 ```ts twoslash
-import {useCurrentFrame} from 'remotion';
+import { useCurrentFrame } from "remotion";
 // ---cut---
 const frame = useCurrentFrame();
 ```
@@ -79,7 +79,7 @@ Always add a `title` to code fences that show example usage:
 
 ````md
 ```ts twoslash title="MyComponent.tsx"
-console.log('Hello');
+console.log("Hello");
 ```
 ````
 

@@ -1,6 +1,10 @@
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext } from "@/lib/api-auth";
-import { getMonthlyScanUsage, getMonthlyUsageSummary, getPlanEntitlements } from "@/lib/plan-gating";
+import {
+  getMonthlyScanUsage,
+  getMonthlyUsageSummary,
+  getPlanEntitlements,
+} from "@/lib/plan-gating";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
 
 export async function GET(req: Request) {
@@ -27,10 +31,16 @@ export async function GET(req: Request) {
         usage: getMonthlyUsageSummary(plan, monthlyScansUsed),
       },
       200,
-      correlationId
+      correlationId,
     );
   } catch (error) {
     console.error("Billing entitlements API error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

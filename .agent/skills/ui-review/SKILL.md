@@ -41,6 +41,7 @@ rg 'shadow-\[' apps/frontend/ --glob '*.tsx' --no-heading -n
 For each changed file:
 
 #### Colors
+
 - [ ] Background uses Canvas `#F0F0E8` or white
 - [ ] Text uses Ink `#000000` (no grey for main text)
 - [ ] Links use Hyper Blue `#1D4ED8`
@@ -50,18 +51,21 @@ For each changed file:
 - [ ] No colors outside the Swiss palette
 
 #### Typography
+
 - [ ] Headers use `font-serif`
 - [ ] Body text uses `font-sans`
 - [ ] Labels/metadata use `font-mono text-sm uppercase tracking-wider`
 - [ ] No decorative fonts
 
 #### Borders & Shadows
+
 - [ ] All elements use `rounded-none`
 - [ ] Borders are `border-2 border-black` (or `border`)
 - [ ] Shadows are hard: `shadow-[Xpx_Xpx_0px_0px_#000000]`
 - [ ] Hover effects translate into shadow space
 
 #### Components
+
 - [ ] Buttons: square corners, hard shadow, press effect
 - [ ] Cards: white bg, black border, hard shadow
 - [ ] Inputs: `rounded-none`, black border
@@ -69,6 +73,7 @@ For each changed file:
 - [ ] Status dots: `w-3 h-3` with no border-radius
 
 #### Layout
+
 - [ ] Grid-based layouts
 - [ ] Consistent spacing (multiples of 4)
 - [ ] Mobile-first responsive breakpoints
@@ -77,16 +82,16 @@ For each changed file:
 
 ### Allowed Colors
 
-| Name | Hex | Tailwind |
-|------|-----|----------|
-| Canvas | `#F0F0E8` | `bg-[#F0F0E8]` |
-| Ink | `#000000` | `text-black` |
-| White | `#FFFFFF` | `bg-white` |
-| Hyper Blue | `#1D4ED8` | `text-blue-700` / `bg-blue-700` |
-| Signal Green | `#15803D` | `text-green-700` |
-| Alert Orange | `#F97316` | `text-orange-500` |
-| Alert Red | `#DC2626` | `text-red-600` |
-| Steel Grey | `#4B5563` | `text-gray-600` |
+| Name         | Hex       | Tailwind                        |
+| ------------ | --------- | ------------------------------- |
+| Canvas       | `#F0F0E8` | `bg-[#F0F0E8]`                  |
+| Ink          | `#000000` | `text-black`                    |
+| White        | `#FFFFFF` | `bg-white`                      |
+| Hyper Blue   | `#1D4ED8` | `text-blue-700` / `bg-blue-700` |
+| Signal Green | `#15803D` | `text-green-700`                |
+| Alert Orange | `#F97316` | `text-orange-500`               |
+| Alert Red    | `#DC2626` | `text-red-600`                  |
+| Steel Grey   | `#4B5563` | `text-gray-600`                 |
 
 ### Component Templates
 
@@ -108,15 +113,15 @@ For each changed file:
 
 If ANY of these appear in changed files, flag immediately:
 
-| Anti-Pattern | Why |
-|-------------|-----|
+| Anti-Pattern               | Why                             |
+| -------------------------- | ------------------------------- |
 | `rounded-sm/md/lg/xl/full` | Swiss style: sharp corners only |
-| `bg-gradient-*` | No gradients allowed |
-| `shadow-sm/md/lg/xl` | Must use hard `shadow-[...]` |
-| `blur-*` / `backdrop-blur` | No blur effects |
-| `opacity-*` (decorative) | Flat, opaque elements only |
-| Pastel colors | Swiss palette is bold |
-| `animate-pulse/bounce` | Minimal animation only |
+| `bg-gradient-*`            | No gradients allowed            |
+| `shadow-sm/md/lg/xl`       | Must use hard `shadow-[...]`    |
+| `blur-*` / `backdrop-blur` | No blur effects                 |
+| `opacity-*` (decorative)   | Flat, opaque elements only      |
+| Pastel colors              | Swiss palette is bold           |
+| `animate-pulse/bounce`     | Minimal animation only          |
 
 ## Retro Terminal Elements
 

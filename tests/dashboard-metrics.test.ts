@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getMarketBadge, toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
+import {
+  getMarketBadge,
+  toOpportunityScore,
+  toValidationScore,
+} from "@/lib/dashboard-metrics";
 
 describe("dashboard metrics", () => {
   it("returns 0 score for empty pain points", () => {

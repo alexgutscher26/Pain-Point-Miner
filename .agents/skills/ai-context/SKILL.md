@@ -24,6 +24,7 @@ packages/<name>/AGENTS.md            # Package-specific context
 Always loaded on every interaction. Keep it **minimal** to save tokens.
 
 Must contain:
+
 - One-line project description
 - Essential commands (run, test, build)
 - Repository structure overview (top-level dirs only)
@@ -31,6 +32,7 @@ Must contain:
 - Key entry points for common tasks
 
 Must **not** contain:
+
 - Detailed explanations (put those in skills)
 - Code examples longer than one line
 - Duplicated content from skills
@@ -46,8 +48,8 @@ Read [AGENTS.md](AGENTS.md) before starting any task.
 
 Load these for detailed context on specific topics:
 
-| Skill | When to use |
-|-------|-------------|
+| Skill                                    | When to use   |
+| ---------------------------------------- | ------------- |
 | [<name>](.github/skills/<name>/SKILL.md) | <description> |
 ```
 
@@ -82,11 +84,12 @@ description: <when an agent should load this — be specific about triggers>
 - **Be concise**: Use tables over prose, code snippets over explanations
 - **Be specific**: File paths, command names, function signatures — not vague descriptions
 - **No duplication**: If info exists in another skill, reference it instead of repeating
-- **Actionable structure**: Organize by what the agent needs to *do*, not by architecture
+- **Actionable structure**: Organize by what the agent needs to _do_, not by architecture
 
 ## Package & Folder Context
 
 Add `AGENTS.md` inside a package or folder when:
+
 - The directory has non-obvious conventions agents keep getting wrong
 - There are local commands, patterns, or gotchas not covered by root docs
 
@@ -94,14 +97,14 @@ Keep these files very short — a few lines of context is often enough.
 
 ## When to Update
 
-| Trigger | Action |
-|---------|--------|
-| Agent repeatedly asks about a topic | Create a new skill |
-| Agent gets something wrong despite docs | Refine the relevant skill |
-| New package/directory with unique patterns | Add a local `AGENTS.md` |
-| Architecture or tooling changes | Update affected skills |
-| Skill grows too large | Split into multiple skills |
-| Skills table changes | Update both `AGENTS.md` and `CLAUDE.md` |
+| Trigger                                    | Action                                  |
+| ------------------------------------------ | --------------------------------------- |
+| Agent repeatedly asks about a topic        | Create a new skill                      |
+| Agent gets something wrong despite docs    | Refine the relevant skill               |
+| New package/directory with unique patterns | Add a local `AGENTS.md`                 |
+| Architecture or tooling changes            | Update affected skills                  |
+| Skill grows too large                      | Split into multiple skills              |
+| Skills table changes                       | Update both `AGENTS.md` and `CLAUDE.md` |
 
 ## Principles
 

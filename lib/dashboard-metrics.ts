@@ -17,7 +17,12 @@ function toNormalizedSignal(value: number) {
   return clamp((Math.log1p(Math.max(0, value)) / Math.log(101)) * 100, 0, 100);
 }
 
-export function toValidationScore(point: Pick<DashboardPainPoint, "upvoteSignal" | "commentCount" | "mentionCount">) {
+export function toValidationScore(
+  point: Pick<
+    DashboardPainPoint,
+    "upvoteSignal" | "commentCount" | "mentionCount"
+  >,
+) {
   const upvotes = toNormalizedSignal(point.upvoteSignal ?? 0);
   const comments = toNormalizedSignal(point.commentCount ?? 0);
   const mentions = toNormalizedSignal(point.mentionCount ?? 0);
@@ -47,11 +52,14 @@ export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
     const modifier = sentimentMap[point.sentiment || ""] || 1.0;
     const validation = toValidationScore(point);
 
-    const base = ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
+    const base =
+      ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
     return base * 0.75 + validation * 0.25;
   });
 
-  const average = Math.round(factors.reduce((a, b) => a + b, 0) / factors.length);
+  const average = Math.round(
+    factors.reduce((a, b) => a + b, 0) / factors.length,
+  );
   return clamp(average, 0, 100);
 }
 

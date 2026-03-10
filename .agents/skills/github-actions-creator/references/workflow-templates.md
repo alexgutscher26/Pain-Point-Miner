@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -96,8 +96,8 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: "pip"
 
       - run: pip install ruff mypy
 
@@ -110,7 +110,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ["3.10", "3.11", "3.12"]
       fail-fast: false
 
     steps:
@@ -119,7 +119,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: "pip"
 
       - run: pip install -e ".[dev]"
 
@@ -160,7 +160,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
 
       - uses: golangci/golangci-lint-action@v6
         with:
@@ -174,7 +174,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
 
       - run: go test -race -coverprofile=coverage.out ./...
 
@@ -192,7 +192,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
 
       - run: go build ./...
 ```
@@ -271,7 +271,7 @@ name: Docker
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ["v*"]
   pull_request:
     branches: [main]
 
@@ -357,7 +357,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -451,7 +451,7 @@ name: Publish
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -467,8 +467,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - run: npm ci
 
@@ -492,7 +492,7 @@ name: Publish to PyPI
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -509,7 +509,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - run: pip install build
 
@@ -533,7 +533,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 9 * * 1'  # Monday 9am UTC
+    - cron: "0 9 * * 1" # Monday 9am UTC
   workflow_dispatch:
 
 permissions:
@@ -553,7 +553,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -616,7 +616,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: packages/frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
@@ -636,7 +636,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: packages/backend/package-lock.json
       - run: npm ci
       - run: npm test
@@ -669,7 +669,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          release-type: node  # or python, go, etc.
+          release-type: node # or python, go, etc.
 
   publish:
     needs: release
@@ -681,8 +681,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
       - run: npm ci
       - run: npm publish --provenance --access public
         env:
@@ -719,7 +719,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -743,7 +743,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6am UTC
+    - cron: "0 6 * * *" # Daily at 6am UTC
 
 permissions:
   contents: read
@@ -762,7 +762,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - run: npm ci
 
@@ -795,7 +795,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 0 * * 1'  # Weekly on Monday
+    - cron: "0 0 * * 1" # Weekly on Monday
 
 permissions:
   contents: read
@@ -810,7 +810,7 @@ jobs:
 
       - uses: github/codeql-action/init@v3
         with:
-          languages: javascript-typescript  # or python, go, java, etc.
+          languages: javascript-typescript # or python, go, java, etc.
 
       - uses: github/codeql-action/analyze@v3
 
@@ -823,14 +823,14 @@ jobs:
 
       - uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
+          scan-type: "fs"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
 
       - uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 ```
 
 ---
@@ -843,10 +843,10 @@ name: Infrastructure
 on:
   push:
     branches: [main]
-    paths: ['terraform/**']
+    paths: ["terraform/**"]
   pull_request:
     branches: [main]
-    paths: ['terraform/**']
+    paths: ["terraform/**"]
 
 permissions:
   contents: read
@@ -869,7 +869,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: '1.7'
+          terraform_version: "1.7"
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -909,7 +909,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: '1.7'
+          terraform_version: "1.7"
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:

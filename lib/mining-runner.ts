@@ -1,8 +1,18 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { keywordStat, painPoint, painPointComment, scraper, scraperRun } from "@/lib/db/schema";
+import {
+  keywordStat,
+  painPoint,
+  painPointComment,
+  scraper,
+  scraperRun,
+} from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
-import { fetchComments, fetchSubredditPostsBatched, type RedditPost } from "@/lib/reddit";
+import {
+  fetchComments,
+  fetchSubredditPostsBatched,
+  type RedditPost,
+} from "@/lib/reddit";
 import { clusterPainPoint } from "@/lib/clustering";
 import { claimRedditPostForAiProcessing } from "@/lib/reddit-idempotency";
 
@@ -86,9 +96,13 @@ export async function executeMiningRun({
   const startTime = new Date();
   const isBasic = miningDepth === "basic";
   const isAdvanced = miningDepth === "advanced";
-  const subLimit = maxSubreddits ?? (isAdvanced ? 15 : miningDepth === "deep" ? 10 : 5);
-  const postsPerSub = maxPostsPerSubreddit ?? (isAdvanced ? 350 : miningDepth === "deep" ? 250 : 120);
-  const analyzeLimit = processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
+  const subLimit =
+    maxSubreddits ?? (isAdvanced ? 15 : miningDepth === "deep" ? 10 : 5);
+  const postsPerSub =
+    maxPostsPerSubreddit ??
+    (isAdvanced ? 350 : miningDepth === "deep" ? 250 : 120);
+  const analyzeLimit =
+    processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
 
   try {
     // Insert a scraperRun record upfront so SSE can track progress
@@ -112,8 +126,8 @@ export async function executeMiningRun({
         fetchSubredditPostsBatched(sub, keyword, {
           maxPosts: postsPerSub,
           time: "year",
-        })
-      )
+        }),
+      ),
     );
 
     for (const result of subredditFetchResults) {
@@ -144,20 +158,28 @@ export async function executeMiningRun({
 
     let commentsFetched = 0;
     let newPainPoints = 0;
-    const patterns = customPatterns.map((pattern) => pattern.trim()).filter(Boolean);
+    const patterns = customPatterns
+      .map((pattern) => pattern.trim())
+      .filter(Boolean);
     const postsToAnalyze = allPosts.slice(0, Math.max(1, analyzeLimit));
-    const commentsByPostId = new Map<string, Awaited<ReturnType<typeof fetchComments>>>();
+    const commentsByPostId = new Map<
+      string,
+      Awaited<ReturnType<typeof fetchComments>>
+    >();
 
     const commentFetchResults = await Promise.allSettled(
       postsToAnalyze.map(async (post) => ({
         postId: post.id,
         comments: await fetchComments(post.id, post.subreddit),
-      }))
+      })),
     );
 
     for (const result of commentFetchResults) {
       if (result.status !== "fulfilled") {
-        console.error("Comment scrape failed for one analyzed post:", result.reason);
+        console.error(
+          "Comment scrape failed for one analyzed post:",
+          result.reason,
+        );
         continue;
       }
 
@@ -166,7 +188,10 @@ export async function executeMiningRun({
     }
 
     for (const post of postsToAnalyze) {
-      const shouldProcessWithAi = await claimRedditPostForAiProcessing(post.id, userId);
+      const shouldProcessWithAi = await claimRedditPostForAiProcessing(
+        post.id,
+        userId,
+      );
       if (!shouldProcessWithAi) {
         continue;
       }
@@ -182,7 +207,7 @@ export async function executeMiningRun({
           subreddit: post.subreddit,
           comments: comments.map((comment) => ({ body: comment.body })),
         },
-        patterns
+        patterns,
       );
 
       if (!points || points.length === 0) continue;
@@ -238,7 +263,7 @@ export async function executeMiningRun({
 
         // Fire-and-forget: embed + cluster this pain point
         void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
-          console.error(`Embedding/clustering failed for ${painPointId}:`, err)
+          console.error(`Embedding/clustering failed for ${painPointId}:`, err),
         );
       }
     }

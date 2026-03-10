@@ -72,11 +72,7 @@ export function useMiningStream(scraperId: string | null) {
             phase,
             message: `Processing... Found ${data.painPointCount ?? 0} pain points.`,
             progress:
-              phase === "completed"
-                ? 100
-                : phase === "failed"
-                  ? 100
-                  : 50,
+              phase === "completed" ? 100 : phase === "failed" ? 100 : 50,
             painPointCount: data.painPointCount ?? 0,
             postsFetched: data.latestRun?.postsFetched ?? 0,
             commentsFetched: data.latestRun?.commentsFetched ?? 0,
@@ -88,7 +84,7 @@ export function useMiningStream(scraperId: string | null) {
         }
       }, 2_000);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -99,10 +95,7 @@ export function useMiningStream(scraperId: string | null) {
     const handleEvent = (data: MiningStreamState) => {
       setState(data);
 
-      if (
-        data.phase === "completed" ||
-        data.status === "completed"
-      ) {
+      if (data.phase === "completed" || data.status === "completed") {
         setIsDone(true);
         setHasFailed(false);
         cleanup();

@@ -14,7 +14,9 @@ function normalizeTagToKeyword(tag: string) {
   return tag.replace(/^#/, "").replace(/-/g, " ").trim();
 }
 
-export function DashboardSearchHero({ trendingTags }: DashboardSearchHeroProps) {
+export function DashboardSearchHero({
+  trendingTags,
+}: DashboardSearchHeroProps) {
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
 
@@ -35,13 +37,15 @@ export function DashboardSearchHero({ trendingTags }: DashboardSearchHeroProps) 
           customPatterns: "",
           miningDepth: "basic",
           savedAt: new Date().toISOString(),
-        })
+        }),
       );
     } catch {
       // Continue without persistence.
     }
 
-    router.push(`/dashboard/search?keyword=${encodeURIComponent(cleanedKeyword)}`);
+    router.push(
+      `/dashboard/search?keyword=${encodeURIComponent(cleanedKeyword)}`,
+    );
   };
 
   return (
@@ -65,11 +69,14 @@ export function DashboardSearchHero({ trendingTags }: DashboardSearchHeroProps) 
           </span>
         </h3>
         <p className="text-zinc-500 max-w-lg mb-10 text-[15px] font-medium leading-relaxed">
-          Uncover high-intent pain points and &quot;workarounds&quot; that signal profitable SaaS opportunities
-          in minutes, not weeks.
+          Uncover high-intent pain points and &quot;workarounds&quot; that
+          signal profitable SaaS opportunities in minutes, not weeks.
         </p>
 
-        <form onSubmit={handleSubmit} className="w-full max-w-xl relative group/search">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-xl relative group/search"
+        >
           <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-2xl opacity-0 group-focus-within/search:opacity-10 blur-md transition-opacity duration-500"></div>
           <div className="relative flex items-center bg-[#111] border border-white/10 rounded-2xl p-1.5 focus-within:border-[#ff4500]/30 transition-all shadow-2xl">
             <span className="pl-4 pr-2 text-zinc-500 shrink-0">
@@ -93,7 +100,9 @@ export function DashboardSearchHero({ trendingTags }: DashboardSearchHeroProps) 
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-6">
-            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Trending:</p>
+            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+              Trending:
+            </p>
             {visibleTags.map((tag) => (
               <button
                 key={tag}

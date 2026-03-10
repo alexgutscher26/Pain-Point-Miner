@@ -12,7 +12,7 @@
 export function isScraperDue(
   lastRunAt: Date | null | undefined,
   frequencyMinutes: number | null | undefined,
-  now = new Date()
+  now = new Date(),
 ) {
   if (!lastRunAt) return true;
 
@@ -31,7 +31,7 @@ export function parsePositiveIntFromEnv(
   value: string | undefined,
   fallback: number,
   min = 1,
-  max = Number.MAX_SAFE_INTEGER
+  max = Number.MAX_SAFE_INTEGER,
 ) {
   const parsed = Number.parseInt(value ?? "", 10);
   if (!Number.isFinite(parsed)) return fallback;

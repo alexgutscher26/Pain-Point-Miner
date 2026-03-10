@@ -8,7 +8,10 @@ import { db } from "@/lib/db";
 import { workspace, workspaceMember } from "@/lib/db/schema";
 import { apiError, getCorrelationId } from "@/lib/api-error";
 
-const workspaceHeaderSchema = z.string().uuid("Invalid workspace id").nullable();
+const workspaceHeaderSchema = z
+  .string()
+  .uuid("Invalid workspace id")
+  .nullable();
 
 type ApiContext = {
   correlationId: string;
@@ -17,7 +20,10 @@ type ApiContext = {
   workspaceId: string | null;
 };
 
-export function workspaceScope(column: AnyPgColumn, workspaceId: string | null): SQL {
+export function workspaceScope(
+  column: AnyPgColumn,
+  workspaceId: string | null,
+): SQL {
   return workspaceId ? eq(column, workspaceId) : isNull(column);
 }
 
@@ -30,12 +36,18 @@ export async function requireApiContext(req: Request) {
   if (!session) {
     return {
       ok: false as const,
-      response: apiError(401, "UNAUTHORIZED", "Unauthorized", undefined, correlationId),
+      response: apiError(
+        401,
+        "UNAUTHORIZED",
+        "Unauthorized",
+        undefined,
+        correlationId,
+      ),
     };
   }
 
   const parsedWorkspaceHeader = workspaceHeaderSchema.safeParse(
-    req.headers.get("x-workspace-id")
+    req.headers.get("x-workspace-id"),
   );
 
   if (!parsedWorkspaceHeader.success) {
@@ -46,7 +58,7 @@ export async function requireApiContext(req: Request) {
         "VALIDATION_ERROR",
         "Invalid workspace header",
         parsedWorkspaceHeader.error.flatten(),
-        correlationId
+        correlationId,
       ),
     };
   }
@@ -57,19 +69,28 @@ export async function requireApiContext(req: Request) {
     const member = await db.query.workspaceMember.findFirst({
       where: and(
         eq(workspaceMember.workspaceId, workspaceId),
-        eq(workspaceMember.userId, session.user.id)
+        eq(workspaceMember.userId, session.user.id),
       ),
     });
 
     if (!member) {
       const ownedWorkspace = await db.query.workspace.findFirst({
-        where: and(eq(workspace.id, workspaceId), eq(workspace.ownerId, session.user.id)),
+        where: and(
+          eq(workspace.id, workspaceId),
+          eq(workspace.ownerId, session.user.id),
+        ),
       });
 
       if (!ownedWorkspace) {
         return {
           ok: false as const,
-          response: apiError(403, "FORBIDDEN", "Workspace access denied", undefined, correlationId),
+          response: apiError(
+            403,
+            "FORBIDDEN",
+            "Workspace access denied",
+            undefined,
+            correlationId,
+          ),
         };
       }
     }

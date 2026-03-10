@@ -18,14 +18,18 @@ export type ResolvedPlanContext = {
   trialDaysRemaining: number | null;
 };
 
-async function loadSubscriptions(requestHeaders: HeadersInit): Promise<SubscriptionRecord[]> {
+async function loadSubscriptions(
+  requestHeaders: HeadersInit,
+): Promise<SubscriptionRecord[]> {
   const stripePluginEnabled = process.env.STRIPE_PLUGIN_ENABLED === "true";
   if (!stripePluginEnabled) {
     return [];
   }
 
   const authApi = auth.api as unknown as {
-    listActiveSubscriptions?: (input: { headers: HeadersInit }) => Promise<unknown>;
+    listActiveSubscriptions?: (input: {
+      headers: HeadersInit;
+    }) => Promise<unknown>;
   };
 
   if (typeof authApi.listActiveSubscriptions !== "function") {
@@ -68,20 +72,33 @@ export async function resolvePlanContext(input: {
     subscriptions,
   });
   const hasActiveSubscription = subscriptions.some((subscription) =>
-    ["active", "trialing", "past_due"].includes((subscription.status ?? "").toLowerCase())
+    ["active", "trialing", "past_due"].includes(
+      (subscription.status ?? "").toLowerCase(),
+    ),
   );
-  const localTrialDays = Number.parseInt(process.env.LOCAL_TRIAL_DAYS ?? "3", 10);
+  const localTrialDays = Number.parseInt(
+    process.env.LOCAL_TRIAL_DAYS ?? "3",
+    10,
+  );
   const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED !== "false";
-  const requirePaidAfterTrial = process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
+  const requirePaidAfterTrial =
+    process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
   let trialActive = false;
 
-  if (!localTrialEnabled || hasActiveSubscription || !Number.isFinite(localTrialDays) || localTrialDays <= 0) {
+  if (
+    !localTrialEnabled ||
+    hasActiveSubscription ||
+    !Number.isFinite(localTrialDays) ||
+    localTrialDays <= 0
+  ) {
     return {
       plan: resolvedPlan,
       hasActiveSubscription,
       trialActive: false,
       planPurchaseRequired:
-        requirePaidAfterTrial && resolvedPlan === "starter" && !hasActiveSubscription,
+        requirePaidAfterTrial &&
+        resolvedPlan === "starter" &&
+        !hasActiveSubscription,
       trialEndsAt: null,
       trialDaysRemaining: null,
     };
@@ -101,7 +118,9 @@ export async function resolvePlanContext(input: {
         hasActiveSubscription,
         trialActive: false,
         planPurchaseRequired:
-          requirePaidAfterTrial && resolvedPlan === "starter" && !hasActiveSubscription,
+          requirePaidAfterTrial &&
+          resolvedPlan === "starter" &&
+          !hasActiveSubscription,
         trialEndsAt: null,
         trialDaysRemaining: null,
       };
@@ -111,7 +130,7 @@ export async function resolvePlanContext(input: {
     trialEndsAt.setDate(trialEndsAt.getDate() + localTrialDays);
     const daysRemaining = Math.max(
       0,
-      Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
     );
 
     if (trialEndsAt.getTime() > Date.now()) {
@@ -141,7 +160,10 @@ export async function resolvePlanContext(input: {
     hasActiveSubscription,
     trialActive,
     planPurchaseRequired:
-      requirePaidAfterTrial && resolvedPlan === "starter" && !hasActiveSubscription && !trialActive,
+      requirePaidAfterTrial &&
+      resolvedPlan === "starter" &&
+      !hasActiveSubscription &&
+      !trialActive,
     trialEndsAt: null,
     trialDaysRemaining: null,
   };

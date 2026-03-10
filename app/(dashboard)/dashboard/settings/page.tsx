@@ -4,7 +4,10 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { SettingsPageClient, type SettingsFormValues } from "@/components/dashboard/settings-page-client";
+import {
+  SettingsPageClient,
+  type SettingsFormValues,
+} from "@/components/dashboard/settings-page-client";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +61,8 @@ export default async function SettingsPage() {
     email: session.user.email ?? "",
     company: persistedSettings.company ?? "",
     role: persistedSettings.role ?? "",
-    weeklyDigest: notifications.weeklyDigest ?? preferences?.emailNotifications ?? true,
+    weeklyDigest:
+      notifications.weeklyDigest ?? preferences?.emailNotifications ?? true,
     scanCompletionAlerts: notifications.scanCompletionAlerts ?? true,
     billingNotifications: notifications.billingNotifications ?? false,
     defaultSubredditCount: scanDefaults.defaultSubredditCount ?? 5,

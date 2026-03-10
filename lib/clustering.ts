@@ -14,7 +14,7 @@ const EMBEDDING_MODEL = "openai/text-embedding-3-small";
 export async function clusterPainPoint(
   painPointId: string,
   userId: string,
-  workspaceId: string | null
+  workspaceId: string | null,
 ): Promise<{ clusterId: string; isNew: boolean }> {
   // 1. Generate / retrieve the embedding
   const embedding = await embedPainPoint(painPointId, userId, workspaceId);
@@ -23,7 +23,7 @@ export async function clusterPainPoint(
   const candidates = await findSimilarClusterCentroids(
     embedding,
     userId,
-    workspaceId
+    workspaceId,
   );
 
   const point = await db.query.painPoint.findFirst({
@@ -59,7 +59,7 @@ type ClusterCandidate = {
 async function findSimilarClusterCentroids(
   embedding: number[],
   userId: string,
-  workspaceId: string | null
+  workspaceId: string | null,
 ): Promise<ClusterCandidate[]> {
   const vectorLiteral = `[${embedding.join(",")}]`;
 
@@ -80,7 +80,7 @@ async function findSimilarClusterCentroids(
           AND c.embedding IS NOT NULL
           AND 1 - (c.embedding::vector(1536) <=> ${vectorLiteral}::vector) >= ${CLUSTER_SIMILARITY_THRESHOLD}
         ORDER BY similarity DESC
-        LIMIT 1`
+        LIMIT 1`,
   );
 
   return Array.from(results) as ClusterCandidate[];
@@ -89,7 +89,7 @@ async function findSimilarClusterCentroids(
 async function assignToCluster(
   painPointId: string,
   clusterId: string,
-  similarity: number
+  similarity: number,
 ): Promise<{ clusterId: string; isNew: boolean }> {
   await db
     .update(painPoint)
@@ -117,7 +117,7 @@ async function createNewCluster(
   userId: string,
   workspaceId: string | null,
   embedding: number[],
-  point: { title: string; body: string }
+  point: { title: string; body: string },
 ): Promise<{ clusterId: string; isNew: boolean }> {
   const clusterId = crypto.randomUUID();
 

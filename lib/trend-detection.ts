@@ -26,7 +26,7 @@ export function detectTrend(
   current: number,
   previous: number | null,
   flatDeltaThreshold = DEFAULT_FLAT_DELTA,
-  flatPercentThreshold = DEFAULT_FLAT_PERCENT
+  flatPercentThreshold = DEFAULT_FLAT_PERCENT,
 ): TrendInsight {
   if (previous === null) {
     return {
@@ -40,7 +40,8 @@ export function detectTrend(
   }
 
   const delta = current - previous;
-  const percentChange = previous === 0 ? (current > 0 ? 100 : 0) : (delta / previous) * 100;
+  const percentChange =
+    previous === 0 ? (current > 0 ? 100 : 0) : (delta / previous) * 100;
   const isFlatByDelta = Math.abs(delta) <= flatDeltaThreshold;
   const isFlatByPercent = Math.abs(percentChange) <= flatPercentThreshold;
   const direction: TrendDirection =

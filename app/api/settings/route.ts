@@ -6,8 +6,16 @@ import { db } from "@/lib/db";
 import { user, userPreferences } from "@/lib/db/schema";
 
 const settingsSchema = z.object({
-  fullName: z.string().trim().min(1, "Full name is required").max(120, "Full name is too long"),
-  email: z.string().trim().email("Enter a valid email").max(255, "Email is too long"),
+  fullName: z
+    .string()
+    .trim()
+    .min(1, "Full name is required")
+    .max(120, "Full name is too long"),
+  email: z
+    .string()
+    .trim()
+    .email("Enter a valid email")
+    .max(255, "Email is too long"),
   company: z.string().trim().max(120, "Company is too long"),
   role: z.string().trim().max(80, "Role is too long"),
   weeklyDigest: z.boolean(),
@@ -83,7 +91,13 @@ export async function GET(req: Request) {
       columns: { name: true, email: true },
     });
     if (!currentUser) {
-      return apiError(404, "NOT_FOUND", "User not found", undefined, correlationId);
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "User not found",
+        undefined,
+        correlationId,
+      );
     }
 
     const preferences = await db.query.userPreferences.findFirst({
@@ -102,11 +116,17 @@ export async function GET(req: Request) {
         dashboardLayout: preferences?.dashboardLayout,
       }),
       200,
-      correlationId
+      correlationId,
     );
   } catch (error) {
     console.error("Settings GET API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }
 
@@ -126,7 +146,7 @@ export async function PATCH(req: Request) {
       "VALIDATION_ERROR",
       "Invalid request body",
       parsedBody.error.flatten(),
-      correlationId
+      correlationId,
     );
   }
 
@@ -140,7 +160,9 @@ export async function PATCH(req: Request) {
         dashboardLayout: true,
       },
     });
-    const parsedLayout = parseDashboardLayout(existingPreferences?.dashboardLayout);
+    const parsedLayout = parseDashboardLayout(
+      existingPreferences?.dashboardLayout,
+    );
     const nextDashboardLayout: DashboardLayoutSettings = {
       ...parsedLayout,
       settings: {
@@ -192,9 +214,21 @@ export async function PATCH(req: Request) {
   } catch (error) {
     const maybePgError = error as { code?: string };
     if (maybePgError?.code === "23505") {
-      return apiError(409, "VALIDATION_ERROR", "Email is already in use", undefined, correlationId);
+      return apiError(
+        409,
+        "VALIDATION_ERROR",
+        "Email is already in use",
+        undefined,
+        correlationId,
+      );
     }
     console.error("Settings PATCH API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

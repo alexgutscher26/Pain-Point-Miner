@@ -33,7 +33,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
   if (!response.ok) {
     throw new Error(
-      `Embedding API error: ${response.status} ${response.statusText}`
+      `Embedding API error: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -41,7 +41,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   const embedding: number[] = data?.data?.[0]?.embedding;
   if (!embedding || embedding.length !== EMBEDDING_DIMENSIONS) {
     throw new Error(
-      `Unexpected embedding dimensions: got ${embedding?.length ?? 0}, expected ${EMBEDDING_DIMENSIONS}`
+      `Unexpected embedding dimensions: got ${embedding?.length ?? 0}, expected ${EMBEDDING_DIMENSIONS}`,
     );
   }
 
@@ -55,7 +55,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 export async function embedPainPoint(
   painPointId: string,
   userId: string,
-  workspaceId: string | null
+  workspaceId: string | null,
 ): Promise<number[]> {
   const point = await db.query.painPoint.findFirst({
     where: eq(painPoint.id, painPointId),
@@ -110,7 +110,7 @@ export async function findSimilarPainPoints(
     limit?: number;
     threshold?: number;
     excludeIds?: string[];
-  }
+  },
 ): Promise<SimilarPainPointResult[]> {
   const limit = opts?.limit ?? 10;
   const threshold = opts?.threshold ?? 0.75;
@@ -122,7 +122,7 @@ export async function findSimilarPainPoints(
     excludeIds.length > 0
       ? sql`AND pe."painPointId" NOT IN (${sql.join(
           excludeIds.map((id) => sql`${id}`),
-          sql`, `
+          sql`, `,
         )})`
       : sql``;
 
@@ -143,7 +143,7 @@ export async function findSimilarPainPoints(
           ${excludeClause}
           AND 1 - (pe.embedding <=> ${vectorLiteral}::vector) >= ${threshold}
         ORDER BY similarity DESC
-        LIMIT ${limit}`
+        LIMIT ${limit}`,
   );
 
   return Array.from(results) as SimilarPainPointResult[];

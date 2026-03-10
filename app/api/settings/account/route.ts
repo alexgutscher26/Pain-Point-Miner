@@ -9,7 +9,10 @@ const deleteAccountSchema = z.object({
   confirmation: z
     .string()
     .trim()
-    .refine((value) => value === "DELETE", "Type DELETE to confirm account deletion"),
+    .refine(
+      (value) => value === "DELETE",
+      "Type DELETE to confirm account deletion",
+    ),
 });
 
 export async function DELETE(req: Request) {
@@ -27,7 +30,7 @@ export async function DELETE(req: Request) {
       "VALIDATION_ERROR",
       "Invalid request body",
       parsedBody.error.flatten(),
-      correlationId
+      correlationId,
     );
   }
 
@@ -48,9 +51,21 @@ export async function DELETE(req: Request) {
     return apiJson({ ok: true }, 200, correlationId);
   } catch (error) {
     if (error instanceof Error && error.message === "User not found") {
-      return apiError(404, "NOT_FOUND", "User not found", undefined, correlationId);
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "User not found",
+        undefined,
+        correlationId,
+      );
     }
     console.error("Delete account API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

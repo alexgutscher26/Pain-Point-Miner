@@ -15,7 +15,11 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const scraperStatus = pgEnum("ScraperStatus", ["running", "paused", "error"]);
+export const scraperStatus = pgEnum("ScraperStatus", [
+  "running",
+  "paused",
+  "error",
+]);
 
 export const verification = pgTable("verification", {
   id: text().primaryKey().notNull(),
@@ -41,9 +45,15 @@ export const user = pgTable(
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
-    uniqueIndex("user_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    uniqueIndex("user_username_key").using("btree", table.username.asc().nullsLast().op("text_ops")),
-  ]
+    uniqueIndex("user_email_key").using(
+      "btree",
+      table.email.asc().nullsLast().op("text_ops"),
+    ),
+    uniqueIndex("user_username_key").using(
+      "btree",
+      table.username.asc().nullsLast().op("text_ops"),
+    ),
+  ],
 );
 
 export const session = pgTable(
@@ -59,7 +69,10 @@ export const session = pgTable(
     userId: text().notNull(),
   },
   (table) => [
-    uniqueIndex("session_token_key").using("btree", table.token.asc().nullsLast().op("text_ops")),
+    uniqueIndex("session_token_key").using(
+      "btree",
+      table.token.asc().nullsLast().op("text_ops"),
+    ),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [user.id],
@@ -67,7 +80,7 @@ export const session = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const account = pgTable(
@@ -95,7 +108,7 @@ export const account = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const subscription = pgTable(
@@ -119,23 +132,27 @@ export const subscription = pgTable(
     billingInterval: text(),
     stripeScheduleId: text(),
     limits: jsonb(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => [
     index("subscription_referenceId_idx").using(
       "btree",
-      table.referenceId.asc().nullsLast().op("text_ops")
+      table.referenceId.asc().nullsLast().op("text_ops"),
     ),
     index("subscription_stripeCustomerId_idx").using(
       "btree",
-      table.stripeCustomerId.asc().nullsLast().op("text_ops")
+      table.stripeCustomerId.asc().nullsLast().op("text_ops"),
     ),
     index("subscription_stripeSubscriptionId_idx").using(
       "btree",
-      table.stripeSubscriptionId.asc().nullsLast().op("text_ops")
+      table.stripeSubscriptionId.asc().nullsLast().op("text_ops"),
     ),
-  ]
+  ],
 );
 
 export const workspace = pgTable(
@@ -145,12 +162,17 @@ export const workspace = pgTable(
     name: text().notNull(),
     slug: text().notNull(),
     ownerId: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
   },
   (table) => [
-    uniqueIndex("workspace_slug_key").using("btree", table.slug.asc().nullsLast().op("text_ops")),
+    uniqueIndex("workspace_slug_key").using(
+      "btree",
+      table.slug.asc().nullsLast().op("text_ops"),
+    ),
     foreignKey({
       columns: [table.ownerId],
       foreignColumns: [user.id],
@@ -158,7 +180,7 @@ export const workspace = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("restrict"),
-  ]
+  ],
 );
 
 export const workspaceMember = pgTable(
@@ -168,14 +190,16 @@ export const workspaceMember = pgTable(
     workspaceId: text().notNull(),
     userId: text().notNull(),
     role: text().default("member").notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
     uniqueIndex("workspace_member_workspaceId_userId_key").using(
       "btree",
       table.workspaceId.asc().nullsLast().op("text_ops"),
-      table.userId.asc().nullsLast().op("text_ops")
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.workspaceId],
@@ -191,7 +215,7 @@ export const workspaceMember = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const userPreferences = pgTable(
@@ -208,7 +232,7 @@ export const userPreferences = pgTable(
   (table) => [
     uniqueIndex("user_preferences_userId_key").using(
       "btree",
-      table.userId.asc().nullsLast().op("text_ops")
+      table.userId.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.userId],
@@ -217,7 +241,7 @@ export const userPreferences = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const scraper = pgTable(
@@ -231,13 +255,17 @@ export const scraper = pgTable(
     painPointsFound: integer().default(0).notNull(),
     lastRunAt: timestamp({ precision: 3, mode: "date" }),
     userId: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     errorCount: integer().default(0).notNull(),
     lastError: text(),
     sortModes: text().array().default(["new", "hot", "top_week"]),
     subreddits: text().array(),
-    customPatterns: text().array().default(sql`'{}'::text[]`),
+    customPatterns: text()
+      .array()
+      .default(sql`'{}'::text[]`),
     miningDepth: text().default("basic").notNull(),
     reportSaved: boolean().default(false).notNull(),
     reportCategory: text().default("Uncategorized").notNull(),
@@ -260,7 +288,7 @@ export const scraper = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const scraperRun = pgTable(
@@ -286,24 +314,28 @@ export const scraperRun = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const redditAiIdempotency = pgTable(
   "reddit_ai_idempotency",
   {
     redditPostId: text().primaryKey().notNull(),
-    lastProcessedAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    lastProcessedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     lastProcessedBy: text(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
     index("reddit_ai_idempotency_lastProcessedAt_idx").using(
       "btree",
-      table.lastProcessedAt.asc().nullsLast().op("timestamp_ops")
+      table.lastProcessedAt.asc().nullsLast().op("timestamp_ops"),
     ),
-  ]
+  ],
 );
 
 export const keywordStat = pgTable(
@@ -315,19 +347,21 @@ export const keywordStat = pgTable(
     lastMatchedAt: timestamp({ precision: 3, mode: "date" }),
     scraperId: text().notNull(),
     userId: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
     uniqueIndex("keyword_stat_scraperId_keyword_key").using(
       "btree",
       table.scraperId.asc().nullsLast().op("text_ops"),
-      table.keyword.asc().nullsLast().op("text_ops")
+      table.keyword.asc().nullsLast().op("text_ops"),
     ),
     index("keyword_stat_userId_painPointsFound_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
-      table.painPointsFound.asc().nullsLast().op("int4_ops")
+      table.painPointsFound.asc().nullsLast().op("int4_ops"),
     ),
     foreignKey({
       columns: [table.scraperId],
@@ -343,7 +377,7 @@ export const keywordStat = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const painPointCluster = pgTable(
@@ -358,21 +392,27 @@ export const painPointCluster = pgTable(
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
-    lastMatchedAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    lastMatchedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
-    index("pain_point_cluster_userId_embeddingProvider_embeddingModel_idx").using(
+    index(
+      "pain_point_cluster_userId_embeddingProvider_embeddingModel_idx",
+    ).using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
       table.embeddingProvider.asc().nullsLast().op("text_ops"),
-      table.embeddingModel.asc().nullsLast().op("text_ops")
+      table.embeddingModel.asc().nullsLast().op("text_ops"),
     ),
     index("pain_point_cluster_userId_lastMatchedAt_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("timestamp_ops"),
-      table.lastMatchedAt.asc().nullsLast().op("timestamp_ops")
+      table.lastMatchedAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({
       columns: [table.userId],
@@ -388,7 +428,7 @@ export const painPointCluster = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const painPoint = pgTable(
@@ -405,17 +445,23 @@ export const painPoint = pgTable(
     marketMaturity: integer().default(0),
     budget: text(),
     switchingCosts: text(),
-    triedSolutions: text().array().default(sql`'{}'::text[]`),
+    triedSolutions: text()
+      .array()
+      .default(sql`'{}'::text[]`),
     category: text(),
     scraperId: text().notNull(),
     userId: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     sentiment: text(),
     subreddit: text(),
     commentCount: integer().default(0).notNull(),
     mentionCount: integer().default(0).notNull(),
-    tags: text().array().default(sql`'{}'::text[]`),
+    tags: text()
+      .array()
+      .default(sql`'{}'::text[]`),
     workspaceId: text(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
     flair: text(),
@@ -430,12 +476,12 @@ export const painPoint = pgTable(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
       table.clusterId.asc().nullsLast().op("text_ops"),
-      table.createdAt.asc().nullsLast().op("text_ops")
+      table.createdAt.asc().nullsLast().op("text_ops"),
     ),
     index("pain_point_userId_createdAt_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("timestamp_ops"),
-      table.createdAt.asc().nullsLast().op("timestamp_ops")
+      table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({
       columns: [table.scraperId],
@@ -465,7 +511,7 @@ export const painPoint = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("set null"),
-  ]
+  ],
 );
 
 export const painPointComment = pgTable(
@@ -478,7 +524,9 @@ export const painPointComment = pgTable(
     commentUrl: text(),
     painScore: integer().default(0).notNull(),
     painPointId: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => [
     foreignKey({
@@ -488,7 +536,7 @@ export const painPointComment = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );
 
 export const painPointEmbedding = pgTable(
@@ -501,20 +549,22 @@ export const painPointEmbedding = pgTable(
     model: text().notNull(),
     dimensions: integer().notNull(),
     embedding: vector({ dimensions: 1536 }).notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
     index("pain_point_embedding_userId_createdAt_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
-      table.createdAt.asc().nullsLast().op("timestamp_ops")
+      table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     index("pain_point_embedding_userId_provider_model_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
       table.provider.asc().nullsLast().op("text_ops"),
-      table.model.asc().nullsLast().op("text_ops")
+      table.model.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.painPointId],
@@ -537,5 +587,5 @@ export const painPointEmbedding = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-  ]
+  ],
 );

@@ -36,7 +36,9 @@ describe("GET /api/reports/[id]", () => {
 
   it("returns 400 when route id param is invalid", async () => {
     const req = new Request("http://localhost:3000/api/reports/not-a-uuid");
-    const res = await GET(req, { params: Promise.resolve({ id: "not-a-uuid" }) });
+    const res = await GET(req, {
+      params: Promise.resolve({ id: "not-a-uuid" }),
+    });
     const body = await res.json();
 
     expect(res.status).toBe(400);
@@ -47,7 +49,9 @@ describe("GET /api/reports/[id]", () => {
   it("returns 404 for cross-user access attempts", async () => {
     mocks.scraperFindFirst.mockResolvedValue(null);
 
-    const req = new Request("http://localhost:3000/api/reports/4b0bcc55-a413-4e26-a92f-c0a4c5b40668");
+    const req = new Request(
+      "http://localhost:3000/api/reports/4b0bcc55-a413-4e26-a92f-c0a4c5b40668",
+    );
     const res = await GET(req, {
       params: Promise.resolve({ id: "4b0bcc55-a413-4e26-a92f-c0a4c5b40668" }),
     });

@@ -1,6 +1,6 @@
 ---
-date: {{date}}
-version: {{version}}
+date: { { date } }
+version: { { version } }
 ---
 
 # Weekly Changelog ({{date_range}})
@@ -24,4 +24,3 @@ version: {{version}}
 ## Internal/Infra
 
 {{internal}}
-

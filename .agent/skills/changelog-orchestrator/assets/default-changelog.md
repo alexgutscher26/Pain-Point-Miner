@@ -1,6 +1,6 @@
 ---
-date: {{date}}
-version: {{version}}
+date: { { date } }
+version: { { version } }
 ---
 
 # Changelog
@@ -20,4 +20,3 @@ version: {{version}}
 ## Internal
 
 {{internal}}
-

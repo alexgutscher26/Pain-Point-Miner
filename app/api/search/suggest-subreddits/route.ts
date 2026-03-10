@@ -1,4 +1,3 @@
-
 import { apiJson } from "@/lib/api-error";
 import { requireApiContext } from "@/lib/api-auth";
 import { z } from "zod";
@@ -14,7 +13,9 @@ const suggestPayloadSchema = z.object({
 const subredditNameSchema = z
   .string()
   .trim()
-  .transform((value) => value.replace(/^r\//i, "").replace(/[^\w]/g, "").toLowerCase())
+  .transform((value) =>
+    value.replace(/^r\//i, "").replace(/[^\w]/g, "").toLowerCase(),
+  )
   .pipe(z.string().regex(/^[a-z0-9_]{2,21}$/));
 
 export async function POST(req: Request) {
@@ -53,24 +54,29 @@ export async function POST(req: Request) {
     Return ONLY a JSON array of strings (the subreddit names without r/). 
     Example: ["saas", "entrepreneur", "startups"]`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.0-flash-001",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+        }),
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }
-      })
-    });
+    );
 
     if (!response.ok) throw new Error("AI suggestion failed");
-    
+
     const data = await response.json();
     const content = JSON.parse(data.choices[0].message.content);
-    const rawSubreddits = Array.isArray(content) ? content : (content.subreddits || content.data || []);
+    const rawSubreddits = Array.isArray(content)
+      ? content
+      : content.subreddits || content.data || [];
     const subreddits = Array.isArray(rawSubreddits)
       ? rawSubreddits
           .map((item) => subredditNameSchema.safeParse(item))

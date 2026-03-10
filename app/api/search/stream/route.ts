@@ -49,7 +49,7 @@ function phaseToMessage(
   phase: RunStatus,
   subreddits: string[],
   painPointCount: number,
-  postsFetched: number
+  postsFetched: number,
 ): string {
   switch (phase) {
     case "queued":
@@ -120,7 +120,7 @@ export async function GET(req: Request) {
           const results = await db.query.painPoint.findMany({
             where: and(
               eq(painPoint.scraperId, scraperId),
-              eq(painPoint.userId, userId)
+              eq(painPoint.userId, userId),
             ),
             columns: { id: true },
           });
@@ -135,7 +135,7 @@ export async function GET(req: Request) {
               phase,
               subreddits,
               painPointCount,
-              latestRun?.postsFetched ?? 0
+              latestRun?.postsFetched ?? 0,
             ),
             progress: phaseToProgress(phase),
             painPointCount,

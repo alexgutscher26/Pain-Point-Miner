@@ -24,7 +24,9 @@ function resolveCorrelationId(correlationId?: string) {
 }
 
 export function getCorrelationId(req: Request) {
-  return resolveCorrelationId(req.headers.get(CORRELATION_ID_HEADER) ?? undefined);
+  return resolveCorrelationId(
+    req.headers.get(CORRELATION_ID_HEADER) ?? undefined,
+  );
 }
 
 export function apiJson<T>(body: T, status = 200, correlationId?: string) {
@@ -42,7 +44,7 @@ export function apiError(
   code: ApiErrorBody["code"],
   message: string,
   details?: unknown,
-  correlationId?: string
+  correlationId?: string,
 ) {
   return apiJson(
     {
@@ -51,6 +53,6 @@ export function apiError(
       ...(details !== undefined ? { details } : {}),
     } satisfies ApiErrorBody,
     status,
-    correlationId
+    correlationId,
   );
 }

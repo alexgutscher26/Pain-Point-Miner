@@ -1,4 +1,3 @@
-
 import { db } from "@/lib/db";
 import { scraper, scraperRun, painPoint } from "@/lib/db/schema";
 import { and, eq, desc } from "drizzle-orm";
@@ -28,46 +27,62 @@ export async function GET(req: Request) {
       "VALIDATION_ERROR",
       "Invalid query parameters",
       parsedQuery.error.flatten(),
-      correlationId
+      correlationId,
     );
   }
   const { id: scraperId } = parsedQuery.data;
 
   try {
     const currentScraper = await db.query.scraper.findFirst({
-        where: and(
-          eq(scraper.id, scraperId),
-          eq(scraper.userId, userId),
-          workspaceScope(scraper.workspaceId, workspaceId)
-        ),
+      where: and(
+        eq(scraper.id, scraperId),
+        eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId),
+      ),
     });
 
     if (!currentScraper) {
-        return apiError(404, "NOT_FOUND", "Scraper not found", undefined, correlationId);
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Scraper not found",
+        undefined,
+        correlationId,
+      );
     }
 
     // Get the latest run for stats
     const latestRun = await db.query.scraperRun.findFirst({
-        where: eq(scraperRun.scraperId, scraperId),
-        orderBy: [desc(scraperRun.startedAt)],
+      where: eq(scraperRun.scraperId, scraperId),
+      orderBy: [desc(scraperRun.startedAt)],
     });
 
     const results = await db.query.painPoint.findMany({
-        where: and(
-          eq(painPoint.scraperId, scraperId),
-          eq(painPoint.userId, userId),
-          workspaceScope(painPoint.workspaceId, workspaceId)
-        ),
+      where: and(
+        eq(painPoint.scraperId, scraperId),
+        eq(painPoint.userId, userId),
+        workspaceScope(painPoint.workspaceId, workspaceId),
+      ),
     });
 
-    return apiJson({
+    return apiJson(
+      {
         scraper: currentScraper,
         latestRun,
         painPointCount: results.length,
         status: normalizeRunStatus(latestRun?.status),
-    }, 200, correlationId);
+      },
+      200,
+      correlationId,
+    );
   } catch (error) {
     console.error("Status API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

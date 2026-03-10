@@ -10,7 +10,9 @@ declare global {
   var __rppIdempotencyStore: Map<string, IdempotencyEntry<unknown>> | undefined;
 }
 
-const store = globalThis.__rppIdempotencyStore ?? new Map<string, IdempotencyEntry<unknown>>();
+const store =
+  globalThis.__rppIdempotencyStore ??
+  new Map<string, IdempotencyEntry<unknown>>();
 globalThis.__rppIdempotencyStore = store;
 
 function sweepExpiredEntries() {
@@ -24,7 +26,7 @@ function sweepExpiredEntries() {
 
 export async function runWithIdempotency<T>(
   namespacedKey: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<{ result: T; replayed: boolean }> {
   sweepExpiredEntries();
   const now = Date.now();

@@ -51,7 +51,9 @@ describe("GET /api/search/status", () => {
   });
 
   it("returns 400 when id query param is invalid", async () => {
-    const req = new Request("http://localhost:3000/api/search/status?id=not-a-uuid");
+    const req = new Request(
+      "http://localhost:3000/api/search/status?id=not-a-uuid",
+    );
     const res = await GET(req);
     const body = await res.json();
 
@@ -64,7 +66,7 @@ describe("GET /api/search/status", () => {
     mocks.scraperFindFirst.mockResolvedValue(null);
 
     const req = new Request(
-      "http://localhost:3000/api/search/status?id=4b0bcc55-a413-4e26-a92f-c0a4c5b40668"
+      "http://localhost:3000/api/search/status?id=4b0bcc55-a413-4e26-a92f-c0a4c5b40668",
     );
     const res = await GET(req);
     const body = await res.json();

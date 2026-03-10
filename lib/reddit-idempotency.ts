@@ -8,7 +8,7 @@ const REDDIT_AI_IDEMPOTENCY_WINDOW_HOURS = 24;
  */
 export async function claimRedditPostForAiProcessing(
   redditPostId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   const normalizedRedditPostId = redditPostId.trim();
   if (!normalizedRedditPostId) return false;

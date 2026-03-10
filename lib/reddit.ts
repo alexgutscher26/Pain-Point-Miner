@@ -99,7 +99,11 @@ function sleep(ms: number) {
  * @returns The response from the fetch call if successful.
  * @throws Error If all retry attempts fail.
  */
-async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETRIES) {
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  retries = MAX_RETRIES,
+) {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const controller = new AbortController();
@@ -115,7 +119,9 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
 
       const isRetriable = response.status === 429 || response.status >= 500;
       if (!isRetriable || attempt === retries) {
-        throw new Error(`Reddit API returned ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `Reddit API returned ${response.status}: ${response.statusText}`,
+        );
       }
     } catch (error) {
       lastError = error;
@@ -127,22 +133,32 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = MAX_RETR
     await sleep(500 * (attempt + 1));
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Reddit request failed");
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Reddit request failed");
 }
 
 function hasOAuthCredentials() {
   return Boolean(REDDIT_CLIENT_ID && REDDIT_CLIENT_SECRET);
 }
 
-async function getRedditAccessToken(forceRefresh = false): Promise<string | null> {
+async function getRedditAccessToken(
+  forceRefresh = false,
+): Promise<string | null> {
   if (!hasOAuthCredentials()) return null;
 
   const nowSeconds = Math.floor(Date.now() / 1_000);
-  if (!forceRefresh && cachedToken && cachedToken.expiresAtEpochSeconds > nowSeconds + TOKEN_EXPIRY_SAFETY_SECONDS) {
+  if (
+    !forceRefresh &&
+    cachedToken &&
+    cachedToken.expiresAtEpochSeconds > nowSeconds + TOKEN_EXPIRY_SAFETY_SECONDS
+  ) {
     return cachedToken.token;
   }
 
-  const basicAuth = Buffer.from(`${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}`).toString("base64");
+  const basicAuth = Buffer.from(
+    `${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}`,
+  ).toString("base64");
   const response = await fetchWithRetry(
     "https://www.reddit.com/api/v1/access_token",
     {
@@ -154,7 +170,7 @@ async function getRedditAccessToken(forceRefresh = false): Promise<string | null
       },
       body: "grant_type=client_credentials",
     },
-    1
+    1,
   );
 
   const payload = (await response.json()) as RedditTokenResponse;
@@ -174,7 +190,10 @@ async function fetchRedditResponse(url: string): Promise<Response> {
   const authToken = await getRedditAccessToken();
 
   if (authToken) {
-    const oauthUrl = url.replace("https://www.reddit.com", "https://oauth.reddit.com");
+    const oauthUrl = url.replace(
+      "https://www.reddit.com",
+      "https://oauth.reddit.com",
+    );
 
     try {
       const response = await fetchWithRetry(oauthUrl, {
@@ -187,7 +206,8 @@ async function fetchRedditResponse(url: string): Promise<Response> {
     } catch (error) {
       if (
         error instanceof Error &&
-        (error.message.includes("401") || error.message.toLowerCase().includes("unauthorized"))
+        (error.message.includes("401") ||
+          error.message.toLowerCase().includes("unauthorized"))
       ) {
         const refreshedToken = await getRedditAccessToken(true);
         if (refreshedToken) {
@@ -202,7 +222,8 @@ async function fetchRedditResponse(url: string): Promise<Response> {
 
       if (
         error instanceof Error &&
-        (error.message.includes("403") || error.message.toLowerCase().includes("forbidden"))
+        (error.message.includes("403") ||
+          error.message.toLowerCase().includes("forbidden"))
       ) {
         throw error;
       }
@@ -225,7 +246,7 @@ function isRedditBlockedError(error: unknown) {
 async function fetchFromPullPushSubmissions(
   subreddit: string,
   keyword: string,
-  maxPosts: number
+  maxPosts: number,
 ): Promise<RedditPost[]> {
   const size = Math.max(1, Math.min(250, maxPosts));
   const params = new URLSearchParams({
@@ -235,14 +256,21 @@ async function fetchFromPullPushSubmissions(
     sort: "desc",
     sort_type: "score",
   });
-  const response = await fetch(`https://api.pullpush.io/reddit/search/submission/?${params.toString()}`);
+  const response = await fetch(
+    `https://api.pullpush.io/reddit/search/submission/?${params.toString()}`,
+  );
   if (!response.ok) {
-    throw new Error(`PullPush API returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `PullPush API returned ${response.status}: ${response.statusText}`,
+    );
   }
   const data = (await response.json()) as PullPushListingResponse;
   const rows = data.data ?? [];
   return rows
-    .filter((row): row is NonNullable<typeof row> & { id: string; title: string } => Boolean(row?.id && row?.title))
+    .filter(
+      (row): row is NonNullable<typeof row> & { id: string; title: string } =>
+        Boolean(row?.id && row?.title),
+    )
     .map((row) => ({
       id: row.id,
       title: row.title,
@@ -250,34 +278,47 @@ async function fetchFromPullPushSubmissions(
       author: row.author ?? "unknown",
       score: row.score ?? 0,
       subreddit: row.subreddit ?? subreddit,
-      url: row.url ?? (row.permalink ? `https://www.reddit.com${row.permalink}` : ""),
+      url:
+        row.url ??
+        (row.permalink ? `https://www.reddit.com${row.permalink}` : ""),
       num_comments: row.num_comments ?? 0,
-      created_utc: row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+      created_utc:
+        row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
     }));
 }
 
-async function fetchFromPullPushComments(postId: string): Promise<RedditComment[]> {
+async function fetchFromPullPushComments(
+  postId: string,
+): Promise<RedditComment[]> {
   const params = new URLSearchParams({
     link_id: postId,
     size: "200",
     sort: "desc",
     sort_type: "score",
   });
-  const response = await fetch(`https://api.pullpush.io/reddit/search/comment/?${params.toString()}`);
+  const response = await fetch(
+    `https://api.pullpush.io/reddit/search/comment/?${params.toString()}`,
+  );
   if (!response.ok) {
-    throw new Error(`PullPush API returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `PullPush API returned ${response.status}: ${response.statusText}`,
+    );
   }
   const data = (await response.json()) as PullPushCommentResponse;
   const rows = data.data ?? [];
   return rows
-    .filter((row): row is NonNullable<typeof row> & { id: string; body: string } => Boolean(row?.id && row?.body))
+    .filter(
+      (row): row is NonNullable<typeof row> & { id: string; body: string } =>
+        Boolean(row?.id && row?.body),
+    )
     .map((row) => ({
       id: row.id,
       body: row.body,
       author: row.author ?? "unknown",
       score: row.score ?? 0,
       permalink: row.permalink ? `https://www.reddit.com${row.permalink}` : "",
-      created_utc: row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+      created_utc:
+        row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
     }));
 }
 
@@ -288,7 +329,7 @@ export const fetchSubredditPosts = async (
   subreddit: string,
   keyword: string,
   limit = 25,
-  time: RedditTimeRange = "all"
+  time: RedditTimeRange = "all",
 ): Promise<RedditPost[]> => {
   const posts = await fetchSubredditPostsBatched(subreddit, keyword, {
     maxPosts: limit,
@@ -321,13 +362,16 @@ export async function fetchSubredditPostsBatched(
     time?: RedditTimeRange;
     delayMs?: number;
     requestLimit?: number;
-  }
+  },
 ): Promise<RedditPost[]> {
   try {
     const maxPosts = Math.max(1, Math.min(2_000, options?.maxPosts ?? 25));
     const delayMs = Math.max(0, options?.delayMs ?? 250);
     const time = options?.time ?? "all";
-    const requestLimit = Math.max(1, Math.min(100, options?.requestLimit ?? 100));
+    const requestLimit = Math.max(
+      1,
+      Math.min(100, options?.requestLimit ?? 100),
+    );
     const posts: RedditPost[] = [];
     let after: string | null = null;
 
@@ -371,18 +415,21 @@ export async function fetchSubredditPostsBatched(
         const fallbackPosts = await fetchFromPullPushSubmissions(
           subreddit,
           keyword,
-          Math.max(1, Math.min(2_000, options?.maxPosts ?? 25))
+          Math.max(1, Math.min(2_000, options?.maxPosts ?? 25)),
         );
         return fallbackPosts;
       } catch (fallbackError) {
-        console.error(`Error fetching posts from fallback source for r/${subreddit}:`, fallbackError);
+        console.error(
+          `Error fetching posts from fallback source for r/${subreddit}:`,
+          fallbackError,
+        );
         return [];
       }
     }
     console.error(`Error fetching posts from r/${subreddit}:`, error);
     return [];
   }
-};
+}
 
 /**
  * Fetch comments from a Reddit post.
@@ -393,41 +440,45 @@ export async function fetchSubredditPostsBatched(
  * @param subreddit - The name of the subreddit containing the post.
  * @returns A promise that resolves to an array of RedditComment objects.
  */
-export const fetchComments = async (postId: string, subreddit: string): Promise<RedditComment[]> => {
+export const fetchComments = async (
+  postId: string,
+  subreddit: string,
+): Promise<RedditComment[]> => {
   try {
     const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json`;
     const response = await fetchRedditResponse(url);
 
     const data = await response.json();
     const commentNodes = data[1].data.children;
-    
-    const extractReplies = (replies: { data?: { children?: any[] } }): RedditComment[] => {
+
+    const extractReplies = (replies: {
+      data?: { children?: any[] };
+    }): RedditComment[] => {
       if (!replies || !replies.data || !replies.data.children) return [];
-      
-      return replies.data.children.flatMap((child: { kind: string, data: any }) => {
-        if (child.kind !== 't1') return [];
-        const comment = child.data;
-        return [
-          comment,
-          ...extractReplies(comment.replies)
-        ];
-      });
+
+      return replies.data.children.flatMap(
+        (child: { kind: string; data: any }) => {
+          if (child.kind !== "t1") return [];
+          const comment = child.data;
+          return [comment, ...extractReplies(comment.replies)];
+        },
+      );
     };
 
-    return commentNodes.flatMap((child: { kind: string, data: any }) => {
-      if (child.kind !== 't1') return [];
+    return commentNodes.flatMap((child: { kind: string; data: any }) => {
+      if (child.kind !== "t1") return [];
       const comment = child.data;
-      return [
-        comment,
-        ...extractReplies(comment.replies)
-      ];
+      return [comment, ...extractReplies(comment.replies)];
     });
   } catch (error) {
     if (isRedditBlockedError(error)) {
       try {
         return await fetchFromPullPushComments(postId);
       } catch (fallbackError) {
-        console.error(`Error fetching comments from fallback source for post ${postId}:`, fallbackError);
+        console.error(
+          `Error fetching comments from fallback source for post ${postId}:`,
+          fallbackError,
+        );
         return [];
       }
     }

@@ -39,7 +39,11 @@ export interface SettingsFormValues {
   defaultLocale: string;
 }
 
-export function SettingsPageClient({ initialValues }: { initialValues: SettingsFormValues }) {
+export function SettingsPageClient({
+  initialValues,
+}: {
+  initialValues: SettingsFormValues;
+}) {
   const router = useRouter();
   const [values, setValues] = useState<SettingsFormValues>(initialValues);
   const [isSaving, setIsSaving] = useState(false);
@@ -114,7 +118,8 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       setValues(updated);
       toast.success("Settings saved.");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to update settings.";
+      const message =
+        error instanceof Error ? error.message : "Unable to update settings.";
       setErrorMessage(message);
       toast.error(message);
     } finally {
@@ -156,7 +161,8 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       await signOut().catch(() => undefined);
       router.replace("/sign-in");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to delete account.";
+      const message =
+        error instanceof Error ? error.message : "Unable to delete account.";
       toast.error(message);
     } finally {
       setIsDeleting(false);
@@ -197,7 +203,10 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
         let message = fallbackMessage;
         if (responseText) {
           try {
-            const parsed = JSON.parse(responseText) as { message?: string; error?: string };
+            const parsed = JSON.parse(responseText) as {
+              message?: string;
+              error?: string;
+            };
             message = parsed.message || parsed.error || fallbackMessage;
           } catch {
             message = fallbackMessage;
@@ -212,7 +221,8 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       setConfirmNewPassword("");
       setIsChangePasswordOpen(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to change password.";
+      const message =
+        error instanceof Error ? error.message : "Unable to change password.";
       toast.error(message);
     } finally {
       setIsChangingPassword(false);
@@ -249,7 +259,8 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
 
       setSessions(normalized);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to fetch sessions.";
+      const message =
+        error instanceof Error ? error.message : "Unable to fetch sessions.";
       toast.error(message);
     } finally {
       setIsLoadingSessions(false);
@@ -274,7 +285,8 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       setSessions((prev) => prev.filter((session) => session.token !== token));
       toast.success("Session revoked.");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to revoke session.";
+      const message =
+        error instanceof Error ? error.message : "Unable to revoke session.";
       toast.error(message);
     } finally {
       setIsRevokingToken(null);
@@ -287,9 +299,13 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">Dashboard Settings</p>
+            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+              Dashboard Settings
+            </p>
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">Settings</h2>
+          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
+            Settings
+          </h2>
           <p className="text-zinc-500 font-medium text-sm">
             Manage your account preferences, notifications, and scan defaults.
           </p>
@@ -322,23 +338,31 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
               <Field
                 label="Full Name"
                 value={values.fullName}
-                onChange={(value) => setValues((prev) => ({ ...prev, fullName: value }))}
+                onChange={(value) =>
+                  setValues((prev) => ({ ...prev, fullName: value }))
+                }
               />
               <Field
                 label="Email"
                 type="email"
                 value={values.email}
-                onChange={(value) => setValues((prev) => ({ ...prev, email: value }))}
+                onChange={(value) =>
+                  setValues((prev) => ({ ...prev, email: value }))
+                }
               />
               <Field
                 label="Company"
                 value={values.company}
-                onChange={(value) => setValues((prev) => ({ ...prev, company: value }))}
+                onChange={(value) =>
+                  setValues((prev) => ({ ...prev, company: value }))
+                }
               />
               <Field
                 label="Role"
                 value={values.role}
-                onChange={(value) => setValues((prev) => ({ ...prev, role: value }))}
+                onChange={(value) =>
+                  setValues((prev) => ({ ...prev, role: value }))
+                }
               />
             </div>
           </section>
@@ -375,19 +399,27 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                 Coming Soon
               </span>
             </div>
-            <fieldset disabled className="space-y-4 opacity-60 pointer-events-none">
+            <fieldset
+              disabled
+              className="space-y-4 opacity-60 pointer-events-none"
+            >
               <ToggleRow
                 title="Weekly market digest"
                 description="Receive top trends and highest-value pain points every Monday."
                 checked={values.weeklyDigest}
-                onCheckedChange={(checked) => setValues((prev) => ({ ...prev, weeklyDigest: checked }))}
+                onCheckedChange={(checked) =>
+                  setValues((prev) => ({ ...prev, weeklyDigest: checked }))
+                }
               />
               <ToggleRow
                 title="Scan completion alerts"
                 description="Get notified when your background analysis is complete."
                 checked={values.scanCompletionAlerts}
                 onCheckedChange={(checked) =>
-                  setValues((prev) => ({ ...prev, scanCompletionAlerts: checked }))
+                  setValues((prev) => ({
+                    ...prev,
+                    scanCompletionAlerts: checked,
+                  }))
                 }
               />
               <ToggleRow
@@ -395,7 +427,10 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                 description="Receive invoices and plan usage alerts."
                 checked={values.billingNotifications}
                 onCheckedChange={(checked) =>
-                  setValues((prev) => ({ ...prev, billingNotifications: checked }))
+                  setValues((prev) => ({
+                    ...prev,
+                    billingNotifications: checked,
+                  }))
                 }
               />
             </fieldset>
@@ -416,7 +451,12 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                 onChange={(value) =>
                   setValues((prev) => ({
                     ...prev,
-                    defaultSubredditCount: clampNumber(value, 1, 25, prev.defaultSubredditCount),
+                    defaultSubredditCount: clampNumber(
+                      value,
+                      1,
+                      25,
+                      prev.defaultSubredditCount,
+                    ),
                   }))
                 }
               />
@@ -429,19 +469,29 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                 onChange={(value) =>
                   setValues((prev) => ({
                     ...prev,
-                    minimumOpportunityScore: clampNumber(value, 0, 100, prev.minimumOpportunityScore),
+                    minimumOpportunityScore: clampNumber(
+                      value,
+                      0,
+                      100,
+                      prev.minimumOpportunityScore,
+                    ),
                   }))
                 }
               />
               <Field
                 label="Default Locale"
                 value={values.defaultLocale}
-                onChange={(value) => setValues((prev) => ({ ...prev, defaultLocale: value }))}
+                onChange={(value) =>
+                  setValues((prev) => ({ ...prev, defaultLocale: value }))
+                }
               />
             </div>
             <p className="text-xs text-zinc-500 mt-4">
               Need higher limits?{" "}
-              <Link href="/dashboard/billing" className="text-[#ff4500] hover:text-[#ff6d33] font-bold">
+              <Link
+                href="/dashboard/billing"
+                className="text-[#ff4500] hover:text-[#ff6d33] font-bold"
+              >
                 Upgrade your plan
               </Link>
               .
@@ -451,9 +501,12 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       </form>
 
       <section className="bg-[#111] rounded-[28px] border border-rose-500/30 p-6 md:p-8 shadow-2xl">
-        <h3 className="text-rose-400 font-black text-lg tracking-tight mb-2">Danger Zone</h3>
+        <h3 className="text-rose-400 font-black text-lg tracking-tight mb-2">
+          Danger Zone
+        </h3>
         <p className="text-sm text-zinc-400 mb-5">
-          Deleting your account removes all reports, scans, and team workspaces permanently.
+          Deleting your account removes all reports, scans, and team workspaces
+          permanently.
         </p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -466,10 +519,14 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
           </AlertDialogTrigger>
           <AlertDialogContent className="bg-[#0e0e0e] border border-rose-500/30 text-zinc-100">
             <AlertDialogHeader className="text-left place-items-start">
-              <AlertDialogTitle className="text-rose-400 font-black">Delete your account?</AlertDialogTitle>
+              <AlertDialogTitle className="text-rose-400 font-black">
+                Delete your account?
+              </AlertDialogTitle>
               <AlertDialogDescription className="text-zinc-400">
-                This action is permanent and removes your account and all associated data.
-                Type <span className="text-zinc-100 font-bold">DELETE</span> to continue.
+                This action is permanent and removes your account and all
+                associated data. Type{" "}
+                <span className="text-zinc-100 font-bold">DELETE</span> to
+                continue.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <input
@@ -501,10 +558,15 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
         </AlertDialog>
       </section>
 
-      <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
+      <Dialog
+        open={isChangePasswordOpen}
+        onOpenChange={setIsChangePasswordOpen}
+      >
         <DialogContent className="bg-[#0e0e0e] border border-white/10 text-zinc-100">
           <DialogHeader>
-            <DialogTitle className="text-white font-black">Change Password</DialogTitle>
+            <DialogTitle className="text-white font-black">
+              Change Password
+            </DialogTitle>
             <DialogDescription className="text-zinc-400">
               Update your password. Use at least 8 characters.
             </DialogDescription>
@@ -516,7 +578,12 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
               value={currentPassword}
               onChange={setCurrentPassword}
             />
-            <Field label="New Password" type="password" value={newPassword} onChange={setNewPassword} />
+            <Field
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={setNewPassword}
+            />
             <Field
               label="Confirm New Password"
               type="password"
@@ -527,7 +594,9 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
               <input
                 type="checkbox"
                 checked={revokeOtherSessions}
-                onChange={(event) => setRevokeOtherSessions(event.target.checked)}
+                onChange={(event) =>
+                  setRevokeOtherSessions(event.target.checked)
+                }
                 className="h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-[#ff4500] focus:ring-[#ff4500]"
               />
               Revoke other active sessions
@@ -556,16 +625,22 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
       <Dialog open={isSessionsOpen} onOpenChange={setIsSessionsOpen}>
         <DialogContent className="bg-[#0e0e0e] border border-white/10 text-zinc-100 sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white font-black">Active Sessions</DialogTitle>
+            <DialogTitle className="text-white font-black">
+              Active Sessions
+            </DialogTitle>
             <DialogDescription className="text-zinc-400">
               Review and revoke active sessions for this account.
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-[360px] overflow-y-auto space-y-3 pr-1">
             {isLoadingSessions ? (
-              <div className="py-8 text-center text-zinc-500 text-sm">Loading sessions...</div>
+              <div className="py-8 text-center text-zinc-500 text-sm">
+                Loading sessions...
+              </div>
             ) : sessions.length === 0 ? (
-              <div className="py-8 text-center text-zinc-500 text-sm">No active sessions found.</div>
+              <div className="py-8 text-center text-zinc-500 text-sm">
+                No active sessions found.
+              </div>
             ) : (
               sessions.map((session) => (
                 <div
@@ -578,10 +653,15 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                     </p>
                     <p className="text-xs text-zinc-500 mt-1">
                       IP: {session.ipAddress || "Unknown"} | Started:{" "}
-                      {session.createdAt ? new Date(session.createdAt).toLocaleString() : "Unknown"}
+                      {session.createdAt
+                        ? new Date(session.createdAt).toLocaleString()
+                        : "Unknown"}
                     </p>
                     <p className="text-xs text-zinc-500 mt-1">
-                      Expires: {session.expiresAt ? new Date(session.expiresAt).toLocaleString() : "Unknown"}
+                      Expires:{" "}
+                      {session.expiresAt
+                        ? new Date(session.expiresAt).toLocaleString()
+                        : "Unknown"}
                     </p>
                   </div>
                   <button
@@ -590,7 +670,9 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
                     disabled={isRevokingToken === session.token}
                     className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
                   >
-                    {isRevokingToken === session.token ? "Revoking..." : "Revoke"}
+                    {isRevokingToken === session.token
+                      ? "Revoking..."
+                      : "Revoke"}
                   </button>
                 </div>
               ))
@@ -620,7 +702,12 @@ export function SettingsPageClient({ initialValues }: { initialValues: SettingsF
   );
 }
 
-function clampNumber(value: string, min: number, max: number, fallback: number) {
+function clampNumber(
+  value: string,
+  min: number,
+  max: number,
+  fallback: number,
+) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) {
     return fallback;
@@ -645,7 +732,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500">{label}</span>
+      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+        {label}
+      </span>
       <input
         type={type}
         value={value}
@@ -685,7 +774,13 @@ function ToggleRow({
   );
 }
 
-function ActionButton({ label, onClick }: { label: string; onClick?: () => void }) {
+function ActionButton({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick?: () => void;
+}) {
   return (
     <button
       type="button"

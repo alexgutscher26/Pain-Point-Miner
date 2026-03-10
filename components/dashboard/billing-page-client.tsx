@@ -49,7 +49,9 @@ export function BillingPageClient({
       const data = (await res.json()) as { url?: string; message?: string };
 
       if (!res.ok) {
-        throw new Error(data?.message ?? "Unable to open billing portal right now.");
+        throw new Error(
+          data?.message ?? "Unable to open billing portal right now.",
+        );
       }
 
       if (data?.url) {
@@ -60,7 +62,10 @@ export function BillingPageClient({
       console.error("Error opening billing portal:", error);
       setActionState({
         type: "error",
-        message: error instanceof Error ? error.message : "Unable to open billing portal.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to open billing portal.",
       });
     } finally {
       setOpeningPortal(false);
@@ -73,11 +78,16 @@ export function BillingPageClient({
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">Billing & Subscription</p>
+            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+              Billing & Subscription
+            </p>
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">Manage Your Plan</h2>
+          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
+            Manage Your Plan
+          </h2>
           <p className="text-zinc-500 font-medium text-sm">
-            Update your payment method, review invoices, and manage your subscription in Stripe.
+            Update your payment method, review invoices, and manage your
+            subscription in Stripe.
           </p>
         </div>
       </div>
@@ -89,7 +99,8 @@ export function BillingPageClient({
             Billing Portal
           </h3>
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-            Open your Stripe billing portal to update payment methods, view invoices, cancel, or restore your subscription.
+            Open your Stripe billing portal to update payment methods, view
+            invoices, cancel, or restore your subscription.
           </p>
           <button
             type="button"
@@ -97,7 +108,11 @@ export function BillingPageClient({
             disabled={openingPortal}
             className="inline-flex items-center gap-2 bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
           >
-            {openingPortal ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
+            {openingPortal ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ExternalLink className="w-4 h-4" />
+            )}
             Open Billing Portal
           </button>
           {actionState?.type === "error" ? (
@@ -113,18 +128,24 @@ export function BillingPageClient({
               Scans this month:{" "}
               <span className="text-white font-bold">
                 {usage.monthlyScansUsed}
-                {usage.monthlyScansLimit === null ? "" : ` / ${usage.monthlyScansLimit}`}
+                {usage.monthlyScansLimit === null
+                  ? ""
+                  : ` / ${usage.monthlyScansLimit}`}
               </span>
             </p>
             <p>
               Max subreddits/search:{" "}
               <span className="text-white font-bold">
-                {entitlements.maxSubredditsPerSearch === null ? "Unlimited" : entitlements.maxSubredditsPerSearch}
+                {entitlements.maxSubredditsPerSearch === null
+                  ? "Unlimited"
+                  : entitlements.maxSubredditsPerSearch}
               </span>
             </p>
             <p>
               Save reports:{" "}
-              <span className="text-white font-bold">{entitlements.canSaveReports ? "Enabled" : "Upgrade required"}</span>
+              <span className="text-white font-bold">
+                {entitlements.canSaveReports ? "Enabled" : "Upgrade required"}
+              </span>
             </p>
           </div>
         </div>

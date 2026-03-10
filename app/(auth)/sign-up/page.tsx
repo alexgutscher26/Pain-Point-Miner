@@ -38,7 +38,9 @@ export default function SignUpPage() {
     });
 
     if (authError) {
-      setError(authError.message ?? "Failed to create account. Please try again.");
+      setError(
+        authError.message ?? "Failed to create account. Please try again.",
+      );
       setLoading(false);
     } else {
       router.push("/dashboard/search");
@@ -57,33 +59,55 @@ export default function SignUpPage() {
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="size-8 bg-[#ff4500] rounded flex items-center justify-center shadow-[0_4px_15px_rgba(255,69,0,0.5)]">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
+                  fill="currentColor"
+                ></path>
               </svg>
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">Pain-Point Miner</span>
+            <span className="text-xl font-bold tracking-tight text-white">
+              Pain-Point Miner
+            </span>
           </Link>
         </div>
 
         {/* Content — sits right below logo */}
         <div className="relative z-10 max-w-lg mt-16 flex-1">
           <div className="mb-12">
-            <p className="text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase mb-4">START FOR FREE</p>
+            <p className="text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase mb-4">
+              START FOR FREE
+            </p>
             <h1 className="text-[40px] font-extrabold text-white leading-tight mb-6 tracking-tight">
-              Stop guessing. Build what <span className="text-[#ff4500]">people need.</span>
+              Stop guessing. Build what{" "}
+              <span className="text-[#ff4500]">people need.</span>
             </h1>
-            <p className="text-zinc-400 text-[17px] font-medium leading-relaxed">Join founders who validate SaaS ideas in hours — using real Reddit conversations as their research dataset.</p>
+            <p className="text-zinc-400 text-[17px] font-medium leading-relaxed">
+              Join founders who validate SaaS ideas in hours — using real Reddit
+              conversations as their research dataset.
+            </p>
           </div>
 
           {/* Sample Insight Card */}
           <div className="bg-[#0f0f0f] border border-white/5 p-6 rounded-[20px] shadow-2xl">
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-[#ff4500]/10 text-[#ff4500] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#ff4500]/20">Pain Point Detected</span>
-              <span className="text-zinc-500 text-xs font-medium">r/SaaS • 4h ago</span>
+              <span className="bg-[#ff4500]/10 text-[#ff4500] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#ff4500]/20">
+                Pain Point Detected
+              </span>
+              <span className="text-zinc-500 text-xs font-medium">
+                r/SaaS • 4h ago
+              </span>
             </div>
 
             <blockquote className="text-white text-[17px] font-medium leading-relaxed mb-6">
-              &quot;I&apos;ve been manually scanning Reddit for 3 hours to validate my idea. There has to be a better way to do this at scale.&quot;
+              &quot;I&apos;ve been manually scanning Reddit for 3 hours to
+              validate my idea. There has to be a better way to do this at
+              scale.&quot;
             </blockquote>
 
             <div className="flex items-center justify-between border-t border-white/5 pt-4">
@@ -93,13 +117,17 @@ export default function SignUpPage() {
                 </div>
                 <div className="text-sm">
                   <p className="text-zinc-200 font-bold">u/ValidatePro</p>
-                  <p className="text-zinc-500 text-xs">187 Upvotes • 63 Comments</p>
+                  <p className="text-zinc-500 text-xs">
+                    187 Upvotes • 63 Comments
+                  </p>
                 </div>
               </div>
 
               <div className="flex gap-1 items-center">
                 <TrendingUp className="w-4 h-4 text-[#ff4500]" />
-                <span className="text-[#ff4500] text-xs font-bold italic">High Demand</span>
+                <span className="text-[#ff4500] text-xs font-bold italic">
+                  High Demand
+                </span>
               </div>
             </div>
           </div>
@@ -107,8 +135,12 @@ export default function SignUpPage() {
 
         <div className="relative z-10 flex gap-8 text-zinc-600 text-sm mt-auto">
           <span>© 2024 Pain-Point Miner</span>
-          <Link className="hover:text-white transition-colors" href="#">Privacy</Link>
-          <Link className="hover:text-white transition-colors" href="#">Terms</Link>
+          <Link className="hover:text-white transition-colors" href="#">
+            Privacy
+          </Link>
+          <Link className="hover:text-white transition-colors" href="#">
+            Terms
+          </Link>
         </div>
       </div>
 
@@ -118,22 +150,41 @@ export default function SignUpPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-2.5 mb-12">
             <div className="size-8 bg-[#ff4500] rounded flex items-center justify-center shadow-[0_4px_15px_rgba(255,69,0,0.4)]">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
+                  fill="currentColor"
+                ></path>
               </svg>
             </div>
-            <span className="text-lg font-bold text-white tracking-tight">Pain-Point Miner</span>
+            <span className="text-lg font-bold text-white tracking-tight">
+              Pain-Point Miner
+            </span>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-[28px] font-extrabold text-white tracking-tight">Create your account</h2>
-            <p className="text-zinc-400 mt-2 font-medium">Start your 3-day free trial. No credit card required.</p>
+            <h2 className="text-[28px] font-extrabold text-white tracking-tight">
+              Create your account
+            </h2>
+            <p className="text-zinc-400 mt-2 font-medium">
+              Start your 3-day free trial. No credit card required.
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5" htmlFor="name">Full Name</label>
+              <label
+                className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5"
+                htmlFor="name"
+              >
+                Full Name
+              </label>
               <input
                 className="w-full px-4 py-2.5 bg-[#0f0f0f] text-white border border-white/5 rounded-lg text-sm focus:ring-2 focus:ring-[#ff4500]/20 focus:border-[#ff4500]/50 outline-none transition-all placeholder:text-zinc-700"
                 id="name"
@@ -148,7 +199,12 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5" htmlFor="email">Email Address</label>
+              <label
+                className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5"
+                htmlFor="email"
+              >
+                Email Address
+              </label>
               <input
                 className="w-full px-4 py-2.5 bg-[#0f0f0f] text-white border border-white/5 rounded-lg text-sm focus:ring-2 focus:ring-[#ff4500]/20 focus:border-[#ff4500]/50 outline-none transition-all placeholder:text-zinc-700"
                 id="email"
@@ -163,7 +219,12 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5" htmlFor="password">Password</label>
+              <label
+                className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5"
+                htmlFor="password"
+              >
+                Password
+              </label>
               <input
                 className="w-full px-4 py-2.5 bg-[#0f0f0f] text-white border border-white/5 rounded-lg text-sm focus:ring-2 focus:ring-[#ff4500]/20 focus:border-[#ff4500]/50 outline-none transition-all placeholder:text-zinc-700"
                 id="password"
@@ -178,7 +239,12 @@ export default function SignUpPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5" htmlFor="confirm-password">Confirm Password</label>
+              <label
+                className="block text-xs font-extrabold text-zinc-400 uppercase tracking-wider mb-1.5"
+                htmlFor="confirm-password"
+              >
+                Confirm Password
+              </label>
               <input
                 className="w-full px-4 py-2.5 bg-[#0f0f0f] text-white border border-white/5 rounded-lg text-sm focus:ring-2 focus:ring-[#ff4500]/20 focus:border-[#ff4500]/50 outline-none transition-all placeholder:text-zinc-700"
                 id="confirm-password"
@@ -198,9 +264,20 @@ export default function SignUpPage() {
 
             <p className="text-xs text-zinc-600 leading-relaxed pt-1">
               By creating an account you agree to our{" "}
-              <Link href="#" className="text-[#ff4500] hover:underline font-semibold">Terms of Service</Link>{" "}
+              <Link
+                href="#"
+                className="text-[#ff4500] hover:underline font-semibold"
+              >
+                Terms of Service
+              </Link>{" "}
               and{" "}
-              <Link href="#" className="text-[#ff4500] hover:underline font-semibold">Privacy Policy</Link>.
+              <Link
+                href="#"
+                className="text-[#ff4500] hover:underline font-semibold"
+              >
+                Privacy Policy
+              </Link>
+              .
             </p>
 
             <button
@@ -224,7 +301,12 @@ export default function SignUpPage() {
 
           <p className="mt-8 text-center text-sm text-zinc-500">
             Already have an account?{" "}
-            <Link className="text-[#ff4500] font-bold hover:underline" href="/sign-in">Sign in</Link>
+            <Link
+              className="text-[#ff4500] font-bold hover:underline"
+              href="/sign-in"
+            >
+              Sign in
+            </Link>
           </p>
         </div>
       </div>

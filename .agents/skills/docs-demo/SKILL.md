@@ -50,7 +50,7 @@ export const myDemo: DemoType = {
   compWidth: 1280,
   durationInFrames: 150,
   fps: 30,
-  id: 'my-demo',
+  id: "my-demo",
   autoPlay: true,
   options: [],
 };

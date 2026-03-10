@@ -17,19 +17,19 @@ Each test is powered by a fixture in `packages/web-renderer/src/test/fixtures`.
 A fixture looks like this for example:
 
 ```tsx
-import {AbsoluteFill} from 'remotion';
+import { AbsoluteFill } from "remotion";
 
 const Component: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <div
         style={{
-          backgroundColor: 'red',
+          backgroundColor: "red",
           width: 100,
           height: 100,
           borderRadius: 20,
@@ -41,7 +41,7 @@ const Component: React.FC = () => {
 
 export const backgroundColor = {
   component: Component,
-  id: 'background-color',
+  id: "background-color",
   width: 200,
   height: 200,
   fps: 25,
@@ -52,21 +52,21 @@ export const backgroundColor = {
 The corresponding test looks like this:
 
 ```tsx
-import {test} from 'vitest';
-import {renderStillOnWeb} from '../render-still-on-web';
-import {backgroundColor} from './fixtures/background-color';
-import {testImage} from './utils';
+import { test } from "vitest";
+import { renderStillOnWeb } from "../render-still-on-web";
+import { backgroundColor } from "./fixtures/background-color";
+import { testImage } from "./utils";
 
-test('should render background-color', async () => {
+test("should render background-color", async () => {
   const blob = await renderStillOnWeb({
-    licenseKey: 'free-license',
+    licenseKey: "free-license",
     composition: backgroundColor,
     frame: 0,
     inputProps: {},
-    imageFormat: 'png',
+    imageFormat: "png",
   });
 
-  await testImage({blob, testId: 'background-color'});
+  await testImage({ blob, testId: "background-color" });
 });
 ```
 

@@ -7,12 +7,12 @@ description: Use when feature flag tests fail, flags need updating, understandin
 
 ## Flag Files
 
-| File | Purpose |
-|------|---------|
-| `packages/shared/ReactFeatureFlags.js` | Default flags (canary), `__EXPERIMENTAL__` overrides |
-| `packages/shared/forks/ReactFeatureFlags.www.js` | www channel, `__VARIANT__` overrides |
-| `packages/shared/forks/ReactFeatureFlags.native-fb.js` | React Native, `__VARIANT__` overrides |
-| `packages/shared/forks/ReactFeatureFlags.test-renderer.js` | Test renderer |
+| File                                                       | Purpose                                              |
+| ---------------------------------------------------------- | ---------------------------------------------------- |
+| `packages/shared/ReactFeatureFlags.js`                     | Default flags (canary), `__EXPERIMENTAL__` overrides |
+| `packages/shared/forks/ReactFeatureFlags.www.js`           | www channel, `__VARIANT__` overrides                 |
+| `packages/shared/forks/ReactFeatureFlags.native-fb.js`     | React Native, `__VARIANT__` overrides                |
+| `packages/shared/forks/ReactFeatureFlags.test-renderer.js` | Test renderer                                        |
 
 ## Gating Tests
 
@@ -22,7 +22,7 @@ Use when the feature is completely unavailable without the flag:
 
 ```javascript
 // @gate enableViewTransition
-it('supports view transitions', () => {
+it("supports view transitions", () => {
   // This test only runs when enableViewTransition is true
   // and is SKIPPED (not failed) when false
 });
@@ -33,13 +33,13 @@ it('supports view transitions', () => {
 Use when the feature exists but behavior differs based on flag:
 
 ```javascript
-it('renders component', async () => {
+it("renders component", async () => {
   await act(() => root.render(<App />));
 
-  if (gate(flags => flags.enableNewBehavior)) {
-    expect(container.textContent).toBe('new output');
+  if (gate((flags) => flags.enableNewBehavior)) {
+    expect(container.textContent).toBe("new output");
   } else {
-    expect(container.textContent).toBe('legacy output');
+    expect(container.textContent).toBe("legacy output");
   }
 });
 ```

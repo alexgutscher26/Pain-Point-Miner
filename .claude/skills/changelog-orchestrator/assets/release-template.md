@@ -1,6 +1,6 @@
 ---
-date: {{date}}
-version: {{version}}
+date: { { date } }
+version: { { version } }
 ---
 
 # Release Notes (v{{version}})
@@ -24,4 +24,3 @@ version: {{version}}
 ## Breaking Changes
 
 {{breaking}}
-
