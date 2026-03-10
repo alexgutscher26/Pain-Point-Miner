@@ -174,9 +174,9 @@ export default async function DashboardPage({
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
       {planContext.trialActive && (planContext.trialDaysRemaining ?? 0) <= 1 ? (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
               Trial Ending Soon
             </p>
             <p className="text-sm text-amber-100 font-semibold">
@@ -186,7 +186,7 @@ export default async function DashboardPage({
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 px-4 py-2 rounded-lg bg-[#ff4500] text-white text-xs font-black uppercase tracking-widest"
+            className="shrink-0 px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-xs font-black uppercase tracking-widest"
           >
             Purchase Plan
           </Link>
@@ -197,14 +197,14 @@ export default async function DashboardPage({
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px w-8 bg-[#ff4500]"></div>
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
               Dashboard Overview
             </p>
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
             Welcome, {userFirstName}
           </h2>
-          <p className="text-zinc-500 font-medium text-sm">
+          <p className="text-zinc-400 font-medium text-sm">
             Your market research engine has analyzed{" "}
             <span className="text-white font-bold">
               {reportsSaved} investigations
@@ -212,23 +212,23 @@ export default async function DashboardPage({
             .
           </p>
         </div>
-        <div className="hidden lg:flex items-center gap-3 bg-[#161616] p-1.5 rounded-2xl border border-white/5">
+        <div className="hidden lg:flex items-center gap-3 bg-[#161616] p-1.5 border border-white/15">
           <Link
             href="/dashboard?window=realtime"
-            className={`px-4 py-2 text-[12px] font-bold rounded-xl ${
+            className={`px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider border ${
               selectedWindow === "realtime"
-                ? "bg-[#ff4500] text-white shadow-lg"
-                : "text-zinc-500 hover:text-zinc-300 transition-colors"
+                ? "bg-[#ff4500] border-[#ff8a57] text-white"
+                : "border-transparent text-zinc-500 hover:text-zinc-300 transition-colors"
             }`}
           >
             Realtime
           </Link>
           <Link
             href="/dashboard?window=30d"
-            className={`px-4 py-2 text-[12px] font-bold rounded-xl ${
+            className={`px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider border ${
               selectedWindow === "30d"
-                ? "bg-[#ff4500] text-white shadow-lg"
-                : "text-zinc-500 hover:text-zinc-300 transition-colors"
+                ? "bg-[#ff4500] border-[#ff8a57] text-white"
+                : "border-transparent text-zinc-500 hover:text-zinc-300 transition-colors"
             }`}
           >
             Past 30 Days
@@ -271,16 +271,16 @@ export default async function DashboardPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Reports Table */}
-        <div className="lg:col-span-2 bg-[#111] rounded-[32px] border border-white/5 shadow-2xl overflow-hidden">
-          <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center">
+        <div className="lg:col-span-2 bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden">
+          <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#ff4500]"></div>
+              <div className="w-2 h-2 bg-[#ff4500]"></div>
               <h4 className="font-black text-white text-lg tracking-tight">
                 Recent Investigations
               </h4>
             </div>
             <Link
-              className="text-[12px] font-bold text-zinc-500 hover:text-[#ff4500] transition-colors uppercase tracking-widest"
+              className="font-mono text-[11px] font-bold text-zinc-400 hover:text-[#ff4500] transition-colors uppercase tracking-widest"
               href="/dashboard/reports"
             >
               View All
@@ -290,16 +290,16 @@ export default async function DashboardPage({
             <table className="min-w-[720px] w-full table-fixed text-left border-collapse">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
-                  <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
                     Investigation
                   </th>
-                  <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
                     Key Insight
                   </th>
-                  <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em] text-center">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-center">
                     Score
                   </th>
-                  <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
                     Status
                   </th>
                 </tr>
@@ -309,7 +309,7 @@ export default async function DashboardPage({
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-8 py-10 text-center text-zinc-500 text-sm font-medium"
+                      className="px-8 py-10 text-center text-zinc-500 font-mono text-sm font-medium"
                     >
                       No investigations yet. Run your first analysis to populate
                       this table.
@@ -360,15 +360,14 @@ export default async function DashboardPage({
 
         {/* Insight Panel */}
         <div className="flex flex-col gap-8">
-          <div className="bg-[#111] rounded-[32px] border border-white/5 shadow-2xl p-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4500]/5 blur-3xl rounded-full"></div>
+          <div className="bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] p-8 relative overflow-hidden">
             <h4 className="font-black text-white text-lg mb-8 flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-[#ff4500]" />
               Market Pulse
             </h4>
             <div className="space-y-8">
               <div>
-                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+                <p className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
                   Trending Niche
                 </p>
                 <Link
@@ -377,9 +376,9 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${trendingReport.id}`
                       : `/dashboard/search?keyword=${encodeURIComponent(trendingInsight?.key || "")}`
                   }
-                  className="flex items-center gap-4 bg-white/3 p-4 rounded-2xl border border-white/5 hover:border-[#ff4500]/30 transition-colors"
+                  className="flex items-center gap-4 bg-white/3 p-4 border border-white/15 hover:border-[#ff4500]/40 transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#ff4500]/10 flex items-center justify-center text-[#ff4500]">
+                  <div className="w-12 h-12 bg-[#ff4500]/10 border border-[#ff4500]/40 flex items-center justify-center text-[#ff4500]">
                     <Sparkles className="w-6 h-6" />
                   </div>
                   <div>
@@ -397,7 +396,7 @@ export default async function DashboardPage({
                 </Link>
               </div>
               <div className="pt-6 border-t border-white/10">
-                <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+                <p className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
                   Urgent Pain Point
                 </p>
                 <Link
@@ -406,7 +405,7 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${urgentPainPointReport.id}`
                       : "/dashboard/reports"
                   }
-                  className="block bg-zinc-900 p-5 rounded-2xl border-l-4 border-[#ff4500] hover:bg-zinc-800/60 transition-colors"
+                  className="block bg-zinc-900 p-5 border-l-4 border-[#ff4500] border-y border-r border-white/10 hover:bg-zinc-800/60 transition-colors"
                 >
                   <p className="text-[14px] text-zinc-200 font-medium italic leading-relaxed">
                     &quot;
@@ -415,7 +414,7 @@ export default async function DashboardPage({
                     &quot;
                   </p>
                 </Link>
-                <p className="text-[11px] text-zinc-500 mt-4 font-bold flex items-center gap-2">
+                <p className="font-mono text-[11px] text-zinc-500 mt-4 font-bold flex items-center gap-2 uppercase tracking-wide">
                   <Database className="w-3.5 h-3.5" /> Found in{" "}
                   {urgentPainPointMentions || 0} investigations
                 </p>
@@ -451,23 +450,20 @@ function MetricCard({
 }) {
   return (
     <div
-      className={`bg-[#111] p-5 rounded-2xl border ${isHighlight ? "border-[#ff4500]/50" : "border-white/5"} shadow-2xl relative overflow-hidden group`}
+      className={`bg-[#111] p-5 border-2 ${isHighlight ? "border-[#ff4500]/60" : "border-white/12"} shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden group`}
     >
-      {isHighlight && (
-        <div className="absolute top-0 right-0 w-24 h-24 bg-[#ff4500]/10 blur-3xl rounded-full -mr-12 -mt-12"></div>
-      )}
       <div className="flex justify-between items-start mb-4">
-        <div className="p-2 bg-white/5 rounded-lg border border-white/5 group-hover:scale-110 transition-transform">
+        <div className="p-2 bg-white/5 border border-white/15 group-hover:-translate-y-0.5 group-hover:-translate-x-0.5 transition-transform">
           {icon}
         </div>
         {badge && (
-          <span className="text-[9px] font-black px-2 py-0.5 bg-[#ff4500]/10 text-[#ff4500] rounded-full uppercase tracking-widest border border-[#ff4500]/20">
+          <span className="font-mono text-[9px] font-black px-2 py-0.5 bg-[#ff4500]/12 text-[#ff4500] uppercase tracking-widest border border-[#ff4500]/35">
             {badge}
           </span>
         )}
       </div>
       <div>
-        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
+        <p className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
           {title}
         </p>
         <div className="flex items-baseline gap-2">
@@ -477,26 +473,26 @@ function MetricCard({
             {value}
           </p>
           {trend && (
-            <p className="text-emerald-500 text-[12px] font-black flex items-center gap-0.5">
+            <p className="text-emerald-400 text-[12px] font-black flex items-center gap-0.5">
               <TrendingUp className="w-3 h-3" /> {trend}
             </p>
           )}
         </div>
         {progress !== undefined && (
           <div className="mt-3">
-            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-white/5 overflow-hidden border border-white/10">
               <div
-                className="h-full bg-[#ff4500] rounded-full shadow-[0_0_8px_rgba(255,69,0,0.5)]"
+                className="h-full bg-[#ff4500] shadow-[0_0_10px_rgba(255,69,0,0.65)]"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-[9px] text-zinc-600 mt-2 font-bold uppercase tracking-widest">
+            <p className="font-mono text-[9px] text-zinc-500 mt-2 font-bold uppercase tracking-widest">
               {subtext}
             </p>
           </div>
         )}
         {trendSub && (
-          <p className="text-[9px] text-zinc-600 mt-0.5 font-bold uppercase tracking-widest">
+          <p className="font-mono text-[9px] text-zinc-500 mt-0.5 font-bold uppercase tracking-widest">
             {trendSub}
           </p>
         )}
@@ -521,13 +517,13 @@ function ReportRow({
   status: string;
 }) {
   return (
-    <tr className="hover:bg-white/2 transition-colors cursor-pointer group">
+    <tr className="hover:bg-white/4 transition-colors cursor-pointer group">
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
           <p className="text-[15px] font-bold text-white mb-1 break-words group-hover:text-[#ff4500] transition-colors">
             {keyword}
           </p>
-          <p className="text-[11px] text-zinc-600 font-bold uppercase tracking-wider">
+          <p className="font-mono text-[11px] text-zinc-500 font-bold uppercase tracking-wider">
             {date}
           </p>
         </Link>
@@ -541,7 +537,7 @@ function ReportRow({
       </td>
       <td className="px-8 py-6 text-center">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <span className="text-lg font-black text-white px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+          <span className="text-lg font-black text-white px-3 py-1 bg-white/5 border border-white/20">
             {score}
           </span>
         </Link>
@@ -552,15 +548,23 @@ function ReportRow({
           className="flex items-center gap-2.5"
         >
           <div
-            className={`w-2 h-2 rounded-full ${
+            className={`w-2.5 h-2.5 ${
               status === "Live"
-                ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"
                 : status === "Failed"
-                  ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
-                  : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                  ? "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.65)]"
+                  : "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.65)]"
             }`}
           ></div>
-          <span className="text-[11px] font-black text-white uppercase tracking-widest">
+          <span
+            className={`font-mono text-[10px] font-black uppercase tracking-widest px-2 py-1 border ${
+              status === "Live"
+                ? "text-amber-200 border-amber-400/40 bg-amber-500/10"
+                : status === "Failed"
+                  ? "text-rose-200 border-rose-400/40 bg-rose-500/10"
+                  : "text-emerald-200 border-emerald-400/40 bg-emerald-500/10"
+            }`}
+          >
             {status}
           </span>
         </Link>

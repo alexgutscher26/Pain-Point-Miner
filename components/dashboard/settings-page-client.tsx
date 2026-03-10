@@ -299,14 +299,14 @@ export function SettingsPageClient({
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
               Dashboard Settings
             </p>
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
             Settings
           </h2>
-          <p className="text-zinc-500 font-medium text-sm">
+          <p className="text-zinc-400 font-medium text-sm">
             Manage your account preferences, notifications, and scan defaults.
           </p>
         </div>
@@ -314,7 +314,7 @@ export function SettingsPageClient({
           type="submit"
           form="settings-form"
           disabled={isSaving}
-          className="bg-[#ff4500] hover:bg-[#e63e00] disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl text-[12px] font-black uppercase tracking-[0.15em] transition-colors inline-flex items-center gap-2"
+          className="border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e63e00] disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 font-mono text-[12px] font-black uppercase tracking-[0.15em] transition-colors inline-flex items-center gap-2"
         >
           {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
           {isSaving ? "Saving..." : "Save Changes"}
@@ -322,14 +322,14 @@ export function SettingsPageClient({
       </div>
 
       {errorMessage && (
-        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+        <div className="border border-rose-400/55 bg-rose-500/10 px-4 py-3 font-mono text-sm text-rose-200">
           {errorMessage}
         </div>
       )}
 
       <form id="settings-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <section className="xl:col-span-2 bg-[#111] rounded-[28px] border border-white/5 p-6 md:p-8 shadow-2xl">
+          <section className="xl:col-span-2 bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-6">
               <User2 className="w-5 h-5 text-[#ff4500]" />
               Profile
@@ -367,7 +367,7 @@ export function SettingsPageClient({
             </div>
           </section>
 
-          <section className="bg-[#111] rounded-[28px] border border-white/5 p-6 shadow-2xl">
+          <section className="bg-[#111] border-2 border-white/15 p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-5">
               <Shield className="w-5 h-5 text-[#ff4500]" />
               Security
@@ -389,13 +389,13 @@ export function SettingsPageClient({
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <section className="bg-[#111] rounded-[28px] border border-white/5 p-6 md:p-8 shadow-2xl">
+          <section className="bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <div className="flex items-center justify-between gap-3 mb-6">
               <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5">
                 <Bell className="w-5 h-5 text-[#ff4500]" />
                 Notifications
               </h3>
-              <span className="px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-[10px] font-black uppercase tracking-[0.15em]">
+              <span className="px-2.5 py-1 border border-amber-400/45 bg-amber-500/10 text-amber-300 font-mono text-[10px] font-black uppercase tracking-[0.15em]">
                 Coming Soon
               </span>
             </div>
@@ -436,7 +436,7 @@ export function SettingsPageClient({
             </fieldset>
           </section>
 
-          <section className="bg-[#111] rounded-[28px] border border-white/5 p-6 md:p-8 shadow-2xl">
+          <section className="bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-6">
               <SlidersHorizontal className="w-5 h-5 text-[#ff4500]" />
               Scan Defaults
@@ -486,7 +486,7 @@ export function SettingsPageClient({
                 }
               />
             </div>
-            <p className="text-xs text-zinc-500 mt-4">
+            <p className="font-mono text-xs text-zinc-500 mt-4">
               Need higher limits?{" "}
               <Link
                 href="/dashboard/billing"
@@ -500,7 +500,7 @@ export function SettingsPageClient({
         </div>
       </form>
 
-      <section className="bg-[#111] rounded-[28px] border border-rose-500/30 p-6 md:p-8 shadow-2xl">
+      <section className="bg-[#111] border-2 border-rose-500/35 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
         <h3 className="text-rose-400 font-black text-lg tracking-tight mb-2">
           Danger Zone
         </h3>
@@ -512,12 +512,12 @@ export function SettingsPageClient({
           <AlertDialogTrigger asChild>
             <button
               type="button"
-              className="bg-rose-600 hover:bg-rose-500 text-white px-5 py-2.5 rounded-lg text-[12px] font-black uppercase tracking-[0.15em] transition-colors"
+              className="bg-rose-600 hover:bg-rose-500 border border-rose-300/45 text-white px-5 py-2.5 font-mono text-[12px] font-black uppercase tracking-[0.15em] transition-colors"
             >
               Delete Account
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0e0e0e] border border-rose-500/30 text-zinc-100">
+          <AlertDialogContent className="bg-[#0e0e0e] border-2 border-rose-500/35 text-zinc-100">
             <AlertDialogHeader className="text-left place-items-start">
               <AlertDialogTitle className="text-rose-400 font-black">
                 Delete your account?
@@ -534,7 +534,7 @@ export function SettingsPageClient({
               value={deleteConfirmation}
               onChange={(event) => setDeleteConfirmation(event.target.value)}
               placeholder="Type DELETE"
-              className="w-full h-11 rounded-xl border border-white/10 bg-black/30 text-sm text-zinc-100 px-3 outline-none focus:border-rose-500/60"
+              className="w-full h-11 border border-white/20 bg-black/30 font-mono text-sm text-zinc-100 px-3 outline-none focus:border-rose-500/60"
             />
             <AlertDialogFooter>
               <AlertDialogCancel
@@ -562,7 +562,7 @@ export function SettingsPageClient({
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
       >
-        <DialogContent className="bg-[#0e0e0e] border border-white/10 text-zinc-100">
+        <DialogContent className="bg-[#0e0e0e] border-2 border-white/15 text-zinc-100">
           <DialogHeader>
             <DialogTitle className="text-white font-black">
               Change Password
@@ -623,7 +623,7 @@ export function SettingsPageClient({
       </Dialog>
 
       <Dialog open={isSessionsOpen} onOpenChange={setIsSessionsOpen}>
-        <DialogContent className="bg-[#0e0e0e] border border-white/10 text-zinc-100 sm:max-w-2xl">
+        <DialogContent className="bg-[#0e0e0e] border-2 border-white/15 text-zinc-100 sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-white font-black">
               Active Sessions
@@ -645,7 +645,7 @@ export function SettingsPageClient({
               sessions.map((session) => (
                 <div
                   key={session.token}
-                  className="rounded-xl border border-white/10 bg-black/30 p-4 flex items-start justify-between gap-4"
+                  className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-white truncate">
@@ -732,7 +732,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500">
         {label}
       </span>
       <input
@@ -741,7 +741,7 @@ function Field({
         min={min}
         max={max}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full h-11 rounded-xl border border-white/10 bg-black/30 text-sm text-zinc-100 px-3 outline-none focus:border-[#ff4500]/60"
+        className="mt-2 w-full h-11 border border-white/20 bg-black/30 text-sm text-zinc-100 px-3 outline-none focus:border-[#ff4500]/60"
       />
     </label>
   );
@@ -785,7 +785,7 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-xl border border-white/10 hover:border-[#ff4500]/40 bg-black/20 hover:bg-black/40 px-4 py-3 text-sm font-semibold text-zinc-200 transition-colors"
+      className="w-full text-left border border-white/20 hover:border-[#ff4500]/55 bg-black/20 hover:bg-black/40 px-4 py-3 font-mono text-sm font-semibold uppercase tracking-wide text-zinc-200 transition-colors"
     >
       {label}
     </button>

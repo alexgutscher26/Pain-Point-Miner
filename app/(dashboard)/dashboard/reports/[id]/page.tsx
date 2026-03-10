@@ -12,7 +12,6 @@ import {
   BarChart3,
   Filter,
   Star,
-  Lock,
   AlertTriangle,
   Lightbulb,
   Loader2,
@@ -498,7 +497,7 @@ export default function ReportDetailPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="w-10 h-10 text-[#ff4500] animate-spin" />
-        <p className="text-[11px] font-black uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500">
           Decrypting Insights...
         </p>
       </div>
@@ -593,7 +592,7 @@ export default function ReportDetailPage() {
       {/* Breadcrumbs & Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-2">
+          <div className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-2">
             <Link
               href="/dashboard"
               className="hover:text-white transition-colors"
@@ -613,7 +612,7 @@ export default function ReportDetailPage() {
           <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">
             Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
           </h2>
-          <div className="flex items-center gap-2 text-zinc-500 font-bold text-[12px] uppercase tracking-widest pt-2">
+          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
             <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
             Scanned on {reportData.date}
           </div>
@@ -638,7 +637,7 @@ export default function ReportDetailPage() {
           <select
             value={selectedCategory}
             onChange={(event) => handleCategoryChange(event.target.value)}
-            className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all [&>option]:bg-white [&>option]:text-black"
+            className="px-4 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors [&>option]:bg-white [&>option]:text-black"
           >
             {categoryOptions.map((categoryOption) => (
               <option key={categoryOption} value={categoryOption}>
@@ -649,7 +648,7 @@ export default function ReportDetailPage() {
           <button
             onClick={() => handleSaveToggle(!reportData.saved)}
             disabled={isSaving}
-            className="px-5 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-5 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving
               ? "Saving..."
@@ -660,7 +659,7 @@ export default function ReportDetailPage() {
           <button
             type="button"
             onClick={handleExportData}
-            className="px-5 py-2.5 rounded-xl bg-zinc-900 border border-white/5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2"
+            className="px-5 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors flex items-center gap-2"
           >
             Export Data
           </button>
@@ -680,7 +679,7 @@ export default function ReportDetailPage() {
         {reportData.metrics.map((metric, idx) => (
           <div
             key={idx}
-            className="bg-[#0c0c0c] border border-white/5 rounded-[24px] p-6 relative overflow-hidden group"
+            className="bg-[#0c0c0c] border-2 border-white/15 p-6 relative overflow-hidden group shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/2 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-[#ff4500]/5 transition-all"></div>
             <div className="flex justify-between items-start mb-4 relative z-10">
@@ -721,7 +720,7 @@ export default function ReportDetailPage() {
 
           {reportData.customPatterns &&
             reportData.customPatterns.length > 0 && (
-              <div className="bg-amber-500/5 border border-amber-500/10 rounded-2xl p-6 mb-6">
+              <div className="bg-amber-500/5 border border-amber-400/35 p-6 mb-6">
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-2 mb-3">
                   <Sparkles className="w-3.5 h-3.5" /> AI Intelligence Patterns
                 </p>
@@ -742,7 +741,7 @@ export default function ReportDetailPage() {
             {visiblePainPoints.map((pain) => (
               <div
                 key={pain.id}
-                className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 space-y-8 hover:border-[#ff4500]/20 transition-all group shadow-2xl relative overflow-hidden"
+                className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-8 hover:border-[#ff4500]/40 transition-colors group shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff4500]/2 rounded-full blur-[80px] -mr-32 -mt-32"></div>
 
@@ -805,7 +804,7 @@ export default function ReportDetailPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-center md:text-right shrink-0 bg-white/2 border border-white/5 px-6 py-4 rounded-2xl">
+                  <div className="text-center md:text-right shrink-0 bg-white/2 border border-white/20 px-6 py-4">
                     <p className="text-4xl font-black text-white">
                       {pain.intensity}/10
                     </p>
@@ -893,7 +892,7 @@ export default function ReportDetailPage() {
                       Community Pulse
                     </p>
                     {pain.userLanguage && (
-                      <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-5 space-y-3">
+                      <div className="border border-white/20 bg-zinc-900/40 p-5 space-y-3">
                         <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
                           Language Overview
                         </p>
@@ -914,7 +913,7 @@ export default function ReportDetailPage() {
                     {pain.communityVoices.map((voice, i) => (
                       <div
                         key={i}
-                        className="bg-white/2 border border-white/5 p-6 rounded-2xl border-l-4 border-l-[#ff4500]"
+                        className="bg-white/2 border border-white/20 p-6 border-l-4 border-l-[#ff4500]"
                       >
                         <div className="space-y-2">
                           {formatPainDescription(voice).map(
@@ -933,7 +932,7 @@ export default function ReportDetailPage() {
                     {pain.userLanguage?.sections?.map((section, sectionIdx) => (
                       <div
                         key={`${pain.id}-lang-${sectionIdx}`}
-                        className="bg-white/2 border border-white/5 p-6 rounded-2xl space-y-3"
+                        className="bg-white/2 border border-white/20 p-6 space-y-3"
                       >
                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                           {section.label}
@@ -1051,8 +1050,8 @@ export default function ReportDetailPage() {
           </div>
 
           {totalPainPoints === 0 && (
-            <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 text-center">
-              <p className="text-[11px] font-black uppercase tracking-widest text-zinc-500">
+            <div className="border border-white/20 bg-zinc-900/40 p-6 text-center">
+              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500">
                 No frustrations match the selected filters
               </p>
             </div>
@@ -1100,7 +1099,7 @@ export default function ReportDetailPage() {
         {/* Right Column: Sidebar Intel */}
         <div className="lg:col-span-4 space-y-8">
           {/* Refine Section */}
-          <div className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 space-y-8 shadow-2xl">
+          <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <div>
               <h4 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 mb-6">
                 <Filter className="w-4 h-4 text-[#ff4500]" />
@@ -1146,7 +1145,7 @@ export default function ReportDetailPage() {
                 <button
                   type="button"
                   onClick={handleApplyFilters}
-                  className="w-full bg-[#ff4500] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#ff571a] transition-all active:scale-[0.98] shadow-lg shadow-[#ff4500]/20"
+                  className="w-full border border-[#ff8a57] bg-[#ff4500] text-white py-4 font-mono font-black text-[11px] uppercase tracking-widest hover:bg-[#ff571a] transition-colors active:scale-[0.98]"
                 >
                   Apply Filter Logic
                 </button>
@@ -1155,12 +1154,12 @@ export default function ReportDetailPage() {
 
             {/* Validation Signals */}
             <div className="pt-8 border-t border-white/5">
-              <h4 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+              <h4 className="font-mono text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" /> Market Signals
               </h4>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <div className="flex justify-between text-[11px] font-black mb-2">
+                  <div className="flex justify-between font-mono text-[11px] font-black mb-2">
                     <span className="text-zinc-400 uppercase">
                       Analysis Confidence
                     </span>
@@ -1171,7 +1170,7 @@ export default function ReportDetailPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-[11px] font-black mb-2">
+                  <div className="flex justify-between font-mono text-[11px] font-black mb-2">
                     <span className="text-zinc-400 uppercase">
                       AI Data Fidelity
                     </span>
@@ -1187,8 +1186,8 @@ export default function ReportDetailPage() {
 
           {reportData.saasOpportunities &&
             reportData.saasOpportunities.length > 0 && (
-              <div className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 space-y-5 shadow-2xl">
-                <h4 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+                <h4 className="font-mono text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-[#ff4500]" /> AI-Generated
                   SaaS Opportunities
                 </h4>
@@ -1196,7 +1195,7 @@ export default function ReportDetailPage() {
                   {reportData.saasOpportunities.slice(0, 3).map((opp, idx) => (
                     <div
                       key={idx}
-                      className="rounded-2xl border border-white/5 bg-white/2 p-5 space-y-3"
+                      className="border border-white/20 bg-white/2 p-5 space-y-3"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-sm font-black text-white leading-tight">
@@ -1268,14 +1267,14 @@ function InfoSquare({
   color: string;
 }) {
   return (
-    <div className="bg-white/2 border border-white/5 p-4 rounded-2xl flex items-start gap-3 min-h-[82px]">
+    <div className="bg-white/2 border border-white/20 p-4 flex items-start gap-3 min-h-[82px]">
       <div
         className={`p-2 rounded-lg bg-zinc-900 border border-white/5 ${color} shrink-0`}
       >
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+        <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-widest">
           {label}
         </p>
         <p className="text-sm font-black text-white leading-tight break-words whitespace-normal">

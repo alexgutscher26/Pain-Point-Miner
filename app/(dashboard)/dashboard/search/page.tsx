@@ -379,12 +379,12 @@ export default function SearchPage() {
   return (
     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="bg-[#111] border border-white/10 text-white">
+        <DialogContent className="bg-[#111] border-2 border-white/15 text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-black">
               Plan Required
             </DialogTitle>
-            <DialogDescription className="text-zinc-300">
+            <DialogDescription className="font-mono text-zinc-300">
               {planDialogMessage}
             </DialogDescription>
           </DialogHeader>
@@ -392,13 +392,13 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-bold"
+              className="px-4 py-2 bg-white/5 border border-white/20 font-mono text-sm font-bold uppercase tracking-wide"
             >
               Close
             </button>
             <Link
               href="/dashboard/billing"
-              className="px-4 py-2 rounded-lg bg-[#ff4500] text-white text-sm font-bold"
+              className="px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-sm font-bold uppercase tracking-wide"
             >
               Purchase Plan
             </Link>
@@ -411,14 +411,14 @@ export default function SearchPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px w-8 bg-[#ff4500]"></div>
-              <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+              <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
                 New Investigation
               </p>
             </div>
             <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-4">
               What are we looking for?
             </h2>
-            <p className="text-zinc-500 font-medium text-sm max-w-xl">
+            <p className="text-zinc-400 font-medium text-sm max-w-xl">
               Define the niche or problem space you want to explore across
               Reddit communities. Our AI will extract high-intent pain points.
             </p>
@@ -427,18 +427,17 @@ export default function SearchPage() {
           <div className="space-y-8">
             {/* Keyword Input */}
             <div className="space-y-3">
-              <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
+              <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
                 Keyword or Niche
-                <div className="w-1.5 h-1.5 rounded-full bg-[#ff4500]"></div>
+                <div className="w-1.5 h-1.5 bg-[#ff4500]"></div>
               </label>
-              <div className="relative group">
-                <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-xl opacity-0 group-focus-within:opacity-10 transition-opacity blur-md pointer-events-none"></div>
+              <div className="relative">
                 <input
                   type="text"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management, SaaS churn"
-                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
               </div>
             </div>
@@ -446,14 +445,16 @@ export default function SearchPage() {
             {/* Subreddits Input */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
                   Target Subreddits{" "}
-                  <span className="text-[9px] text-zinc-600">(Optional)</span>
+                  <span className="font-mono text-[9px] text-zinc-600">
+                    (Optional)
+                  </span>
                 </label>
                 <button
                   onClick={handleSuggestSubreddits}
                   disabled={isSuggesting || !keyword}
-                  className="text-[10px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8c00] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed group/suggest"
+                  className="font-mono text-[10px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8c00] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed group/suggest"
                 >
                   {isSuggesting ? (
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -470,21 +471,21 @@ export default function SearchPage() {
                   value={subreddits}
                   onChange={(e) => setSubreddits(e.target.value)}
                   placeholder="r/sales, r/realestate, r/entrepreneur"
-                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
                 <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 z-20 pointer-events-none" />
               </div>
 
               {suggestedSubreddits.length > 0 && (
                 <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                  <p className="w-full font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
                     AI Recommended Communities
                   </p>
                   {suggestedSubreddits.map((sub, i) => (
                     <button
                       key={i}
                       onClick={() => addSubreddit(sub)}
-                      className="px-3 py-1.5 rounded-lg bg-[#ff4500]/5 border border-[#ff4500]/20 text-[11px] font-bold text-[#ff4500] hover:bg-[#ff4500]/10 transition-all"
+                      className="px-3 py-1.5 border border-[#ff4500]/40 bg-[#ff4500]/8 font-mono text-[11px] font-bold text-[#ff4500] hover:bg-[#ff4500]/15 transition-colors"
                     >
                       + r/{sub}
                     </button>
@@ -493,21 +494,21 @@ export default function SearchPage() {
               )}
 
               <div className="flex flex-wrap gap-2">
-                <p className="w-full text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                <p className="w-full font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
                   Common Core Communities ({defaultLocale})
                 </p>
                 {visibleCommunities.map((sub, i) => (
                   <button
                     key={i}
                     onClick={() => addSubreddit(sub)}
-                    className="px-3 py-1.5 rounded-lg bg-white/2 border border-white/5 text-[11px] font-bold text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+                    className="px-3 py-1.5 border border-white/15 bg-white/2 font-mono text-[11px] font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                   >
                     + r/{sub}
                   </button>
                 ))}
               </div>
 
-              <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+              <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
                 Leave blank to use your default locale and subreddit count from
                 settings.
               </p>
@@ -515,9 +516,11 @@ export default function SearchPage() {
 
             {/* Custom Extraction Parameters */}
             <div className="space-y-3">
-              <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-400">
+              <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
                 Custom Intelligence Patterns{" "}
-                <span className="text-[9px] text-zinc-600">(Optional)</span>
+                <span className="font-mono text-[9px] text-zinc-600">
+                  (Optional)
+                </span>
               </label>
               <div className="relative group">
                 <input
@@ -525,11 +528,11 @@ export default function SearchPage() {
                   value={customPatterns}
                   onChange={(e) => setCustomPatterns(e.target.value)}
                   placeholder="e.g. mentions of HubSpot, frustration with pricing, legal compliance, developer experience"
-                  className="w-full relative z-10 bg-[#0c0c0c] border border-white/5 rounded-xl px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-amber-500/30 transition-all placeholder:text-zinc-700 shadow-2xl"
+                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-amber-400/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
                 <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500/60 z-20 pointer-events-none" />
               </div>
-              <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+              <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
                 Comma-separated signals you want the AI to specifically hunt
                 for.
               </p>
@@ -537,26 +540,26 @@ export default function SearchPage() {
 
             {/* Mining Depth Selection */}
             <div className="space-y-4">
-              <label className="text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
+              <label className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
                 Mining Depth
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setMiningDepth("basic")}
-                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group ${
+                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group ${
                     miningDepth === "basic"
-                      ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]"
-                      : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
+                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
+                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
                   }`}
                 >
                   <div
-                    className={`p-3 rounded-xl ${miningDepth === "basic" ? "bg-[#ff4500] text-white" : "bg-white/5 text-zinc-500"}`}
+                    className={`p-3 border ${miningDepth === "basic" ? "bg-[#ff4500] border-[#ff8a57] text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
                   >
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
                     <p
-                      className={`font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "basic" ? "text-white" : "text-zinc-400"}`}
+                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "basic" ? "text-white" : "text-zinc-400"}`}
                     >
                       Basic Scan
                     </p>
@@ -582,20 +585,20 @@ export default function SearchPage() {
                         )
                       : false
                   }
-                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
+                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "deep"
-                      ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]"
-                      : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
+                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
+                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
                   }`}
                 >
                   <div
-                    className={`p-3 rounded-xl ${miningDepth === "deep" ? "bg-amber-500 text-white" : "bg-white/5 text-zinc-500"}`}
+                    className={`p-3 border ${miningDepth === "deep" ? "bg-amber-500 border-amber-300 text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
                   >
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
                     <p
-                      className={`font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "deep" ? "text-white" : "text-zinc-400"}`}
+                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "deep" ? "text-white" : "text-zinc-400"}`}
                     >
                       Deep Mine
                     </p>
@@ -612,7 +615,7 @@ export default function SearchPage() {
                   </div>
                   {miningDepth !== "deep" && (
                     <div className="absolute top-0 right-0 p-2">
-                      <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20">
+                      <span className="font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
                         {billing &&
                         !billing.entitlements.allowedMiningDepths.includes(
                           "deep",
@@ -633,20 +636,20 @@ export default function SearchPage() {
                         )
                       : false
                   }
-                  className={`relative p-6 rounded-2xl border transition-all text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
+                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "advanced"
-                      ? "bg-[#ff4500]/5 border-[#ff4500]/50 shadow-[0_0_30px_rgba(255,69,0,0.1)]"
-                      : "bg-[#0c0c0c] border-white/5 hover:border-white/10"
+                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
+                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
                   }`}
                 >
                   <div
-                    className={`p-3 rounded-xl ${miningDepth === "advanced" ? "bg-violet-500 text-white" : "bg-white/5 text-zinc-500"}`}
+                    className={`p-3 border ${miningDepth === "advanced" ? "bg-violet-500 border-violet-300 text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
                   >
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
                     <p
-                      className={`font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "advanced" ? "text-white" : "text-zinc-400"}`}
+                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "advanced" ? "text-white" : "text-zinc-400"}`}
                     >
                       Advanced Clustering
                     </p>
@@ -666,7 +669,7 @@ export default function SearchPage() {
                     "advanced",
                   ) ? (
                     <div className="absolute top-0 right-0 p-2">
-                      <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full border border-amber-500/20">
+                      <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
                         <Lock className="w-2.5 h-2.5" />
                         Growth+
                       </span>
@@ -675,7 +678,7 @@ export default function SearchPage() {
                 </button>
               </div>
               {billing ? (
-                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
                   Plan: {billing.plan.toUpperCase()} | Monthly scans:{" "}
                   {billing.usage.monthlyScansUsed}
                   {billing.usage.monthlyScansLimit === null
@@ -686,8 +689,8 @@ export default function SearchPage() {
             </div>
 
             {/* Footer Actions */}
-            <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-3 text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
+            <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-3 text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
                 <Clock className="w-4 h-4" />
                 Est. time: ~
                 {(() => {
@@ -706,14 +709,14 @@ export default function SearchPage() {
                     : `${totalSeconds} seconds`;
                 })()}
               </div>
-              <div className="text-zinc-600 text-[11px] font-bold uppercase tracking-widest">
+              <div className="text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
                 Min score default: {minimumOpportunityScore}+
               </div>
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <button
                   onClick={handleSaveDraft}
                   disabled={isLoading}
-                  className="flex-1 sm:flex-none text-[12px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors disabled:opacity-50"
+                  className="flex-1 sm:flex-none font-mono text-[12px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
                   type="button"
                 >
                   {draftSavedAt ? "Update Draft" : "Save Draft"}
@@ -721,7 +724,7 @@ export default function SearchPage() {
                 <button
                   onClick={handleStartMining}
                   disabled={isLoading}
-                  className="flex-1 sm:flex-none bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#ff4500]/20 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
+                  className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
@@ -741,8 +744,7 @@ export default function SearchPage() {
 
         {/* Info Sidebar */}
         <div className="space-y-8">
-          <div className="bg-[#0c0c0c] border border-white/5 rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4500]/5 blur-3xl rounded-full"></div>
+          <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden">
             <h4 className="font-black text-white text-lg mb-8 flex items-center gap-3 tracking-tight">
               <Zap className="w-6 h-6 text-[#ff4500]" />
               Expert Tips
@@ -750,7 +752,7 @@ export default function SearchPage() {
 
             <div className="space-y-8">
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 rounded-full bg-[#ff4500]/10 border border-[#ff4500]/20 flex items-center justify-center">
+                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
                 </div>
                 <div>
@@ -765,7 +767,7 @@ export default function SearchPage() {
               </div>
 
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 rounded-full bg-[#ff4500]/10 border border-[#ff4500]/20 flex items-center justify-center">
+                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
                 </div>
                 <div>
@@ -780,7 +782,7 @@ export default function SearchPage() {
               </div>
 
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 rounded-full bg-[#ff4500]/10 border border-[#ff4500]/20 flex items-center justify-center">
+                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
                 </div>
                 <div>

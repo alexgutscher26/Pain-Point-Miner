@@ -42,17 +42,17 @@ export function SidebarLinks() {
   ];
 
   return (
-    <nav className="space-y-1.5">
+    <nav className="space-y-2">
       {links.map((link) => {
         const isActive = pathname === link.href;
         return (
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl transition-all font-medium text-sm group ${
+            className={`flex items-center gap-3.5 px-3.5 py-2.5 border transition-colors font-mono uppercase tracking-wide text-[11px] group ${
               isActive
-                ? "bg-[#ff4500] text-white shadow-lg shadow-[#ff4500]/20"
-                : "text-zinc-500 hover:text-white hover:bg-white/5"
+                ? "border-[#ff8a57] bg-[#ff4500] text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]"
+                : "border-white/10 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/5"
             }`}
           >
             <span

@@ -50,14 +50,11 @@ export function DashboardSearchHero({
 
   return (
     <div className="relative group">
-      <div className="absolute inset-0 bg-linear-to-b from-[#ff4500]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-[32px] blur-3xl -z-10"></div>
-      <div className="relative overflow-hidden rounded-[32px] bg-[#0c0c0c] border border-white/5 p-12 flex flex-col items-center text-center shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/15 to-transparent"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#ff4500]/5 blur-[100px] rounded-full -mr-32 -mt-32 group-hover:bg-[#ff4500]/10 transition-colors duration-1000"></div>
+      <div className="relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-12 flex flex-col items-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
 
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-[#ff4500] blur-2xl opacity-20 scale-150 animate-pulse"></div>
-          <div className="relative w-14 h-14 bg-[#0a0a0a] rounded-2xl flex items-center justify-center text-[#ff4500] border border-[#ff4500]/30 shadow-[0_0_20px_rgba(255,69,0,0.15)] group-hover:border-[#ff4500] transition-colors duration-500">
+          <div className="relative w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-[#ff4500] border border-[#ff4500]/45 shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)] group-hover:border-[#ff4500] transition-colors duration-500">
             <Sparkles className="w-7 h-7" />
           </div>
         </div>
@@ -77,8 +74,7 @@ export function DashboardSearchHero({
           onSubmit={handleSubmit}
           className="w-full max-w-xl relative group/search"
         >
-          <div className="absolute -inset-0.5 bg-linear-to-r from-[#ff4500] to-[#ff8c00] rounded-2xl opacity-0 group-focus-within/search:opacity-10 blur-md transition-opacity duration-500"></div>
-          <div className="relative flex items-center bg-[#111] border border-white/10 rounded-2xl p-1.5 focus-within:border-[#ff4500]/30 transition-all shadow-2xl">
+          <div className="relative flex items-center bg-[#111] border-2 border-white/20 p-1.5 focus-within:border-[#ff4500]/70 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]">
             <span className="pl-4 pr-2 text-zinc-500 shrink-0">
               <Search className="w-5 h-5 group-focus-within/search:text-[#ff4500] transition-colors" />
             </span>
@@ -92,7 +88,7 @@ export function DashboardSearchHero({
             />
             <button
               type="submit"
-              className="shrink-0 whitespace-nowrap bg-[#ff4500] hover:bg-[#ff571a] active:scale-[0.98] text-white px-7 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all flex items-center gap-2.5 shadow-lg shadow-[#ff4500]/20"
+              className="shrink-0 whitespace-nowrap border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-7 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center gap-2.5"
             >
               Begin Analysis{" "}
               <ArrowRight className="w-4 h-4 group-hover/search:translate-x-1 transition-transform" />
@@ -100,14 +96,14 @@ export function DashboardSearchHero({
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-6">
-            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+            <p className="font-mono text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
               Trending:
             </p>
             {visibleTags.map((tag) => (
               <button
                 key={tag}
                 type="button"
-                className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest"
+                className="border border-white/10 px-2 py-1 font-mono text-[10px] font-bold text-zinc-400 hover:text-white hover:border-[#ff4500]/70 transition-colors uppercase tracking-widest"
                 onClick={() => setKeyword(normalizeTagToKeyword(tag))}
               >
                 {tag}

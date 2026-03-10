@@ -18,7 +18,7 @@ export function DashboardMobileNav({
       <SheetTrigger asChild>
         <button
           type="button"
-          className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-200"
+          className="lg:hidden inline-flex h-9 w-9 items-center justify-center border border-white/20 bg-white/5 text-zinc-200"
           aria-label="Open navigation menu"
         >
           <Menu className="h-4 w-4" />
@@ -31,7 +31,7 @@ export function DashboardMobileNav({
         <div className="flex h-full flex-col">
           <div className="border-b border-white/10 px-5 py-5">
             <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="rounded-xl bg-[#ff4500] p-2 text-white shadow-[0_0_20px_rgba(255,69,0,0.3)]">
+              <div className="bg-[#ff4500] border border-[#ff8a57] p-2 text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]">
                 <span className="material-symbols-outlined block text-xl font-bold">
                   query_stats
                 </span>
@@ -40,7 +40,7 @@ export function DashboardMobileNav({
                 <p className="text-base font-black leading-tight tracking-tight">
                   Pain Miner
                 </p>
-                <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500">
                   {planLabel}
                 </p>
               </div>
@@ -50,7 +50,7 @@ export function DashboardMobileNav({
             <SidebarLinks />
           </div>
           <div className="mt-auto border-t border-white/10 px-4 py-4">
-            <p className="mb-2 text-xs font-semibold text-zinc-400">
+            <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
               {userName}
             </p>
             <SignOutButton />

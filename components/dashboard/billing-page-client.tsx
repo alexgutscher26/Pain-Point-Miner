@@ -78,14 +78,14 @@ export function BillingPageClient({
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
               Billing & Subscription
             </p>
           </div>
           <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
             Manage Your Plan
           </h2>
-          <p className="text-zinc-500 font-medium text-sm">
+          <p className="text-zinc-400 font-medium text-sm">
             Update your payment method, review invoices, and manage your
             subscription in Stripe.
           </p>
@@ -93,7 +93,7 @@ export function BillingPageClient({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-[#111] rounded-[24px] border border-white/5 p-6">
+        <div className="lg:col-span-2 bg-[#111] border-2 border-white/15 p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
           <h3 className="text-white text-lg font-black mb-4 flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-[#ff4500]" />
             Billing Portal
@@ -106,7 +106,7 @@ export function BillingPageClient({
             type="button"
             onClick={openBillingPortal}
             disabled={openingPortal}
-            className="inline-flex items-center gap-2 bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all"
+            className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white font-mono text-sm font-bold uppercase tracking-wide px-5 py-2.5 transition-colors"
           >
             {openingPortal ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -116,14 +116,16 @@ export function BillingPageClient({
             Open Billing Portal
           </button>
           {actionState?.type === "error" ? (
-            <p className="mt-4 text-xs text-rose-400">{actionState.message}</p>
+            <p className="mt-4 font-mono text-xs text-rose-300">
+              {actionState.message}
+            </p>
           ) : null}
         </div>
 
-        <div className="bg-[#111] rounded-[24px] border border-white/5 p-6 space-y-4">
+        <div className="bg-[#111] border-2 border-white/15 p-6 space-y-4 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
           <h3 className="text-white text-lg font-black">Current Plan</h3>
           <p className="text-2xl font-black text-[#ff4500] uppercase">{plan}</p>
-          <div className="space-y-2 text-sm text-zinc-400">
+          <div className="space-y-2 font-mono text-sm text-zinc-400">
             <p>
               Scans this month:{" "}
               <span className="text-white font-bold">

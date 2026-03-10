@@ -76,7 +76,7 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Design System & Dashboard**
 
-- [ ] **Global Dashboard Refine**: Apply high-contrast signals, sharp geometry, and mono-typography accents.
+- [x] **Global Dashboard Refine**: Apply high-contrast signals, sharp geometry, and mono-typography accents.
 - [ ] **Opportunity Radar Charts**: A Pentagonal radar chart showing (Pain, Urgency, Monetization, Maturity, Complexity).
 - [ ] **Subreddit Heatmap**: Visualization of which communities have the most unsolved problems.
 - [ ] **Command Palette (Cmd+K)**: Quick navigation and action execution: `/scan`, `/report`, `/settings`.
@@ -110,7 +110,7 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Monetization Strategy**
 
-- [ ] **Stripe Usage Billing**: Connect 1 "Advanced Scan" to a credit-based consumption model.
+- [x] **Stripe Usage Billing**: Connect 1 "Advanced Scan" to a credit-based consumption model.
 
 ### **Growth Engine**
 
