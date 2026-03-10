@@ -121,15 +121,6 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ---
 
-## 🧪 7. PHASE 6: Quality, QA & Evaluation
-
-- [ ] **E2E Playwright Suite**: Full funnel testing: `Sign Up -> New Scan -> View Report`.
-- [ ] **AI Evaluation Framework**: Create a manual "Golden Dataset" to benchmark extraction accuracy.
-- [ ] **Performance Audit**: Optimize for < 1.0s LCP on the Dashboard.
-- [ ] **Dry Run Mode**: Scraper simulation to see post matches without AI cost.
-
----
-
 ## 📅 Maintenance & Periodic Audits
 
 - [ ] **Monthly Log Truncation**: Archive `scraper_run` logs every 60 days.
