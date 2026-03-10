@@ -289,6 +289,23 @@ export const scraperRun = pgTable(
   ]
 );
 
+export const redditAiIdempotency = pgTable(
+  "reddit_ai_idempotency",
+  {
+    redditPostId: text().primaryKey().notNull(),
+    lastProcessedAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    lastProcessedBy: text(),
+    createdAt: timestamp({ precision: 3, mode: "date" }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  },
+  (table) => [
+    index("reddit_ai_idempotency_lastProcessedAt_idx").using(
+      "btree",
+      table.lastProcessedAt.asc().nullsLast().op("timestamp_ops")
+    ),
+  ]
+);
+
 export const keywordStat = pgTable(
   "keyword_stat",
   {

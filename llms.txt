@@ -1,0 +1,65 @@
+# RPP (Reddit Pain Point Miner)
+
+> RPP is a Next.js application that discovers Reddit pain points, extracts structured opportunities with AI, and surfaces them in a dashboard with scheduled scanning support.
+
+Use this file as the navigation index for understanding product intent, runtime entry points, API surface, and core mining/data pipeline code.
+
+## Documentation
+
+- [Project README](README.md): Setup, local development, and scheduled scan environment/secrets overview.
+- [Product Roadmap and Spec](todo.md): Combined MVP specification and multi-phase implementation roadmap.
+- [Security Policy](SECURITY.md): Security reporting policy template.
+
+## Application Entry Points
+
+- [App Layout](app/layout.tsx): Root application shell and shared providers/styles.
+- [Landing Page](app/page.tsx): Public marketing and product positioning entry point.
+- [Global Error Boundary](app/global-error.tsx): Top-level runtime error boundary.
+- [Not Found Boundary](app/not-found.tsx): Application-level 404 handling.
+
+## API Surface
+
+- [Search API](app/api/search/route.ts): Main search/mining request orchestration endpoint.
+- [Scheduled Search API](app/api/search/scheduled/route.ts): Batch scheduler trigger endpoint for recurring scans.
+- [Search Stream API](app/api/search/stream/route.ts): Streaming updates for scan progress/results.
+- [Search Status API](app/api/search/status/route.ts): Mining run status endpoint.
+- [Suggest Subreddits API](app/api/search/suggest-subreddits/route.ts): Subreddit suggestion endpoint.
+- [Reports API](app/api/reports/route.ts): Report collection read/write operations.
+- [Settings API](app/api/settings/route.ts): Workspace/account settings endpoint.
+- [Billing Entitlements API](app/api/billing/entitlements/route.ts): Subscription entitlement checks.
+
+## Core Mining and AI Pipeline
+
+- [Mining Runner](lib/mining-runner.ts): Reddit ingestion and extraction orchestration.
+- [Reddit Client](lib/reddit.ts): Reddit API fetch and normalization utilities.
+- [AI Integration](lib/ai.ts): LLM prompt/extraction integration layer.
+- [Embeddings](lib/embeddings.ts): Vector embedding generation for semantic grouping.
+- [Clustering](lib/clustering.ts): Similarity clustering logic for pain points/opportunities.
+- [Trend Detection](lib/trend-detection.ts): Trend scoring and signal aggregation logic.
+- [Run Status](lib/run-status.ts): Runtime scan progress/state tracking helpers.
+- [Scheduler Utilities](lib/scheduler.ts): Scheduling helper logic for recurring scans.
+- [Reddit Idempotency](lib/reddit-idempotency.ts): Duplicate-run protections for Reddit items.
+
+## Data Model and Persistence
+
+- [Drizzle Schema](lib/db/schema.ts): Core PostgreSQL schema for users, scans, and opportunities.
+- [Drizzle Relations](lib/db/relations.ts): ORM relation mappings.
+- [Database Client](lib/db/index.ts): Database connection and Drizzle initialization.
+- [Migration 0001](drizzle/0001_reddit_ai_idempotency.sql): Initial idempotency-related migration.
+- [Drizzle Config](drizzle.config.ts): Migration and schema configuration.
+
+## Configuration and Operations
+
+- [Package Manifest](package.json): Runtime dependencies and scripts.
+- [Next Config](next.config.ts): Next.js runtime/build configuration.
+- [TypeScript Config](tsconfig.json): Project compiler/type-check settings.
+- [ESLint Config](eslint.config.mjs): Lint rules and quality gates.
+- [Vitest Config](vitest.config.ts): Test runner configuration.
+- [Environment Template](.env.example): Required environment variable template.
+- [Scheduled Scan Workflow](.github/workflows/scheduled-reddit-scan.yml): GitHub Actions cron trigger for scheduled scans.
+
+## Optional
+
+- [Dashboard Search Hero](components/dashboard/dashboard-search-hero.tsx): Primary search UX component composition.
+- [Mining Stream Hook](hooks/use-mining-stream.ts): Client-side streaming hook for live mining updates.
+- [UI Component Registry](components.json): Shadcn/base UI component registry metadata.

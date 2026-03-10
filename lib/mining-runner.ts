@@ -4,6 +4,7 @@ import { keywordStat, painPoint, painPointComment, scraper, scraperRun } from "@
 import { extractPainPoints } from "@/lib/ai";
 import { fetchComments, fetchSubredditPostsBatched, type RedditPost } from "@/lib/reddit";
 import { clusterPainPoint } from "@/lib/clustering";
+import { claimRedditPostForAiProcessing } from "@/lib/reddit-idempotency";
 
 export type MiningDepth = "basic" | "deep" | "advanced";
 
@@ -165,6 +166,11 @@ export async function executeMiningRun({
     }
 
     for (const post of postsToAnalyze) {
+      const shouldProcessWithAi = await claimRedditPostForAiProcessing(post.id, userId);
+      if (!shouldProcessWithAi) {
+        continue;
+      }
+
       const comments = commentsByPostId.get(post.id) ?? [];
 
       const points = await extractPainPoints(

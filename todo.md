@@ -51,7 +51,7 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 - [ ] **Problem Pattern Filtering**: Integrate the "Problem Keyword" filter (e.g., "struggling", "frustrating", "hate", "pain").
 - [ ] **Temporal Filtering**: Support last 24h, 7d, and 30d windows.
-- [ ] **Idempotency Guard**: Ensure we never bill/call AI twice for the same Reddit ID within a 24h window.
+- [x] **Idempotency Guard**: Ensure we never bill/call AI twice for the same Reddit ID within a 24h window.
 
 ---
 

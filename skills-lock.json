@@ -16,10 +16,20 @@
       "sourceType": "github",
       "computedHash": "1ad7ac7488d2050dfd7d64c592a64f86f8ec9a1a871b571544b1a997031c3f38"
     },
+    "add-expert": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "e19d0cfe02cff6e24ed11c298e600e7a5bf62040bbb422b3a618a7a29ecd58a2"
+    },
     "add-neon-docs": {
       "source": "neondatabase/ai-rules",
       "sourceType": "github",
       "computedHash": "f281548afc855d8555072664627beeb54bf8b9d3fbdf319224ba448ae498f911"
+    },
+    "add-sfx": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "dd7cbb69a4208ece2405909aa15dab14d7cca04f29a7ba81aac6c8623dd0d5cb"
     },
     "agentic-engineering": {
       "source": "affaan-m/everything-claude-code",
@@ -30,6 +40,11 @@
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "8a5ff990847b2c45503aa4608c6e4586121a6f5461c025790bfe36c52abdb52f"
+    },
+    "ai-context": {
+      "source": "meteor/meteor",
+      "sourceType": "github",
+      "computedHash": "3fe7a62102c7a5b961810765d7de78c88be169a784e8e8b5b8745603a56a3c51"
     },
     "ai-first-engineering": {
       "source": "affaan-m/everything-claude-code",
@@ -66,20 +81,60 @@
       "sourceType": "github",
       "computedHash": "f84bcb773a67ade28878d63103e3d4dc1f5031d6103be5107ff99c15b8d4a992"
     },
+    "changelog-orchestrator": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "c0a74a7ca0cd35810f5eb3a9f8da6fe8073458f384cf71632e93116faf5200bb"
+    },
     "code-reviewer": {
       "source": "google-gemini/gemini-cli",
       "sourceType": "github",
       "computedHash": "270f0dd1d4c15a798bad5253a309cdc2056fe5322f99ba06ca22ce50581adc02"
+    },
+    "coderabbit-ci-integration": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "c0c964b5a7cc37caf50ce3c64c08536d44d44ccb497190a7d06f021f848b96cf"
+    },
+    "coderabbit-common-errors": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "e1a6bba3c1f8990f20c0de7b89ae555a58444cc43a19d9929df47bbd629027ce"
+    },
+    "coderabbit-core-workflow-a": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "a636d4b93405c8084add39facd184820ce2b2a19a8a2af6acd69e05c94e27bff"
+    },
+    "coderabbit-core-workflow-b": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "d550d3db2b47f221fc08b15de0a6e32302c8c367cf0ef1364e06173ca76b30ec"
+    },
+    "create-llms": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2eea327b7f6ad67d91addd334a864f545cd5a1474dd8b03f7a00abc70b2715e2"
     },
     "create-plan": {
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "304edde95edfd9ca37b1077168874e0722fba2036b510f121ce6ce2d2c3b0e37"
     },
+    "csrf-protection-validator": {
+      "source": "jeremylongshore/claude-code-plugins-plus-skills",
+      "sourceType": "github",
+      "computedHash": "d23e7b09786f052903af4f75e983ecef6bf3caa9ca9f4e1715bb877ced9d0996"
+    },
     "design-principles": {
       "source": "srbhr/Resume-Matcher",
       "sourceType": "github",
       "computedHash": "fafed0051790439ebb4ab301b193fa74a5b28ba97c4499fba9a1f5a8013780bd"
+    },
+    "docs-demo": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "97879303f2a383817da2513b624766a035d9769050abf32e3af60d518dd74ae1"
     },
     "documentation-lookup": {
       "source": "upstash/context7",
@@ -90,6 +145,16 @@
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "d8cdaa1279f4447fdd766bed9a566346ff2e72db822b4b3695fe033701903af6"
+    },
+    "drizzle": {
+      "source": "lobehub/lobehub",
+      "sourceType": "github",
+      "computedHash": "5cfce7f940d8d52863a0206a0afe7c5b5f04d610c1eac2b01274938abbddcd23"
+    },
+    "drizzle-orm": {
+      "source": "EpicenterHQ/epicenter",
+      "sourceType": "github",
+      "computedHash": "c40ca79534f93fd86ca920a3e705887ec44b96f73914c16f77603e86d7bf5542"
     },
     "feature-flags": {
       "source": "facebook/react",
@@ -115,6 +180,11 @@
       "source": "davila7/claude-code-templates",
       "sourceType": "github",
       "computedHash": "398701f802cf5dc66f85d13068de77442c4599f1b98121da6f49989d2be8a70e"
+    },
+    "make-pr": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "d2c83ce6bc9760f0b4d4f7a2f24951f0606d5fd5c8759f29a6949a629afa9db4"
     },
     "neon-auth": {
       "source": "neondatabase/ai-rules",
@@ -210,6 +280,26 @@
       "source": "srbhr/Resume-Matcher",
       "sourceType": "github",
       "computedHash": "159a656a8dfbd608d26b2e82b60df63f268b8dfe92d9ac7b7f14d9b866735fd6"
+    },
+    "video-report": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "c5137bb16eb0a011ab9446fd790c9ffd724ee6a564e264c62663efafae5b9d75"
+    },
+    "web-renderer-test": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "c713f1df3522cdb27ecb9f33ea62f9b6a5b1cbe8b184913a8800cb4304641d35"
+    },
+    "write-tbp": {
+      "source": "tldraw/tldraw",
+      "sourceType": "github",
+      "computedHash": "bb7b4e5e72465ef9b198dea06bf4a1a4456346c1c7fdd04639f5d9bda3bc2112"
+    },
+    "writing-docs": {
+      "source": "remotion-dev/remotion",
+      "sourceType": "github",
+      "computedHash": "eccdf5155c908311fb347d0afd01188df2e39d26ad486c53d69b2898bfb0f4b8"
     }
   }
 }
