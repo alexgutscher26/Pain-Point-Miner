@@ -12,7 +12,7 @@ export function Pricing() {
   };
 
   return (
-    <section className="w-full py-32 px-6 flex flex-col items-center bg-[#111] border-y-2 border-white/[0.03]" id="pricing">
+    <section className="w-full py-24 sm:py-32 px-4 sm:px-6 flex flex-col items-center bg-[#111] border-y-2 border-white/[0.03]" id="pricing">
       <div className="text-center max-w-2xl mb-12">
         <h2 className="text-[11px] font-extrabold tracking-widest text-[#ff4500] uppercase mb-4">
           PRICING
@@ -24,18 +24,18 @@ export function Pricing() {
           Scale your market research as you grow from idea to product.
         </p>
         
-        <div className="inline-flex items-center p-1.5 bg-[#1a1a1a] rounded-full shadow-inner mb-6 border border-white/5">
+        <div className="inline-flex flex-wrap items-center justify-center gap-2 p-1.5 bg-[#1a1a1a] rounded-2xl sm:rounded-full shadow-inner mb-6 border border-white/5">
           <button 
             type="button"
             onClick={() => setIsYearly(false)}
-            className={`px-8 py-2.5 rounded-full text-[14px] font-extrabold shadow-sm transition-all ${!isYearly ? 'bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20' : 'text-zinc-400 hover:text-white border border-transparent'}`}
+            className={`px-6 sm:px-8 py-2.5 rounded-full text-[13px] sm:text-[14px] font-extrabold shadow-sm transition-all ${!isYearly ? 'bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20' : 'text-zinc-400 hover:text-white border border-transparent'}`}
           >
              Monthly
           </button>
           <button 
             type="button"
             onClick={() => setIsYearly(true)}
-            className={`px-8 py-2.5 rounded-full text-[14px] font-extrabold shadow-sm transition-all flex items-center gap-2 ${isYearly ? 'bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20' : 'text-zinc-400 hover:text-white border border-transparent'}`}
+            className={`px-6 sm:px-8 py-2.5 rounded-full text-[13px] sm:text-[14px] font-extrabold shadow-sm transition-all flex items-center gap-2 ${isYearly ? 'bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20' : 'text-zinc-400 hover:text-white border border-transparent'}`}
           >
              Yearly <span className="text-[#ff4500] text-[10px] tracking-wider uppercase font-black">Save 2 months</span>
           </button>
@@ -84,7 +84,7 @@ export function Pricing() {
         </div>
 
         {/* Growth Plan - Featured */}
-        <div className="bg-[#141414] border-2 border-[#ff4500]/40 rounded-2xl flex flex-col shadow-[0_0_40px_rgba(255,69,0,0.1)] relative overflow-hidden group scale-105 z-20">
+        <div className="bg-[#141414] border-2 border-[#ff4500]/40 rounded-2xl flex flex-col shadow-[0_0_40px_rgba(255,69,0,0.1)] relative overflow-hidden group lg:scale-105 z-20">
           <div className="absolute top-0 right-0 bg-linear-to-r from-[#ff4500] to-[#ff571a] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-lg flex items-center gap-1.5 shadow-lg border-b border-l border-white/20">
             <span className="text-[12px]">⭐</span> Most Popular
           </div>
@@ -173,7 +173,7 @@ export function Pricing() {
         </div>
       </div>
 
-      <div className="border border-[#7a281c] bg-[#140a08] rounded-xl px-12 py-8 max-w-[700px] w-full flex flex-col items-center justify-center shadow-lg text-center mt-6 mx-4 relative overflow-hidden">
+      <div className="border border-[#7a281c] bg-[#140a08] rounded-xl px-5 sm:px-12 py-8 max-w-[700px] w-full flex flex-col items-center justify-center shadow-lg text-center mt-6 mx-0 sm:mx-4 relative overflow-hidden">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
           <h4 className="text-[18px] font-extrabold text-white tracking-tight mb-2">
             Start your 3-day free trial. No credit card required.

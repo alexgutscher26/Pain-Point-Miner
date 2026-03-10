@@ -3,8 +3,8 @@ import { Sun, Moon } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="w-full pt-16 pb-8 px-6 bg-[#1a1a1a]">
-      <div className="max-w-[1240px] mx-auto mb-20 flex flex-col md:flex-row gap-12 md:gap-8 justify-between">
+    <footer className="w-full bg-[#1a1a1a] px-4 pb-8 pt-16 sm:px-6">
+      <div className="mx-auto mb-20 flex max-w-[1240px] flex-col justify-between gap-12 md:flex-row md:gap-8">
         
         {/* Left Col: Brand & Theme Toggle */}
         <div className="flex flex-col items-start max-w-[280px]">
@@ -29,7 +29,7 @@ export function Footer() {
         </div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-x-8 gap-y-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12">
           
           <div className="flex flex-col gap-5">
             <h4 className="font-bold text-white text-[15px] mb-2">Features</h4>
@@ -46,7 +46,7 @@ export function Footer() {
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">FAQ</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Blog</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Case Studies</Link>
-            <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Affiliate Program (30%)</Link>
+            <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors break-words">Affiliate Program (30%)</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Documentation</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Contact</Link>
           </div>
@@ -68,7 +68,7 @@ export function Footer() {
             <h4 className="font-bold text-white text-[15px] mb-2">Free Tools</h4>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Subreddit Finder</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Website to Subreddits</Link>
-            <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Reddit Opportunity Finder</Link>
+            <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors break-words">Reddit Opportunity Finder</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Post Title Generator</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Best Time to Post</Link>
             <Link href="#" className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors">Subreddit Rules Checker</Link>
@@ -105,7 +105,7 @@ export function Footer() {
       </div>
 
       {/* Copyright Base */}
-      <div className="max-w-[1240px] mx-auto flex flex-col md:flex-row justify-between items-center text-[12px] text-zinc-500 border-t border-zinc-800 pt-8 pb-4">
+      <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-500 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
         <p>© 2026 RedShip. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
             Built with <span className="text-[#a8a8a8]">☕</span> by <span className="text-white font-bold ml-1">Axel Schapmann</span>

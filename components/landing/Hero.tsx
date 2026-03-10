@@ -42,7 +42,7 @@ export function Hero() {
   };
 
   return (
-    <section className="w-full pt-32 pb-20 px-6 flex flex-col items-center bg-[#0a0a0a]">
+    <section className="flex w-full flex-col items-center bg-[#0a0a0a] px-4 pb-16 pt-28 sm:px-6 sm:pb-20 sm:pt-32">
       <div className="max-w-7xl w-full grid grid-cols-1 xl:grid-cols-12 gap-12 items-center mb-16">
         
         {/* Centered Content */}
@@ -56,12 +56,12 @@ export function Hero() {
             AI-powered Reddit research
           </div>
 
-          <h1 className="text-[52px] md:text-[68px] lg:text-[76px] font-extrabold tracking-[-0.02em] text-[#f4f4f5] mb-6 leading-[1.1] inline-block text-center">
+          <h1 className="inline-block text-center text-[38px] font-extrabold leading-[1.1] tracking-[-0.02em] text-[#f4f4f5] mb-6 sm:text-[52px] md:text-[68px] lg:text-[76px]">
             Discover{' '}
             <span className="text-[#ff4500]">validated</span>
             <br />
             software ideas from{' '}
-            <span className="inline-flex items-center gap-2 bg-[#ff4500]/10 border border-[#ff4500]/30 rounded-2xl md:rounded-[20px] px-3 md:px-4 py-1.5 md:py-2 align-middle mx-1.5 mb-2 relative md:-mt-2">
+            <span className="relative mx-1.5 mb-2 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/10 px-3 py-1.5 align-middle md:-mt-2 md:rounded-[20px] md:px-4 md:py-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 md:w-11 md:h-11 text-[#ff4500]">
                 <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.248-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.248 1.248.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
               </svg>
@@ -69,26 +69,26 @@ export function Hero() {
             </span>
           </h1>
 
-          <p className="text-[17px] md:text-[20px] text-zinc-400 max-w-[700px] mb-10 leading-relaxed font-medium mx-auto">
+          <p className="mx-auto mb-10 max-w-[700px] text-[16px] font-medium leading-relaxed text-zinc-400 md:text-[20px]">
             Reddit Pain-Point Miner analyzes real conversations to extract underlying problems so you can validate ideas and find underserved niches.
           </p>
 
           <form onSubmit={handleHeroSubmit} className="w-full max-w-[560px] mb-10 mx-auto">
-             <div className="w-full flex items-center bg-[#0a0a0a] border border-white/10 rounded-full p-1.5 focus-within:border-zinc-700 transition-colors shadow-sm relative overflow-hidden">
-                <div className="flex items-center gap-2 pl-4 pr-3 text-zinc-400 flex-none opacity-80 h-10 w-auto">
+             <div className="relative flex w-full flex-col items-stretch gap-2 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-2 shadow-sm transition-colors focus-within:border-zinc-700 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-1.5">
+                <div className="flex h-10 w-auto flex-none items-center gap-2 pl-4 pr-3 text-zinc-400 opacity-80">
                    <Search className="w-5 h-5"/>
                 </div>
                 <input
                   type="text"
                   placeholder="e.g. SEO tools, property management..."
-                  className="w-full flex-1 bg-transparent border-none text-white placeholder-zinc-500 text-[16px] focus:outline-none focus:ring-0 min-w-0 font-medium px-1 py-3"
+                  className="min-w-0 w-full flex-1 border-none bg-transparent px-1 py-2 text-[16px] font-medium text-white placeholder-zinc-500 focus:outline-none focus:ring-0 sm:py-3"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   required
                 />
                 <button 
                   type="submit"
-                  className="flex-shrink-0 flex-none bg-[#7a281c] hover:bg-[#8c3123] text-[#ff8e75] px-6 rounded-full font-bold text-[15px] transition-colors flex items-center justify-center gap-2 h-12 absolute right-1.5"
+                  className="flex h-11 flex-none items-center justify-center gap-2 rounded-full bg-[#7a281c] px-6 text-[15px] font-bold text-[#ff8e75] transition-colors hover:bg-[#8c3123] sm:mr-1 sm:h-12 sm:w-auto"
                 >
                   Mine insights <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
@@ -118,7 +118,7 @@ export function Hero() {
       </div>
 
       {/* Video Section centered below */}
-      <div className="w-full relative py-16 flex justify-center">
+      <div className="relative flex w-full justify-center py-10 sm:py-16">
         {/* Floating Badges Left */}
         <div className="hidden xl:flex absolute left-8 top-1/2 -translate-y-1/2 flex-col gap-12 z-0">
           {[1, 2, 3].map((i) => (
@@ -149,9 +149,9 @@ export function Hero() {
           ))}
         </div>
 
-        <div className="max-w-[900px] flex-1 w-full mx-auto relative z-10 hidden sm:block">
+        <div className="relative z-10 mx-auto w-full max-w-[900px] flex-1">
            {/* Drawn Arrow and Text */}
-           <div className="absolute -top-10 right-4 md:right-12 flex items-center gap-2">
+           <div className="absolute -top-10 right-4 hidden items-center gap-2 md:right-12 sm:flex">
              <svg width="60" height="40" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="mt-4">
                 <path d="M58 2C45 5 25 15 5 35M5 35C12 33 18 35 22 40M5 35C2 28 -1 20 2 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500" />
              </svg>
@@ -168,9 +168,9 @@ export function Hero() {
                  />
                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
                  {/* Play Button - simple white triangle with shadow */}
-                 <div className="z-10 w-20 h-20 md:w-24 md:h-24 flex items-center justify-center relative shadow-2xl transition-transform duration-300 group-hover:scale-110">
+                 <div className="relative z-10 flex h-16 w-16 items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 md:h-24 md:w-24">
                    {/* Custom triangular play button */}
-                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-[84px] h-[84px] text-white drop-shadow-xl ml-2">
+                   <svg viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-[64px] w-[64px] text-white drop-shadow-xl md:ml-2 md:h-[84px] md:w-[84px]">
                      <path d="M8 5v14l11-7z" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5"/>
                    </svg>
                  </div>

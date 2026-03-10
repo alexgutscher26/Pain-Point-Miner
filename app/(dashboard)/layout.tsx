@@ -4,12 +4,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
+import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
 import { 
   HelpCircle,
   Plus,
   Bell,
-  Crown
+  Crown,
+  LayoutDashboard
 } from "lucide-react";
 
 export default async function DashboardLayout({
@@ -39,9 +41,9 @@ export default async function DashboardLayout({
         : "Upgrade to Growth or Pro for advanced features.";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-[#ff4500]/30 antialiased">
+    <div className="flex min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-[#ff4500]/30 antialiased">
       {/* Sidebar */}
-      <aside className="w-60 shrink-0 border-r border-white/10 bg-[#0d0d0d] flex flex-col h-full">
+      <aside className="hidden h-screen w-60 shrink-0 border-r border-white/10 bg-[#0d0d0d] lg:flex lg:flex-col">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-[#ff4500] rounded-xl p-2 text-white shadow-[0_0_20px_rgba(255,69,0,0.3)]">
@@ -78,22 +80,28 @@ export default async function DashboardLayout({
       </aside>
       
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col relative">
+      <main className="relative flex min-h-screen flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#ff4500]/5 blur-[120px] rounded-full -mr-[250px] -mt-[250px] pointer-events-none"></div>
 
         {/* Topbar */}
-        <header className="h-16 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-10 px-8 flex items-center justify-between">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/10 bg-[#0a0a0a]/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 text-[11px] text-zinc-400 font-bold uppercase tracking-widest">
+            <DashboardMobileNav userName={session.user.name ?? "Founder"} planLabel={planLabel} />
+            <div className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-zinc-400 max-sm:hidden">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
               System Active
             </div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400 sm:hidden">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Dashboard
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="/dashboard/search" className="bg-white hover:bg-zinc-200 text-black px-5 py-2 rounded-full text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <Link href="/dashboard/search" className="bg-white hover:bg-zinc-200 text-black px-3 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-bold flex items-center gap-2 transition-all shadow-lg whitespace-nowrap">
               <Plus className="w-4 h-4" />
-              New Scan
+              <span className="hidden sm:inline">New Scan</span>
+              <span className="sm:hidden">Scan</span>
             </Link>
             <button className="p-2.5 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all relative border border-white/5">
               <Bell className="w-5 h-5" />
@@ -112,7 +120,7 @@ export default async function DashboardLayout({
         </header>
 
         {/* Dynamic Content */}
-        <div className="flex-1 relative">
+        <div className="relative flex-1">
            {children}
         </div>
       </main>

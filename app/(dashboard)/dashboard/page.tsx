@@ -145,7 +145,7 @@ export default async function DashboardPage({
     : null;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
+    <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
       {planContext.trialActive && (planContext.trialDaysRemaining ?? 0) <= 1 ? (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
           <div>
@@ -250,8 +250,8 @@ export default async function DashboardPage({
               View All
             </Link>
           </div>
-          <div className="overflow-x-hidden">
-            <table className="w-full table-fixed text-left border-collapse">
+          <div className="overflow-x-auto">
+            <table className="min-w-[720px] w-full table-fixed text-left border-collapse">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
                   <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-[0.15em]">Investigation</th>
