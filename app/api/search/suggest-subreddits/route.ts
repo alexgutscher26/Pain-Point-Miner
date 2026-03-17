@@ -1,8 +1,8 @@
-import { apiJson } from "@/lib/api-error";
+import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext } from "@/lib/api-auth";
 import { z } from "zod";
 import { getPlanEntitlements } from "@/lib/plan-gating";
-import { resolveCurrentPlan } from "@/lib/plan-resolver";
+import { resolvePlanContext } from "@/lib/plan-resolver";
 
 const suggestPayloadSchema = z.object({
   keyword: z.string().trim().min(3).max(120),
@@ -33,11 +33,23 @@ export async function POST(req: Request) {
       return apiJson({ subreddits: [] }, 200, correlationId);
     }
     const { keyword, locale, count } = parsedPayload.data;
-    const plan = await resolveCurrentPlan({
+    const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
       requestHeaders: req.headers,
     });
+    if (planContext.planPurchaseRequired) {
+      return apiError(
+        403,
+        "PLAN_REQUIRED",
+        "Your free trial has ended. Purchase a plan to continue.",
+        {
+          trialEnded: true,
+        },
+        correlationId,
+      );
+    }
+    const plan = planContext.plan;
     const entitlements = getPlanEntitlements(plan);
     const cappedCount =
       entitlements.maxSubredditsPerSearch === null

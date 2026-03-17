@@ -125,9 +125,6 @@ export const auth = betterAuth({
                                       stripePriceStarterYearly,
                                   }
                                 : {}),
-                              freeTrial: {
-                                days: 3,
-                              },
                             },
                           ]
                         : []),
@@ -137,9 +134,6 @@ export const auth = betterAuth({
                         ...(stripePriceGrowthYearly
                           ? { annualDiscountPriceId: stripePriceGrowthYearly }
                           : {}),
-                        freeTrial: {
-                          days: 3,
-                        },
                       },
                       {
                         name: "pro",
@@ -147,9 +141,6 @@ export const auth = betterAuth({
                         ...(stripePriceProYearly
                           ? { annualDiscountPriceId: stripePriceProYearly }
                           : {}),
-                        freeTrial: {
-                          days: 3,
-                        },
                       },
                     ],
                   },

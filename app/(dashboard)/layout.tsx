@@ -87,9 +87,12 @@ export default async function DashboardLayout({
             <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">
               {upgradeMessage}
             </p>
-            <button className="w-full border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e63e00] text-white font-mono text-[11px] font-bold py-2.5 transition-colors uppercase tracking-widest relative z-10">
+            <Link
+              href="/dashboard/billing"
+              className="block w-full border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e63e00] text-white font-mono text-[11px] font-bold py-2.5 transition-colors uppercase tracking-widest relative z-10 text-center"
+            >
               Upgrade Now
-            </button>
+            </Link>
           </div>
           <div className="flex flex-col gap-1 border-t border-white/10 pt-4">
             <button className="flex items-center gap-3 px-3 py-2 text-zinc-400 hover:text-white transition-colors w-full text-left font-mono uppercase tracking-wide text-[11px]">

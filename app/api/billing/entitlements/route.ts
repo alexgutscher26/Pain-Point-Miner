@@ -5,7 +5,7 @@ import {
   getMonthlyUsageSummary,
   getPlanEntitlements,
 } from "@/lib/plan-gating";
-import { resolveCurrentPlan } from "@/lib/plan-resolver";
+import { resolvePlanContext } from "@/lib/plan-resolver";
 
 export async function GET(req: Request) {
   const authContext = await requireApiContext(req);
@@ -16,17 +16,23 @@ export async function GET(req: Request) {
   const { correlationId, userId, userEmail } = authContext.context;
 
   try {
-    const plan = await resolveCurrentPlan({
+    const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
       requestHeaders: req.headers,
     });
+    const plan = planContext.plan;
     const entitlements = getPlanEntitlements(plan);
     const monthlyScansUsed = await getMonthlyScanUsage(userId);
 
     return apiJson(
       {
         plan,
+        hasActiveSubscription: planContext.hasActiveSubscription,
+        trialActive: planContext.trialActive,
+        planPurchaseRequired: planContext.planPurchaseRequired,
+        trialEndsAt: planContext.trialEndsAt?.toISOString() ?? null,
+        trialDaysRemaining: planContext.trialDaysRemaining,
         entitlements,
         usage: getMonthlyUsageSummary(plan, monthlyScansUsed),
       },

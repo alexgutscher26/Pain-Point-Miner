@@ -57,11 +57,13 @@ export default async function DashboardPage({
     await getMonthlyScanUsage(session.user.id),
   );
   const searchesRemainingLabel =
-    usageSummary.monthlyScansLimit === null
+    planContext.planPurchaseRequired
+      ? "Blocked"
+      : usageSummary.monthlyScansLimit === null
       ? "Unlimited"
       : `${usageSummary.monthlyScansUsed}/${usageSummary.monthlyScansLimit}`;
   const searchesProgress =
-    usageSummary.monthlyScansLimit === null
+    planContext.planPurchaseRequired || usageSummary.monthlyScansLimit === null
       ? 0
       : Math.min(
           100,
@@ -71,7 +73,9 @@ export default async function DashboardPage({
           ),
         );
   const searchesSubtext =
-    usageSummary.monthlyScansLimit === null
+    planContext.planPurchaseRequired
+      ? "Purchase a plan to resume scans"
+      : usageSummary.monthlyScansLimit === null
       ? "No monthly cap on Pro"
       : `${usageSummary.monthlyScansRemaining ?? 0} scans remaining this month`;
   const parsedWorkspaceId = workspaceHeaderSchema.safeParse(
@@ -173,6 +177,25 @@ export default async function DashboardPage({
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
+      {planContext.planPurchaseRequired ? (
+        <div className="border-2 border-rose-400/60 bg-rose-500/10 px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-rose-300 mb-1">
+              Plan Required
+            </p>
+            <p className="text-sm text-rose-100 font-semibold">
+              Your free trial has ended. Purchase a plan to continue using
+              search and paid features.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/billing"
+            className="shrink-0 px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-xs font-black uppercase tracking-widest"
+          >
+            Purchase Plan
+          </Link>
+        </div>
+      ) : null}
       {planContext.trialActive && (planContext.trialDaysRemaining ?? 0) <= 1 ? (
         <div className="border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
           <div>

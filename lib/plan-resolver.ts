@@ -18,6 +18,16 @@ export type ResolvedPlanContext = {
   trialDaysRemaining: number | null;
 };
 
+type PlanContextResolutionInput = {
+  resolvedPlan: BillingPlan;
+  hasActiveSubscription: boolean;
+  userCreatedAt?: Date | null;
+  now?: Date;
+  localTrialEnabled?: boolean;
+  localTrialDays?: number;
+  requirePaidAfterTrial?: boolean;
+};
+
 async function loadSubscriptions(
   requestHeaders: HeadersInit,
 ): Promise<SubscriptionRecord[]> {
@@ -83,26 +93,13 @@ export async function resolvePlanContext(input: {
   const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED !== "false";
   const requirePaidAfterTrial =
     process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
-  let trialActive = false;
-
-  if (
-    !localTrialEnabled ||
-    hasActiveSubscription ||
-    !Number.isFinite(localTrialDays) ||
-    localTrialDays <= 0
-  ) {
-    return {
-      plan: resolvedPlan,
-      hasActiveSubscription,
-      trialActive: false,
-      planPurchaseRequired:
-        requirePaidAfterTrial &&
-        resolvedPlan === "starter" &&
-        !hasActiveSubscription,
-      trialEndsAt: null,
-      trialDaysRemaining: null,
-    };
-  }
+  const baseResolutionInput = {
+    resolvedPlan,
+    hasActiveSubscription,
+    localTrialDays,
+    localTrialEnabled,
+    requirePaidAfterTrial,
+  };
 
   try {
     const currentUser = await db.query.user.findFirst({
@@ -111,60 +108,72 @@ export async function resolvePlanContext(input: {
         createdAt: true,
       },
     });
-
-    if (!currentUser?.createdAt) {
-      return {
-        plan: resolvedPlan,
-        hasActiveSubscription,
-        trialActive: false,
-        planPurchaseRequired:
-          requirePaidAfterTrial &&
-          resolvedPlan === "starter" &&
-          !hasActiveSubscription,
-        trialEndsAt: null,
-        trialDaysRemaining: null,
-      };
-    }
-
-    const trialEndsAt = new Date(currentUser.createdAt);
-    trialEndsAt.setDate(trialEndsAt.getDate() + localTrialDays);
-    const daysRemaining = Math.max(
-      0,
-      Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-    );
-
-    if (trialEndsAt.getTime() > Date.now()) {
-      trialActive = true;
-      return {
-        plan: "pro",
-        hasActiveSubscription,
-        trialActive,
-        planPurchaseRequired: false,
-        trialEndsAt,
-        trialDaysRemaining: daysRemaining,
-      };
-    }
+    return resolvePlanAccessState({
+      ...baseResolutionInput,
+      userCreatedAt: currentUser?.createdAt ?? null,
+    });
   } catch {
+    return resolvePlanAccessState({
+      ...baseResolutionInput,
+      userCreatedAt: null,
+    });
+  }
+}
+
+export function resolvePlanAccessState({
+  resolvedPlan,
+  hasActiveSubscription,
+  userCreatedAt = null,
+  now = new Date(),
+  localTrialEnabled = true,
+  localTrialDays = 3,
+  requirePaidAfterTrial = true,
+}: PlanContextResolutionInput): ResolvedPlanContext {
+  const defaultContext: ResolvedPlanContext = {
+    plan: resolvedPlan,
+    hasActiveSubscription,
+    trialActive: false,
+    planPurchaseRequired:
+      requirePaidAfterTrial &&
+      resolvedPlan === "starter" &&
+      !hasActiveSubscription,
+    trialEndsAt: null,
+    trialDaysRemaining: null,
+  };
+
+  if (
+    !localTrialEnabled ||
+    hasActiveSubscription ||
+    !Number.isFinite(localTrialDays) ||
+    localTrialDays <= 0 ||
+    !userCreatedAt
+  ) {
+    return defaultContext;
+  }
+
+  const trialEndsAt = new Date(userCreatedAt);
+  trialEndsAt.setDate(trialEndsAt.getDate() + localTrialDays);
+  const trialEndsAtMs = trialEndsAt.getTime();
+  const nowMs = now.getTime();
+  const trialDaysRemaining = Math.max(
+    0,
+    Math.ceil((trialEndsAtMs - nowMs) / (1000 * 60 * 60 * 24)),
+  );
+
+  if (trialEndsAtMs > nowMs) {
     return {
-      plan: resolvedPlan,
+      plan: "pro",
       hasActiveSubscription,
-      trialActive: false,
+      trialActive: true,
       planPurchaseRequired: false,
-      trialEndsAt: null,
-      trialDaysRemaining: null,
+      trialEndsAt,
+      trialDaysRemaining,
     };
   }
 
   return {
-    plan: resolvedPlan,
-    hasActiveSubscription,
-    trialActive,
-    planPurchaseRequired:
-      requirePaidAfterTrial &&
-      resolvedPlan === "starter" &&
-      !hasActiveSubscription &&
-      !trialActive,
-    trialEndsAt: null,
-    trialDaysRemaining: null,
+    ...defaultContext,
+    trialEndsAt,
+    trialDaysRemaining: 0,
   };
 }
