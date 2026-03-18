@@ -2,6 +2,10 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { painPoint, painPointCluster } from "@/lib/db/schema";
 import { embedPainPoint } from "@/lib/embeddings";
+import {
+  aggregateBudgetSignals,
+  normalizeBudgetSignals,
+} from "@/lib/budget-signals";
 
 const CLUSTER_SIMILARITY_THRESHOLD = 0.82;
 const EMBEDDING_PROVIDER = "openrouter";
@@ -103,11 +107,12 @@ async function assignToCluster(
   await db
     .update(painPointCluster)
     .set({
-      sourceCount: sql`${painPointCluster.sourceCount} + 1`,
       lastMatchedAt: new Date(),
       updatedAt: new Date(),
     })
     .where(eq(painPointCluster.id, clusterId));
+
+  await refreshClusterRollups(clusterId);
 
   return { clusterId, isNew: false };
 }
@@ -143,5 +148,34 @@ async function createNewCluster(
     })
     .where(eq(painPoint.id, painPointId));
 
+  await refreshClusterRollups(clusterId);
+
   return { clusterId, isNew: true };
+}
+
+async function refreshClusterRollups(clusterId: string) {
+  const clusterPoints = await db.query.painPoint.findMany({
+    where: eq(painPoint.clusterId, clusterId),
+    columns: {
+      id: true,
+      budget: true,
+    },
+  });
+
+  const budgetSignals = clusterPoints.flatMap((point) =>
+    normalizeBudgetSignals(point.budget),
+  );
+  const { budgetSignalCount, estimatedTamUsdAnnual } =
+    aggregateBudgetSignals(budgetSignals);
+
+  await db
+    .update(painPointCluster)
+    .set({
+      sourceCount: clusterPoints.length,
+      budgetSignalCount,
+      estimatedTamUsdAnnual,
+      lastMatchedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(painPointCluster.id, clusterId));
 }

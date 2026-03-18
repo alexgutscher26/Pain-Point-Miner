@@ -1,3 +1,9 @@
+import {
+  normalizeBudgetSignals,
+  type BudgetSignal,
+  type BudgetCadence,
+} from "@/lib/budget-signals";
+
 export interface PainPointData {
   title: string;
   body: string;
@@ -5,7 +11,7 @@ export interface PainPointData {
   urgency: number;
   monetizationScore: number;
   marketMaturity: number;
-  budget?: string;
+  budget: BudgetSignal[];
   switchingCosts?: string;
   triedSolutions: string[];
   sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
@@ -106,10 +112,14 @@ Scoring rubric:
 Field rules:
 - title: 4-10 words, specific, no hype
 - body: 2-4 sentences summarizing the root pain, who feels it, and why it matters
-- budget: empty string if not stated or strongly implied
+- budget: [] unless the thread contains an explicit willingness-to-pay quote such as "I would pay $50/month", "budget of $5k", "willing to spend $200", or "shut up and take my money"
 - switchingCosts: empty string if not stated or strongly implied
 - triedSolutions: specific tools, workarounds, or alternatives only; otherwise []
 - sentiment: choose exactly one of frustrated, curious, desperate, neutral, angry
+- budget[].quote must be the exact quote text from the post or a comment
+- budget[].source must be exactly "post" or "comment"
+- budget[].cadence must be one_time, monthly, annual, or unknown
+- Do not create budget entries from vague commercial context or inferred willingness to pay
 
 Return only valid JSON matching:
 {
@@ -121,7 +131,16 @@ Return only valid JSON matching:
       "urgency": 1,
       "monetizationScore": 1,
       "marketMaturity": 1,
-      "budget": "",
+      "budget": [
+        {
+          "quote": "I'd pay $50/month for this.",
+          "amountMinUsd": 50,
+          "amountMaxUsd": 50,
+          "cadence": "monthly",
+          "annualizedMidpointUsd": 600,
+          "source": "comment"
+        }
+      ],
       "switchingCosts": "",
       "triedSolutions": [],
       "sentiment": "frustrated"
@@ -197,7 +216,14 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       urgency: number;
       monetizationScore: number;
       marketMaturity: number;
-      budget?: string;
+      budget?: Array<{
+        quote?: string;
+        amountMinUsd?: number | null;
+        amountMaxUsd?: number | null;
+        cadence?: BudgetCadence;
+        annualizedMidpointUsd?: number | null;
+        source?: "post" | "comment";
+      }> | string;
       switchingCosts?: string;
       triedSolutions?: string[];
       sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
@@ -209,6 +235,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 
     return rawPainPoints.map((pp: RawPainPoint) => ({
       ...pp,
+      budget: normalizeBudgetSignals(pp.budget),
       url: post.url,
       author: post.author,
       subreddit: post.subreddit,

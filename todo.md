@@ -113,11 +113,11 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
   - [ ] Default weights: `painIntensity` (40%), `monetizationScore` (30%), `urgency` (20%), `marketMaturity` (10%).
   - [ ] Allow Pro users to customize weights via the settings page.
   - [ ] Add a `scoreExplanation` breakdown to each opportunity: "High score driven by 8/10 pain intensity and explicit budget mentions."
-- [ ] **The "Desperate User" Index**: Extract specific willingness-to-pay signals.
-  - [ ] Detect phrases: "I would pay $X", "shut up and take my money", "budget of $X", "willing to spend".
-  - [ ] Store extracted budget quotes in `painPoint.budget` with the original quote text.
-  - [ ] Surface a "💰 Willingness to Pay" badge on pain points that have budget signals.
-  - [ ] Aggregate budget signals into a `painPointCluster`-level "Estimated TAM" field.
+- [x] **The "Desperate User" Index**: Extract specific willingness-to-pay signals.
+  - [x] Detect phrases: "I would pay $X", "shut up and take my money", "budget of $X", "willing to spend".
+  - [x] Store extracted budget quotes in `painPoint.budget` with the original quote text.
+  - [x] Surface a "💰 Willingness to Pay" badge on pain points that have budget signals.
+  - [x] Aggregate budget signals into a `painPointCluster`-level "Estimated TAM" field.
 - [ ] **Sentiment Confidence Scoring**: Add confidence level to AI sentiment classification.
   - [ ] Instead of just `frustrated | curious | desperate | neutral | angry`, also return a confidence float (0-1).
   - [ ] Use low-confidence results to trigger a re-extraction with a more capable model.

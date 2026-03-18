@@ -55,7 +55,21 @@ interface PainPoint {
     }[];
   };
   angles: string[];
-  budget?: string;
+  budgetSignals?: Array<{
+    quote: string;
+    amountMinUsd: number | null;
+    amountMaxUsd: number | null;
+    cadence: "one_time" | "monthly" | "annual" | "unknown";
+    annualizedMidpointUsd: number | null;
+    source: "post" | "comment";
+  }>;
+  hasWillingnessToPay?: boolean;
+  budgetSignalSummary?: string | null;
+  cluster?: {
+    id: string;
+    estimatedTamUsdAnnual: number | null;
+    budgetSignalCount: number;
+  } | null;
   switchingCosts?: string;
   triedSolutions?: string[];
 }
@@ -175,12 +189,16 @@ function toTitleCase(value: string) {
 }
 
 function formatBudgetValue(
-  budget?: string | null,
+  budgetSignals?: PainPoint["budgetSignals"],
+  budgetSignalSummary?: string | null,
   monetization?: number,
   urgency?: string,
 ) {
-  const value = normalizeEvidenceText(budget);
+  const value = normalizeEvidenceText(budgetSignalSummary);
   if (value) return value;
+
+  const quote = normalizeEvidenceText(budgetSignals?.[0]?.quote);
+  if (quote) return quote;
 
   if ((monetization ?? 0) >= 8) {
     return "High willingness";
@@ -195,6 +213,18 @@ function formatBudgetValue(
   }
 
   return "Weak signal";
+}
+
+function formatCurrency(value?: number | null) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "No TAM yet";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 function formatSwitchingValue(
@@ -861,7 +891,7 @@ export default function ReportDetailPage() {
                 {/* Pain Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start gap-4 relative z-10">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <h4 className="text-2xl font-black text-white tracking-tight group-hover:text-[#ff4500] transition-colors">
                         {pain.title}
                       </h4>
@@ -874,6 +904,11 @@ export default function ReportDetailPage() {
                       >
                         {pain.urgency}
                       </span>
+                      {pain.hasWillingnessToPay && (
+                        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border bg-emerald-500/10 border-emerald-400/30 text-emerald-300">
+                          💰 Willingness to Pay
+                        </span>
+                      )}
                     </div>
                     <div className="max-w-2xl bg-[#111]/30 p-4 rounded-xl border border-white/5 space-y-3">
                       {formatPainDescription(pain.description).map(
@@ -955,45 +990,94 @@ export default function ReportDetailPage() {
                 </div>
 
                 {getActiveTab(pain.id) === "signals" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 relative z-10">
-                    <InfoSquare
-                      icon={<DollarSign className="w-3.5 h-3.5" />}
-                      label="Budget"
-                      value={formatBudgetValue(
-                        pain.budget,
-                        pain.monetization,
-                        pain.urgency,
-                      )}
-                      color="text-emerald-500"
-                    />
-                    <InfoSquare
-                      icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
-                      label="Switching"
-                      value={formatSwitchingValue(
-                        pain.switchingCosts,
-                        pain.maturity,
-                        pain.triedSolutions,
-                      )}
-                      color="text-amber-500"
-                    />
-                    <InfoSquare
-                      icon={<Wrench className="w-3.5 h-3.5" />}
-                      label="Tried"
-                      value={formatTriedValue(pain.triedSolutions)}
-                      color="text-blue-500"
-                    />
-                    <InfoSquare
-                      icon={<TrendingUp className="w-3.5 h-3.5" />}
-                      label="Pay Signal"
-                      value={formatPaySignalValue(pain.monetization)}
-                      color="text-violet-500"
-                    />
-                    <InfoSquare
-                      icon={<BarChart3 className="w-3.5 h-3.5" />}
-                      label="Stage"
-                      value={formatStageValue(pain.maturity)}
-                      color="text-rose-500"
-                    />
+                  <div className="space-y-4 relative z-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3">
+                      <InfoSquare
+                        icon={<DollarSign className="w-3.5 h-3.5" />}
+                        label="Budget"
+                        value={formatBudgetValue(
+                          pain.budgetSignals,
+                          pain.budgetSignalSummary,
+                          pain.monetization,
+                          pain.urgency,
+                        )}
+                        color="text-emerald-500"
+                        preserveCase
+                      />
+                      <InfoSquare
+                        icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
+                        label="Switching"
+                        value={formatSwitchingValue(
+                          pain.switchingCosts,
+                          pain.maturity,
+                          pain.triedSolutions,
+                        )}
+                        color="text-amber-500"
+                      />
+                      <InfoSquare
+                        icon={<Wrench className="w-3.5 h-3.5" />}
+                        label="Tried"
+                        value={formatTriedValue(pain.triedSolutions)}
+                        color="text-blue-500"
+                      />
+                      <InfoSquare
+                        icon={<TrendingUp className="w-3.5 h-3.5" />}
+                        label="Pay Signal"
+                        value={
+                          pain.hasWillingnessToPay
+                            ? `${pain.budgetSignals?.length ?? 0} quote${(pain.budgetSignals?.length ?? 0) === 1 ? "" : "s"}`
+                            : formatPaySignalValue(pain.monetization)
+                        }
+                        color="text-violet-500"
+                      />
+                      <InfoSquare
+                        icon={<DollarSign className="w-3.5 h-3.5" />}
+                        label="Estimated TAM"
+                        value={formatCurrency(pain.cluster?.estimatedTamUsdAnnual)}
+                        color="text-fuchsia-500"
+                        preserveCase
+                      />
+                      <InfoSquare
+                        icon={<BarChart3 className="w-3.5 h-3.5" />}
+                        label="Stage"
+                        value={formatStageValue(pain.maturity)}
+                        color="text-rose-500"
+                      />
+                    </div>
+                    {pain.hasWillingnessToPay &&
+                    (pain.budgetSignals?.length ?? 0) > 0 ? (
+                      <div className="border border-emerald-400/20 bg-emerald-500/5 p-5 space-y-3">
+                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                            WTP Quotes
+                          </p>
+                          {pain.cluster?.budgetSignalCount ? (
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                              {pain.cluster.budgetSignalCount} cluster quote
+                              {pain.cluster.budgetSignalCount === 1 ? "" : "s"}
+                            </p>
+                          ) : null}
+                        </div>
+                        <div className="space-y-2">
+                          {pain.budgetSignals?.map((signal, idx) => (
+                            <div
+                              key={`${pain.id}-budget-${idx}`}
+                              className="border border-white/10 bg-black/20 p-3 space-y-1"
+                            >
+                              <p className="text-sm text-zinc-200 font-medium leading-relaxed">
+                                "{signal.quote}"
+                              </p>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                {signal.source} signal
+                                {signal.annualizedMidpointUsd !== null
+                                  ? ` • ${formatCurrency(signal.annualizedMidpointUsd)} annualized`
+                                  : ""}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 )}
 
@@ -1371,11 +1455,13 @@ function InfoSquare({
   label,
   value,
   color,
+  preserveCase,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   color: string;
+  preserveCase?: boolean;
 }) {
   return (
     <div className="bg-white/2 border border-white/20 p-4 flex items-start gap-3 min-h-[82px]">
@@ -1389,7 +1475,7 @@ function InfoSquare({
           {label}
         </p>
         <p className="text-sm font-black text-white leading-tight break-words whitespace-normal sm:text-[15px]">
-          {toTitleCase(value)}
+          {preserveCase ? value : toTitleCase(value)}
         </p>
       </div>
     </div>

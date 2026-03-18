@@ -13,6 +13,7 @@ import {
   vector,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { BudgetSignal } from "@/lib/budget-signals";
 
 export const scraperStatus = pgEnum("ScraperStatus", [
   "running",
@@ -392,6 +393,8 @@ export const painPointCluster = pgTable(
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
+    estimatedTamUsdAnnual: integer(),
+    budgetSignalCount: integer().default(0).notNull(),
     lastMatchedAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -443,7 +446,7 @@ export const painPoint = pgTable(
     urgency: integer().default(0),
     monetizationScore: integer().default(0),
     marketMaturity: integer().default(0),
-    budget: text(),
+    budget: jsonb().$type<BudgetSignal[]>(),
     switchingCosts: text(),
     triedSolutions: text()
       .array()

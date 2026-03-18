@@ -9,6 +9,12 @@ import {
   formatTrendChangePercent,
 } from "@/lib/trend-detection";
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
+import {
+  hasWillingnessToPaySignals,
+  normalizeBudgetSignals,
+  summarizeBudgetSignal,
+  type BudgetSignal,
+} from "@/lib/budget-signals";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
@@ -146,9 +152,14 @@ interface DBPainPoint {
   sentiment: string;
   mentionCount: number;
   commentCount: number;
-  budget?: string;
+  budget?: BudgetSignal[] | string | null;
   switchingCosts?: string;
   triedSolutions?: string[];
+  painPointCluster?: {
+    id: string;
+    estimatedTamUsdAnnual: number | null;
+    budgetSignalCount: number;
+  } | null;
   painPointComments?: Array<{
     body: string;
     score: number;
@@ -214,6 +225,13 @@ export async function GET(
         },
         painPoints: {
           with: {
+            painPointCluster: {
+              columns: {
+                id: true,
+                estimatedTamUsdAnnual: true,
+                budgetSignalCount: true,
+              },
+            },
             painPointComments: {
               columns: {
                 body: true,
@@ -274,6 +292,7 @@ export async function GET(
     ).find((trend) => trend.key === currentKeyword);
 
     const enrichedPainPoints = painPoints.map((point) => {
+      const budgetSignals = normalizeBudgetSignals(point.budget);
       const topCommentScores = (point.painPointComments ?? [])
         .map((comment) => comment.score ?? 0)
         .slice(0, 3);
@@ -288,6 +307,8 @@ export async function GET(
           : 0;
       return {
         ...point,
+        budgetSignals,
+        hasWillingnessToPay: hasWillingnessToPaySignals(budgetSignals),
         upvoteSignal,
       };
     });
@@ -448,7 +469,20 @@ export async function GET(
           description: pp.body,
           subreddits: [pp.subreddit],
           sentiment: pp.sentiment,
-          budget: pp.budget,
+          budgetSignals: pp.budgetSignals,
+          hasWillingnessToPay: pp.hasWillingnessToPay,
+          budgetSignalSummary:
+            pp.budgetSignals.length > 0
+              ? summarizeBudgetSignal(pp.budgetSignals[0])
+              : null,
+          cluster: pp.painPointCluster
+            ? {
+                id: pp.painPointCluster.id,
+                estimatedTamUsdAnnual:
+                  pp.painPointCluster.estimatedTamUsdAnnual ?? null,
+                budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
+              }
+            : null,
           switchingCosts: pp.switchingCosts,
           triedSolutions: pp.triedSolutions || [],
           communityVoices:

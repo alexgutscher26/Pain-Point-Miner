@@ -46,42 +46,6 @@ export default function ReportsPage() {
   const [minScore, setMinScore] = useState("0");
   const [savedOnly, setSavedOnly] = useState("false");
   const [category, setCategory] = useState("all");
-  const [defaultsHydrated, setDefaultsHydrated] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function hydrateDefaults() {
-      try {
-        const response = await fetch("/api/settings");
-        if (!response.ok) return;
-        const data = (await response.json()) as {
-          minimumOpportunityScore?: number;
-        };
-        if (cancelled) return;
-
-        const score = data.minimumOpportunityScore;
-        if (typeof score === "number") {
-          const normalized = Math.max(
-            0,
-            Math.min(100, Math.round(score)),
-          ).toString();
-          setMinScore(normalized);
-        }
-      } catch {
-        // Ignore hydration errors and continue with baseline filter defaults.
-      } finally {
-        if (!cancelled) {
-          setDefaultsHydrated(true);
-        }
-      }
-    }
-
-    void hydrateDefaults();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
@@ -105,9 +69,8 @@ export default function ReportsPage() {
   }, [days, status, minScore, savedOnly, category]);
 
   useEffect(() => {
-    if (!defaultsHydrated) return;
     fetchReports();
-  }, [fetchReports, defaultsHydrated]);
+  }, [fetchReports]);
 
   // Real-time polling while active scans exist
   useEffect(() => {
