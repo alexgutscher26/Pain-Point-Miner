@@ -12,7 +12,7 @@ import { Plus, Bell, Crown, LayoutDashboard } from "lucide-react";
 export const metadata: Metadata = {
   title: {
     default: "Dashboard",
-    template: "%s | Dashboard | Pain-Point Miner",
+    template: "%s | Dashboard | ThreddIQ",
   },
   description: "Private workspace for searches, reports, and account settings.",
   robots: {
@@ -66,7 +66,7 @@ export default async function DashboardLayout({
             </div>
             <div>
               <h1 className="text-[17px] font-black leading-tight tracking-tight">
-                Pain Miner
+                Threddiq
               </h1>
               <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-zinc-400 font-bold">
                 Market Analysis
@@ -125,10 +125,6 @@ export default async function DashboardLayout({
               <span className="hidden sm:inline">New Scan</span>
               <span className="sm:hidden">Scan</span>
             </Link>
-            <button className="p-2.5 text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 transition-colors relative border border-white/20">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff4500] border border-[#0a0a0a]"></span>
-            </button>
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="text-right hidden sm:block">
                 <p className="text-[13px] font-bold text-white leading-none mb-1">

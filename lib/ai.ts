@@ -116,7 +116,7 @@ export const extractPainPoints = async (
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "RPP - Reddit Intelligence Engine",
+          "X-Title": "ThreddIQ - Reddit Intelligence Engine",
         },
         body: JSON.stringify({
           model: model,

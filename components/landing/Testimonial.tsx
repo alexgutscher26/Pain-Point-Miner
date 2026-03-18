@@ -61,7 +61,7 @@ export function Testimonial() {
           <p className="text-[16px] text-zinc-400 font-medium leading-relaxed mb-6">
             I wanted a tool that would analyze Reddit for me, extract complaints
             with AI, and deliver structured validation reports so I could build
-            exactly what people need. So I built Pain-Point Miner.
+                exactly what people need. So I built ThreddIQ.
           </p>
 
           <p className="text-[17px] text-white font-bold leading-relaxed mb-10">

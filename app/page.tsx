@@ -34,20 +34,20 @@ const softwareApplicationJsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "Reddit Pain Point Miner for SaaS Validation",
+  title: "ThreddIQ for SaaS Validation",
   description:
     "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Reddit Pain Point Miner for SaaS Validation",
+    title: "ThreddIQ for SaaS Validation",
     description:
       "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
     url: siteUrl,
   },
   twitter: {
-    title: "Reddit Pain Point Miner for SaaS Validation",
+    title: "ThreddIQ for SaaS Validation",
     description:
       "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
   },

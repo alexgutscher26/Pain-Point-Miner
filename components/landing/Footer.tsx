@@ -20,7 +20,7 @@ export function Footer() {
               <circle cx="12" cy="15" r="3" fill="#1a1a1a" />
             </svg>
             <span className="font-extrabold text-[15px] text-white tracking-wide">
-              RedShip
+              ThreddIQ
             </span>
           </Link>
           <p className="text-[14px] text-zinc-400 leading-relaxed font-medium mb-6">
@@ -301,7 +301,7 @@ export function Footer() {
       {/* From the Maker Banner */}
       <div className="max-w-[1240px] mx-auto border-t border-zinc-800 py-10 flex flex-col items-center gap-4">
         <h5 className="text-[14px] font-bold text-white tracking-wide">
-          From the maker of RedShip
+          From the makers of ThreddIQ
         </h5>
         <div className="flex items-center gap-6 text-[13px] font-medium text-zinc-400 flex-wrap justify-center">
           <Link href="#" className="hover:text-white transition-colors">
@@ -336,7 +336,7 @@ export function Footer() {
 
       {/* Copyright Base */}
       <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-500 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
-        <p>© 2026 RedShip. All rights reserved.</p>
+        <p>© 2026 ThreddIQ. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
           Built with <span className="text-[#a8a8a8]">☕</span> by{" "}
           <span className="text-white font-bold ml-1">Axel Schapmann</span>

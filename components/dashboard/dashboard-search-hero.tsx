@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 
-const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
+const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
 type DashboardSearchHeroProps = {
   trendingTags: string[];

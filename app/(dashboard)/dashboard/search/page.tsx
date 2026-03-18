@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
+const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
 type SearchDraft = {
   keyword: string;

@@ -25,7 +25,7 @@ type RedditTimeRange = "hour" | "day" | "week" | "month" | "year" | "all";
 
 const DEFAULT_USER_AGENT =
   process.env.REDDIT_USER_AGENT ??
-  "RPPScanner/1.0 (+https://github.com; contact: ops@example.com)";
+  "Threddiq/1.0 (+https://threddiq.com; contact: [EMAIL_ADDRESS])";
 const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID?.trim();
 const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET?.trim();
 const DEFAULT_TIMEOUT_MS = 15_000;

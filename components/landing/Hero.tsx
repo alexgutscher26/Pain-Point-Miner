@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Search } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 
-const SEARCH_DRAFT_STORAGE_KEY = "rpp-search-draft-v1";
+const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
 export function Hero() {
   const router = useRouter();
@@ -72,9 +72,8 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-[700px] text-[16px] font-medium leading-relaxed text-zinc-400 md:text-[20px]">
-            Reddit Pain-Point Miner analyzes real conversations to extract
-            underlying problems so you can validate ideas and find underserved
-            niches.
+            ThreddIQ analyzes real conversations to extract underlying
+            problems so you can validate ideas and find underserved niches.
           </p>
 
           <form

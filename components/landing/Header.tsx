@@ -17,7 +17,7 @@ export function Header() {
             </svg>
           </div>
           <span className="font-bold text-base sm:text-lg text-white tracking-tight">
-            Pain-Point Miner
+            Threddiq
           </span>
         </Link>
 

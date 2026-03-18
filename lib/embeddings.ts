@@ -23,7 +23,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "http://localhost:3000",
-      "X-Title": "RPP - Reddit Intelligence Engine",
+      "X-Title": "ThreddIQ - Reddit Intelligence Engine",
     },
     body: JSON.stringify({
       model: EMBEDDING_MODEL,

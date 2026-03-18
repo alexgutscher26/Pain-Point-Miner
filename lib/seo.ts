@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const DEFAULT_SITE_URL = "http://localhost:3000";
+const DEFAULT_SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 function toAbsoluteUrl(rawUrl: string | undefined): string {
   if (!rawUrl) {
@@ -20,7 +20,7 @@ function toAbsoluteUrl(rawUrl: string | undefined): string {
 }
 
 export const siteConfig = {
-  name: "Pain-Point Miner",
+  name: "ThreddIQ",
   description:
     "Discover validated SaaS opportunities by mining real customer frustrations from Reddit.",
   locale: "en_US",

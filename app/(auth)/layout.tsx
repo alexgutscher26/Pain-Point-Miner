@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: {
     default: "Authentication",
-    template: "%s | Pain-Point Miner",
+    template: "%s | ThreddIQ",
   },
-  description: "Sign in or create an account to access Pain-Point Miner.",
+  description: "Sign in or create an account to access Threddiq.",
   robots: {
     index: false,
     follow: false,
