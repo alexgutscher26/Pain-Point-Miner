@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export interface RedditPost {
@@ -99,8 +100,21 @@ const STOP_WORDS = new Set([
   "to",
   "with",
 ]);
-const PAIN_SIGNAL_REGEX =
-  /\b(problem|pain|frustrat(?:ed|ing|ion)?|annoy(?:ed|ing)?|stuck|struggl(?:e|ing)|broken|issue|waste|slow|manual|hate|need|looking for|any alternative|any solution)\b/i;
+
+export const DEFAULT_PROBLEM_PATTERNS = [
+  "struggling",
+  "frustrating",
+  "hate",
+  "pain",
+  "wish there was",
+  "why is it so hard",
+  "anyone else deal with",
+] as const;
+
+export type ProblemPatternMatchStats = {
+  matchCount: number;
+  matchedPatterns: string[];
+};
 
 /**
  * Pauses execution for a specified number of milliseconds.
@@ -274,6 +288,24 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function normalizePattern(pattern: string) {
+  return pattern.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function createPatternRegex(pattern: string) {
+  const normalizedPattern = normalizePattern(pattern);
+  const parts = normalizedPattern
+    .split(" ")
+    .map((part) => escapeRegExp(part))
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return null;
+  }
+
+  return new RegExp(`\\b${parts.join("\\s+")}\\b`, "gi");
+}
+
 function tokenizeKeyword(keyword: string) {
   return keyword
     .toLowerCase()
@@ -288,12 +320,46 @@ function countOccurrences(text: string, needle: string) {
   return matches?.length ?? 0;
 }
 
-export function scoreRedditPostRelevance(post: RedditPost, keyword: string) {
+export function resolveProblemPatterns(customPatterns: string[] = []) {
+  return [...DEFAULT_PROBLEM_PATTERNS, ...customPatterns]
+    .map((pattern) => normalizePattern(pattern))
+    .filter(Boolean)
+    .filter((pattern, index, values) => values.indexOf(pattern) === index);
+}
+
+export function getProblemPatternMatchStats(
+  post: RedditPost,
+  problemPatterns: string[] = [...DEFAULT_PROBLEM_PATTERNS],
+): ProblemPatternMatchStats {
+  const combined = normalizeText(`${post.title ?? ""} ${post.selftext ?? ""}`);
+  const matchedPatterns: string[] = [];
+
+  for (const pattern of resolveProblemPatterns(problemPatterns)) {
+    const regex = createPatternRegex(pattern);
+    if (!regex) continue;
+
+    if (regex.test(combined)) {
+      matchedPatterns.push(pattern);
+    }
+  }
+
+  return {
+    matchCount: matchedPatterns.length,
+    matchedPatterns,
+  };
+}
+
+export function scoreRedditPostRelevance(
+  post: RedditPost,
+  keyword: string,
+  problemPatterns: string[] = [...DEFAULT_PROBLEM_PATTERNS],
+) {
   const normalizedKeyword = normalizeText(keyword);
   const keywordTokens = tokenizeKeyword(keyword);
   const title = normalizeText(post.title ?? "");
   const body = normalizeText(post.selftext ?? "");
   const combined = `${title} ${body}`.trim();
+  const patternStats = getProblemPatternMatchStats(post, problemPatterns);
 
   let score = 0;
 
@@ -320,8 +386,9 @@ export function scoreRedditPostRelevance(post: RedditPost, keyword: string) {
     if (bodyTokenMatches === keywordTokens.length) score += 10;
   }
 
-  if (PAIN_SIGNAL_REGEX.test(title)) score += 10;
-  if (PAIN_SIGNAL_REGEX.test(body)) score += 6;
+  score += patternStats.matchCount * 12;
+  if (patternStats.matchCount > 0 && title) score += 8;
+  if (patternStats.matchCount > 1 && body) score += 4;
 
   score += Math.min(20, Math.log10(Math.max(1, post.score) + 1) * 8);
   score += Math.min(18, Math.log10(Math.max(1, post.num_comments) + 1) * 9);
@@ -338,11 +405,24 @@ export function scoreRedditPostRelevance(post: RedditPost, keyword: string) {
   return score;
 }
 
-export function rankRedditPosts(posts: RedditPost[], keyword: string) {
+export function filterPostsByProblemPatterns(
+  posts: RedditPost[],
+  problemPatterns: string[] = [...DEFAULT_PROBLEM_PATTERNS],
+) {
+  return posts.filter(
+    (post) => getProblemPatternMatchStats(post, problemPatterns).matchCount > 0,
+  );
+}
+
+export function rankRedditPosts(
+  posts: RedditPost[],
+  keyword: string,
+  problemPatterns: string[] = [...DEFAULT_PROBLEM_PATTERNS],
+) {
   return [...posts].sort((a, b) => {
     const byScore =
-      scoreRedditPostRelevance(b, keyword) -
-      scoreRedditPostRelevance(a, keyword);
+      scoreRedditPostRelevance(b, keyword, problemPatterns) -
+      scoreRedditPostRelevance(a, keyword, problemPatterns);
     if (byScore !== 0) return byScore;
 
     const byComments = (b.num_comments ?? 0) - (a.num_comments ?? 0);

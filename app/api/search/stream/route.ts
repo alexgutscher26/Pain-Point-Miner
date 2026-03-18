@@ -5,6 +5,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { normalizeRunStatus, type RunStatus } from "@/lib/run-status";
+import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
 
 const querySchema = z.object({
   id: z.string().uuid("Invalid scraper id"),
@@ -22,6 +23,7 @@ type StreamEvent = {
   commentsFetched: number;
   status: RunStatus;
   subreddits: string[];
+  timeWindow: string;
 };
 
 function phaseToProgress(phase: RunStatus): number {
@@ -128,6 +130,9 @@ export async function GET(req: Request) {
           const phase = normalizeRunStatus(latestRun?.status);
           const painPointCount = results.length;
           const subreddits = scraperRecord.subreddits ?? [];
+          const timeWindow = getTimeWindowLabel(
+            normalizeTimeWindow(scraperRecord.timeWindow),
+          );
 
           const event: StreamEvent = {
             phase,
@@ -143,6 +148,7 @@ export async function GET(req: Request) {
             commentsFetched: latestRun?.commentsFetched ?? 0,
             status: phase,
             subreddits,
+            timeWindow,
           };
 
           send(event);

@@ -9,13 +9,20 @@ import {
 } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import {
+  filterPostsByProblemPatterns,
   fetchComments,
   fetchSubredditPostsBatched,
   rankRedditPosts,
+  resolveProblemPatterns,
   type RedditPost,
 } from "@/lib/reddit";
 import { clusterPainPoint } from "@/lib/clustering";
 import { claimRedditPostForAiProcessing } from "@/lib/reddit-idempotency";
+import {
+  getRedditTimeRangeForWindow,
+  getTimeWindowAgeSeconds,
+  type TimeWindow,
+} from "@/lib/time-window";
 
 export type MiningDepth = "basic" | "deep" | "advanced";
 
@@ -25,6 +32,7 @@ type ExecuteMiningRunInput = {
   subreddits: string[];
   customPatterns: string[];
   miningDepth: MiningDepth;
+  timeWindow: TimeWindow;
   userId: string;
   workspaceId: string | null;
   maxSubreddits?: number;
@@ -35,6 +43,7 @@ type ExecuteMiningRunInput = {
 type ExecuteMiningRunResult = {
   runId: string;
   postsFetched: number;
+  postsMatched: number;
   commentsFetched: number;
   newPainPoints: number;
 };
@@ -87,6 +96,7 @@ export async function executeMiningRun({
   subreddits,
   customPatterns,
   miningDepth,
+  timeWindow,
   userId,
   workspaceId,
   maxSubreddits,
@@ -95,7 +105,6 @@ export async function executeMiningRun({
 }: ExecuteMiningRunInput): Promise<ExecuteMiningRunResult> {
   const runId = crypto.randomUUID();
   const startTime = new Date();
-  const isBasic = miningDepth === "basic";
   const isAdvanced = miningDepth === "advanced";
   const subLimit =
     maxSubreddits ?? (isAdvanced ? 15 : miningDepth === "deep" ? 10 : 5);
@@ -126,7 +135,7 @@ export async function executeMiningRun({
       targetSubreddits.map((sub) =>
         fetchSubredditPostsBatched(sub, keyword, {
           maxPosts: postsPerSub,
-          time: "year",
+          time: getRedditTimeRangeForWindow(timeWindow),
         }),
       ),
     );
@@ -139,24 +148,25 @@ export async function executeMiningRun({
       }
     }
 
-    allPosts = rankRedditPosts(dedupePosts(allPosts), keyword);
+    const problemPatterns = resolveProblemPatterns(customPatterns);
+    const fetchedPosts = dedupePosts(allPosts);
+    const rankedPosts = rankRedditPosts(fetchedPosts, keyword, problemPatterns);
+    allPosts = filterPostsByProblemPatterns(rankedPosts, problemPatterns);
 
     // Update phase: scanning → extracting
+    const nowSeconds = Math.floor(Date.now() / 1_000);
+    const oldestAllowedUtc = nowSeconds - getTimeWindowAgeSeconds(timeWindow);
+    allPosts = allPosts.filter((post) => post.created_utc >= oldestAllowedUtc);
+    allPosts = rankRedditPosts(allPosts, keyword, problemPatterns);
+
     await db
       .update(scraperRun)
       .set({
         status: "extracting",
-        postsFetched: allPosts.length,
+        postsFetched: fetchedPosts.length,
         postsMatched: allPosts.length,
       })
       .where(eq(scraperRun.id, runId));
-
-    if (isBasic) {
-      const nowSeconds = Math.floor(Date.now() / 1_000);
-      const threeMonthsAgo = nowSeconds - 90 * 24 * 60 * 60;
-      allPosts = allPosts.filter((post) => post.created_utc >= threeMonthsAgo);
-      allPosts = rankRedditPosts(allPosts, keyword);
-    }
 
     let commentsFetched = 0;
     let newPainPoints = 0;
@@ -286,7 +296,7 @@ export async function executeMiningRun({
       .set({
         status: "completed",
         finishedAt: new Date(),
-        postsFetched: allPosts.length,
+        postsFetched: fetchedPosts.length,
         postsMatched: allPosts.length,
         commentsFetched,
         newPainPoints,
@@ -318,7 +328,7 @@ export async function executeMiningRun({
       .set({
         lastRunAt: new Date(),
         updatedAt: new Date(),
-        postsScanned: sql`${scraper.postsScanned} + ${allPosts.length}`,
+        postsScanned: sql`${scraper.postsScanned} + ${fetchedPosts.length}`,
         painPointsFound: sql`${scraper.painPointsFound} + ${newPainPoints}`,
         errorCount: 0,
         lastError: null,
@@ -327,7 +337,8 @@ export async function executeMiningRun({
 
     return {
       runId,
-      postsFetched: allPosts.length,
+      postsFetched: fetchedPosts.length,
+      postsMatched: allPosts.length,
       commentsFetched,
       newPainPoints,
     };

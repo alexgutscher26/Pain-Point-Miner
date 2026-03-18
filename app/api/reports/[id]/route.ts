@@ -11,6 +11,7 @@ import {
 import { toOpportunityScore, toValidationScore } from "@/lib/dashboard-metrics";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
+import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
@@ -352,6 +353,10 @@ export async function GET(
       saved: currentScraper.reportSaved ?? false,
       category: currentScraper.reportCategory || "Uncategorized",
       customPatterns: currentScraper.customPatterns || [],
+      timeWindow: normalizeTimeWindow(currentScraper.timeWindow),
+      timeWindowLabel: getTimeWindowLabel(
+        normalizeTimeWindow(currentScraper.timeWindow),
+      ),
       trend: trendInsight
         ? entitlements.hasTrendDetection
           ? {

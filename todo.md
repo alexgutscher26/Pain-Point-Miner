@@ -70,14 +70,14 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Data & Scraper Logic**
 
-- [ ] **Problem Pattern Filtering**: Integrate the "Problem Keyword" filter directly into post selection.
-  - [ ] Add a configurable keyword dictionary: "struggling", "frustrating", "hate", "pain", "wish there was", "why is it so hard", "anyone else deal with".
-  - [ ] Score posts by how many problem patterns appear in title + selftext.
-  - [ ] Expose pattern matching stats in the `scraperRun` record (e.g., `postsMatched` reflects pattern-filtered count).
-- [ ] **Temporal Filtering**: Support last 24h, 7d, 30d, and 90d windows.
-  - [ ] Add a `timeWindow` field to the search payload schema.
-  - [ ] Pass `time` parameter to `fetchSubredditPostsBatched` based on selected window.
-  - [ ] Show the active time window in the analysis page and report header.
+- [x] **Problem Pattern Filtering**: Integrate the "Problem Keyword" filter directly into post selection.
+  - [x] Add a configurable keyword dictionary: "struggling", "frustrating", "hate", "pain", "wish there was", "why is it so hard", "anyone else deal with".
+  - [x] Score posts by how many problem patterns appear in title + selftext.
+  - [x] Expose pattern matching stats in the `scraperRun` record (e.g., `postsMatched` reflects pattern-filtered count).
+- [x] **Temporal Filtering**: Support last 24h, 7d, 30d, and 90d windows.
+  - [x] Add a `timeWindow` field to the search payload schema.
+  - [x] Pass `time` parameter to `fetchSubredditPostsBatched` based on selected window.
+  - [x] Show the active time window in the analysis page and report header.
 - [x] **Idempotency Guard**: `reddit-idempotency.ts` ensures we never bill/call AI twice for the same Reddit post ID within a 24h window.
 - [ ] **Reddit Rate Limit Monitoring**: Track 429/403 error rates per-subreddit.
   - [ ] Log rate limit events to a `reddit_rate_limit_log` table.

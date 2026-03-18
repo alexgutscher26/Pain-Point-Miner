@@ -5,6 +5,7 @@ import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
+import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
 
 const searchStatusQuerySchema = z.object({
   id: z.string().uuid("Invalid scraper id"),
@@ -68,6 +69,9 @@ export async function GET(req: Request) {
     return apiJson(
       {
         scraper: currentScraper,
+        timeWindowLabel: getTimeWindowLabel(
+          normalizeTimeWindow(currentScraper.timeWindow),
+        ),
         latestRun,
         painPointCount: results.length,
         status: normalizeRunStatus(latestRun?.status),

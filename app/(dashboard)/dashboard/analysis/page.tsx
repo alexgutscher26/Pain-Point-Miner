@@ -26,6 +26,7 @@ export default function AnalysisPage() {
     painPointCount,
     postsFetched,
     subreddits,
+    timeWindow,
     isDone,
     hasFailed,
   } = useMiningStream(scraperId);
@@ -115,6 +116,9 @@ export default function AnalysisPage() {
         </h2>
         <p className="text-zinc-400 font-medium text-lg">
           Our specialized algorithms are decoding the Reddit pulse for you.
+        </p>
+        <p className="mt-3 font-mono text-[11px] font-black uppercase tracking-widest text-amber-400">
+          Active window: {timeWindow}
         </p>
       </div>
 

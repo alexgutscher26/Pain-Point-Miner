@@ -7,6 +7,7 @@ import { scraper } from "@/lib/db/schema";
 import { executeMiningRun } from "@/lib/mining-runner";
 import { isScraperDue, parsePositiveIntFromEnv } from "@/lib/scheduler";
 import type { MiningDepth } from "@/lib/mining-runner";
+import { normalizeTimeWindow } from "@/lib/time-window";
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional(),
@@ -104,6 +105,7 @@ export async function POST(req: Request) {
         subreddits: scraper.subreddits,
         customPatterns: scraper.customPatterns,
         miningDepth: scraper.miningDepth,
+        timeWindow: scraper.timeWindow,
         frequency: scraper.frequency,
         lastRunAt: scraper.lastRunAt,
       })
@@ -144,6 +146,7 @@ export async function POST(req: Request) {
           subreddits,
           customPatterns: row.customPatterns ?? [],
           miningDepth: normalizeMiningDepth(row.miningDepth),
+          timeWindow: normalizeTimeWindow(row.timeWindow),
           userId: row.userId,
           workspaceId: row.workspaceId,
           maxSubreddits,

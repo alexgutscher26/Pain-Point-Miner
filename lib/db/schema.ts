@@ -266,6 +266,7 @@ export const scraper = pgTable(
       .array()
       .default(sql`'{}'::text[]`),
     miningDepth: text().default("basic").notNull(),
+    timeWindow: text().default("90d").notNull(),
     reportSaved: boolean().default(false).notNull(),
     reportCategory: text().default("Uncategorized").notNull(),
     reportSavedAt: timestamp({ precision: 3, mode: "date" }),

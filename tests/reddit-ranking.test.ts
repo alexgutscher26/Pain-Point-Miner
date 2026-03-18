@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  filterPostsByProblemPatterns,
+  getProblemPatternMatchStats,
   rankRedditPosts,
+  resolveProblemPatterns,
   scoreRedditPostRelevance,
   type RedditPost,
 } from "@/lib/reddit";
@@ -71,5 +74,63 @@ describe("reddit ranking", () => {
     const ranked = rankRedditPosts(posts, keyword);
 
     expect(ranked[0]?.title).toContain("Property management software");
+  });
+
+  it("counts default and custom problem patterns across title and selftext", () => {
+    const post = makePost({
+      title: "Why is it so hard to manage handoffs?",
+      selftext:
+        "Anyone else deal with this? I hate how frustrating the current process is.",
+    });
+
+    const stats = getProblemPatternMatchStats(
+      post,
+      resolveProblemPatterns(["current process"]),
+    );
+
+    expect(stats.matchCount).toBe(5);
+    expect(stats.matchedPatterns).toEqual(
+      expect.arrayContaining([
+        "why is it so hard",
+        "anyone else deal with",
+        "hate",
+        "frustrating",
+        "current process",
+      ]),
+    );
+  });
+
+  it("filters out posts with no problem-pattern matches", () => {
+    const patterns = resolveProblemPatterns();
+    const matched = makePost({
+      title: "Anyone else deal with support queue pain?",
+      selftext: "This workflow is frustrating every single day.",
+    });
+    const unmatched = makePost({
+      title: "What analytics dashboard do you use?",
+      selftext: "Collecting tool recommendations for a side project.",
+    });
+
+    const filtered = filterPostsByProblemPatterns([matched, unmatched], patterns);
+
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0]?.id).toBe(matched.id);
+  });
+
+  it("uses multiple pattern matches to boost ranking", () => {
+    const keyword = "customer support";
+    const patterns = resolveProblemPatterns();
+    const strong = makePost({
+      title: "Customer support is frustrating and I hate our queue",
+      selftext: "Anyone else deal with this pain every week?",
+    });
+    const weaker = makePost({
+      title: "Customer support software recommendations",
+      selftext: "Looking for a better setup.",
+    });
+
+    expect(
+      scoreRedditPostRelevance(strong, keyword, patterns),
+    ).toBeGreaterThan(scoreRedditPostRelevance(weaker, keyword, patterns));
   });
 });

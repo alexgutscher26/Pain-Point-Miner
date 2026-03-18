@@ -21,6 +21,7 @@ export type MiningStreamState = {
   commentsFetched: number;
   status: MiningPhase;
   subreddits: string[];
+  timeWindow: string;
 };
 
 const INITIAL_STATE: MiningStreamState = {
@@ -32,6 +33,7 @@ const INITIAL_STATE: MiningStreamState = {
   commentsFetched: 0,
   status: "running",
   subreddits: [],
+  timeWindow: "Last 90d",
 };
 
 /**
@@ -78,6 +80,7 @@ export function useMiningStream(scraperId: string | null) {
             commentsFetched: data.latestRun?.commentsFetched ?? 0,
             status: phase,
             subreddits: data.scraper?.subreddits ?? [],
+            timeWindow: data.timeWindowLabel ?? "Last 90d",
           });
         } catch {
           // ignore polling errors

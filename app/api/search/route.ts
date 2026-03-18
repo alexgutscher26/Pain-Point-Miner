@@ -13,6 +13,10 @@ import {
   isDepthAllowed,
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
+import {
+  DEFAULT_TIME_WINDOW,
+  normalizeTimeWindow,
+} from "@/lib/time-window";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -155,6 +159,10 @@ const searchPayloadSchema = z.object({
     .enum(["basic", "deep", "advanced"])
     .optional()
     .default("basic"),
+  timeWindow: z
+    .enum(["24h", "7d", "30d", "90d"])
+    .optional()
+    .default(DEFAULT_TIME_WINDOW),
 });
 
 const idempotencyKeySchema = z
@@ -246,7 +254,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { keyword, subreddits, customPatterns, miningDepth } =
+    const { keyword, subreddits, customPatterns, miningDepth, timeWindow } =
       parsedPayload.data;
     const planContext = await resolvePlanContext({
       userId,
@@ -400,13 +408,16 @@ export async function POST(req: Request) {
             latestMatchingScraper.customPatterns,
             patterns,
           );
+          const isSameTimeWindow =
+            normalizeTimeWindow(latestMatchingScraper.timeWindow) === timeWindow;
 
           if (
             isWithinDuplicateWindow &&
             isSameKeyword &&
             isSameDepth &&
             isSameSubreddits &&
-            isSamePatterns
+            isSamePatterns &&
+            isSameTimeWindow
           ) {
             const latestRun = latestMatchingScraper.scraperRuns?.[0];
             return {
@@ -427,6 +438,7 @@ export async function POST(req: Request) {
           subreddits: targetSubreddits,
           customPatterns: patterns,
           miningDepth,
+          timeWindow,
           userId,
           workspaceId,
           updatedAt: new Date(),
@@ -438,6 +450,7 @@ export async function POST(req: Request) {
           subreddits: targetSubreddits,
           customPatterns: patterns,
           miningDepth,
+          timeWindow,
           userId,
           workspaceId,
           maxPostsPerSubreddit:

@@ -22,6 +22,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DEFAULT_TIME_WINDOW,
+  getTimeWindowLabel,
+  type TimeWindow,
+} from "@/lib/time-window";
 
 const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
@@ -30,6 +35,7 @@ type SearchDraft = {
   subreddits: string;
   customPatterns: string;
   miningDepth: "basic" | "deep" | "advanced";
+  timeWindow: TimeWindow;
   savedAt: string;
 };
 
@@ -107,6 +113,7 @@ export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [miningDepth, setMiningDepth] = useState<MiningDepth>("basic");
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>(DEFAULT_TIME_WINDOW);
   const [keyword, setKeyword] = useState("");
   const [subreddits, setSubreddits] = useState("");
   const [customPatterns, setCustomPatterns] = useState("");
@@ -157,6 +164,13 @@ export default function SearchPage() {
           : parsedDraft.miningDepth === "deep"
             ? "deep"
             : "basic",
+      );
+      setTimeWindow(
+        parsedDraft.timeWindow === "24h" ||
+          parsedDraft.timeWindow === "7d" ||
+          parsedDraft.timeWindow === "30d"
+          ? parsedDraft.timeWindow
+          : DEFAULT_TIME_WINDOW,
       );
       setDraftSavedAt(parsedDraft.savedAt ?? null);
     } catch {
@@ -330,6 +344,7 @@ export default function SearchPage() {
             .map((p) => p.trim())
             .filter(Boolean),
           miningDepth,
+          timeWindow,
         }),
       });
 
@@ -382,6 +397,7 @@ export default function SearchPage() {
       subreddits: subreddits.trim(),
       customPatterns: customPatterns.trim(),
       miningDepth,
+      timeWindow,
       savedAt: new Date().toISOString(),
     };
 
@@ -712,6 +728,37 @@ export default function SearchPage() {
                     : `/${billing.usage.monthlyScansLimit}`}
                 </p>
               ) : null}
+            </div>
+
+            <div className="space-y-4">
+              <label className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
+                Time Window
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(["24h", "7d", "30d", "90d"] as const).map((window) => (
+                  <button
+                    key={window}
+                    type="button"
+                    onClick={() => setTimeWindow(window)}
+                    className={`border-2 px-4 py-4 text-left transition-colors ${
+                      timeWindow === window
+                        ? "bg-amber-500/10 border-amber-400/60 shadow-[3px_3px_0px_0px_rgba(245,158,11,0.18)]"
+                        : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
+                    }`}
+                  >
+                    <p
+                      className={`font-mono text-[11px] font-black uppercase tracking-widest ${
+                        timeWindow === window ? "text-amber-300" : "text-zinc-400"
+                      }`}
+                    >
+                      {getTimeWindowLabel(window)}
+                    </p>
+                    <p className="mt-1 text-[11px] font-bold text-zinc-500">
+                      Restrict discovery to this recency window.
+                    </p>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Footer Actions */}

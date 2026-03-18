@@ -66,6 +66,8 @@ interface ReportData {
   date: string;
   saved: boolean;
   category: string;
+  timeWindow?: "24h" | "7d" | "30d" | "90d";
+  timeWindowLabel?: string;
   trend?: {
     direction: "up" | "down" | "flat" | "new";
     delta: number;
@@ -154,6 +156,111 @@ function formatPainDescription(description: string) {
     paragraphs.push(sentenceList.slice(i, i + 2).join(" "));
   }
   return paragraphs;
+}
+
+function normalizeEvidenceText(value?: string | null) {
+  const normalized = value?.trim();
+  return normalized && normalized.length > 0 ? normalized : null;
+}
+
+function toTitleCase(value: string) {
+  return value
+    .split(/\s+/)
+    .map((part) =>
+      part.length <= 2
+        ? part.toUpperCase()
+        : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join(" ");
+}
+
+function formatBudgetValue(
+  budget?: string | null,
+  monetization?: number,
+  urgency?: string,
+) {
+  const value = normalizeEvidenceText(budget);
+  if (value) return value;
+
+  if ((monetization ?? 0) >= 8) {
+    return "High willingness";
+  }
+
+  if ((monetization ?? 0) >= 6) {
+    return "Paid team need";
+  }
+
+  if ((monetization ?? 0) >= 4) {
+    return urgency === "Extreme Urgency" ? "Budget pressure" : "Some willingness";
+  }
+
+  return "Weak signal";
+}
+
+function formatSwitchingValue(
+  switchingCosts?: string | null,
+  maturity?: number,
+  triedSolutions?: string[],
+) {
+  const value = normalizeEvidenceText(switchingCosts);
+  if (value) return value;
+
+  const triedCount = (triedSolutions ?? []).filter(Boolean).length;
+
+  if ((maturity ?? 0) >= 8) {
+    return triedCount > 0 ? "Crowded market" : "Entrenched tools";
+  }
+
+  if ((maturity ?? 0) >= 5) {
+    return triedCount > 1 ? "Actively comparing" : "Existing tools";
+  }
+
+  if (triedCount > 0) {
+    return "Low lock-in";
+  }
+
+  return "Early market";
+}
+
+function formatTriedValue(triedSolutions?: string[]) {
+  const tried = (triedSolutions ?? [])
+    .map((solution) => solution.trim())
+    .filter(Boolean);
+
+  if (tried.length === 0) {
+    return "None named";
+  }
+
+  if (tried.length === 1) {
+    return tried[0];
+  }
+
+  const preview = tried.slice(0, 2).join(", ");
+  return tried.length > 2 ? `${preview} +${tried.length - 2}` : preview;
+}
+
+function formatPaySignalValue(monetization?: number) {
+  if (!monetization || monetization <= 0) {
+    return "No signal";
+  }
+
+  return `${monetization}/10`;
+}
+
+function formatStageValue(maturity?: number) {
+  if (!maturity || maturity <= 0) {
+    return "Unclear";
+  }
+
+  if (maturity < 4) {
+    return "Blue Ocean";
+  }
+
+  if (maturity > 7) {
+    return "Disruption";
+  }
+
+  return "Scaling";
 }
 
 function normalizeKeyword(input: string) {
@@ -354,6 +461,7 @@ export default function ReportDetailPage() {
           .join(", "),
         customPatterns: sanitizedPatterns,
         miningDepth: "deep" as const,
+        timeWindow: reportData.timeWindow ?? "90d",
       };
 
       let response = await fetch("/api/search", {
@@ -372,6 +480,7 @@ export default function ReportDetailPage() {
             subreddits: "",
             customPatterns: [],
             miningDepth: "deep",
+            timeWindow: reportData.timeWindow ?? "90d",
           }),
         });
       }
@@ -612,10 +721,14 @@ export default function ReportDetailPage() {
           <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">
             Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
           </h2>
-          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
-            Scanned on {reportData.date}
-          </div>
+              <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
+                Scanned on {reportData.date}
+              </div>
+              <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest">
+                <Filter className="w-3.5 h-3.5 text-amber-400" />
+                Window: {reportData.timeWindowLabel ?? "Last 90d"}
+              </div>
           {reportData.trend && (
             <div className="pt-3">
               <span
@@ -842,45 +955,43 @@ export default function ReportDetailPage() {
                 </div>
 
                 {getActiveTab(pain.id) === "signals" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3 relative z-10">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 relative z-10">
                     <InfoSquare
                       icon={<DollarSign className="w-3.5 h-3.5" />}
                       label="Budget"
-                      value={pain.budget || "Unseen"}
+                      value={formatBudgetValue(
+                        pain.budget,
+                        pain.monetization,
+                        pain.urgency,
+                      )}
                       color="text-emerald-500"
                     />
                     <InfoSquare
                       icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
                       label="Switching"
-                      value={pain.switchingCosts || "Low friction"}
+                      value={formatSwitchingValue(
+                        pain.switchingCosts,
+                        pain.maturity,
+                        pain.triedSolutions,
+                      )}
                       color="text-amber-500"
                     />
                     <InfoSquare
                       icon={<Wrench className="w-3.5 h-3.5" />}
                       label="Tried"
-                      value={
-                        pain.triedSolutions && pain.triedSolutions.length > 0
-                          ? pain.triedSolutions.length.toString()
-                          : "0"
-                      }
+                      value={formatTriedValue(pain.triedSolutions)}
                       color="text-blue-500"
                     />
                     <InfoSquare
                       icon={<TrendingUp className="w-3.5 h-3.5" />}
                       label="Pay Signal"
-                      value={`${pain.monetization || 0}/10`}
+                      value={formatPaySignalValue(pain.monetization)}
                       color="text-violet-500"
                     />
                     <InfoSquare
                       icon={<BarChart3 className="w-3.5 h-3.5" />}
                       label="Stage"
-                      value={
-                        pain.maturity && pain.maturity < 4
-                          ? "Blue Ocean"
-                          : pain.maturity && pain.maturity > 7
-                            ? "Disruption"
-                            : "Scaling"
-                      }
+                      value={formatStageValue(pain.maturity)}
                       color="text-rose-500"
                     />
                   </div>
@@ -1277,8 +1388,8 @@ function InfoSquare({
         <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-widest">
           {label}
         </p>
-        <p className="text-sm font-black text-white leading-tight break-words whitespace-normal">
-          {value}
+        <p className="text-sm font-black text-white leading-tight break-words whitespace-normal sm:text-[15px]">
+          {toTitleCase(value)}
         </p>
       </div>
     </div>
