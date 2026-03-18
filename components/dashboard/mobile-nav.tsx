@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
-import { SignOutButton } from "@/components/dashboard/sign-out-button";
+import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-links";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function DashboardMobileNav({
@@ -49,11 +49,11 @@ export function DashboardMobileNav({
           <div className="px-4 py-4">
             <SidebarLinks />
           </div>
-          <div className="mt-auto border-t border-white/10 px-4 py-4">
+          <div className="mt-auto px-4 py-4">
             <p className="mb-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
               {userName}
             </p>
-            <SignOutButton />
+            <DashboardFooterLinks />
           </div>
         </div>
       </SheetContent>
