@@ -4,9 +4,14 @@ import { useState } from "react";
 import { CreditCard, ExternalLink, Loader2 } from "lucide-react";
 import type { BillingPlan, PlanEntitlements } from "@/lib/plan-gating";
 
+type BillingPurchaseOption = {
+  plan: BillingPlan;
+  yearlyAvailable: boolean;
+};
+
 type BillingPageClientProps = {
   stripeConfigured: boolean;
-  availablePlans: BillingPlan[];
+  availablePlans: BillingPurchaseOption[];
   plan: BillingPlan;
   planPurchaseRequired: boolean;
   trialActive: boolean;
@@ -39,6 +44,9 @@ export function BillingPageClient({
   const [openingPortal, setOpeningPortal] = useState(false);
   const [startingCheckoutPlan, setStartingCheckoutPlan] =
     useState<BillingPlan | null>(null);
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
   const [actionState, setActionState] = useState<BillingActionState>(null);
 
   async function openBillingPortal() {
@@ -98,7 +106,7 @@ export function BillingPageClient({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           plan: targetPlan,
-          annual: false,
+          annual: billingInterval === "yearly",
           successUrl: `${window.location.origin}/dashboard/billing`,
           cancelUrl: `${window.location.origin}/dashboard/billing`,
           returnUrl: `${window.location.origin}/dashboard/billing`,
@@ -157,11 +165,11 @@ export function BillingPageClient({
       {planPurchaseRequired ? (
         <div className="border-2 border-rose-400/60 bg-rose-500/10 px-5 py-4">
           <p className="font-mono text-[11px] font-black uppercase tracking-widest text-rose-300 mb-1">
-            Trial Expired
+            Plan Inactive
           </p>
           <p className="text-sm text-rose-100 font-semibold">
-            Your free trial has ended. Purchase a plan to resume searches and
-            paid features.
+            Your account is in read-only mode. Purchase a plan to resume new
+            searches and paid features.
           </p>
         </div>
       ) : null}
@@ -187,23 +195,59 @@ export function BillingPageClient({
 
       {availablePlans.length > 0 ? (
         <div className="bg-[#111] border-2 border-white/15 p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
-          <h3 className="text-white text-lg font-black mb-4">Purchase Plan</h3>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
+            <h3 className="text-white text-lg font-black">Purchase Plan</h3>
+            <div className="inline-flex items-center gap-2 bg-[#161616] p-1 border border-white/15">
+              <button
+                type="button"
+                onClick={() => setBillingInterval("monthly")}
+                className={`px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest ${
+                  billingInterval === "monthly"
+                    ? "bg-[#ff4500] text-white"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                onClick={() => setBillingInterval("yearly")}
+                className={`px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest ${
+                  billingInterval === "yearly"
+                    ? "bg-[#ff4500] text-white"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Yearly
+              </button>
+            </div>
+          </div>
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
             Choose a paid plan to restore access after trial expiry or upgrade
-            your current account.
+            your current account.{" "}
+            {billingInterval === "yearly"
+              ? "Yearly checkout is selected."
+              : "Monthly checkout is selected."}
           </p>
           <div className="flex flex-wrap gap-3">
-            {availablePlans.map((targetPlan) => {
+            {availablePlans.map(({ plan: targetPlan, yearlyAvailable }) => {
               const isCurrentPlan =
                 !planPurchaseRequired && targetPlan === plan && !trialActive;
               const isLoading = startingCheckoutPlan === targetPlan;
+              const yearlyDisabled =
+                billingInterval === "yearly" && !yearlyAvailable;
 
               return (
                 <button
                   key={targetPlan}
                   type="button"
                   onClick={() => startCheckout(targetPlan)}
-                  disabled={isCurrentPlan || isLoading || !stripeConfigured}
+                  disabled={
+                    isCurrentPlan ||
+                    isLoading ||
+                    !stripeConfigured ||
+                    yearlyDisabled
+                  }
                   className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white font-mono text-sm font-bold uppercase tracking-wide px-5 py-2.5 transition-colors"
                 >
                   {isLoading ? (
@@ -211,7 +255,11 @@ export function BillingPageClient({
                   ) : (
                     <ExternalLink className="w-4 h-4" />
                   )}
-                  {isCurrentPlan ? `${targetPlan} current` : `Buy ${targetPlan}`}
+                  {isCurrentPlan
+                    ? `${targetPlan} current`
+                    : yearlyDisabled
+                      ? `Yearly unavailable`
+                      : `Buy ${targetPlan} ${billingInterval}`}
                 </button>
               );
             })}
@@ -252,14 +300,14 @@ export function BillingPageClient({
         <div className="bg-[#111] border-2 border-white/15 p-6 space-y-4 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
           <h3 className="text-white text-lg font-black">Current Access</h3>
           <p className="text-2xl font-black text-[#ff4500] uppercase">
-            {planPurchaseRequired ? "Plan Required" : plan}
+            {planPurchaseRequired ? "Read Only" : plan}
           </p>
           <div className="space-y-2 font-mono text-sm text-zinc-400">
             <p>
               Status:{" "}
               <span className="text-white font-bold">
                 {planPurchaseRequired
-                  ? "Trial expired"
+                  ? "Plan inactive"
                   : trialActive
                     ? "Free trial"
                     : "Active plan"}
@@ -269,7 +317,7 @@ export function BillingPageClient({
               Scans this month:{" "}
               <span className="text-white font-bold">
                 {planPurchaseRequired
-                  ? "Blocked until purchase"
+                  ? "Read only"
                   : `${usage.monthlyScansUsed}${
                       usage.monthlyScansLimit === null
                         ? ""
@@ -281,7 +329,7 @@ export function BillingPageClient({
               Max subreddits/search:{" "}
               <span className="text-white font-bold">
                 {planPurchaseRequired
-                  ? "Locked until purchase"
+                  ? "Requires paid plan"
                   : entitlements.maxSubredditsPerSearch === null
                   ? "Unlimited"
                   : entitlements.maxSubredditsPerSearch}
@@ -291,12 +339,17 @@ export function BillingPageClient({
               Save reports:{" "}
               <span className="text-white font-bold">
                 {planPurchaseRequired
-                  ? "Locked until purchase"
+                  ? "Past reports stay available"
                   : entitlements.canSaveReports
                     ? "Enabled"
                     : "Upgrade required"}
               </span>
             </p>
+            {planPurchaseRequired ? (
+              <p className="text-amber-200">
+                New scans and AI actions unlock after you purchase a plan.
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

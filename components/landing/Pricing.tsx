@@ -7,9 +7,31 @@ import { ArrowRight, Check, Magnet, RotateCw } from "lucide-react";
 export function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
 
-  const calculatePrice = (monthly: number) => {
-    return isYearly ? Math.floor(monthly * 0.8) : monthly;
+  const getPricing = (monthly: number) => {
+    if (!isYearly) {
+      return {
+        displayPrice: `$${monthly}`,
+        suffix: "/month",
+        detail: null,
+      };
+    }
+
+    const yearlyTotal = monthly * 10;
+    const yearlyMonthlyEquivalent = yearlyTotal / 12;
+    const formattedEquivalent = Number.isInteger(yearlyMonthlyEquivalent)
+      ? yearlyMonthlyEquivalent.toString()
+      : yearlyMonthlyEquivalent.toFixed(2).replace(/\.?0+$/, "");
+
+    return {
+      displayPrice: `$${formattedEquivalent}`,
+      suffix: "/month",
+      detail: `$${yearlyTotal} billed yearly`,
+    };
   };
+
+  const starterPricing = getPricing(15);
+  const growthPricing = getPricing(29);
+  const proPricing = getPricing(69);
 
   return (
     <section
@@ -60,12 +82,17 @@ export function Pricing() {
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
               <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
-                ${calculatePrice(15)}
+                {starterPricing.displayPrice}
               </span>
               <span className="text-zinc-400 text-[14px] font-semibold">
-                /month
+                {starterPricing.suffix}
               </span>
             </div>
+            {starterPricing.detail ? (
+              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+                {starterPricing.detail}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex-1 px-8 relative z-10 w-full mb-8">
@@ -123,12 +150,17 @@ export function Pricing() {
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
               <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
-                ${calculatePrice(29)}
+                {growthPricing.displayPrice}
               </span>
               <span className="text-zinc-400 text-[14px] font-semibold">
-                /month
+                {growthPricing.suffix}
               </span>
             </div>
+            {growthPricing.detail ? (
+              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+                {growthPricing.detail}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex-1 px-8 relative z-10 w-full mb-8">
@@ -183,12 +215,17 @@ export function Pricing() {
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
               <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
-                ${calculatePrice(69)}
+                {proPricing.displayPrice}
               </span>
               <span className="text-zinc-400 text-[14px] font-semibold">
-                /month
+                {proPricing.suffix}
               </span>
             </div>
+            {proPricing.detail ? (
+              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+                {proPricing.detail}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex-1 px-8 relative z-10 w-full mb-8">

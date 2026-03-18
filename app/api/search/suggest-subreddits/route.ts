@@ -18,6 +18,66 @@ const subredditNameSchema = z
   )
   .pipe(z.string().regex(/^[a-z0-9_]{2,21}$/));
 
+const extractMessageContent = (content: unknown): string => {
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  return content
+    .map((part) => {
+      if (typeof part === "string") {
+        return part;
+      }
+
+      if (
+        part &&
+        typeof part === "object" &&
+        "text" in part &&
+        typeof part.text === "string"
+      ) {
+        return part.text;
+      }
+
+      return "";
+    })
+    .join("")
+    .trim();
+};
+
+const parseSuggestedSubreddits = (
+  rawContent: unknown,
+  cappedCount: number,
+): string[] => {
+  const normalizedContent = extractMessageContent(rawContent)
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+
+  if (!normalizedContent) {
+    return [];
+  }
+
+  const parsed = JSON.parse(normalizedContent);
+  const rawSubreddits = Array.isArray(parsed)
+    ? parsed
+    : parsed.subreddits || parsed.data || [];
+
+  if (!Array.isArray(rawSubreddits)) {
+    return [];
+  }
+
+  return rawSubreddits
+    .map((item) => subredditNameSchema.safeParse(item))
+    .filter((result) => result.success)
+    .map((result) => result.data)
+    .filter((value, index, arr) => arr.indexOf(value) === index)
+    .slice(0, cappedCount);
+};
+
 export async function POST(req: Request) {
   const authContext = await requireApiContext(req);
   if (!authContext.ok) {
@@ -73,30 +133,28 @@ export async function POST(req: Request) {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "RPP - Reddit Intelligence Engine",
         },
         body: JSON.stringify({
           model: "google/gemini-2.0-flash-001",
           messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" },
         }),
       },
     );
 
-    if (!response.ok) throw new Error("AI suggestion failed");
+    if (!response.ok) {
+      const details = await response.text().catch(() => "");
+      throw new Error(
+        `AI suggestion failed: ${response.status} ${response.statusText}${details ? ` - ${details}` : ""}`,
+      );
+    }
 
     const data = await response.json();
-    const content = JSON.parse(data.choices[0].message.content);
-    const rawSubreddits = Array.isArray(content)
-      ? content
-      : content.subreddits || content.data || [];
-    const subreddits = Array.isArray(rawSubreddits)
-      ? rawSubreddits
-          .map((item) => subredditNameSchema.safeParse(item))
-          .filter((result) => result.success)
-          .map((result) => result.data)
-          .filter((value, index, arr) => arr.indexOf(value) === index)
-          .slice(0, cappedCount)
-      : [];
+    const subreddits = parseSuggestedSubreddits(
+      data?.choices?.[0]?.message?.content,
+      cappedCount,
+    );
 
     return apiJson({ subreddits }, 200, correlationId);
   } catch (error) {

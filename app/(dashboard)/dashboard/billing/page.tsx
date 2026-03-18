@@ -10,6 +10,17 @@ import {
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 
+type BillingPurchaseOption = {
+  plan: BillingPlan;
+  yearlyAvailable: boolean;
+};
+
+type BillingPurchaseConfig = {
+  plan: BillingPlan;
+  monthlyPriceId?: string;
+  yearlyPriceId?: string;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function BillingPage() {
@@ -25,13 +36,28 @@ export default async function BillingPage() {
   const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET,
   );
-  const availablePlans = (
-    [
-      process.env.STRIPE_PRICE_STARTER_MONTHLY ? "starter" : null,
-      process.env.STRIPE_PRICE_GROWTH_MONTHLY ? "growth" : null,
-      process.env.STRIPE_PRICE_PRO_MONTHLY ? "pro" : null,
-    ] as const
-  ).filter((plan): plan is BillingPlan => Boolean(plan));
+  const availablePlans: BillingPurchaseOption[] = ([
+    {
+      plan: "starter",
+      monthlyPriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_STARTER_YEARLY,
+    },
+    {
+      plan: "growth",
+      monthlyPriceId: process.env.STRIPE_PRICE_GROWTH_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_GROWTH_YEARLY,
+    },
+    {
+      plan: "pro",
+      monthlyPriceId: process.env.STRIPE_PRICE_PRO_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_PRO_YEARLY,
+    },
+  ] satisfies BillingPurchaseConfig[])
+    .filter((option) => Boolean(option.monthlyPriceId))
+    .map(({ plan, yearlyPriceId }) => ({
+      plan,
+      yearlyAvailable: Boolean(yearlyPriceId),
+    }));
   const planContext = await resolvePlanContext({
     userId: session.user.id,
     email: session.user.email,

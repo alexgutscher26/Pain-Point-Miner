@@ -58,7 +58,7 @@ export default async function DashboardPage({
   );
   const searchesRemainingLabel =
     planContext.planPurchaseRequired
-      ? "Blocked"
+      ? "Read Only"
       : usageSummary.monthlyScansLimit === null
       ? "Unlimited"
       : `${usageSummary.monthlyScansUsed}/${usageSummary.monthlyScansLimit}`;
@@ -74,7 +74,7 @@ export default async function DashboardPage({
         );
   const searchesSubtext =
     planContext.planPurchaseRequired
-      ? "Purchase a plan to resume scans"
+      ? "Past results stay available. New scans require a paid plan"
       : usageSummary.monthlyScansLimit === null
       ? "No monthly cap on Pro"
       : `${usageSummary.monthlyScansRemaining ?? 0} scans remaining this month`;
@@ -178,14 +178,14 @@ export default async function DashboardPage({
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
       {planContext.planPurchaseRequired ? (
-        <div className="border-2 border-rose-400/60 bg-rose-500/10 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4 flex items-center justify-between gap-4">
           <div>
-            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-rose-300 mb-1">
-              Plan Required
+            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+              Read-Only After Trial
             </p>
-            <p className="text-sm text-rose-100 font-semibold">
-              Your free trial has ended. Purchase a plan to continue using
-              search and paid features.
+            <p className="text-sm text-amber-100 font-semibold">
+              You can still review past results and explore the app. New scans
+              and AI actions require a paid plan.
             </p>
           </div>
           <Link

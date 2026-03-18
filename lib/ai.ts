@@ -14,6 +14,36 @@ export interface PainPointData {
   subreddit: string;
 }
 
+const extractMessageContent = (content: unknown): string => {
+  if (typeof content === "string") {
+    return content;
+  }
+
+  if (!Array.isArray(content)) {
+    return "";
+  }
+
+  return content
+    .map((part) => {
+      if (typeof part === "string") {
+        return part;
+      }
+
+      if (
+        part &&
+        typeof part === "object" &&
+        "text" in part &&
+        typeof part.text === "string"
+      ) {
+        return part.text;
+      }
+
+      return "";
+    })
+    .join("")
+    .trim();
+};
+
 export const extractPainPoints = async (
   post: {
     title: string;
@@ -91,19 +121,22 @@ export const extractPainPoints = async (
         body: JSON.stringify({
           model: model,
           messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" },
         }),
       },
     );
 
     if (!response.ok) {
+      const details = await response.text().catch(() => "");
       throw new Error(
-        `OpenRouter API error: ${response.status} ${response.statusText}`,
+        `OpenRouter API error: ${response.status} ${response.statusText}${details ? ` - ${details}` : ""}`,
       );
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    const content = extractMessageContent(data?.choices?.[0]?.message?.content)
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "")
+      .trim();
     const parsed = JSON.parse(content);
 
     interface RawPainPoint {

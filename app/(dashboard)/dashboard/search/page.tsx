@@ -423,13 +423,13 @@ export default function SearchPage() {
         {/* Main Form Area */}
         <div className="lg:col-span-2 space-y-10">
           {trialEnded ? (
-            <div className="border-2 border-rose-400/60 bg-rose-500/10 px-5 py-4">
-              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-rose-300 mb-1">
-                Plan Required
+            <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4">
+              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+                Read-Only After Trial
               </p>
-              <p className="text-sm text-rose-100 font-semibold">
-                Your free trial has ended. Purchase a plan to continue using
-                search and AI suggestions.
+              <p className="text-sm text-amber-100 font-semibold">
+                You can still explore the app and review past results. New
+                scans and AI suggestions require a paid plan.
               </p>
             </div>
           ) : null}
@@ -462,7 +462,6 @@ export default function SearchPage() {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management, SaaS churn"
-                  disabled={trialEnded}
                   className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
               </div>
@@ -479,7 +478,7 @@ export default function SearchPage() {
                 </label>
                 <button
                   onClick={handleSuggestSubreddits}
-                  disabled={trialEnded || isSuggesting || !keyword}
+                  disabled={isSuggesting || !keyword}
                   className="font-mono text-[10px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8c00] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed group/suggest"
                 >
                   {isSuggesting ? (
@@ -497,7 +496,6 @@ export default function SearchPage() {
                   value={subreddits}
                   onChange={(e) => setSubreddits(e.target.value)}
                   placeholder="r/sales, r/realestate, r/entrepreneur"
-                  disabled={trialEnded}
                   className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
                 <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 z-20 pointer-events-none" />
@@ -512,7 +510,6 @@ export default function SearchPage() {
                     <button
                       key={i}
                       onClick={() => addSubreddit(sub)}
-                      disabled={trialEnded}
                       className="px-3 py-1.5 border border-[#ff4500]/40 bg-[#ff4500]/8 font-mono text-[11px] font-bold text-[#ff4500] hover:bg-[#ff4500]/15 transition-colors"
                     >
                       + r/{sub}
@@ -529,7 +526,6 @@ export default function SearchPage() {
                   <button
                     key={i}
                     onClick={() => addSubreddit(sub)}
-                    disabled={trialEnded}
                     className="px-3 py-1.5 border border-white/15 bg-white/2 font-mono text-[11px] font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
                   >
                     + r/{sub}
@@ -557,7 +553,6 @@ export default function SearchPage() {
                   value={customPatterns}
                   onChange={(e) => setCustomPatterns(e.target.value)}
                   placeholder="e.g. mentions of HubSpot, frustration with pricing, legal compliance, developer experience"
-                  disabled={trialEnded}
                   className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-amber-400/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
                 />
                 <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500/60 z-20 pointer-events-none" />
@@ -576,7 +571,6 @@ export default function SearchPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setMiningDepth("basic")}
-                  disabled={trialEnded}
                   className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group ${
                     miningDepth === "basic"
                       ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
@@ -610,12 +604,11 @@ export default function SearchPage() {
                 <button
                   onClick={() => setMiningDepth("deep")}
                   disabled={
-                    trialEnded ||
-                    (billing
+                    billing
                       ? !billing.entitlements.allowedMiningDepths.includes(
                           "deep",
                         )
-                      : false)
+                      : false
                   }
                   className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "deep"
@@ -662,12 +655,11 @@ export default function SearchPage() {
                 <button
                   onClick={() => setMiningDepth("advanced")}
                   disabled={
-                    trialEnded ||
-                    (billing
+                    billing
                       ? !billing.entitlements.allowedMiningDepths.includes(
                           "advanced",
                         )
-                      : false)
+                      : false
                   }
                   className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
                     miningDepth === "advanced"
@@ -712,10 +704,7 @@ export default function SearchPage() {
               </div>
               {billing ? (
                 <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                  Plan:{" "}
-                  {billing.planPurchaseRequired
-                    ? "PLAN REQUIRED"
-                    : billing.plan.toUpperCase()}{" "}
+                  Plan: {billing.plan.toUpperCase()}{" "}
                   | Monthly scans:{" "}
                   {billing.usage.monthlyScansUsed}
                   {billing.usage.monthlyScansLimit === null
@@ -752,7 +741,7 @@ export default function SearchPage() {
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <button
                   onClick={handleSaveDraft}
-                  disabled={trialEnded || isLoading}
+                  disabled={isLoading}
                   className="flex-1 sm:flex-none font-mono text-[12px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
                   type="button"
                 >
@@ -760,7 +749,7 @@ export default function SearchPage() {
                 </button>
                 <button
                   onClick={handleStartMining}
-                  disabled={trialEnded || isLoading}
+                  disabled={isLoading}
                   className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
