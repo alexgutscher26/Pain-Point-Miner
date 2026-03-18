@@ -64,48 +64,96 @@ export const extractPainPoints = async (
 
   const customPatternsSection =
     customPatterns.length > 0
-      ? `\n    CUSTOM INTELLIGENCE PATTERNS TO MATCH:
-    ${customPatterns.map((p, i) => `${i + 1}. **${p}**`).join("\n    ")}\n`
+      ? `CUSTOM INTELLIGENCE PATTERNS TO MATCH:
+${customPatterns.map((pattern, index) => `${index + 1}. ${pattern}`).join("\n")}`
       : "";
 
-  const prompt = `
-    You are a world-class Venture Capitalist and Product Researcher. 
-    Analyze the following Reddit post and its associated comments to extract high-value business opportunities.
-    
-    CRITICAL SIGNALS TO DETECT:
-    1. **Pain Intensity (1-10)**: 1=Feature request, 10=Business-breaking crisis.
-    2. **Urgency (1-10)**: 1=Someday, 10=I need this fixed immediately.
-    3. **Monetization Score (1-10)**: 
-       - 10: Explicit budget, professional context, "this costs me $X/hour".
-       - 1: Hobbyist, "looking for free", just Venting.
-    4. **Market Maturity (1-10)**: 
-       - 1: No tools exist yet ("Blue Ocean").
-       - 10: Saturated market where users are unhappy with current giants ("Red Ocean disruption").
-    ${customPatternsSection}
-    Post Title: ${post.title}
-    Post Content: ${post.selftext}
-    Subreddit: r/${post.subreddit}
+  const systemPrompt = `You are a rigorous product researcher extracting SaaS opportunities from Reddit discussions.
 
-    Top Comments for context:
-    ${post.comments
-      .slice(0, 10)
-      .map((c) => `- ${c.body}`)
-      .join("\n")}
+Your job is to identify concrete user pain points, not to brainstorm startup ideas or inflate weak signals.
 
-    Format the output as a JSON object with a 'painPoints' array. Each object MUST have: 
-    - title (concise headline)
-    - body (deep summary)
-    - painIntensity (1-10)
-    - urgency (1-10)
-    - monetizationScore (1-10)
-    - marketMaturity (1-10)
-    - budget (string)
-    - switchingCosts (string)
-    - triedSolutions (array of specific strings)
-    - sentiment (one of: frustrated, curious, desperate, neutral, angry)
+Rules:
+- Be skeptical. Prefer under-scoring over over-scoring.
+- Use only evidence from the post and comments. Do not invent facts, budgets, or intent.
+- Focus on the underlying problem, not superficial feature requests.
+- Only extract pain points that appear actionable, recurring, or costly enough to matter.
+- If the thread is vague, off-topic, celebratory, or lacks a real problem, return an empty painPoints array.
+- Avoid duplicates. Merge overlapping complaints into one root pain point.
+- Write concise, plain-English titles and summaries.
 
-    IMPORTANT: Return ONLY valid JSON output. Be extremely critical—do not over-inflate scores.
-  `;
+Scoring rubric:
+- painIntensity:
+  1-3 = mild annoyance, wishlist item, or convenience issue
+  4-6 = meaningful workflow friction or repeated frustration
+  7-8 = serious blocker causing lost time, money, or performance
+  9-10 = business-critical or urgent operational failure
+- urgency:
+  1-3 = someday / exploratory
+  4-6 = active frustration but not immediate
+  7-8 = user is actively searching for relief now
+  9-10 = immediate pain, escalation, or emergency language
+- monetizationScore:
+  1-3 = hobbyist / free-only / low willingness to pay
+  4-6 = plausible willingness to pay, but indirect evidence
+  7-8 = clear professional or commercial context
+  9-10 = explicit budget, revenue impact, or high-value workflow
+- marketMaturity:
+  1-3 = little evidence of existing solutions
+  4-6 = some solutions likely exist, but problem still feels open
+  7-8 = established category with visible dissatisfaction
+  9-10 = crowded market with many known alternatives
+
+Field rules:
+- title: 4-10 words, specific, no hype
+- body: 2-4 sentences summarizing the root pain, who feels it, and why it matters
+- budget: empty string if not stated or strongly implied
+- switchingCosts: empty string if not stated or strongly implied
+- triedSolutions: specific tools, workarounds, or alternatives only; otherwise []
+- sentiment: choose exactly one of frustrated, curious, desperate, neutral, angry
+
+Return only valid JSON matching:
+{
+  "painPoints": [
+    {
+      "title": "string",
+      "body": "string",
+      "painIntensity": 1,
+      "urgency": 1,
+      "monetizationScore": 1,
+      "marketMaturity": 1,
+      "budget": "",
+      "switchingCosts": "",
+      "triedSolutions": [],
+      "sentiment": "frustrated"
+    }
+  ]
+}`;
+
+  const topComments = post.comments
+    .slice(0, 10)
+    .map((comment, index) => `${index + 1}. ${comment.body}`)
+    .join("\n");
+
+  const userPrompt = `Analyze this Reddit thread and extract the strongest pain points.
+
+Post title:
+${post.title}
+
+Post body:
+${post.selftext || "(empty)"}
+
+Subreddit:
+r/${post.subreddit}
+
+Top comments:
+${topComments || "(no comments)"}
+
+${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
+- Extract up to 3 distinct pain points.
+- Prioritize pains with urgency, repeatability, and business value.
+- Ignore generic complaints unless they reveal a concrete unmet need.
+- Prefer the root cause over symptoms.
+- Return JSON only.`;
 
   try {
     const response = await fetch(
@@ -119,8 +167,11 @@ export const extractPainPoints = async (
           "X-Title": "ThreddIQ - Reddit Intelligence Engine",
         },
         body: JSON.stringify({
-          model: model,
-          messages: [{ role: "user", content: prompt }],
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
         }),
       },
     );
@@ -152,7 +203,6 @@ export const extractPainPoints = async (
       sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
     }
 
-    // Normalize if needed (some models wrap it in a root object)
     const rawPainPoints: RawPainPoint[] = Array.isArray(parsed)
       ? parsed
       : parsed.painPoints || parsed.data || [parsed];

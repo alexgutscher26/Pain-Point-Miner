@@ -11,6 +11,7 @@ import { extractPainPoints } from "@/lib/ai";
 import {
   fetchComments,
   fetchSubredditPostsBatched,
+  rankRedditPosts,
   type RedditPost,
 } from "@/lib/reddit";
 import { clusterPainPoint } from "@/lib/clustering";
@@ -138,7 +139,7 @@ export async function executeMiningRun({
       }
     }
 
-    allPosts = dedupePosts(allPosts);
+    allPosts = rankRedditPosts(dedupePosts(allPosts), keyword);
 
     // Update phase: scanning → extracting
     await db
@@ -154,6 +155,7 @@ export async function executeMiningRun({
       const nowSeconds = Math.floor(Date.now() / 1_000);
       const threeMonthsAgo = nowSeconds - 90 * 24 * 60 * 60;
       allPosts = allPosts.filter((post) => post.created_utc >= threeMonthsAgo);
+      allPosts = rankRedditPosts(allPosts, keyword);
     }
 
     let commentsFetched = 0;
