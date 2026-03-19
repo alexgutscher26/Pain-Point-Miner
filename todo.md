@@ -164,10 +164,10 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
   - [ ] Axes: Pain Intensity, Urgency, Monetization Potential, Market Maturity, Build Complexity.
   - [ ] Use Recharts (already in deps) with custom dark theme styling.
   - [ ] Show radar chart in report detail page and opportunity comparison view.
-- [ ] **Subreddit Heatmap**: Visualization of community problem density.
-  - [ ] Grid/treemap showing subreddits sized by pain point count and colored by average intensity.
-  - [ ] Clickable cells that drill into filtered pain point lists.
-  - [ ] Available on the main dashboard as a "Community Map" panel.
+- [x] **Subreddit Heatmap**: Visualization of community problem density.
+  - [x] Grid/treemap showing subreddits sized by pain point count and colored by average intensity.
+  - [x] Clickable cells that drill into filtered pain point lists.
+  - [x] Available on the main dashboard as a "Community Map" panel.
 - [ ] **Command Palette (Cmd+K)**: Quick navigation and action execution.
   - [ ] Use `cmdk` (already in deps) to build the palette.
   - [ ] Actions: `/scan <keyword>`, `/report <id>`, `/settings`, `/billing`, `/search`.

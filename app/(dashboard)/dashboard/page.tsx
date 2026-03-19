@@ -24,6 +24,8 @@ import {
 import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-hero";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
+import { buildCommunityMapNodes } from "@/lib/community-map";
+import { CommunityMapPanel } from "@/components/dashboard/community-map-panel";
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
 const dashboardWindowSchema = z.enum(["realtime", "30d"]).default("realtime");
@@ -94,6 +96,8 @@ export default async function DashboardPage({
   } else {
     windowFromDate.setHours(windowFromDate.getHours() - 24);
   }
+  const selectedWindowLabel =
+    selectedWindow === "30d" ? "the past 30 days" : "the last 24 hours";
 
   const whereClause = and(
     eq(scraper.userId, session.user.id),
@@ -120,6 +124,10 @@ export default async function DashboardPage({
           monetizationScore: true,
           marketMaturity: true,
           sentiment: true,
+          mentionCount: true,
+          commentCount: true,
+          subreddit: true,
+          subredditDisplayName: true,
         },
       },
     },
@@ -133,6 +141,23 @@ export default async function DashboardPage({
   const marketScore = toOpportunityScore(allPainPoints);
   const reportsSaved = reports.length;
   const marketBadge = getMarketBadge(marketScore);
+  const communityMapNodes = buildCommunityMapNodes(
+    reports.flatMap((report) =>
+      report.painPoints.map((point) => ({
+        id: point.id,
+        title: point.title,
+        reportId: report.id,
+        reportTitle: report.keywords?.[0] || "Unknown Investigation",
+        score: point.score,
+        urgency: point.urgency,
+        sentiment: point.sentiment,
+        mentionCount: point.mentionCount,
+        commentCount: point.commentCount,
+        subreddit: point.subreddit,
+        subredditDisplayName: point.subredditDisplayName,
+      })),
+    ),
+  );
   const keywordTrendInsights = buildLatestTrendInsights(
     reports
       .map((report) => {
@@ -291,6 +316,11 @@ export default async function DashboardPage({
 
       {/* Main Action Block */}
       <DashboardSearchHero trendingTags={trendingTags} />
+
+      <CommunityMapPanel
+        nodes={communityMapNodes}
+        selectedWindowLabel={selectedWindowLabel}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Reports Table */}

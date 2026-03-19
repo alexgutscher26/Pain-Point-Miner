@@ -856,9 +856,6 @@ export default function ReportDetailPage() {
               <TrendingUp className="w-5 h-5 text-[#ff4500]" />
               Top Frustrations Identified
             </h3>
-            <button className="text-[11px] font-black text-[#ff4500] uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
-              View Heatmap
-            </button>
           </div>
 
           {reportData.customPatterns &&
@@ -991,7 +988,7 @@ export default function ReportDetailPage() {
 
                 {getActiveTab(pain.id) === "signals" && (
                   <div className="space-y-4 relative z-10">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
                       <InfoSquare
                         icon={<DollarSign className="w-3.5 h-3.5" />}
                         label="Budget"
@@ -1464,17 +1461,17 @@ function InfoSquare({
   preserveCase?: boolean;
 }) {
   return (
-    <div className="bg-white/2 border border-white/20 p-4 flex items-start gap-3 min-h-[82px]">
+    <div className="bg-white/2 border border-white/20 p-4 flex items-start gap-3 min-h-[104px]">
       <div
-        className={`p-2 rounded-lg bg-zinc-900 border border-white/5 ${color} shrink-0`}
+        className={`mt-0.5 p-2.5 rounded-xl bg-zinc-900 border border-white/5 ${color} shrink-0`}
       >
         {icon}
       </div>
-      <div className="min-w-0">
-        <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+      <div className="min-w-0 flex-1">
+        <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-[0.18em]">
           {label}
         </p>
-        <p className="text-sm font-black text-white leading-tight break-words whitespace-normal sm:text-[15px]">
+        <p className="mt-2 text-base font-black text-white leading-[1.15] break-words whitespace-normal sm:text-[19px]">
           {preserveCase ? value : toTitleCase(value)}
         </p>
       </div>
