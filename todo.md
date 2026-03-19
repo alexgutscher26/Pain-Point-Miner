@@ -198,10 +198,10 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
   - [ ] Card-based feed optimized for thumb-scrolling.
   - [ ] Swipe-to-save gesture for bookmarking opportunities.
   - [ ] Bottom sheet for pain point detail (use `vaul` drawer, already in deps).
-- [ ] **Skeleton Loading States**: Replace all loading spinners with content-aware skeletons.
-  - [ ] Dashboard metric cards: skeleton boxes matching exact layout.
-  - [ ] Report table: skeleton rows with shimmer animation.
-  - [ ] Analysis page: skeleton steps with pulsing indicators.
+- [x] **Skeleton Loading States**: Replace all loading spinners with content-aware skeletons.
+  - [x] Dashboard metric cards: skeleton boxes matching exact layout.
+  - [x] Report table: skeleton rows with shimmer animation.
+  - [x] Analysis page: skeleton steps with pulsing indicators.
 - [ ] **Empty States with CTAs**: Design compelling empty states for all pages.
   - [ ] Dashboard with no reports: "Start your first investigation" hero.
   - [ ] Reports page with no saved reports: illustration + "Run a scan" button.

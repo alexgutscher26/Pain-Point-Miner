@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
@@ -29,6 +30,7 @@ export default function AnalysisPage() {
     timeWindow,
     isDone,
     hasFailed,
+    hasHydrated,
   } = useMiningStream(scraperId);
 
   // Derive step status from the live SSE phase
@@ -99,6 +101,10 @@ export default function AnalysisPage() {
       },
     ];
   }, [phase, postsFetched, painPointCount, subreddits, isDone]);
+
+  if (!hasHydrated && scraperId) {
+    return <AnalysisSkeletonView />;
+  }
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
@@ -201,6 +207,88 @@ export default function AnalysisPage() {
             generic comments to find high-conviction market gaps.
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalysisSkeletonView() {
+  return (
+    <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
+      <div className="relative mb-8">
+        <div className="relative flex h-20 w-20 items-center justify-center border border-[#ff4500]/35 bg-[#0c0c0c] shadow-[3px_3px_0px_0px_rgba(255,69,0,0.2)]">
+          <div className="h-10 w-10 rounded-full border border-[#ff4500]/45 bg-[#ff4500]/12 animate-pulse"></div>
+        </div>
+      </div>
+
+      <div className="mb-12 text-center">
+        <Skeleton className="mx-auto mb-4 h-11 w-80 rounded-none bg-white/10" />
+        <Skeleton className="mx-auto h-5 w-96 max-w-full rounded-none bg-white/8" />
+        <Skeleton className="mx-auto mt-4 h-3 w-36 rounded-none bg-amber-500/12" />
+      </div>
+
+      <div className="relative w-full overflow-hidden border-2 border-white/15 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <div className="absolute top-0 left-0 h-px w-full bg-linear-to-r from-transparent via-[#ff4500]/20 to-transparent"></div>
+
+        <div className="space-y-10 p-10">
+          <div className="space-y-4">
+            <div className="flex items-end justify-between">
+              <Skeleton className="h-3 w-28 rounded-none bg-white/8" />
+              <Skeleton className="h-7 w-14 rounded-none bg-[#ff4500]/12" />
+            </div>
+            <div className="h-2 w-full overflow-hidden border border-white/10 bg-white/5">
+              <div className="h-full w-1/3 bg-[#ff4500]/25 animate-pulse"></div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-[#ff4500]/70 animate-pulse"></div>
+              <Skeleton className="h-3 w-48 rounded-none bg-white/8" />
+            </div>
+          </div>
+
+          <div className="relative space-y-0">
+            <div className="absolute top-6 bottom-6 left-[19px] w-px bg-white/10"></div>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <AnalysisSkeletonStep key={index} />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-white/10 bg-white/2 px-10 py-6">
+          <div className="flex items-center gap-2.5">
+            <Skeleton className="h-4 w-4 rounded-full bg-white/8" />
+            <Skeleton className="h-3 w-40 rounded-none bg-white/8" />
+          </div>
+          <Skeleton className="h-10 w-44 rounded-none bg-[#ff4500]/12" />
+        </div>
+      </div>
+
+      <div className="relative mt-8 flex w-full max-w-2xl items-start gap-4 overflow-hidden border-2 border-[#ff4500]/25 bg-[#ff4500]/5 p-6">
+        <Skeleton className="h-10 w-10 rounded-none border border-[#ff4500]/35 bg-[#ff4500]/12" />
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-3 w-44 rounded-none bg-[#ff4500]/12" />
+          <Skeleton className="h-4 w-full rounded-none bg-white/8" />
+          <Skeleton className="h-4 w-5/6 rounded-none bg-white/8" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalysisSkeletonStep() {
+  return (
+    <div className="flex gap-6 p-5">
+      <div className="relative z-10">
+        <div className="flex h-10 w-10 items-center justify-center border border-white/15 bg-white/5">
+          <div className="h-4 w-4 rounded-full bg-[#ff4500]/55 animate-pulse"></div>
+        </div>
+      </div>
+      <div className="flex-1">
+        <div className="mb-2 flex items-center gap-3">
+          <Skeleton className="h-6 w-52 rounded-none bg-white/10" />
+          <Skeleton className="h-5 w-20 rounded-none bg-[#ff4500]/12" />
+        </div>
+        <Skeleton className="mb-2 h-4 w-full max-w-lg rounded-none bg-white/8" />
+        <Skeleton className="h-4 w-4/5 max-w-md rounded-none bg-white/8" />
       </div>
     </div>
   );

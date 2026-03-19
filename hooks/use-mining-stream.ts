@@ -44,6 +44,9 @@ export function useMiningStream(scraperId: string | null) {
   const [state, setState] = useState<MiningStreamState>(INITIAL_STATE);
   const [isDone, setIsDone] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
+  const [hydratedScraperId, setHydratedScraperId] = useState<string | null>(
+    null,
+  );
   const eventSourceRef = useRef<EventSource | null>(null);
   const fallbackRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -97,6 +100,7 @@ export function useMiningStream(scraperId: string | null) {
 
     const handleEvent = (data: MiningStreamState) => {
       setState(data);
+      setHydratedScraperId(scraperId);
 
       if (data.phase === "completed" || data.status === "completed") {
         setIsDone(true);
@@ -141,5 +145,10 @@ export function useMiningStream(scraperId: string | null) {
     return cleanup;
   }, [scraperId, cleanup, startPollingFallback]);
 
-  return { ...state, isDone, hasFailed };
+  return {
+    ...state,
+    isDone,
+    hasFailed,
+    hasHydrated: hydratedScraperId === scraperId,
+  };
 }

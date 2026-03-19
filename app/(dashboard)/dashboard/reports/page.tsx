@@ -23,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Report {
   id: string;
@@ -85,6 +86,8 @@ export default function ReportsPage() {
 
     return () => clearInterval(pollInterval);
   }, [reports, fetchReports]);
+
+  const isInitialLoading = isLoading && reports.length === 0;
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -339,8 +342,10 @@ export default function ReportsPage() {
 
         <div className="ml-auto px-4 hidden sm:block">
           <p className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
-            {isLoading
+            {isInitialLoading
               ? "Counting records..."
+              : isLoading
+                ? "Refreshing records..."
               : `Showing ${reports.length} results`}
           </p>
         </div>
@@ -349,13 +354,8 @@ export default function ReportsPage() {
       {/* Reports Table Card */}
       <div className="bg-[#0c0c0c] border-2 border-white/15 overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
         <div className="overflow-x-hidden min-h-[300px]">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="w-8 h-8 text-[#ff4500] animate-spin" />
-              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500">
-                Decrypting Archives...
-              </p>
-            </div>
+          {isInitialLoading ? (
+            <ReportsTableSkeleton />
           ) : reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
               <div className="w-16 h-16 bg-zinc-900 flex items-center justify-center border border-white/20">
@@ -520,6 +520,78 @@ export default function ReportsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ReportsTableSkeleton() {
+  return (
+    <table className="w-full table-fixed text-left border-collapse">
+      <thead>
+        <tr className="border-b border-white/5 bg-white/2">
+          {[
+            "Keyword / Niche",
+            "Created Date",
+            "Pain Points",
+            "Top Score",
+            "Category",
+            "Status",
+            "Actions",
+          ].map((label) => (
+            <th
+              key={label}
+              className="px-8 py-5 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500"
+            >
+              {label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-white/5">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <tr key={index} className="group">
+            <td className="px-8 py-6">
+              <div className="flex min-w-0 items-center gap-4">
+                <Skeleton className="skeleton-shimmer h-10 w-10 rounded-none border border-white/20 bg-[#ff4500]/8" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="skeleton-shimmer h-5 w-32 rounded-none bg-white/10" />
+                  <Skeleton className="skeleton-shimmer h-3 w-20 rounded-none bg-white/8" />
+                </div>
+              </div>
+            </td>
+            <td className="px-8 py-6">
+              <Skeleton className="skeleton-shimmer h-4 w-24 rounded-none bg-white/8" />
+            </td>
+            <td className="px-8 py-6">
+              <div className="flex items-center gap-2">
+                <Skeleton className="skeleton-shimmer h-5 w-8 rounded-none bg-white/10" />
+                <div className="h-1.5 w-1.5 bg-zinc-800"></div>
+                <Skeleton className="skeleton-shimmer h-3 w-12 rounded-none bg-white/8" />
+              </div>
+            </td>
+            <td className="px-8 py-6">
+              <Skeleton className="skeleton-shimmer h-8 w-20 rounded-none bg-amber-500/10" />
+            </td>
+            <td className="px-8 py-6">
+              <div className="flex items-center gap-2.5">
+                <Skeleton className="skeleton-shimmer h-4 w-24 rounded-none bg-white/8" />
+                <Skeleton className="skeleton-shimmer h-5 w-14 rounded-none bg-emerald-500/10" />
+              </div>
+            </td>
+            <td className="px-8 py-6">
+              <div className="flex items-center gap-2.5">
+                <Skeleton className="h-2 w-2 rounded-full bg-[#ff4500]/60 animate-pulse" />
+                <Skeleton className="skeleton-shimmer h-4 w-20 rounded-none bg-white/8" />
+              </div>
+            </td>
+            <td className="px-8 py-6 text-right">
+              <div className="flex items-center justify-end gap-3">
+                <Skeleton className="skeleton-shimmer h-10 w-28 rounded-none bg-white/8" />
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
