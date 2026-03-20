@@ -356,10 +356,14 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
   - [ ] For dormant users: "New trending pain points in your saved niches".
   - [ ] Unsubscribe link per notification type.
 - [ ] **Landing Page Optimization**:
-  - [ ] A/B test hero headline copy.
-  - [ ] Add live counter: "X pain points discovered this week".
-  - [ ] Add customer logos / testimonial carousel (existing `Testimonial.tsx` component).
-  - [ ] Add interactive demo: run a sample scan without signing up.
+  - [x] A/B test hero headline copy.
+  - [x] Add live counter: "X pain points discovered this week".
+  - [x] Add customer logos / testimonial carousel (existing `Testimonial.tsx` component).
+  - [x] Add interactive demo: run a sample scan without signing up.
+- [x] **Toast Notification Improvements**:
+  - [x] Success: show pain point count in toast after mining completes.
+  - [x] Error: include retry button in error toasts.
+  - [x] Info: show progress percentage for long-running operations.
 
 ---
 
