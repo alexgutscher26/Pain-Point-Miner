@@ -29,9 +29,47 @@ export function workspaceScope(
 
 export async function requireApiContext(req: Request) {
   const correlationId = getCorrelationId(req);
+
+  // CSRF Protection: Validate Origin for Mutations
+  const origin = req.headers.get("origin");
+  const method = req.method.toUpperCase();
+  const isMutation = ["POST", "PATCH", "PUT", "DELETE"].includes(method);
+
+  if (isMutation) {
+    const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL || "";
+    const isLocalhost = origin?.includes("localhost") || origin?.includes("127.0.0.1");
+    const isSafeOrigin = origin === allowedOrigin || isLocalhost;
+
+    if (origin && !isSafeOrigin) {
+      return {
+        ok: false as const,
+        response: apiError(
+          403,
+          "FORBIDDEN",
+          "CSRF: Invalid request origin",
+          undefined,
+          correlationId,
+        ),
+      };
+    }
+  }
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+
+  if (session?.user && (session.user as { deletedAt?: Date | null }).deletedAt) {
+    return {
+      ok: false as const,
+      response: apiError(
+        403,
+        "FORBIDDEN",
+        "Your account is currently scheduled for deletion and is in a 30-day grace period. Please contact support to restore access.",
+        undefined,
+        correlationId,
+      ),
+    };
+  }
 
   if (!session) {
     return {

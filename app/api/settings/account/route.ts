@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireApiContext } from "@/lib/api-auth";
 import { apiError, apiJson } from "@/lib/api-error";
 import { db } from "@/lib/db";
-import { user, workspace } from "@/lib/db/schema";
+import { user } from "@/lib/db/schema";
 
 const deleteAccountSchema = z.object({
   confirmation: z
@@ -35,18 +35,21 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    await db.transaction(async (tx) => {
-      await tx.delete(workspace).where(eq(workspace.ownerId, userId));
+    const updatedUsers = await db
+      .update(user)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(eq(user.id, userId))
+      .returning({ id: user.id });
 
-      const deletedUsers = await tx
-        .delete(user)
-        .where(eq(user.id, userId))
-        .returning({ id: user.id });
-
-      if (deletedUsers.length === 0) {
-        throw new Error("User not found");
-      }
-    });
+    if (updatedUsers.length === 0) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "User not found",
+        undefined,
+        correlationId,
+      );
+    }
 
     return apiJson({ ok: true }, 200, correlationId);
   } catch (error) {

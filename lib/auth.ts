@@ -42,6 +42,16 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
   }),
+  session: {
+    expiresIn: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
+  user: {
+    additionalFields: {
+      anonymizeRedditUsernames: { type: "boolean" },
+      deletedAt: { type: "date" },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },

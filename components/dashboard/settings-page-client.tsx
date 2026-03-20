@@ -61,7 +61,7 @@ export function SettingsPageClient({
   const [isRevokingToken, setIsRevokingToken] = useState<string | null>(null);
   const [sessions, setSessions] = useState<
     Array<{
-      token: string;
+      id: string;
       createdAt: string;
       expiresAt: string;
       ipAddress: string | null;
@@ -232,30 +232,26 @@ export function SettingsPageClient({
   async function loadSessions() {
     setIsLoadingSessions(true);
     try {
-      const response = await fetch("/api/auth/list-sessions", {
-        method: "GET",
-      });
+      const response = await fetch("/api/auth/sessions");
       if (!response.ok) {
         throw new Error("Unable to fetch sessions.");
       }
 
-      const payload = (await response.json()) as unknown;
-      const parsedSessions = Array.isArray(payload)
-        ? payload
-        : Array.isArray((payload as { data?: unknown[] })?.data)
-          ? ((payload as { data: unknown[] }).data ?? [])
-          : [];
+      const sessionsData = (await response.json()) as Array<{
+        id: string;
+        createdAt: string | number | Date;
+        expiresAt: string | number | Date;
+        ipAddress: string | null;
+        userAgent: string | null;
+      }>;
 
-      const normalized = parsedSessions
-        .map((item) => item as Record<string, unknown>)
-        .filter((item) => typeof item.token === "string")
-        .map((item) => ({
-          token: String(item.token),
-          createdAt: String(item.createdAt ?? ""),
-          expiresAt: String(item.expiresAt ?? ""),
-          ipAddress: item.ipAddress ? String(item.ipAddress) : null,
-          userAgent: item.userAgent ? String(item.userAgent) : null,
-        }));
+      const normalized = sessionsData.map((item) => ({
+        id: item.id,
+        createdAt: new Date(item.createdAt).toISOString(),
+        expiresAt: new Date(item.expiresAt).toISOString(),
+        ipAddress: item.ipAddress || null,
+        userAgent: item.userAgent || null,
+      }));
 
       setSessions(normalized);
     } catch (error) {
@@ -267,32 +263,27 @@ export function SettingsPageClient({
     }
   }
 
-  async function handleRevokeSession(token: string) {
-    if (!token || isRevokingToken) return;
+  async function handleRevokeSession(sessionId: string) {
+    if (!sessionId || isRevokingToken) return;
 
-    setIsRevokingToken(token);
+    setIsRevokingToken(sessionId);
     try {
-      const response = await fetch("/api/auth/revoke-session", {
-        method: "POST",
+      const response = await fetch("/api/auth/sessions", {
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ id: sessionId }),
       });
 
       if (!response.ok) {
         throw new Error("Unable to revoke session.");
       }
 
-      setSessions((prev) => prev.filter((session) => session.token !== token));
+      setSessions((prev) => prev.filter((session) => session.id !== sessionId));
       toast.success("Session revoked.");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unable to revoke session.";
-      toast.error(message, {
-        action: {
-          label: "Retry",
-          onClick: () => void handleRevokeSession(token),
-        },
-      });
+      toast.error(message);
     } finally {
       setIsRevokingToken(null);
     }
@@ -648,37 +639,37 @@ export function SettingsPageClient({
               </div>
             ) : (
               sessions.map((session) => (
-                <div
-                  key={session.token}
-                  className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-white truncate">
-                      {session.userAgent || "Unknown device"}
-                    </p>
-                    <p className="text-xs text-zinc-500 mt-1">
-                      IP: {session.ipAddress || "Unknown"} | Started:{" "}
-                      {session.createdAt
-                        ? new Date(session.createdAt).toLocaleString()
-                        : "Unknown"}
-                    </p>
-                    <p className="text-xs text-zinc-500 mt-1">
-                      Expires:{" "}
-                      {session.expiresAt
-                        ? new Date(session.expiresAt).toLocaleString()
-                        : "Unknown"}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void handleRevokeSession(session.token)}
-                    disabled={isRevokingToken === session.token}
-                    className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                   <div
+                    key={session.id}
+                    className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
                   >
-                    {isRevokingToken === session.token
-                      ? "Revoking..."
-                      : "Revoke"}
-                  </button>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white truncate">
+                        {session.userAgent || "Unknown device"}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-1">
+                        IP: {session.ipAddress || "Unknown"} | Started:{" "}
+                        {session.createdAt
+                          ? new Date(session.createdAt).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-1">
+                        Expires:{" "}
+                        {session.expiresAt
+                          ? new Date(session.expiresAt).toLocaleString()
+                          : "Unknown"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void handleRevokeSession(session.id)}
+                      disabled={isRevokingToken === session.id}
+                      className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                    >
+                      {isRevokingToken === session.id
+                        ? "Revoking..."
+                        : "Revoke"}
+                    </button>
                 </div>
               ))
             )}

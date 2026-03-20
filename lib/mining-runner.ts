@@ -6,6 +6,7 @@ import {
   painPointComment,
   scraper,
   scraperRun,
+  user,
 } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import {
@@ -115,6 +116,11 @@ export async function executeMiningRun({
     processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
 
   try {
+    const userRecord = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+    });
+    const anonymize = userRecord?.anonymizeRedditUsernames ?? false;
+
     // Insert a scraperRun record upfront so SSE can track progress
     await db.insert(scraperRun).values({
       id: runId,
@@ -241,7 +247,7 @@ export async function executeMiningRun({
           scraperId,
           subreddit: post.subreddit,
           postUrl: post.url,
-          author: post.author,
+          author: anonymize ? "[Anonymized]" : post.author,
           sentiment: point.sentiment,
           commentCount: comments.length,
           mentionCount: 1,
@@ -261,7 +267,7 @@ export async function executeMiningRun({
           .map((comment) => ({
             id: crypto.randomUUID(),
             body: cleanCommentBody(comment.body),
-            author: comment.author || "unknown",
+            author: anonymize ? "[Anonymized]" : (comment.author || "unknown"),
             score: comment.score ?? 0,
             commentUrl: comment.permalink || null,
             painScore: point.painIntensity ?? 0,

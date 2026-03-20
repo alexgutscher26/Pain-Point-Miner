@@ -489,23 +489,23 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Authentication & Authorization**
 
-- [ ] **Session Security**: Review `better-auth` session configuration.
-  - [ ] Ensure sessions expire after 30 days of inactivity.
-  - [ ] Support session revocation from settings page.
-  - [ ] Track active sessions with device info (`session.userAgent` already stored).
+- [x] **Session Security**: Review `better-auth` session configuration.
+  - [x] Ensure sessions expire after 30 days of inactivity.
+  - [x] Support session revocation from settings page.
+  - [x] Track active sessions with device info (`session.userAgent` already stored).
 - [ ] **API Key Security**:
   - [ ] Hash API keys before storage (store only the hash, show key once on creation).
   - [ ] Add IP allowlist per API key.
   - [ ] Log all API key usage for audit trail.
-- [ ] **CSRF Protection**: Validate origin headers on all mutation endpoints.
-- [ ] **Content Security Policy**: Add strict CSP headers via `next.config.ts`.
+- [x] **CSRF Protection**: Validate origin headers on all mutation endpoints.
+- [x] **Content Security Policy**: Add strict CSP headers via `next.config.ts`.
 - [ ] **Dependency Audit**: Run `npm audit` monthly, zero critical vulnerabilities policy.
 
 ### **Data Protection**
 
-- [ ] **PII Handling**: Ensure Reddit usernames are anonymized in reports.
-  - [ ] Option to strip `author` fields before storing pain points.
-  - [ ] GDPR-compliant data retention: auto-delete user data 30 days after account deletion.
+- [x] **PII Handling**: Ensure Reddit usernames are anonymized in reports.
+  - [x] Option to strip `author` fields before storing pain points.
+  - [x] GDPR-compliant data retention: auto-delete user data 30 days after account deletion.
 - [ ] **Encryption at Rest**: Ensure database connection uses SSL.
 - [ ] **Rate Limiting**: Implement per-user rate limiting on all API endpoints.
   - [ ] Use a sliding window counter in Redis or in-memory.

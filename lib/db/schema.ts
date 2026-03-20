@@ -43,6 +43,8 @@ export const user = pgTable(
     image: text(),
     createdAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    anonymizeRedditUsernames: boolean().default(false).notNull(),
+    deletedAt: timestamp({ precision: 3, mode: "date" }),
   },
   (table) => [
     uniqueIndex("user_email_key").using(
