@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { workspace, workspaceMember } from "@/lib/db/schema";
 import { apiError, getCorrelationId } from "@/lib/api-error";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const workspaceHeaderSchema = z
   .string()
@@ -132,6 +133,22 @@ export async function requireApiContext(req: Request) {
         };
       }
     }
+  }
+
+  // Rate Limiting Enforcement (100 per minute)
+  const { allowed, reset } = checkRateLimit(session.user.id, 100);
+  if (!allowed) {
+    return {
+      ok: false as const,
+      response: apiError(
+        429,
+        "TOO_MANY_REQUESTS",
+        "Rate limit exceeded. Please try again in 1 minute.",
+        undefined,
+        correlationId,
+        { "Retry-After": reset.toString() },
+      ),
+    };
   }
 
   return {

@@ -6,6 +6,7 @@ export type ApiErrorCode =
   | "INVALID_JSON"
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "TOO_MANY_REQUESTS"
   | "INTERNAL_SERVER_ERROR";
 
 export interface ApiErrorBody {
@@ -29,12 +30,18 @@ export function getCorrelationId(req: Request) {
   );
 }
 
-export function apiJson<T>(body: T, status = 200, correlationId?: string) {
+export function apiJson<T>(
+  body: T,
+  status = 200,
+  correlationId?: string,
+  extraHeaders?: Record<string, string>,
+) {
   const id = resolveCorrelationId(correlationId);
   return NextResponse.json(body, {
     status,
     headers: {
       [CORRELATION_ID_HEADER]: id,
+      ...extraHeaders,
     },
   });
 }
@@ -45,6 +52,7 @@ export function apiError(
   message: string,
   details?: unknown,
   correlationId?: string,
+  extraHeaders?: Record<string, string>,
 ) {
   return apiJson(
     {
@@ -54,5 +62,6 @@ export function apiError(
     } satisfies ApiErrorBody,
     status,
     correlationId,
+    extraHeaders,
   );
 }

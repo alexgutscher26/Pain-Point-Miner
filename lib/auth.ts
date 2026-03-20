@@ -38,9 +38,13 @@ const sentinelEnabled =
   Boolean(sentinelKvUrl) &&
   Boolean(sentinelApiKey);
 
+import * as schema from "./db/schema";
+import * as relations from "./db/relations";
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
+    schema: { ...schema, ...relations },
   }),
   session: {
     expiresIn: 30 * 24 * 60 * 60, // 30 days

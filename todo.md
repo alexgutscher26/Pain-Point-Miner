@@ -506,10 +506,10 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 - [x] **PII Handling**: Ensure Reddit usernames are anonymized in reports.
   - [x] Option to strip `author` fields before storing pain points.
   - [x] GDPR-compliant data retention: auto-delete user data 30 days after account deletion.
-- [ ] **Encryption at Rest**: Ensure database connection uses SSL.
-- [ ] **Rate Limiting**: Implement per-user rate limiting on all API endpoints.
-  - [ ] Use a sliding window counter in Redis or in-memory.
-  - [ ] Return `429 Too Many Requests` with `Retry-After` header.
+- [x] **Encryption at Rest**: Ensure database connection uses SSL.
+- [x] **Rate Limiting**: Implement per-user rate limiting on all API endpoints.
+  - [x] Use a sliding window counter in Redis or in-memory.
+  - [x] Return `429 Too Many Requests` with `Retry-After` header.
 
 ---
 
