@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { headers } from "next/headers";
@@ -6,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { defaultMetadata } from "@/lib/seo";
 import { UserJotWidget } from "@/components/userjot-widget";
 import { auth } from "@/lib/auth";
+
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -43,6 +46,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserJotWidget user={session?.user ?? null} />
+        <Toaster />
         {children}
       </body>
     </html>

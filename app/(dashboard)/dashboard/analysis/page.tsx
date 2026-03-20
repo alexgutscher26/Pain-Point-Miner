@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   CheckCircle2,
   Eye,
@@ -14,6 +14,7 @@ import {
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
@@ -32,6 +33,47 @@ export default function AnalysisPage() {
     hasFailed,
     hasHydrated,
   } = useMiningStream(scraperId);
+
+  // New: Toast management for mining operations
+  useEffect(() => {
+    if (!scraperId || !hasHydrated) return;
+
+    if (hasFailed) {
+      toast.error("Analysis Failed", {
+        description: "There was a problem processing the Reddit data.",
+        id: `mining-${scraperId}`,
+        action: {
+          label: "Retry",
+          onClick: () => window.location.reload(), // Simple retry by reload for now, or could re-trigger mining
+        },
+      });
+      return;
+    }
+
+    if (isDone) {
+      toast.success("Mining Complete", {
+        description: `Discovered ${painPointCount} unique pain points.`,
+        id: `mining-${scraperId}`,
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (progress > 0 && progress < 100) {
+      toast.info(`Mining in progress: ${progress}%`, {
+        description: statusText,
+        id: `mining-${scraperId}`,
+        duration: Infinity, // Keep it visible until complete or failed
+      });
+    }
+
+    return () => {
+      // Clear progress toast if it's still there when unmounting
+      if (!isDone && !hasFailed) {
+        toast.dismiss(`mining-${scraperId}`);
+      }
+    };
+  }, [scraperId, hasHydrated, isDone, hasFailed, progress, painPointCount, statusText]);
 
   // Derive step status from the live SSE phase
   const steps = useMemo(() => {

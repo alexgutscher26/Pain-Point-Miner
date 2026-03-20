@@ -287,7 +287,12 @@ export function SettingsPageClient({
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unable to revoke session.";
-      toast.error(message);
+      toast.error(message, {
+        action: {
+          label: "Retry",
+          onClick: () => void handleRevokeSession(token),
+        },
+      });
     } finally {
       setIsRevokingToken(null);
     }

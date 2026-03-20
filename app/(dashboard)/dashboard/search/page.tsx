@@ -148,6 +148,10 @@ export default function SearchPage() {
     normalizedVisibleCommunityCount,
   );
   const trialEnded = billing?.planPurchaseRequired ?? false;
+  const isAtScanLimit =
+    billing?.usage.monthlyScansLimit !== null &&
+    (billing?.usage.monthlyScansUsed ?? 0) >=
+      (billing?.usage.monthlyScansLimit ?? 0);
 
   useEffect(() => {
     try {
@@ -384,6 +388,12 @@ export default function SearchPage() {
         error instanceof Error
           ? error.message
           : "There was an error starting the investigation.",
+        {
+          action: {
+            label: "Retry",
+            onClick: () => void handleStartMining(),
+          },
+        },
       );
     } finally {
       setIsLoading(false);
@@ -654,18 +664,17 @@ export default function SearchPage() {
                       <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
                     )}
                   </div>
-                  {miningDepth !== "deep" && (
+                  {billing &&
+                  !billing.entitlements.allowedMiningDepths.includes(
+                    "deep",
+                  ) ? (
                     <div className="absolute top-0 right-0 p-2">
-                      <span className="font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
-                        {billing &&
-                        !billing.entitlements.allowedMiningDepths.includes(
-                          "deep",
-                        )
-                          ? "Pro"
-                          : "Deep"}
+                      <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
+                        <Lock className="w-2.5 h-2.5" />
+                        Pro
                       </span>
                     </div>
-                  )}
+                  ) : null}
                 </button>
 
                 <button
@@ -712,7 +721,7 @@ export default function SearchPage() {
                     <div className="absolute top-0 right-0 p-2">
                       <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
                         <Lock className="w-2.5 h-2.5" />
-                        Growth+
+                        Growth
                       </span>
                     </div>
                   ) : null}
@@ -794,22 +803,39 @@ export default function SearchPage() {
                 >
                   {draftSavedAt ? "Update Draft" : "Save Draft"}
                 </button>
-                <button
-                  onClick={handleStartMining}
-                  disabled={isLoading}
-                  className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <>
-                      Processing <Loader2 className="w-4 h-4 animate-spin" />
-                    </>
-                  ) : (
-                    <>
-                      Start Mining
-                      <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
-                    </>
-                  )}
-                </button>
+                {isAtScanLimit || trialEnded ? (
+                  <div className="flex flex-col items-center sm:items-end gap-2">
+                    <p className="font-serif text-[13px] text-amber-300 italic">
+                      {trialEnded
+                        ? "Free trial ended — upgrade to start a new investigation."
+                        : "Scan limit reached — upgrade to Growth or Pro to continue."}
+                    </p>
+                    <Link
+                      href="/dashboard/billing"
+                      className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group"
+                    >
+                      {trialEnded ? "Unlock New Scans" : "Upgrade to Continue"}
+                      <Sparkles className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleStartMining}
+                    disabled={isLoading}
+                    className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <>
+                        Processing <Loader2 className="w-4 h-4 animate-spin" />
+                      </>
+                    ) : (
+                      <>
+                        Start Mining
+                        <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -418,7 +418,12 @@ export default function ReportDetailPage() {
       }
     } catch (error) {
       console.error("Error updating report:", error);
-      toast.error("Unable to update report.");
+      toast.error("Unable to update report.", {
+        action: {
+          label: "Retry",
+          onClick: () => void handleSaveToggle(nextSaved, categoryOverride, showToast),
+        },
+      });
     } finally {
       setIsSaving(false);
     }
@@ -568,7 +573,12 @@ export default function ReportDetailPage() {
         error instanceof Error
           ? error.message
           : "Unable to run investigation again.";
-      toast.error(message);
+      toast.error(message, {
+        action: {
+          label: "Retry",
+          onClick: () => void handleRunAgain(),
+        },
+      });
     } finally {
       setIsRerunning(false);
     }
@@ -1471,7 +1481,7 @@ function InfoSquare({
         <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-[0.18em]">
           {label}
         </p>
-        <p className="mt-2 text-base font-black text-white leading-[1.15] break-words whitespace-normal sm:text-[19px]">
+        <p className="mt-2 text-base font-black text-white leading-[1.15] wrap-break-word whitespace-normal sm:text-[19px]">
           {preserveCase ? value : toTitleCase(value)}
         </p>
       </div>

@@ -206,10 +206,10 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
   - [ ] Dashboard with no reports: "Start your first investigation" hero.
   - [ ] Reports page with no saved reports: illustration + "Run a scan" button.
   - [ ] Analysis page with no scraper ID: redirect to search page.
-- [ ] **Toast Notification Improvements**: Enhance `sonner` toast usage.
-  - [ ] Success: show pain point count in toast after mining completes.
-  - [ ] Error: include retry button in error toasts.
-  - [ ] Info: show progress percentage for long-running operations.
+- [x] **Toast Notification Improvements**: Enhance `sonner` toast usage.
+  - [x] Success: show pain point count in toast after mining completes.
+  - [x] Error: include retry button in error toasts.
+  - [x] Info: show progress percentage for long-running operations.
 - [ ] **Keyboard Shortcuts**:
   - [ ] `n` — New investigation (navigate to search page).
   - [ ] `r` — Go to reports.
@@ -309,19 +309,18 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 ### **Monetization Strategy**
 
 - [x] **Stripe Usage Billing**: Credit-based consumption model connected to Stripe.
-- [ ] **Plan Enforcement Improvements**:
-  - [ ] Enforce `maxSubredditsPerSearch` from `plan-gating.ts` in the search API.
-  - [ ] Enforce `allowedMiningDepths` — show locked depth options with "Upgrade" badge in the search UI.
-  - [ ] Show usage meter in the sidebar: "7/10 scans used this month".
-  - [ ] Soft-block at 100% usage with a clear upgrade CTA (not a hard error).
-- [ ] **Free Trial Flow**:
-  - [ ] 7-day free trial of Pro plan for new sign-ups.
-  - [ ] Trial banner in dashboard with countdown: "3 days remaining in your Pro trial".
-  - [ ] Trial expiry email sequence: Day 5 warning, Day 7 expiry, Day 10 win-back.
-  - [ ] Graceful downgrade to Starter on trial expiry (preserve all data, just limit features).
-- [ ] **Annual Billing Discount**: 20% off for annual plans.
-  - [ ] Toggle in the billing page: Monthly / Annual.
-  - [ ] Show savings callout: "Save $48/year with annual billing".
+- [x] **Plan Enforcement Improvements**:
+  - [x] Enforce `maxSubredditsPerSearch` from `plan-gating.ts` in the search API.
+  - [x] Enforce `allowedMiningDepths` — show locked depth options with "Upgrade" badge in the search UI.
+  - [x] Show usage meter in the sidebar: "7/10 scans used this month".
+  - [x] Soft-block at 100% usage with a clear upgrade CTA (not a hard error).
+- [x] **Free Trial Flow**:
+  - [x] 3-day free trial of Pro plan for new sign-ups.
+  - [x] Trial banner in dashboard with countdown: "3 days remaining in your Pro trial".
+  - [x] Trial expiry email sequence: Day 2 warning, Day 3 expiry, Day 5 win-back.
+- [x] **Annual Billing Discount**: 20% off for annual plans.
+  - [x] Toggle in the billing page: Monthly / Annual.
+  - [x] Show savings callout: "Save $48/year with annual billing".
 - [ ] **Usage-Based Overage**: Allow Starter/Growth users to buy additional scans.
   - [ ] "Buy 10 more scans for $5" one-time purchase.
   - [ ] Track overage purchases separately from subscription.

@@ -3,7 +3,6 @@ import { GoldMine } from "@/components/landing/GoldMine";
 import { Steps } from "@/components/landing/Steps";
 import { Toolkit } from "@/components/landing/Toolkit";
 import { Opportunities } from "@/components/landing/Opportunities";
-import { Testimonial } from "@/components/landing/Testimonial";
 import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
@@ -73,7 +72,6 @@ export default function Home() {
         <Steps />
         <Toolkit />
         <Opportunities />
-        <Testimonial />
         <Pricing />
         <FAQ />
       </main>

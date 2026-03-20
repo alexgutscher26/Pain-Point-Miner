@@ -313,6 +313,21 @@ export async function POST(req: Request) {
 
     const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
     const planLimit = entitlements.maxSubredditsPerSearch ?? depthLimit;
+
+    if (rawSubreddits.length > planLimit) {
+      return apiError(
+        403,
+        "PLAN_UPGRADE_REQUIRED",
+        `Your ${plan} plan supports up to ${planLimit} subreddits per search. Upgrade to add more.`,
+        {
+          plan,
+          maxSubredditsPerSearch: planLimit,
+          requestedSubreddits: rawSubreddits.length,
+        },
+        correlationId,
+      );
+    }
+
     const maxSubredditsForDepth = Math.min(depthLimit, planLimit);
     const normalizedSubreddits = z
       .array(subredditTokenSchema)

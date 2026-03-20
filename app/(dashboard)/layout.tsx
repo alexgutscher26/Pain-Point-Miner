@@ -7,7 +7,11 @@ import { SidebarLinks } from "@/components/dashboard/sidebar-links";
 import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-links";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
-import { Plus, Bell, Crown, LayoutDashboard } from "lucide-react";
+import { Plus, Crown, LayoutDashboard } from "lucide-react";
+import {
+  getMonthlyScanUsage,
+  getMonthlyUsageSummary,
+} from "@/lib/plan-gating";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +57,9 @@ export default async function DashboardLayout({
         ? "Upgrade to Pro for unlimited scans and deep analysis."
         : "Upgrade to Growth or Pro for advanced features.";
 
+  const monthlyScansUsed = await getMonthlyScanUsage(session.user.id);
+  const { monthlyScansLimit } = getMonthlyUsageSummary(plan, monthlyScansUsed);
+
   return (
     <div className="flex min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-[#ff4500]/30 antialiased">
       {/* Sidebar */}
@@ -84,6 +91,39 @@ export default async function DashboardLayout({
                 {planLabel}
               </p>
             </div>
+
+            {/* Usage Meter */}
+            <div className="mb-4 relative z-10">
+              <div className="flex justify-between items-end mb-1.5 font-mono">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Usage
+                </p>
+                <p className="text-[11px] font-black text-zinc-300">
+                  {monthlyScansUsed}
+                  {monthlyScansLimit === null ? (
+                    <span className="text-zinc-500 ml-1">/ Unlimited</span>
+                  ) : (
+                    <span className="text-zinc-500 ml-1">/ {monthlyScansLimit}</span>
+                  )}
+                </p>
+              </div>
+              <div className="h-1 w-full bg-white/5 overflow-hidden">
+                <div
+                  className="h-full bg-[#ff4500]"
+                  style={{
+                    width: `${
+                      monthlyScansLimit === null
+                        ? 0
+                        : Math.min(
+                            100,
+                            (monthlyScansUsed / monthlyScansLimit) * 100,
+                          )
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+
             <p className="text-[12px] text-zinc-400 mb-4 leading-relaxed relative z-10">
               {upgradeMessage}
             </p>
