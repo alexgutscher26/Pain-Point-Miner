@@ -25,7 +25,61 @@ import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-her
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { buildCommunityMapNodes } from "@/lib/community-map";
-import { CommunityMapPanel } from "@/components/dashboard/community-map-panel";
+import { unstable_cache } from "next/cache";
+import dynamicLoader from "next/dynamic";
+
+const LazyCommunityMapPanel = dynamicLoader(
+  () =>
+    import("@/components/dashboard/community-map-panel").then(
+      (mod) => mod.CommunityMapPanel,
+    ),
+  {
+    loading: () => (
+      <div className="h-[400px] w-full animate-pulse bg-white/5 border-2 border-white/10" />
+    ),
+  },
+);
+
+const getCachedDashboardData = unstable_cache(
+  async (userId: string, workspaceId: string | null, windowDateMs: number) => {
+    const fromDate = new Date(windowDateMs);
+    const whereClause = and(
+      eq(scraper.userId, userId),
+      workspaceId
+        ? eq(scraper.workspaceId, workspaceId)
+        : isNull(scraper.workspaceId),
+      gte(scraper.createdAt, fromDate),
+    );
+
+    return await db.query.scraper.findMany({
+      where: whereClause,
+      orderBy: [desc(scraper.createdAt)],
+      with: {
+        scraperRuns: {
+          orderBy: [desc(scraperRun.startedAt)],
+          limit: 1,
+        },
+        painPoints: {
+          columns: {
+            id: true,
+            title: true,
+            score: true,
+            urgency: true,
+            monetizationScore: true,
+            marketMaturity: true,
+            sentiment: true,
+            mentionCount: true,
+            commentCount: true,
+            subreddit: true,
+            subredditDisplayName: true,
+          },
+        },
+      },
+    });
+  },
+  ["dashboard-metrics-cache"],
+  { revalidate: 30, tags: ["dashboard"] },
+);
 
 const workspaceHeaderSchema = z.string().uuid().nullable();
 const dashboardWindowSchema = z.enum(["realtime", "30d"]).default("realtime");
@@ -96,42 +150,19 @@ export default async function DashboardPage({
   } else {
     windowFromDate.setHours(windowFromDate.getHours() - 24);
   }
+
+  // Ensure stable cache keys by rounding the timestamp to 30s intervals
+  const stableWindowDateMs =
+    Math.floor(windowFromDate.getTime() / 30000) * 30000;
+
   const selectedWindowLabel =
     selectedWindow === "30d" ? "the past 30 days" : "the last 24 hours";
 
-  const whereClause = and(
-    eq(scraper.userId, session.user.id),
-    workspaceId
-      ? eq(scraper.workspaceId, workspaceId)
-      : isNull(scraper.workspaceId),
-    gte(scraper.createdAt, windowFromDate),
+  const reports = await getCachedDashboardData(
+    session.user.id,
+    workspaceId,
+    stableWindowDateMs,
   );
-
-  const reports = await db.query.scraper.findMany({
-    where: whereClause,
-    orderBy: [desc(scraper.createdAt)],
-    with: {
-      scraperRuns: {
-        orderBy: [desc(scraperRun.startedAt)],
-        limit: 1,
-      },
-      painPoints: {
-        columns: {
-          id: true,
-          title: true,
-          score: true,
-          urgency: true,
-          monetizationScore: true,
-          marketMaturity: true,
-          sentiment: true,
-          mentionCount: true,
-          commentCount: true,
-          subreddit: true,
-          subredditDisplayName: true,
-        },
-      },
-    },
-  });
 
   const painPointsFound = reports.reduce(
     (sum, report) => sum + report.painPoints.length,
@@ -317,7 +348,7 @@ export default async function DashboardPage({
       {/* Main Action Block */}
       <DashboardSearchHero trendingTags={trendingTags} />
 
-      <CommunityMapPanel
+      <LazyCommunityMapPanel
         nodes={communityMapNodes}
         selectedWindowLabel={selectedWindowLabel}
       />

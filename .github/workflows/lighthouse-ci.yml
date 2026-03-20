@@ -1,0 +1,40 @@
+name: Lighthouse Performance Audit
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Application
+        run: bun run build
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          # We don't need real DB for Lighthouse build, but Next.js might check vars
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_URL: http://localhost:3000
+
+      - name: Lighthouse Check
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://localhost:3000/dashboard
+          server: true
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

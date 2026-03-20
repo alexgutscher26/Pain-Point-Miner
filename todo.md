@@ -400,19 +400,19 @@ $$Score = (\text{mentions} \times 1.0) + (\text{avg\_comments} \times 0.5) + (\t
 
 ### **Performance & Reliability**
 
-- [ ] **Performance Audit**: Optimize for < 1.0s LCP on the Dashboard.
-  - [ ] Audit with Lighthouse CI on every PR.
-  - [ ] Lazy-load heavy components (radar charts, heatmaps).
-  - [ ] Optimize database queries: ensure all dashboard queries use indexes.
-  - [ ] Cache dashboard metrics for 30 seconds to reduce DB load.
+- [x] **Performance Audit**: Optimize for < 1.0s LCP on the Dashboard.
+  - [x] Audit with Lighthouse CI on every PR.
+  - [x] Lazy-load heavy components (radar charts, heatmaps).
+  - [x] Optimize database queries: ensure all dashboard queries use indexes.
+  - [x] Cache dashboard metrics for 30 seconds to reduce DB load.
 - [ ] **Dry Run Mode**: Scraper simulation without AI cost.
   - [ ] New mining depth option: `dry-run` that fetches posts + comments but skips AI extraction.
   - [ ] Show post count, comment count, and estimated AI cost.
   - [ ] Useful for validating subreddit selection before committing credits.
-- [ ] **Load Testing**:
-  - [ ] Simulate 50 concurrent mining runs.
-  - [ ] Measure: DB connection pool exhaustion, Reddit API rate limiting, SSE connection limits.
-  - [ ] Establish baseline performance metrics.
+- [x] **Load Testing**:
+  - [x] Simulate 50 concurrent mining runs.
+  - [x] Measure: DB connection pool exhaustion, Reddit API rate limiting, SSE connection limits.
+  - [x] Establish baseline performance metrics.
 - [ ] **Error Boundary Coverage**: Ensure all pages have proper error boundaries.
   - [ ] `app/error.tsx` and `app/global-error.tsx` already exist — verify they catch all error types.
   - [ ] Add error boundaries to dashboard sub-pages.

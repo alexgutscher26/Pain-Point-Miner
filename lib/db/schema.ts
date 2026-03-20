@@ -289,6 +289,12 @@ export const scraper = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    index("scraper_userId_workspaceId_createdAt_idx").on(
+      table.userId,
+      table.workspaceId,
+      table.createdAt,
+    ),
+    index("scraper_createdAt_idx").on(table.createdAt),
   ],
 );
 
@@ -315,6 +321,10 @@ export const scraperRun = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    index("scraper_run_scraperId_startedAt_idx").on(
+      table.scraperId,
+      table.startedAt,
+    ),
   ],
 );
 
@@ -514,6 +524,7 @@ export const painPoint = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("set null"),
+    index("pain_point_scraperId_idx").on(table.scraperId),
   ],
 );
 
