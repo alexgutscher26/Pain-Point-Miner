@@ -26,7 +26,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           # We don't need real DB for Lighthouse build, but Next.js might check vars
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
           BETTER_AUTH_URL: http://localhost:3000
 
       - name: Lighthouse Check
@@ -34,7 +34,7 @@ jobs:
         env:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
           BETTER_AUTH_URL: http://localhost:3000
         with:
           urls: |
