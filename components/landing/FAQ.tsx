@@ -60,7 +60,7 @@ export function FAQ() {
             Join 100+ startups getting organic leads today.
           </p>
 
-          <button className="bg-[#ff4500] hover:bg-[#e03d00] text-white px-10 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,69,0,0.4)] relative z-10">
+          <button className="bg-[#ff4500] hover:bg-[#e03d00] text-black px-10 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,69,0,0.4)] relative z-10">
             Start 7-day free trial
           </button>
           <p className="text-xs text-red-300 font-bold mt-4 tracking-widest uppercase relative z-10">
@@ -78,6 +78,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <div className="border-b border-white/5 last:border-0 p-4">
       <button
+        aria-expanded={open}
         className="w-full flex items-center justify-between text-left text-white font-semibold text-sm hover:text-[#ff4500] transition-colors gap-4"
         onClick={() => setOpen(!open)}
       >

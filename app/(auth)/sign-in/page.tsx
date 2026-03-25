@@ -58,7 +58,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-                ThreddIQ
+              ThreddIQ
             </span>
           </Link>
         </div>
@@ -103,6 +103,10 @@ export default function SignInPage() {
                     className="w-full h-full object-cover"
                     alt="User profile avatar"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpLlYYAZn40R7Lm84eVCNy4IOE8qFlZ6xYn6Ew7Y9zcJVBc4OHrmrWkSrxBcJDcGP1b65_1ZFDi98eLUtBve0QU-W3HGsByrCoTnOh5IezVZiJIHw3nBVLsSGUpi5W-8K6kAGUhd_kdp4dDYXXrO2Y8y972qYdKflGuVEElMlqJwmP7209vTWaOhpPg0wc3P2Q7GmDUv2-ZZgKCkuVTLWgAxpT2FcUMgMS4vDg8uLXxBsN5nDdFLUAWbh2-y1dAsfDX22vX_pp0g"
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="text-sm">
@@ -125,10 +129,10 @@ export default function SignInPage() {
 
         <div className="relative z-10 flex gap-8 text-zinc-600 text-sm mt-auto">
                   <span>© 2024 ThreddIQ</span>
-          <Link className="hover:text-white transition-colors" href="#">
+          <Link className="hover:text-white transition-colors" href="/">
             Privacy
           </Link>
-          <Link className="hover:text-white transition-colors" href="#">
+          <Link className="hover:text-white transition-colors" href="/">
             Terms
           </Link>
         </div>
@@ -153,7 +157,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-lg font-bold text-white tracking-tight">
-                ThreddIQ
+              ThreddIQ
             </span>
           </div>
 
@@ -198,7 +202,7 @@ export default function SignInPage() {
                 </label>
                 <Link
                   className="text-xs font-semibold text-[#ff4500] hover:underline"
-                  href="#"
+                  href="/"
                 >
                   Forgot password?
                 </Link>
