@@ -86,24 +86,24 @@ cp .env.example .env.local
 
 Required variables:
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string (must have PGVector enabled) |
-| `BETTER_AUTH_SECRET` | Random secret for session signing |
-| `BETTER_AUTH_URL` | App URL (e.g. `http://localhost:3000`) |
-| `OPENROUTER_API_KEY` | OpenRouter API key for AI extraction + embeddings |
-| `REDDIT_CLIENT_ID` | Reddit app client ID for OAuth API access |
-| `REDDIT_CLIENT_SECRET` | Reddit app client secret |
+| Variable               | Description                                               |
+| ---------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string (must have PGVector enabled) |
+| `BETTER_AUTH_SECRET`   | Random secret for session signing                         |
+| `BETTER_AUTH_URL`      | App URL (e.g. `http://localhost:3000`)                    |
+| `OPENROUTER_API_KEY`   | OpenRouter API key for AI extraction + embeddings         |
+| `REDDIT_CLIENT_ID`     | Reddit app client ID for OAuth API access                 |
+| `REDDIT_CLIENT_SECRET` | Reddit app client secret                                  |
 
 Optional variables:
 
-| Variable | Default | Description |
-|---|---|---|
-| `REDDIT_USER_AGENT` | `RPPScanner/1.0` | Custom Reddit user-agent |
-| `DEFAULT_BILLING_PLAN` | `starter` | Default plan for new users |
-| `STRIPE_SECRET_KEY` | — | Stripe secret key for billing |
-| `STRIPE_WEBHOOK_SECRET` | — | Stripe webhook signing secret |
-| `CRON_SECRET` | — | Shared secret for scheduled scan trigger |
+| Variable                | Default          | Description                              |
+| ----------------------- | ---------------- | ---------------------------------------- |
+| `REDDIT_USER_AGENT`     | `RPPScanner/1.0` | Custom Reddit user-agent                 |
+| `DEFAULT_BILLING_PLAN`  | `starter`        | Default plan for new users               |
+| `STRIPE_SECRET_KEY`     | —                | Stripe secret key for billing            |
+| `STRIPE_WEBHOOK_SECRET` | —                | Stripe webhook signing secret            |
+| `CRON_SECRET`           | —                | Shared secret for scheduled scan trigger |
 
 ### 3. Set up the database
 
@@ -130,13 +130,13 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start development server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run Vitest test suite |
+| Command         | Description               |
+| --------------- | ------------------------- |
+| `npm run dev`   | Start development server  |
+| `npm run build` | Production build          |
+| `npm run start` | Start production server   |
+| `npm run lint`  | Run ESLint                |
+| `npm run test`  | Run Vitest test suite     |
 | `npm run write` | Format code with Prettier |
 
 ## Architecture
@@ -204,13 +204,13 @@ Recurring scans run via `POST /api/search/scheduled`, triggered by a cron job.
 
 ### Scheduler env vars
 
-| Variable | Default | Description |
-|---|---|---|
-| `CRON_SECRET` | — | Required. Shared secret for auth. |
-| `SCHEDULED_BATCH_LIMIT` | `5` | Scrapers processed per trigger |
-| `SCHEDULED_MAX_POSTS_PER_SUBREDDIT` | `180` | Post cap per subreddit per run |
-| `SCHEDULED_MAX_SUBREDDITS` | `10` | Subreddit count cap per run |
-| `SCHEDULED_PROCESSING_LIMIT` | `8` | Posts sent to AI extraction per run |
+| Variable                            | Default | Description                         |
+| ----------------------------------- | ------- | ----------------------------------- |
+| `CRON_SECRET`                       | —       | Required. Shared secret for auth.   |
+| `SCHEDULED_BATCH_LIMIT`             | `5`     | Scrapers processed per trigger      |
+| `SCHEDULED_MAX_POSTS_PER_SUBREDDIT` | `180`   | Post cap per subreddit per run      |
+| `SCHEDULED_MAX_SUBREDDITS`          | `10`    | Subreddit count cap per run         |
+| `SCHEDULED_PROCESSING_LIMIT`        | `8`     | Posts sent to AI extraction per run |
 
 ### GitHub Actions
 

@@ -230,9 +230,13 @@ export async function executeMiningRun({
 
       if (!points || points.length === 0) continue;
 
+      const painPointsToInsert = [];
+      const commentsToInsert = [];
+      const clusterJobs = [];
+
       for (const point of points) {
         const painPointId = crypto.randomUUID();
-        await db.insert(painPoint).values({
+        painPointsToInsert.push({
           id: painPointId,
           title: point.title,
           body: point.body,
@@ -267,7 +271,7 @@ export async function executeMiningRun({
           .map((comment) => ({
             id: crypto.randomUUID(),
             body: cleanCommentBody(comment.body),
-            author: anonymize ? "[Anonymized]" : (comment.author || "unknown"),
+            author: anonymize ? "[Anonymized]" : comment.author || "unknown",
             score: comment.score ?? 0,
             commentUrl: comment.permalink || null,
             painScore: point.painIntensity ?? 0,
@@ -275,10 +279,22 @@ export async function executeMiningRun({
           }));
 
         if (commentRows.length > 0) {
-          await db.insert(painPointComment).values(commentRows);
+          commentsToInsert.push(...commentRows);
         }
         newPainPoints += 1;
 
+        clusterJobs.push(painPointId);
+      }
+
+      if (painPointsToInsert.length > 0) {
+        await db.insert(painPoint).values(painPointsToInsert);
+      }
+
+      if (commentsToInsert.length > 0) {
+        await db.insert(painPointComment).values(commentsToInsert);
+      }
+
+      for (const painPointId of clusterJobs) {
         // Fire-and-forget: embed + cluster this pain point
         void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
           console.error(`Embedding/clustering failed for ${painPointId}:`, err),
