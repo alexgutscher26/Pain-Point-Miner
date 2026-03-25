@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   },
   description: "Sign in or create an account to access Threddiq.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
     nocache: true,
     googleBot: {
-      index: false,
-      follow: false,
+      index: true,
+      follow: true,
       noimageindex: true,
     },
   },
