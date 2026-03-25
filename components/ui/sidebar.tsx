@@ -588,14 +588,14 @@ function SidebarMenuSkeleton({
   showIcon?: boolean;
 }) {
   // Random width between 50 to 90%.
-  const [width] = React.useState(() => {
+  const width = React.useMemo(() => {
     if (typeof crypto !== "undefined" && crypto.getRandomValues) {
       const array = new Uint32Array(1);
       crypto.getRandomValues(array);
       return `${(array[0] % 40) + 50}%`;
     }
     return "50%"; // Fallback when crypto is not available
-  });
+  }, []);
 
   return (
     <div
