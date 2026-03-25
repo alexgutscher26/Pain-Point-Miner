@@ -639,37 +639,35 @@ export function SettingsPageClient({
               </div>
             ) : (
               sessions.map((session) => (
-                   <div
-                    key={session.id}
-                    className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
+                <div
+                  key={session.id}
+                  className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-white truncate">
+                      {session.userAgent || "Unknown device"}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      IP: {session.ipAddress || "Unknown"} | Started:{" "}
+                      {session.createdAt
+                        ? new Date(session.createdAt).toLocaleString()
+                        : "Unknown"}
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-1">
+                      Expires:{" "}
+                      {session.expiresAt
+                        ? new Date(session.expiresAt).toLocaleString()
+                        : "Unknown"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void handleRevokeSession(session.id)}
+                    disabled={isRevokingToken === session.id}
+                    className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
                   >
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-white truncate">
-                        {session.userAgent || "Unknown device"}
-                      </p>
-                      <p className="text-xs text-zinc-500 mt-1">
-                        IP: {session.ipAddress || "Unknown"} | Started:{" "}
-                        {session.createdAt
-                          ? new Date(session.createdAt).toLocaleString()
-                          : "Unknown"}
-                      </p>
-                      <p className="text-xs text-zinc-500 mt-1">
-                        Expires:{" "}
-                        {session.expiresAt
-                          ? new Date(session.expiresAt).toLocaleString()
-                          : "Unknown"}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => void handleRevokeSession(session.id)}
-                      disabled={isRevokingToken === session.id}
-                      className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
-                    >
-                      {isRevokingToken === session.id
-                        ? "Revoking..."
-                        : "Revoke"}
-                    </button>
+                    {isRevokingToken === session.id ? "Revoking..." : "Revoke"}
+                  </button>
                 </div>
               ))
             )}
