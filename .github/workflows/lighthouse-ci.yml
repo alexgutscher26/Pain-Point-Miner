@@ -41,6 +41,14 @@ jobs:
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
 
+      - name: Start Application Server
+        run: bun run start &
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_URL: http://localhost:3000
+
       - name: Lighthouse Check
         uses: treosh/lighthouse-ci-action@v12
         env:
