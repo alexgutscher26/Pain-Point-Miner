@@ -5,39 +5,64 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 const logos = [
-  { name: "Y Combinator", src: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Y_Combinator_logo.svg" },
-  { name: "Indie Hackers", src: "https://www.indiehackers.com/images/logos/indie-hackers-logo-dark.svg" },
-  { name: "Product Hunt", src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Product_Hunt_Logo.svg" },
-  { name: "Stripe", src: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" },
-  { name: "Vercel", src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg" },
+  {
+    name: "Y Combinator",
+    src: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Y_Combinator_logo.svg",
+  },
+  {
+    name: "Indie Hackers",
+    src: "https://www.indiehackers.com/images/logos/indie-hackers-logo-dark.svg",
+  },
+  {
+    name: "Product Hunt",
+    src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Product_Hunt_Logo.svg",
+  },
+  {
+    name: "Stripe",
+    src: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
+  },
+  {
+    name: "Vercel",
+    src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg",
+  },
 ];
 
 const testimonials = [
   {
-    quote: "ThreddIQ changed how I validate SaaS ideas. I found 3 high-intent pain points in r/sales that I'd never have spotted manually. It saved me weeks of dev time.",
+    quote:
+      "ThreddIQ changed how I validate SaaS ideas. I found 3 high-intent pain points in r/sales that I'd never have spotted manually. It saved me weeks of dev time.",
     author: "James Chen",
     role: "Founder, OutreachSync",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop",
+    avatar:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop",
   },
   {
-    quote: "The ability to see exactly what people are complaining about, with upvote counts and sentiment analysis, is like having a cheat code for market research.",
+    quote:
+      "The ability to see exactly what people are complaining about, with upvote counts and sentiment analysis, is like having a cheat code for market research.",
     author: "Sarah Jenkins",
     role: "Growth Lead at Mercury",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=256&auto=format&fit=crop",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=256&auto=format&fit=crop",
   },
   {
-    quote: "Finally, a tool that doesn't just scrape data but actually extracts *problems*. ThreddIQ is now a core part of our product discovery workflow.",
+    quote:
+      "Finally, a tool that doesn't just scrape data but actually extracts *problems*. ThreddIQ is now a core part of our product discovery workflow.",
     author: "Marcus Thorne",
     role: "Product Manager, ScalePath",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=256&auto=format&fit=crop",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=256&auto=format&fit=crop",
   },
 ];
 
 export function Testimonial() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const next = () => setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  const prev = () => setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  const next = () =>
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+  const prev = () =>
+    setCurrentIndex(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+    );
 
   useEffect(() => {
     const timer = setInterval(next, 8000);
@@ -55,8 +80,10 @@ export function Testimonial() {
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
             {logos.map((logo) => (
               <div key={logo.name} className="h-6 md:h-8 w-auto relative">
-                 <span className="text-white font-black text-xl md:text-2xl tracking-tighter">{logo.name}</span>
-                 {/* Note: In a real app we'd use <Image src={logo.src} .../> but for demo text branding looks premium too */}
+                <span className="text-white font-black text-xl md:text-2xl tracking-tighter">
+                  {logo.name}
+                </span>
+                {/* Note: In a real app we'd use <Image src={logo.src} .../> but for demo text branding looks premium too */}
               </div>
             ))}
           </div>
@@ -115,7 +142,7 @@ export function Testimonial() {
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Dots */}
             <div className="flex justify-center gap-2">
               {testimonials.map((_, i) => (

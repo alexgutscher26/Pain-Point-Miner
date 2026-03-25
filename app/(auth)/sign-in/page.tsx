@@ -58,7 +58,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-                ThreddIQ
+              ThreddIQ
             </span>
           </Link>
         </div>
@@ -157,7 +157,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-lg font-bold text-white tracking-tight">
-                ThreddIQ
+              ThreddIQ
             </span>
           </div>
 

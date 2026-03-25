@@ -5,14 +5,28 @@ import { Search, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 const demoData = [
-  { id: 1, text: "Spending 4+ hours a week manually cleaning data in Excel.", intensity: "High" },
-  { id: 2, text: "Current tools are too expensive for solopreneurs.", intensity: "Medium" },
-  { id: 3, text: "No way to automate the reporting process for clients.", intensity: "High" },
+  {
+    id: 1,
+    text: "Spending 4+ hours a week manually cleaning data in Excel.",
+    intensity: "High",
+  },
+  {
+    id: 2,
+    text: "Current tools are too expensive for solopreneurs.",
+    intensity: "Medium",
+  },
+  {
+    id: 3,
+    text: "No way to automate the reporting process for clients.",
+    intensity: "High",
+  },
 ];
 
 export function InteractiveDemo() {
   const [keyword, setKeyword] = useState("");
-  const [step, setStep] = useState<"not-started" | "searching" | "mining" | "results">("not-started");
+  const [step, setStep] = useState<
+    "not-started" | "searching" | "mining" | "results"
+  >("not-started");
   const [progress, setProgress] = useState(0);
 
   const startDemo = (e: React.FormEvent) => {
@@ -43,7 +57,8 @@ export function InteractiveDemo() {
             Test our AI in <span className="text-[#ff4500]">Seconds</span>
           </h3>
           <p className="text-zinc-400 max-w-2xl mx-auto font-medium text-lg">
-            Curious what we find? Enter a niche below to see a simulated analysis. No account required.
+            Curious what we find? Enter a niche below to see a simulated
+            analysis. No account required.
           </p>
         </div>
 
@@ -51,7 +66,10 @@ export function InteractiveDemo() {
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#ff4500]/30 to-transparent"></div>
 
           {step === "not-started" && (
-            <form onSubmit={startDemo} className="space-y-8 max-w-xl mx-auto text-center">
+            <form
+              onSubmit={startDemo}
+              className="space-y-8 max-w-xl mx-auto text-center"
+            >
               <div className="relative">
                 <input
                   type="text"
@@ -68,7 +86,8 @@ export function InteractiveDemo() {
                 type="submit"
                 className="w-full py-5 bg-[#ff4500] text-white font-black uppercase tracking-widest hover:bg-[#ff5500] transition-colors flex items-center justify-center gap-3 group"
               >
-                Run Sample Scan <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Run Sample Scan{" "}
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
           )}
@@ -81,10 +100,12 @@ export function InteractiveDemo() {
               </div>
               <div className="text-center space-y-4 w-full max-w-md">
                 <p className="font-mono text-[11px] font-black uppercase tracking-widest text-[#ff4500]">
-                  {step === "searching" ? "Scanning Subreddits..." : "AI Extraction in Progress..."}
+                  {step === "searching"
+                    ? "Scanning Subreddits..."
+                    : "AI Extraction in Progress..."}
                 </p>
                 <div className="h-1 w-full bg-white/5 overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-[#ff4500] transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   ></div>
@@ -103,19 +124,27 @@ export function InteractiveDemo() {
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <h4 className="text-xl font-bold text-white uppercase tracking-tight">
-                  Sample Analysis: <span className="text-[#ff4500]">{keyword}</span>
+                  Sample Analysis:{" "}
+                  <span className="text-[#ff4500]">{keyword}</span>
                 </h4>
               </div>
 
               <div className="grid gap-4 mb-10">
                 {demoData.map((item) => (
-                  <div key={item.id} className="p-5 bg-white/2 border border-white/5 flex items-start justify-between gap-4">
+                  <div
+                    key={item.id}
+                    className="p-5 bg-white/2 border border-white/5 flex items-start justify-between gap-4"
+                  >
                     <p className="text-zinc-200 font-medium">
                       &ldquo;{item.text}&rdquo;
                     </p>
-                    <span className={`px-2 py-1 font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
-                      item.intensity === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
+                        item.intensity === "High"
+                          ? "bg-red-500/10 text-red-400 border border-red-500/30"
+                          : "bg-amber-500/10 text-amber-400 border border-amber-500/30"
+                      }`}
+                    >
                       {item.intensity} Intensity
                     </span>
                   </div>
@@ -123,12 +152,15 @@ export function InteractiveDemo() {
               </div>
 
               <div className="bg-[#ff4500]/5 border border-[#ff4500]/20 p-8 text-center flex flex-col items-center">
-                <p className="text-white font-bold text-xl mb-2">Want to see the real deal?</p>
-                <p className="text-zinc-400 text-sm mb-8 max-w-md">
-                  We found 42+ potential entry points for <strong className="text-zinc-200">{keyword}</strong>.
-                  Unlock the full reports, budget extraction, and market scores now.
+                <p className="text-white font-bold text-xl mb-2">
+                  Want to see the real deal?
                 </p>
-                <Link 
+                <p className="text-zinc-400 text-sm mb-8 max-w-md">
+                  We found 42+ potential entry points for{" "}
+                  <strong className="text-zinc-200">{keyword}</strong>. Unlock
+                  the full reports, budget extraction, and market scores now.
+                </p>
+                <Link
                   href="/sign-up"
                   className="px-10 py-4 bg-[#ff4500] text-white font-black uppercase tracking-widest hover:bg-[#ff5500] transition-colors"
                 >

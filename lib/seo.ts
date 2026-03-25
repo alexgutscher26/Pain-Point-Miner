@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-const DEFAULT_SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const DEFAULT_SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 function toAbsoluteUrl(rawUrl: string | undefined): string {
   if (!rawUrl) {
