@@ -1,3 +1,4 @@
+import pMap from "p-map";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
@@ -185,11 +186,20 @@ export async function executeMiningRun({
       Awaited<ReturnType<typeof fetchComments>>
     >();
 
-    const commentFetchResults = await Promise.allSettled(
-      postsToAnalyze.map(async (post) => ({
-        postId: post.id,
-        comments: await fetchComments(post.id, post.subreddit),
-      })),
+    const commentFetchResults = await pMap(
+      postsToAnalyze,
+      async (post) => {
+        try {
+          const comments = await fetchComments(post.id, post.subreddit);
+          return {
+            status: "fulfilled" as const,
+            value: { postId: post.id, comments },
+          };
+        } catch (error) {
+          return { status: "rejected" as const, reason: error };
+        }
+      },
+      { concurrency: 5 },
     );
 
     for (const result of commentFetchResults) {
