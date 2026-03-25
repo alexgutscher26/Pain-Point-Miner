@@ -38,7 +38,8 @@ export async function requireApiContext(req: Request) {
 
   if (isMutation) {
     const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL || "";
-    const isLocalhost = origin?.includes("localhost") || origin?.includes("127.0.0.1");
+    const isLocalhost =
+      origin?.includes("localhost") || origin?.includes("127.0.0.1");
     const isSafeOrigin = origin === allowedOrigin || isLocalhost;
 
     if (origin && !isSafeOrigin) {
@@ -59,7 +60,10 @@ export async function requireApiContext(req: Request) {
     headers: await headers(),
   });
 
-  if (session?.user && (session.user as { deletedAt?: Date | null }).deletedAt) {
+  if (
+    session?.user &&
+    (session.user as { deletedAt?: Date | null }).deletedAt
+  ) {
     return {
       ok: false as const,
       response: apiError(

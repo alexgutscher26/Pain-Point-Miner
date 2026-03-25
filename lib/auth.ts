@@ -42,6 +42,7 @@ import * as schema from "./db/schema";
 import * as relations from "./db/relations";
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET || "fallback_secret_for_local_development_or_testing",
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
     schema: { ...schema, ...relations },

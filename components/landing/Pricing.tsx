@@ -125,10 +125,10 @@ export function Pricing() {
             >
               Get Started
             </Link>
-            <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
               Best for:
             </p>
-            <p className="text-[13px] text-zinc-400 font-medium leading-tight">
+            <p className="text-[13px] text-zinc-300 font-medium leading-tight">
               Early-stage founders validating first ideas.
             </p>
           </div>
@@ -193,7 +193,7 @@ export function Pricing() {
           <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-[#ff4500]/5">
             <Link
               href={`/sign-up?plan=growth&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="w-full h-11 rounded-lg bg-[#ff4500] hover:bg-[#ff571a] border border-[#ff4500] text-white font-extrabold text-[14px] transition-all shadow-lg shadow-[#ff4500]/20 flex items-center justify-center gap-2 mb-4"
+              className="w-full h-11 rounded-lg bg-[#ff4500] hover:bg-[#ff571a] border border-[#ff4500] text-black font-extrabold text-[14px] transition-all shadow-lg shadow-[#ff4500]/20 flex items-center justify-center gap-2 mb-4"
             >
               Get Started <ArrowRight className="w-4 h-4" />
             </Link>
@@ -260,10 +260,10 @@ export function Pricing() {
             >
               Get Started
             </Link>
-            <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
               Best for:
             </p>
-            <p className="text-[13px] text-zinc-400 font-medium leading-tight">
+            <p className="text-[13px] text-zinc-300 font-medium leading-tight">
               Startup teams, agencies, and product researchers.
             </p>
           </div>
@@ -291,11 +291,11 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center gap-3 w-full mb-6 mt-2">
-      <div className={`${spotlight ? "text-[#ff4500]" : "text-zinc-500"}`}>
+      <div className={`${spotlight ? "text-[#ff4500]" : "text-zinc-400"}`}>
         {icon}
       </div>
       <h4
-        className={`text-[11px] font-extrabold tracking-[0.2em] uppercase ${spotlight ? "text-[#ff4500]" : "text-zinc-500"}`}
+        className={`text-[11px] font-extrabold tracking-[0.2em] uppercase ${spotlight ? "text-[#ff4500]" : "text-zinc-400"}`}
       >
         {label}
       </h4>

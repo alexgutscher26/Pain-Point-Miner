@@ -30,9 +30,11 @@ export async function DELETE(req: Request) {
   }
 
   // Find the session token by ID in the database
-  const targetSession = await auth.api.listSessions({
-    headers: await headers(),
-  }).then(list => list.find(s => s.id === id));
+  const targetSession = await auth.api
+    .listSessions({
+      headers: await headers(),
+    })
+    .then((list) => list.find((s) => s.id === id));
 
   if (!targetSession) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
