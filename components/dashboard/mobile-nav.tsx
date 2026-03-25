@@ -38,7 +38,7 @@ export function DashboardMobileNav({
               </div>
               <div>
                 <p className="text-base font-black leading-tight tracking-tight">
-                  ThreddIQ
+              ThreddIQ
                 </p>
                 <p className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500">
                   {planLabel}

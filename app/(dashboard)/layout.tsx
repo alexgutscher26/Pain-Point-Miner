@@ -8,7 +8,10 @@ import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-links";
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
 import { Plus, Crown, LayoutDashboard } from "lucide-react";
-import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
+import {
+  getMonthlyScanUsage,
+  getMonthlyUsageSummary,
+} from "@/lib/plan-gating";
 
 export const metadata: Metadata = {
   title: {
@@ -100,9 +103,7 @@ export default async function DashboardLayout({
                   {monthlyScansLimit === null ? (
                     <span className="text-zinc-500 ml-1">/ Unlimited</span>
                   ) : (
-                    <span className="text-zinc-500 ml-1">
-                      / {monthlyScansLimit}
-                    </span>
+                    <span className="text-zinc-500 ml-1">/ {monthlyScansLimit}</span>
                   )}
                 </p>
               </div>

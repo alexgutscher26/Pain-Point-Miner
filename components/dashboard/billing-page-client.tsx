@@ -75,10 +75,6 @@ export function BillingPageClient({
       }
 
       if (data?.url) {
-        const url = new URL(data.url, window.location.origin);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
-          throw new Error("Invalid redirect URL.");
-        }
         window.location.href = data.url;
         return;
       }
@@ -127,10 +123,6 @@ export function BillingPageClient({
       }
 
       if (data?.url) {
-        const url = new URL(data.url, window.location.origin);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
-          throw new Error("Invalid redirect URL.");
-        }
         window.location.href = data.url;
         return;
       }
@@ -141,7 +133,9 @@ export function BillingPageClient({
       setActionState({
         type: "error",
         message:
-          error instanceof Error ? error.message : "Unable to start checkout.",
+          error instanceof Error
+            ? error.message
+            : "Unable to start checkout.",
       });
     } finally {
       setStartingCheckoutPlan(null);
@@ -337,8 +331,8 @@ export function BillingPageClient({
                 {planPurchaseRequired
                   ? "Requires paid plan"
                   : entitlements.maxSubredditsPerSearch === null
-                    ? "Unlimited"
-                    : entitlements.maxSubredditsPerSearch}
+                  ? "Unlimited"
+                  : entitlements.maxSubredditsPerSearch}
               </span>
             </p>
             <p>

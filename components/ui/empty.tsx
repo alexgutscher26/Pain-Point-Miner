@@ -1,4 +1,4 @@
-import { cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
@@ -44,7 +44,7 @@ function EmptyMedia({
   className,
   variant = "default",
   ...props
-}: React.ComponentProps<"div"> & Parameters<typeof emptyMediaVariants>[0]) {
+}: React.ComponentProps<"div"> & VariantProps<typeof emptyMediaVariants>) {
   return (
     <div
       data-slot="empty-icon"

@@ -1,4 +1,4 @@
-import { cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ function ButtonGroup({
   className,
   orientation,
   ...props
-}: React.ComponentProps<"div"> & Parameters<typeof buttonGroupVariants>[0]) {
+}: React.ComponentProps<"div"> & VariantProps<typeof buttonGroupVariants>) {
   return (
     <div
       role="group"

@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const runStatusSchema = z.enum([
-  "pending",
   "queued",
   "running",
   "scanning",
@@ -15,10 +14,9 @@ export const runStatusSchema = z.enum([
 export type RunStatus = z.infer<typeof runStatusSchema>;
 
 export function normalizeRunStatus(
-  value: unknown,
-  fallback: RunStatus = "pending",
+  status: string | null | undefined,
 ): RunStatus {
-  if (typeof value !== "string" || !value) return fallback;
+  if (!status) return "running";
 
   const legacyMap: Record<string, RunStatus> = {
     success: "completed",
@@ -26,7 +24,7 @@ export function normalizeRunStatus(
     error: "failed",
   };
 
-  const mapped = legacyMap[value] ?? value;
+  const mapped = legacyMap[status] ?? status;
   const parsed = runStatusSchema.safeParse(mapped);
-  return parsed.success ? parsed.data : fallback;
+  return parsed.success ? parsed.data : "running";
 }

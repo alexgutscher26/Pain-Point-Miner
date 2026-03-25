@@ -33,9 +33,9 @@ export function Steps() {
               </span>
             </div>
           </div>
-          <h3 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
+          <h4 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
             1. Define your niche
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 leading-relaxed font-medium">
             Enter a keyword like 'SEO tools' or 'property management' to target
             the exact subreddits relevant to your SaaS.
@@ -60,9 +60,9 @@ export function Steps() {
               <div className="h-1.5 bg-zinc-800 w-[90%] rounded"></div>
             </div>
           </div>
-          <h3 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
+          <h4 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
             2. We analyze discussions
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 leading-relaxed font-medium">
             Our system scans recent discussions, identifies repeated
             frustrations, and clusters similar complaints automatically.
@@ -83,9 +83,9 @@ export function Steps() {
               <div className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-black animate-pulse"></div>
             </div>
           </div>
-          <h3 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
+          <h4 className="text-[22px] font-extrabold text-white mb-3 tracking-tight">
             3. Review Pain Points
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 leading-relaxed font-medium">
             Get structured reports detailing common pain points, demand signals,
             and user language to validate your next feature.
