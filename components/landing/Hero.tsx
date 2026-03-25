@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
@@ -38,7 +38,7 @@ export function Hero() {
       });
   }, []);
 
-  const handleHeroSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleHeroSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const keyword = website.trim();
