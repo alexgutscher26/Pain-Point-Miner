@@ -8,7 +8,7 @@ describe("fetchSubredditPosts", () => {
 
   it("fetches and returns a list of reddit posts up to the limit", async () => {
     // Mock the global fetch
-    global.fetch = vi.fn().mockResolvedValue({
+    vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
       json: async () => ({
         data: {
@@ -42,19 +42,19 @@ describe("fetchSubredditPosts", () => {
           ],
         },
       }),
-    });
+    } as Response);
 
     const posts = await fetchSubredditPosts("test", "keyword", 2);
 
     expect(posts).toHaveLength(2);
     // Sort logic in rankRedditPosts will sort them, but let's just make sure IDs are included
-    expect(posts.map(p => p.id)).toContain("1");
-    expect(posts.map(p => p.id)).toContain("2");
+    expect(posts.map((p) => p.id)).toContain("1");
+    expect(posts.map((p) => p.id)).toContain("2");
   });
 
   it("handles fetch errors gracefully", async () => {
     // Mock the global fetch
-    global.fetch = vi.fn().mockRejectedValue(new Error("Failed to fetch"));
+    vi.spyOn(global, "fetch").mockRejectedValue(new Error("Failed to fetch"));
 
     const posts = await fetchSubredditPosts("test", "keyword", 2);
     expect(posts).toHaveLength(0);
@@ -62,14 +62,14 @@ describe("fetchSubredditPosts", () => {
 
   it("returns empty array when no posts are found", async () => {
     // Mock the global fetch
-    global.fetch = vi.fn().mockResolvedValue({
+    vi.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
       json: async () => ({
         data: {
           children: [],
         },
       }),
-    });
+    } as Response);
 
     const posts = await fetchSubredditPosts("test", "keyword", 2);
     expect(posts).toHaveLength(0);
@@ -78,7 +78,7 @@ describe("fetchSubredditPosts", () => {
   it("handles multiple batches when limit > 100", async () => {
     // Mock the global fetch
     let callCount = 0;
-    global.fetch = vi.fn().mockImplementation(async () => {
+    vi.spyOn(global, "fetch").mockImplementation(async () => {
       callCount += 1;
       const start = (callCount - 1) * 100;
       const children = Array.from({ length: 100 }, (_, i) => ({
@@ -102,7 +102,7 @@ describe("fetchSubredditPosts", () => {
             after: callCount < 2 ? "after_token" : null,
           },
         }),
-      };
+      } as Response;
     });
 
     const posts = await fetchSubredditPosts("test", "keyword", 150);
