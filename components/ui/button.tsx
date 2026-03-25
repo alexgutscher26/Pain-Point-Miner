@@ -1,5 +1,5 @@
 import * as React from "react";
-// @ts-expect-error this is needed for the Button props typing
+// VariantProps is actively used in the component props below
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
