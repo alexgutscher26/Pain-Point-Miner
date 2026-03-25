@@ -27,10 +27,10 @@ export function Footer() {
             Find perfect opportunities on Reddit with AI-powered monitoring
           </p>
           <div className="flex items-center p-1 border border-zinc-800 rounded-lg bg-[#141414]">
-            <button className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+            <button aria-label="Light mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
               <Sun className="w-4 h-4" />
             </button>
-            <button className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+            <button aria-label="Dark mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
               <Moon className="w-4 h-4" />
             </button>
           </div>

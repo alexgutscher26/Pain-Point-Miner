@@ -101,12 +101,14 @@ export function Testimonial() {
             {/* Navigation */}
             <div className="flex justify-center gap-4 pt-4">
               <button
+                aria-label="Previous testimonial"
                 onClick={prev}
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
+                aria-label="Next testimonial"
                 onClick={next}
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
