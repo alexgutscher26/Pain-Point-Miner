@@ -209,7 +209,9 @@ function formatBudgetValue(
   }
 
   if ((monetization ?? 0) >= 4) {
-    return urgency === "Extreme Urgency" ? "Budget pressure" : "Some willingness";
+    return urgency === "Extreme Urgency"
+      ? "Budget pressure"
+      : "Some willingness";
   }
 
   return "Weak signal";
@@ -421,7 +423,8 @@ export default function ReportDetailPage() {
       toast.error("Unable to update report.", {
         action: {
           label: "Retry",
-          onClick: () => void handleSaveToggle(nextSaved, categoryOverride, showToast),
+          onClick: () =>
+            void handleSaveToggle(nextSaved, categoryOverride, showToast),
         },
       });
     } finally {
@@ -761,14 +764,14 @@ export default function ReportDetailPage() {
           <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">
             Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
           </h2>
-              <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
-                Scanned on {reportData.date}
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest">
-                <Filter className="w-3.5 h-3.5 text-amber-400" />
-                Window: {reportData.timeWindowLabel ?? "Last 90d"}
-              </div>
+          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
+            Scanned on {reportData.date}
+          </div>
+          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest">
+            <Filter className="w-3.5 h-3.5 text-amber-400" />
+            Window: {reportData.timeWindowLabel ?? "Last 90d"}
+          </div>
           {reportData.trend && (
             <div className="pt-3">
               <span
@@ -1040,7 +1043,9 @@ export default function ReportDetailPage() {
                       <InfoSquare
                         icon={<DollarSign className="w-3.5 h-3.5" />}
                         label="Estimated TAM"
-                        value={formatCurrency(pain.cluster?.estimatedTamUsdAnnual)}
+                        value={formatCurrency(
+                          pain.cluster?.estimatedTamUsdAnnual,
+                        )}
                         color="text-fuchsia-500"
                         preserveCase
                       />
