@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
