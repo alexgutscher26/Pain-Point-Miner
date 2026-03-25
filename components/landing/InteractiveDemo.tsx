@@ -55,6 +55,7 @@ export function InteractiveDemo() {
               <div className="relative">
                 <input
                   type="text"
+                  aria-label="Enter a niche to scan"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management..."

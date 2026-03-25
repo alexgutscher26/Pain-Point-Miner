@@ -72,9 +72,9 @@ export function Testimonial() {
 
           <div className="relative z-10 text-center space-y-10">
             <div className="min-h-[160px] md:min-h-[180px] flex items-center justify-center">
-              <h3 className="text-[24px] md:text-[32px] font-bold text-white leading-relaxed tracking-tight transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+              <h2 className="text-[24px] md:text-[32px] font-bold text-white leading-relaxed tracking-tight transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
                 &ldquo;{testimonials[currentIndex].quote}&rdquo;
-              </h3>
+              </h2>
             </div>
 
             <div className="flex flex-col items-center gap-4">
@@ -102,12 +102,14 @@ export function Testimonial() {
             <div className="flex justify-center gap-4 pt-4">
               <button
                 onClick={prev}
+                aria-label="Previous testimonial"
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={next}
+                aria-label="Next testimonial"
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
                 <ChevronRight className="w-5 h-5" />
