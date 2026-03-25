@@ -88,29 +88,31 @@ export default function HelpSupportPage() {
           </div>
 
           <div className="grid gap-4 p-6 sm:p-8">
-            {quickActions.map(({ title, description, href, icon: Icon, cta }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group flex items-start gap-4 border border-white/10 bg-white/[0.02] p-5 transition-colors hover:border-[#ff4500]/40 hover:bg-[#ff4500]/[0.06]"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10 text-[#ff4500]">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-base font-black tracking-tight text-white">
-                    {title}
-                  </p>
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
-                    {description}
-                  </p>
-                </div>
-                <div className="hidden items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-500 transition-colors group-hover:text-[#ff4500] sm:flex">
-                  {cta}
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </Link>
-            ))}
+            {quickActions.map(
+              ({ title, description, href, icon: Icon, cta }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="group flex items-start gap-4 border border-white/10 bg-white/[0.02] p-5 transition-colors hover:border-[#ff4500]/40 hover:bg-[#ff4500]/[0.06]"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10 text-[#ff4500]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-black tracking-tight text-white">
+                      {title}
+                    </p>
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
+                      {description}
+                    </p>
+                  </div>
+                  <div className="hidden items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-500 transition-colors group-hover:text-[#ff4500] sm:flex">
+                    {cta}
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </Link>
+              ),
+            )}
           </div>
         </section>
 

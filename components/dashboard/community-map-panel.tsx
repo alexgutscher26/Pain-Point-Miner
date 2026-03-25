@@ -121,7 +121,9 @@ function CommunityPainPointCard({
           <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
             Investigation
           </p>
-          <p className="text-sm font-bold text-zinc-200">{painPoint.reportTitle}</p>
+          <p className="text-sm font-bold text-zinc-200">
+            {painPoint.reportTitle}
+          </p>
         </div>
         <Link
           href={`/dashboard/reports/${painPoint.reportId}`}
@@ -139,9 +141,8 @@ export function CommunityMapPanel({
   nodes,
   selectedWindowLabel,
 }: CommunityMapPanelProps) {
-  const [selectedNode, setSelectedNode] = useState<SubredditCommunityNode | null>(
-    null,
-  );
+  const [selectedNode, setSelectedNode] =
+    useState<SubredditCommunityNode | null>(null);
   const largestCount = nodes[0]?.painPointCount ?? 0;
 
   return (
@@ -171,7 +172,9 @@ export function CommunityMapPanel({
               <MapPinned className="h-8 w-8" />
             </div>
             <div className="space-y-2">
-              <p className="text-lg font-black text-white">No community map yet</p>
+              <p className="text-lg font-black text-white">
+                No community map yet
+              </p>
               <p className="max-w-md text-sm font-medium text-zinc-500">
                 Run more investigations in this time window to see where pain is
                 concentrating across subreddits.
@@ -252,7 +255,9 @@ export function CommunityMapPanel({
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-black text-white">{node.label}</p>
+                        <p className="text-sm font-black text-white">
+                          {node.label}
+                        </p>
                         <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
                           {node.painPointCount} pain points
                         </p>
