@@ -10,12 +10,12 @@ type RateLimitRecord = {
 const storage = new Map<string, RateLimitRecord>();
 
 // Cleanup stale records every minute
-if (typeof setInterval !== "undefined") {
+if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now();
     for (const [key, record] of storage.entries()) {
       // Remove timestamps older than 1 minute
-      const filtered = record.timestamps.filter((t) => now - t < 60000);
+      const filtered = record.timestamps.filter(t => now - t < 60000);
       if (filtered.length === 0) {
         storage.delete(key);
       } else {
@@ -36,10 +36,7 @@ export interface RateLimitResult {
  * @param identifier Unique key (e.g. userId or IP)
  * @param limit Max requests per minute
  */
-export function checkRateLimit(
-  identifier: string,
-  limit: number,
-): RateLimitResult {
+export function checkRateLimit(identifier: string, limit: number): RateLimitResult {
   const now = Date.now();
   const windowMs = 60000; // 1 minute
 
@@ -50,7 +47,7 @@ export function checkRateLimit(
   }
 
   // Filter out expired timestamps
-  record.timestamps = record.timestamps.filter((t) => now - t < windowMs);
+  record.timestamps = record.timestamps.filter(t => now - t < windowMs);
 
   if (record.timestamps.length >= limit) {
     const oldest = record.timestamps[0];

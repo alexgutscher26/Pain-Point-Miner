@@ -9,12 +9,12 @@ import {
 describe("budget signal normalization", () => {
   it("parses monthly willingness-to-pay quotes and annualizes them", () => {
     const signal = normalizeBudgetSignal({
-      quote: "I would pay $50/month for this today.",
+      quote: 'I would pay $50/month for this today.',
       source: "comment",
     });
 
     expect(signal).toMatchObject({
-      quote: "I would pay $50/month for this today.",
+      quote: 'I would pay $50/month for this today.',
       amountMinUsd: 50,
       amountMaxUsd: 50,
       cadence: "monthly",

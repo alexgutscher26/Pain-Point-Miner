@@ -1,8 +1,5 @@
 name: Lighthouse Performance Audit
 
-permissions:
-  contents: read
-
 on:
   pull_request:
     branches: [main, master]
@@ -12,13 +9,11 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
@@ -31,37 +26,14 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           # We don't need real DB for Lighthouse build, but Next.js might check vars
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
-          BETTER_AUTH_URL: http://localhost:3000
-
-      - name: Start Application Server
-        run: |
-          bun run start &
-          sleep 5
-        env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: secret
-          BETTER_AUTH_URL: http://localhost:3000
-
-      - name: Start Application Server
-        run: bun run start &
-        env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
 
       - name: Lighthouse Check
         uses: treosh/lighthouse-ci-action@v12
-        env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: secret
-          BETTER_AUTH_URL: http://localhost:3000
         with:
           urls: |
-            http://localhost:3000/dashboard
+            http://localhost:3000/
           configPath: .lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true

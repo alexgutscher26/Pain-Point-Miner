@@ -21,9 +21,9 @@ export function Opportunities() {
         <div className="bg-[#0f0f0f] border-2 border-white/[0.03] rounded-[24px] p-8 h-full flex flex-col hover:border-white/[0.08] transition-colors group relative shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none transition-colors"></div>
 
-          <h3 className="font-extrabold text-[22px] text-white mb-4">
+          <h4 className="font-extrabold text-[22px] text-white mb-4">
             Underlying frustrations
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 mb-10 flex-1 leading-relaxed font-medium">
             See users actively complaining about workflows that your software
             could automate or simplify.
@@ -53,9 +53,9 @@ export function Opportunities() {
         <div className="bg-[#0f0f0f] border-2 border-white/[0.03] rounded-[24px] p-8 h-full flex flex-col hover:border-white/[0.08] transition-colors group relative shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none transition-colors"></div>
 
-          <h3 className="font-extrabold text-[22px] text-white mb-4">
+          <h4 className="font-extrabold text-[22px] text-white mb-4">
             Competitor weaknesses
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 mb-10 flex-1 leading-relaxed font-medium">
             Discover exactly what features are lacking or broken in competing
             tools to position yourself better.
@@ -84,9 +84,9 @@ export function Opportunities() {
         <div className="bg-[#0f0f0f] border-2 border-white/[0.03] rounded-[24px] p-8 h-full flex flex-col hover:border-white/[0.08] transition-colors group relative shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-[#9333ea]/10 rounded-full blur-[80px] pointer-events-none transition-colors"></div>
 
-          <h3 className="font-extrabold text-[22px] text-white mb-4">
+          <h4 className="font-extrabold text-[22px] text-white mb-4">
             Feature requests
-          </h3>
+          </h4>
           <p className="text-[15px] text-zinc-400 mb-10 flex-1 leading-relaxed font-medium">
             Validate roadmaps based on users explicitly asking &quot;Is there a
             tool that does X?&quot;

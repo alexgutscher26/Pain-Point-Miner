@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ function InputGroupAddon({
   className,
   align = "inline-start",
   ...props
-}: React.ComponentProps<"div"> & NonNullable<Parameters<typeof inputGroupAddonVariants>[0]>) {
+}: React.ComponentProps<"div"> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
     <div
       role="group"
@@ -90,7 +90,7 @@ function InputGroupButton({
   size = "xs",
   ...props
 }: Omit<React.ComponentProps<typeof Button>, "size"> &
-  NonNullable<Parameters<typeof inputGroupButtonVariants>[0]>) {
+  VariantProps<typeof inputGroupButtonVariants>) {
   return (
     <Button
       type={type}

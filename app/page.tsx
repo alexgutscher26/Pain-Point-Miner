@@ -12,8 +12,8 @@ import { Testimonial } from "@/components/landing/Testimonial";
 import { InteractiveDemo } from "@/components/landing/InteractiveDemo";
 import { siteConfig, siteUrl } from "@/lib/seo";
 
-function safeJsonLd(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+function safeJsonLd(data: unknown) {
+  return JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
 }
 
 const organizationJsonLd = {

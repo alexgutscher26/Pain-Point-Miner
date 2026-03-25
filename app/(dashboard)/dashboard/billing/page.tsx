@@ -36,25 +36,23 @@ export default async function BillingPage() {
   const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET,
   );
-  const availablePlans: BillingPurchaseOption[] = (
-    [
-      {
-        plan: "starter",
-        monthlyPriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY,
-        yearlyPriceId: process.env.STRIPE_PRICE_STARTER_YEARLY,
-      },
-      {
-        plan: "growth",
-        monthlyPriceId: process.env.STRIPE_PRICE_GROWTH_MONTHLY,
-        yearlyPriceId: process.env.STRIPE_PRICE_GROWTH_YEARLY,
-      },
-      {
-        plan: "pro",
-        monthlyPriceId: process.env.STRIPE_PRICE_PRO_MONTHLY,
-        yearlyPriceId: process.env.STRIPE_PRICE_PRO_YEARLY,
-      },
-    ] satisfies BillingPurchaseConfig[]
-  )
+  const availablePlans: BillingPurchaseOption[] = ([
+    {
+      plan: "starter",
+      monthlyPriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_STARTER_YEARLY,
+    },
+    {
+      plan: "growth",
+      monthlyPriceId: process.env.STRIPE_PRICE_GROWTH_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_GROWTH_YEARLY,
+    },
+    {
+      plan: "pro",
+      monthlyPriceId: process.env.STRIPE_PRICE_PRO_MONTHLY,
+      yearlyPriceId: process.env.STRIPE_PRICE_PRO_YEARLY,
+    },
+  ] satisfies BillingPurchaseConfig[])
     .filter((option) => Boolean(option.monthlyPriceId))
     .map(({ plan, yearlyPriceId }) => ({
       plan,

@@ -216,16 +216,14 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       urgency: number;
       monetizationScore: number;
       marketMaturity: number;
-      budget?:
-        | Array<{
-            quote?: string;
-            amountMinUsd?: number | null;
-            amountMaxUsd?: number | null;
-            cadence?: BudgetCadence;
-            annualizedMidpointUsd?: number | null;
-            source?: "post" | "comment";
-          }>
-        | string;
+      budget?: Array<{
+        quote?: string;
+        amountMinUsd?: number | null;
+        amountMaxUsd?: number | null;
+        cadence?: BudgetCadence;
+        annualizedMidpointUsd?: number | null;
+        source?: "post" | "comment";
+      }> | string;
       switchingCosts?: string;
       triedSolutions?: string[];
       sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";

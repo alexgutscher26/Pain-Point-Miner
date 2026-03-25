@@ -454,8 +454,8 @@ export default function SearchPage() {
                 Read-Only After Trial
               </p>
               <p className="text-sm text-amber-100 font-semibold">
-                You can still explore the app and review past results. New scans
-                and AI suggestions require a paid plan.
+                You can still explore the app and review past results. New
+                scans and AI suggestions require a paid plan.
               </p>
             </div>
           ) : null}
@@ -665,7 +665,9 @@ export default function SearchPage() {
                     )}
                   </div>
                   {billing &&
-                  !billing.entitlements.allowedMiningDepths.includes("deep") ? (
+                  !billing.entitlements.allowedMiningDepths.includes(
+                    "deep",
+                  ) ? (
                     <div className="absolute top-0 right-0 p-2">
                       <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
                         <Lock className="w-2.5 h-2.5" />
@@ -727,7 +729,8 @@ export default function SearchPage() {
               </div>
               {billing ? (
                 <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                  Plan: {billing.plan.toUpperCase()} | Monthly scans:{" "}
+                  Plan: {billing.plan.toUpperCase()}{" "}
+                  | Monthly scans:{" "}
                   {billing.usage.monthlyScansUsed}
                   {billing.usage.monthlyScansLimit === null
                     ? "/Unlimited"
@@ -754,9 +757,7 @@ export default function SearchPage() {
                   >
                     <p
                       className={`font-mono text-[11px] font-black uppercase tracking-widest ${
-                        timeWindow === window
-                          ? "text-amber-300"
-                          : "text-zinc-400"
+                        timeWindow === window ? "text-amber-300" : "text-zinc-400"
                       }`}
                     >
                       {getTimeWindowLabel(window)}

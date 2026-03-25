@@ -39,10 +39,7 @@ function normalizeMoneyToken(token: string) {
   return match[2] ? Math.round(base * 1_000) : Math.round(base);
 }
 
-function inferCadence(
-  quote: string,
-  hintedCadence?: BudgetCadence,
-): BudgetCadence {
+function inferCadence(quote: string, hintedCadence?: BudgetCadence): BudgetCadence {
   if (
     hintedCadence === "one_time" ||
     hintedCadence === "monthly" ||
@@ -52,7 +49,9 @@ function inferCadence(
   }
 
   const normalized = quote.toLowerCase();
-  if (/\b(per month|\/month|monthly|mo\b|mrr\b)\b/.test(normalized)) {
+  if (
+    /\b(per month|\/month|monthly|mo\b|mrr\b)\b/.test(normalized)
+  ) {
     return "monthly";
   }
 

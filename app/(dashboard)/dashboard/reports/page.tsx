@@ -346,7 +346,7 @@ export default function ReportsPage() {
               ? "Counting records..."
               : isLoading
                 ? "Refreshing records..."
-                : `Showing ${reports.length} results`}
+              : `Showing ${reports.length} results`}
           </p>
         </div>
       </div>

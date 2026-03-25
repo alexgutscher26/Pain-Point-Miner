@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, Sparkles } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -16,9 +16,7 @@ export function Hero() {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("hero-ab-variant");
       if (saved === "a" || saved === "b") return saved as "a" | "b";
-      const array = new Uint8Array(1);
-      window.crypto.getRandomValues(array);
-      const v = array[0] > 127 ? "b" : "a";
+      const v = Math.random() > 0.5 ? "b" : "a";
       localStorage.setItem("hero-ab-variant", v);
       return v;
     }
@@ -40,7 +38,7 @@ export function Hero() {
       });
   }, []);
 
-  const handleHeroSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleHeroSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const keyword = website.trim();
@@ -110,8 +108,8 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-[700px] text-[16px] font-medium leading-relaxed text-zinc-400 md:text-[20px]">
-            ThreddIQ analyzes real conversations to extract underlying problems
-            so you can validate ideas and find underserved niches.
+            ThreddIQ analyzes real conversations to extract underlying
+            problems so you can validate ideas and find underserved niches.
           </p>
 
           <form

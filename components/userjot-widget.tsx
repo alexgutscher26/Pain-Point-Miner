@@ -41,8 +41,7 @@ function ensureQueueShim() {
   }
 
   window.uj = new Proxy({} as UserJotQueuedApi, {
-    get:
-      (_, property) =>
+    get: (_, property) =>
       (...args: unknown[]) =>
         window.$ujq?.push([String(property), ...args]),
   });
@@ -82,11 +81,7 @@ export function UserJotWidget({
           theme: "auto",
         });
 
-        if (
-          user &&
-          "identify" in userJot &&
-          typeof userJot.identify === "function"
-        ) {
+        if (user && "identify" in userJot && typeof userJot.identify === "function") {
           userJot.identify(getUserJotIdentity(user));
         }
 

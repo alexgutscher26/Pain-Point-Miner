@@ -111,10 +111,7 @@ describe("reddit ranking", () => {
       selftext: "Collecting tool recommendations for a side project.",
     });
 
-    const filtered = filterPostsByProblemPatterns(
-      [matched, unmatched],
-      patterns,
-    );
+    const filtered = filterPostsByProblemPatterns([matched, unmatched], patterns);
 
     expect(filtered).toHaveLength(1);
     expect(filtered[0]?.id).toBe(matched.id);
@@ -132,8 +129,8 @@ describe("reddit ranking", () => {
       selftext: "Looking for a better setup.",
     });
 
-    expect(scoreRedditPostRelevance(strong, keyword, patterns)).toBeGreaterThan(
-      scoreRedditPostRelevance(weaker, keyword, patterns),
-    );
+    expect(
+      scoreRedditPostRelevance(strong, keyword, patterns),
+    ).toBeGreaterThan(scoreRedditPostRelevance(weaker, keyword, patterns));
   });
 });
