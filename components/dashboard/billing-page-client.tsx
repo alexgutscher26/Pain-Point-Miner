@@ -133,9 +133,7 @@ export function BillingPageClient({
       setActionState({
         type: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : "Unable to start checkout.",
+          error instanceof Error ? error.message : "Unable to start checkout.",
       });
     } finally {
       setStartingCheckoutPlan(null);
@@ -331,8 +329,8 @@ export function BillingPageClient({
                 {planPurchaseRequired
                   ? "Requires paid plan"
                   : entitlements.maxSubredditsPerSearch === null
-                  ? "Unlimited"
-                  : entitlements.maxSubredditsPerSearch}
+                    ? "Unlimited"
+                    : entitlements.maxSubredditsPerSearch}
               </span>
             </p>
             <p>

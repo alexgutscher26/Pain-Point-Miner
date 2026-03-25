@@ -108,8 +108,8 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-[700px] text-[16px] font-medium leading-relaxed text-zinc-400 md:text-[20px]">
-            ThreddIQ analyzes real conversations to extract underlying
-            problems so you can validate ideas and find underserved niches.
+            ThreddIQ analyzes real conversations to extract underlying problems
+            so you can validate ideas and find underserved niches.
           </p>
 
           <form

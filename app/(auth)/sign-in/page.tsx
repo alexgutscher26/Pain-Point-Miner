@@ -58,7 +58,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-                ThreddIQ
+              ThreddIQ
             </span>
           </Link>
         </div>
@@ -124,7 +124,7 @@ export default function SignInPage() {
         </div>
 
         <div className="relative z-10 flex gap-8 text-zinc-600 text-sm mt-auto">
-                  <span>© 2024 ThreddIQ</span>
+          <span>© 2024 ThreddIQ</span>
           <Link className="hover:text-white transition-colors" href="#">
             Privacy
           </Link>
@@ -153,7 +153,7 @@ export default function SignInPage() {
               </svg>
             </div>
             <span className="text-lg font-bold text-white tracking-tight">
-                ThreddIQ
+              ThreddIQ
             </span>
           </div>
 

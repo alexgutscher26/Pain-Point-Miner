@@ -13,7 +13,10 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   // Simple check for cron secret if available
   const authHeader = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (
+    process.env.CRON_SECRET &&
+    authHeader !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -38,19 +41,24 @@ export async function GET(req: Request) {
     await db.transaction(async (tx) => {
       // Remove workspaces owned by these users
       await tx.delete(workspace).where(inArray(workspace.ownerId, idsToPurge));
-      
+
       // Remove the users themselves
       await tx.delete(user).where(inArray(user.id, idsToPurge));
     });
 
-    console.log(`[GDPR CRON] Successfully purged ${idsToPurge.length} accounts.`);
-    
+    console.log(
+      `[GDPR CRON] Successfully purged ${idsToPurge.length} accounts.`,
+    );
+
     return NextResponse.json({
       success: true,
       purgedCount: idsToPurge.length,
     });
   } catch (error) {
     console.error("[GDPR CRON] Error during user cleanup:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
