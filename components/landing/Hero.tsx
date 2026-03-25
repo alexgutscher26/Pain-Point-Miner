@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -16,7 +16,9 @@ export function Hero() {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("hero-ab-variant");
       if (saved === "a" || saved === "b") return saved as "a" | "b";
-      const v = Math.random() > 0.5 ? "b" : "a";
+      const array = new Uint8Array(1);
+      window.crypto.getRandomValues(array);
+      const v = array[0] > 127 ? "b" : "a";
       localStorage.setItem("hero-ab-variant", v);
       return v;
     }
