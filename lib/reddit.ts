@@ -321,10 +321,13 @@ function countOccurrences(text: string, needle: string) {
 }
 
 export function resolveProblemPatterns(customPatterns: string[] = []) {
-  return [...DEFAULT_PROBLEM_PATTERNS, ...customPatterns]
-    .map((pattern) => normalizePattern(pattern))
-    .filter(Boolean)
-    .filter((pattern, index, values) => values.indexOf(pattern) === index);
+  return Array.from(
+    new Set(
+      [...DEFAULT_PROBLEM_PATTERNS, ...customPatterns]
+        .map((pattern) => normalizePattern(pattern))
+        .filter(Boolean),
+    ),
+  );
 }
 
 export function getProblemPatternMatchStats(
