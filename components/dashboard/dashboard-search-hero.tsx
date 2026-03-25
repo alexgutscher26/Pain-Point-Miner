@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 
@@ -23,7 +23,7 @@ export function DashboardSearchHero({
   const visibleTags =
     trendingTags.length > 0 ? trendingTags : ["#saas", "#marketing", "#devops"];
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const cleanedKeyword = keyword.trim();
     if (!cleanedKeyword) return;

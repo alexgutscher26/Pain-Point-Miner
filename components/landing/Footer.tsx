@@ -28,10 +28,10 @@ export function Footer() {
           </p>
           <div className="flex items-center p-1 border border-zinc-800 rounded-lg bg-[#141414]">
             <button aria-label="Light mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
-              <Sun className="w-4 h-4" />
+              <Sun className="w-4 h-4" aria-hidden="true" />
             </button>
             <button aria-label="Dark mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
-              <Moon className="w-4 h-4" />
+              <Moon className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -39,7 +39,7 @@ export function Footer() {
         {/* Links Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12">
           <div className="flex flex-col gap-5">
-            <h4 className="font-bold text-white text-[15px] mb-2">Features</h4>
+            <p className="font-bold text-white text-[15px] mb-2">Features</p>
             <Link
               href="#"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
@@ -73,7 +73,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <h4 className="font-bold text-white text-[15px] mb-2">Product</h4>
+            <p className="font-bold text-white text-[15px] mb-2">Product</p>
             <Link
               href="#"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
@@ -119,9 +119,9 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <h4 className="font-bold text-white text-[15px] mb-2">
+            <p className="font-bold text-white text-[15px] mb-2">
               Alternatives
-            </h4>
+            </p>
             <Link
               href="#"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
@@ -179,9 +179,9 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <h4 className="font-bold text-white text-[15px] mb-2">
+            <p className="font-bold text-white text-[15px] mb-2">
               Free Tools
-            </h4>
+            </p>
             <Link
               href="#"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
@@ -251,7 +251,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <h4 className="font-bold text-white text-[15px] mb-2">Resources</h4>
+            <p className="font-bold text-white text-[15px] mb-2">Resources</p>
             <Link
               href="#"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
@@ -300,9 +300,9 @@ export function Footer() {
 
       {/* From the Maker Banner */}
       <div className="max-w-[1240px] mx-auto border-t border-zinc-800 py-10 flex flex-col items-center gap-4">
-        <h5 className="text-[14px] font-bold text-white tracking-wide">
+        <p className="text-[14px] font-bold text-white tracking-wide">
           From the makers of ThreddIQ
-        </h5>
+        </p>
         <div className="flex items-center gap-6 text-[13px] font-medium text-zinc-400 flex-wrap justify-center">
           <Link href="#" className="hover:text-white transition-colors">
             FreeToolsLand
@@ -335,7 +335,7 @@ export function Footer() {
       </div>
 
       {/* Copyright Base */}
-      <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-500 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
+      <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-400 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
         <p>© 2026 ThreddIQ. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
           Built with <span className="text-[#a8a8a8]">☕</span> by{" "}

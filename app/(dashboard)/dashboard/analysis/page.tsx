@@ -73,7 +73,15 @@ export default function AnalysisPage() {
         toast.dismiss(`mining-${scraperId}`);
       }
     };
-  }, [scraperId, hasHydrated, isDone, hasFailed, progress, painPointCount, statusText]);
+  }, [
+    scraperId,
+    hasHydrated,
+    isDone,
+    hasFailed,
+    progress,
+    painPointCount,
+    statusText,
+  ]);
 
   // Derive step status from the live SSE phase
   const steps = useMemo(() => {
