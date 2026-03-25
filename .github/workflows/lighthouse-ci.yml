@@ -34,7 +34,11 @@ jobs:
         with:
           urls: |
             http://localhost:3000/dashboard
-          server: true
           configPath: .lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_URL: http://localhost:3000
