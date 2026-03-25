@@ -112,10 +112,9 @@ export default async function DashboardPage({
     plan,
     await getMonthlyScanUsage(session.user.id),
   );
-  const searchesRemainingLabel =
-    planContext.planPurchaseRequired
-      ? "Read Only"
-      : usageSummary.monthlyScansLimit === null
+  const searchesRemainingLabel = planContext.planPurchaseRequired
+    ? "Read Only"
+    : usageSummary.monthlyScansLimit === null
       ? "Unlimited"
       : `${usageSummary.monthlyScansUsed}/${usageSummary.monthlyScansLimit}`;
   const searchesProgress =
@@ -128,10 +127,9 @@ export default async function DashboardPage({
               100,
           ),
         );
-  const searchesSubtext =
-    planContext.planPurchaseRequired
-      ? "Past results stay available. New scans require a paid plan"
-      : usageSummary.monthlyScansLimit === null
+  const searchesSubtext = planContext.planPurchaseRequired
+    ? "Past results stay available. New scans require a paid plan"
+    : usageSummary.monthlyScansLimit === null
       ? "No monthly cap on Pro"
       : `${usageSummary.monthlyScansRemaining ?? 0} scans remaining this month`;
   const parsedWorkspaceId = workspaceHeaderSchema.safeParse(
