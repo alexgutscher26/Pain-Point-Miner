@@ -114,8 +114,10 @@ export function buildCommunityMapNodes(
         painPoints.reduce((sum, painPoint) => sum + painPoint.score, 0) /
         painPoints.length;
       const averageUrgency =
-        painPoints.reduce((sum, painPoint) => sum + (painPoint.urgency ?? 0), 0) /
-        painPoints.length;
+        painPoints.reduce(
+          (sum, painPoint) => sum + (painPoint.urgency ?? 0),
+          0,
+        ) / painPoints.length;
 
       return {
         subreddit,

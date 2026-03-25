@@ -271,7 +271,7 @@ export async function executeMiningRun({
           .map((comment) => ({
             id: crypto.randomUUID(),
             body: cleanCommentBody(comment.body),
-            author: anonymize ? "[Anonymized]" : (comment.author || "unknown"),
+            author: anonymize ? "[Anonymized]" : comment.author || "unknown",
             score: comment.score ?? 0,
             commentUrl: comment.permalink || null,
             painScore: point.painIntensity ?? 0,

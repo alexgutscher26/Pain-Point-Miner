@@ -4,10 +4,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import {
-  SettingsPageClient,
-  type SettingsFormValues,
-} from "@/components/dashboard/settings-page-client";
+import { SettingsPageClient } from "@/components/dashboard/settings-page-client";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +53,7 @@ export default async function SettingsPage() {
   const notifications = persistedSettings.notifications ?? {};
   const scanDefaults = persistedSettings.scanDefaults ?? {};
 
-  const initialValues: SettingsFormValues = {
+  const initialValues = {
     fullName: session.user.name ?? "",
     email: session.user.email ?? "",
     company: persistedSettings.company ?? "",
