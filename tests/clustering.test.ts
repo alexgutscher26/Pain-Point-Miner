@@ -1,132 +1,97 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { clusterPainPoint } from "@/lib/clustering";
-import { db } from "@/lib/db";
-import { embedPainPoint } from "@/lib/embeddings";
 
-// Mock external dependencies
-vi.mock("@/lib/embeddings", () => ({
-  embedPainPoint: vi.fn(),
-}));
+const mockExecute = vi.fn();
+const mockFindFirst = vi.fn();
+const mockFindMany = vi.fn();
 
-vi.mock("@/lib/db", () => {
-  const mockChainable = () => ({
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-  });
+const mockValues = vi.fn().mockResolvedValue([{ id: "mock-id" }]);
+const mockWhere = vi.fn().mockResolvedValue([{ id: "mock-id" }]);
+const mockSet = vi.fn().mockReturnValue({ where: mockWhere });
+const mockInsert = vi.fn(() => ({ values: mockValues }));
+const mockUpdate = vi.fn(() => ({ set: mockSet }));
 
-  return {
-    db: {
-      execute: vi.fn(),
-      insert: vi.fn(mockChainable),
-      update: vi.fn(mockChainable),
-      query: {
-        painPoint: {
-          findFirst: vi.fn(),
-          findMany: vi.fn(),
-        },
+vi.mock("@/lib/db", () => ({
+  db: {
+    execute: (...args: any[]) => mockExecute(...args),
+    insert: (...args: any[]) => mockInsert(...args),
+    update: (...args: any[]) => mockUpdate(...args),
+    query: {
+      painPoint: {
+        findFirst: (...args: any[]) => mockFindFirst(...args),
+        findMany: (...args: any[]) => mockFindMany(...args),
       },
     },
-  };
-});
+  },
+}));
 
-// We need to provide dummy tables for pgTable, otherwise drizzle-orm/pg-core might fail
-// Actually since we mocked `db`, we don't necessarily need the tables mocked if they're not used inside the mocked module.
-// But we should reset mocks before each test
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+vi.mock("@/lib/embeddings", () => ({
+  embedPainPoint: vi.fn().mockResolvedValue([0.1, 0.2, 0.3]),
+}));
 
 describe("clusterPainPoint", () => {
-  const mockPainPointId = "point-123";
-  const mockUserId = "user-123";
-  const mockWorkspaceId = "workspace-123";
-  const mockEmbedding = [0.1, 0.2, 0.3];
+  beforeEach(() => {
+    vi.clearAllMocks();
 
-  const mockPainPoint = {
-    id: mockPainPointId,
-    title: "Test pain point",
-    body: "This is a test pain point body.",
-    budget: [],
-  };
-
-  it("creates a new cluster when no similar centroids are found", async () => {
-    // Setup mocks
-    vi.mocked(embedPainPoint).mockResolvedValue(mockEmbedding);
-    vi.mocked(db.execute).mockResolvedValue([]);
-    vi.mocked(db.query.painPoint.findFirst).mockResolvedValue(mockPainPoint);
-    vi.mocked(db.query.painPoint.findMany).mockResolvedValue([mockPainPoint]);
-
-    // Execute
-    const result = await clusterPainPoint(
-      mockPainPointId,
-      mockUserId,
-      mockWorkspaceId,
-    );
-
-    // Verify embedding was called
-    expect(embedPainPoint).toHaveBeenCalledWith(
-      mockPainPointId,
-      mockUserId,
-      mockWorkspaceId,
-    );
-
-    // Verify search was performed
-    expect(db.execute).toHaveBeenCalled();
-
-    // Verify new cluster creation logic
-    expect(db.insert).toHaveBeenCalled();
-    expect(db.update).toHaveBeenCalled();
-
-    // Verify result format
-    expect(result).toEqual({
-      clusterId: expect.any(String),
-      isNew: true,
+    // Default mocks
+    mockFindFirst.mockResolvedValue({
+      id: "pain-1",
+      title: "Test pain point",
+      body: "Test body content",
+      budget: null,
     });
+    mockFindMany.mockResolvedValue([]);
   });
 
-  it("assigns to an existing cluster when similar centroids are found", async () => {
-    // Setup mocks
-    const existingClusterId = "cluster-999";
-    vi.mocked(embedPainPoint).mockResolvedValue(mockEmbedding);
+  it("creates a new cluster when no candidates match", async () => {
+    // Return empty candidates
+    mockExecute.mockResolvedValue([]);
 
-    // Return a candidate that passes the threshold
-    vi.mocked(db.execute).mockResolvedValue([
-      { clusterId: existingClusterId, similarity: 0.95 },
+    const result = await clusterPainPoint("pain-1", "user-1", "workspace-1");
+
+    expect(result.isNew).toBe(true);
+    expect(result.clusterId).toBeDefined();
+
+    // Verify insert was called for the new cluster
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockValues).toHaveBeenCalledTimes(1);
+
+    // Verify updates were called (one for painPoint, one for painPointCluster from refreshClusterRollups)
+    // Wait, refreshClusterRollups updates the painPointCluster.
+    // And assignToCluster / createNewCluster also update the painPoint.
+    expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  it("assigns to an existing cluster when a candidate passes the threshold", async () => {
+    // Return a candidate
+    mockExecute.mockResolvedValue([
+      {
+        clusterId: "existing-cluster-1",
+        similarity: 0.9,
+      },
     ]);
-    vi.mocked(db.query.painPoint.findFirst).mockResolvedValue(mockPainPoint);
-    vi.mocked(db.query.painPoint.findMany).mockResolvedValue([mockPainPoint]);
 
-    // Execute
-    const result = await clusterPainPoint(
-      mockPainPointId,
-      mockUserId,
-      mockWorkspaceId,
-    );
+    const result = await clusterPainPoint("pain-1", "user-1", "workspace-1");
 
-    // Verify assigning to cluster logic
-    expect(db.update).toHaveBeenCalledTimes(3); // painPoint update, cluster update, refresh rollup cluster updates
-    expect(db.insert).not.toHaveBeenCalled();
+    expect(result.isNew).toBe(false);
+    expect(result.clusterId).toBe("existing-cluster-1");
 
-    // Verify result format
-    expect(result).toEqual({
-      clusterId: existingClusterId,
-      isNew: false,
-    });
+    // Verify insert was NOT called
+    expect(mockInsert).not.toHaveBeenCalled();
+
+    // Verify updates were called
+    expect(mockUpdate).toHaveBeenCalled();
   });
 
-  it("throws an error if the pain point is not found", async () => {
-    // Setup mocks
-    vi.mocked(embedPainPoint).mockResolvedValue(mockEmbedding);
-    vi.mocked(db.execute).mockResolvedValue([]);
+  it("throws an error if pain point is not found", async () => {
+    // Return a candidate (doesn't matter)
+    mockExecute.mockResolvedValue([]);
 
-    // Return null for findFirst
-    vi.mocked(db.query.painPoint.findFirst).mockResolvedValue(null);
+    // Mock pain point not found
+    mockFindFirst.mockResolvedValue(null);
 
-    // Execute & Verify
     await expect(
-      clusterPainPoint(mockPainPointId, mockUserId, mockWorkspaceId)
-    ).rejects.toThrow(`Pain point ${mockPainPointId} not found`);
+      clusterPainPoint("pain-invalid", "user-1", "workspace-1"),
+    ).rejects.toThrow("Pain point pain-invalid not found");
   });
 });

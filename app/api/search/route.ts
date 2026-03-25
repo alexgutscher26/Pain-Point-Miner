@@ -13,10 +13,7 @@ import {
   isDepthAllowed,
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
-import {
-  DEFAULT_TIME_WINDOW,
-  normalizeTimeWindow,
-} from "@/lib/time-window";
+import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -424,7 +421,8 @@ export async function POST(req: Request) {
             patterns,
           );
           const isSameTimeWindow =
-            normalizeTimeWindow(latestMatchingScraper.timeWindow) === timeWindow;
+            normalizeTimeWindow(latestMatchingScraper.timeWindow) ===
+            timeWindow;
 
           if (
             isWithinDuplicateWindow &&
