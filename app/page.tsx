@@ -12,6 +12,10 @@ import { Testimonial } from "@/components/landing/Testimonial";
 import { InteractiveDemo } from "@/components/landing/InteractiveDemo";
 import { siteConfig, siteUrl } from "@/lib/seo";
 
+function safeJsonLd(data: unknown) {
+  return JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+}
+
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -59,12 +63,12 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans selection:bg-[#ff4500]/30 overflow-x-hidden">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd) }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(softwareApplicationJsonLd),
+          __html: safeJsonLd(softwareApplicationJsonLd),
         }}
       />
       <Header />
