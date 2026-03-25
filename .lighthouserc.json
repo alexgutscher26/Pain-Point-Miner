@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "startServerCommand": "bun run start",
-      "url": ["http://localhost:3000/dashboard"],
+      "url": ["http://localhost:3000"],
       "numberOfRuns": 3
     },
     "upload": {
