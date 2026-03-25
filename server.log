@@ -1,0 +1,41 @@
+
+> rpp@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1258ms
+○ Compiling / ...
+[2m2026-03-25T23:26:44.809Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[2m2026-03-25T23:26:44.812Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+ GET / 200 in 15.1s (compile: 13.1s, render: 1982ms)
+○ Compiling /api/stats/pain-points ...
+Error fetching pain point stats: Error: Failed query: select count(*) from "pain_point" where "pain_point"."createdAt" >= $1
+params: 2026-03-18T23:26:56.412Z
+    at async GET (app/api/stats/pain-points/route.ts:11:20)
+   9 |     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  10 |
+> 11 |     const result = await db
+     |                    ^
+  12 |       .select({ value: count() })
+  13 |       .from(painPoint)
+  14 |       .where(gte(painPoint.createdAt, sevenDaysAgo)); {
+  query: 'select count(*) from "pain_point" where "pain_point"."createdAt" >= $1',
+  params: [Array],
+  [cause]: AggregateError:
+      at ignore-listed frames {
+    code: 'ECONNREFUSED'
+  }
+}
+[2m2026-03-25T23:26:59.308Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[2m2026-03-25T23:26:59.311Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
+[2m2026-03-25T23:27:01.951Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET should be at least 32 characters long for adequate security. Generate one with `npx auth secret` or `openssl rand -base64 32`.
+[2m2026-03-25T23:27:01.954Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Warning: your BETTER_AUTH_SECRET appears low-entropy. Use a randomly generated secret for production.
