@@ -41,47 +41,41 @@ export function Footer() {
           <div className="flex flex-col gap-5">
             <p className="font-bold text-white text-[15px] mb-2">Features</p>
             <Link
-              href="#"
+              href="/features/pain-point-mining"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              Reddit Monitoring
+              Pain Point Mining
             </Link>
             <Link
-              href="#"
+              href="/features/idea-validation"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              AI Reply Generator
+              Idea Validation
             </Link>
             <Link
-              href="#"
+              href="/features/market-discovery"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              SEO Opportunities
+              Market Discovery
             </Link>
             <Link
-              href="#"
+              href="/features/keyword-monitoring"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              Post Monitoring
+              Keyword Monitoring
             </Link>
             <Link
-              href="#"
+              href="/features/sentiment-analysis"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              Comment Monitoring
+              Sentiment Analysis
             </Link>
           </div>
 
           <div className="flex flex-col gap-5">
             <p className="font-bold text-white text-[15px] mb-2">Product</p>
             <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="#"
+              href="/#faq"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
               FAQ

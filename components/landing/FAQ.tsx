@@ -29,7 +29,7 @@ export function FAQ() {
 
   return (
     <>
-      <section className="w-full py-24 px-6 flex flex-col items-center bg-[#080808]">
+      <section id="faq" className="w-full py-24 px-6 flex flex-col items-center bg-[#080808]">
         <div className="text-center max-w-2xl mb-16">
           <h2 className="text-3xl font-bold text-white mb-4">
             Frequently Asked Questions
