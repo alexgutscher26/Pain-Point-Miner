@@ -6,7 +6,7 @@ describe("generateEmbedding", () => {
 
   beforeEach(() => {
     vi.stubEnv("OPENROUTER_API_KEY", "test-api-key");
-    global.fetch = vi.fn();
+    global.fetch = vi.fn() as any;
   });
 
   afterEach(() => {
@@ -42,6 +42,8 @@ describe("generateEmbedding", () => {
         headers: expect.objectContaining({
           Authorization: "Bearer test-api-key",
           "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "ThreddIQ - Reddit Intelligence Engine",
         }),
         body: JSON.stringify({
           model: "openai/text-embedding-3-small",
