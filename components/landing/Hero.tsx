@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, BookOpen, Map, Users, Layout, Zap, BarChart3, ListChecks } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -12,21 +12,23 @@ export function Hero() {
   const router = useRouter();
   const { data: session } = useSession();
   const [website, setWebsite] = useState("");
-  const [variant, setVariant] = useState<"a" | "b">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hero-ab-variant");
-      if (saved === "a" || saved === "b") return saved as "a" | "b";
-      const array = new Uint8Array(1);
-      window.crypto.getRandomValues(array);
-      const v = array[0] > 127 ? "b" : "a";
-      localStorage.setItem("hero-ab-variant", v);
-      return v;
-    }
-    return "a";
-  });
+  const [variant, setVariant] = useState<"a" | "b">("a");
   const [painPointCount, setPainPointCount] = useState<number | string>("...");
 
   useEffect(() => {
+    // Handle A/B variant selection on client side only to avoid hydration mismatch
+    const variantFromStorage = localStorage.getItem("hero-ab-variant");
+    const stableVariant = (variantFromStorage === "a" || variantFromStorage === "b") 
+      ? variantFromStorage as "a" | "b"
+      : (Math.random() > 0.5 ? "b" : "a");
+
+    if (!variantFromStorage) {
+      localStorage.setItem("hero-ab-variant", stableVariant);
+    }
+
+    // eslint-disable-next-line
+    setVariant(stableVariant);
+
     // Fetch live counter
     fetch("/api/stats/pain-points")
       .then((res) => res.json())

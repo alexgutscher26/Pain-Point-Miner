@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Sun, Moon } from "lucide-react";
 
 export function Footer() {
   return (
@@ -26,18 +25,26 @@ export function Footer() {
           <p className="text-[14px] text-zinc-400 leading-relaxed font-medium mb-6">
             Find perfect opportunities on Reddit with AI-powered monitoring
           </p>
+          {/* 
           <div className="flex items-center p-1 border border-zinc-800 rounded-lg bg-[#141414]">
-            <button aria-label="Light mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+            <button
+              aria-label="Light mode"
+              className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+            >
               <Sun className="w-4 h-4" aria-hidden="true" />
             </button>
-            <button aria-label="Dark mode" className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+            <button
+              aria-label="Dark mode"
+              className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+            >
               <Moon className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
+          */}
         </div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
           <div className="flex flex-col gap-5">
             <p className="font-bold text-white text-[15px] mb-2">Features</p>
             <Link
@@ -81,209 +88,89 @@ export function Footer() {
               FAQ
             </Link>
             <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Blog
-            </Link>
-            <Link
-              href="#"
+              href="/case-studies"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
               Case Studies
             </Link>
             <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors break-words"
-            >
-              Affiliate Program (30%)
-            </Link>
-            <Link
-              href="#"
+              href="/docs"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              Documentation
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Contact
+              Documentation -- Coming Soon
             </Link>
           </div>
 
           <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">
-              Alternatives
-            </p>
+            <p className="font-bold text-white text-[15px] mb-2">Free Tools</p>
             <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              href="/free-tools/pain-point-miner"
+              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors flex items-center gap-2"
             >
-              vs F5Bot
+              Pain Point Miner{" "}
+              <span className="text-[10px] bg-[#ff4500]/20 text-[#ff4500] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
+                Free
+              </span>
             </Link>
             <Link
-              href="#"
+              href="/free-tools/opportunity-scoreboard"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              vs GummySearch
+              Opportunity Scoreboard
             </Link>
             <Link
-              href="#"
+              href="/free-tools/sentiment-context-map"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              vs MediaFast
+              Sentiment Context Map
             </Link>
             <Link
-              href="#"
+              href="/free-tools/reddit-lead-generator"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
             >
-              vs ReplyGuy
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              vs Redreach
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              vs OctoLens
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              vs Syften
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              vs Brand24
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              vs KWatch.io
+              Reddit Lead Generator
             </Link>
           </div>
-
-          <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">
-              Free Tools
-            </p>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Subreddit Finder
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Website to Subreddits
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors break-words"
-            >
-              Reddit Opportunity Finder
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Post Title Generator
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Best Time to Post
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Subreddit Rules Checker
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Shadowban Checker
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Brand Analyzer
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Username Checker
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Account Analyzer
-            </Link>
-            <Link
-              href="#"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
-            >
-              Subreddit Comparison
-            </Link>
-          </div>
-
           <div className="flex flex-col gap-5">
             <p className="font-bold text-white text-[15px] mb-2">Resources</p>
             <Link
-              href="#"
+              href="/resources/best-subreddits-by-industry"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Best Subreddits by Industry
             </Link>
             <Link
-              href="#"
+              href="/resources/monitor-reddit-by-industry"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Monitor Reddit by Industry
             </Link>
             <Link
-              href="#"
+              href="/resources/reddit-monitoring-use-cases"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Reddit Monitoring Use Cases
             </Link>
             <Link
-              href="#"
+              href="/resources/reddit-marketing-glossary"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Reddit Marketing Glossary
             </Link>
             <Link
-              href="#"
+              href="/resources/reddit-marketing-by-industry"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Reddit Marketing by Industry
             </Link>
             <Link
-              href="#"
+              href="/resources/tool-comparisons"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Tool Comparisons
             </Link>
             <Link
-              href="#"
+              href="/resources/reddit-tools"
               className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
             >
               Reddit Tools
@@ -293,7 +180,7 @@ export function Footer() {
       </div>
 
       {/* From the Maker Banner */}
-      <div className="max-w-[1240px] mx-auto border-t border-zinc-800 py-10 flex flex-col items-center gap-4">
+      {/* <div className="max-w-[1240px] mx-auto border-t border-zinc-800 py-10 flex flex-col items-center gap-4">
         <p className="text-[14px] font-bold text-white tracking-wide">
           From the makers of ThreddIQ
         </p>
@@ -326,14 +213,14 @@ export function Footer() {
             MyFeedIn
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* Copyright Base */}
       <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-400 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
         <p>© 2026 ThreddIQ. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
           Built with <span className="text-[#a8a8a8]">☕</span> by{" "}
-          <span className="text-white font-bold ml-1">Axel Schapmann</span>
+          <span className="text-white font-bold ml-1">Alex</span>
         </div>
       </div>
     </footer>
