@@ -4,7 +4,7 @@ import { Search, Zap, MessageSquare, CheckCircle2 } from "lucide-react";
 
 export function GoldMine() {
   return (
-    <section className="w-full pt-32 pb-24 px-6 flex flex-col items-center bg-[#000]">
+    <section id="features" className="w-full pt-32 pb-24 px-6 flex flex-col items-center bg-[#000]">
       <div className="text-center max-w-4xl mb-12">
         <h2 className="text-[12px] font-extrabold tracking-widest text-[#ff4500] uppercase mb-4">
           WHY REDDIT?
