@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client";
 
 export function Header() {
+  const { data: session, isPending } = useSession();
+
   return (
     <header className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -22,18 +25,33 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-3 sm:gap-4">
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium text-zinc-300 hover:text-white transition-colors"
-          >
-            Sign in
-          </Link>
-          <Button
-            asChild
-            className="bg-[#ff4500] hover:bg-[#e03d00] text-white rounded-md px-3 h-9 text-xs sm:text-sm sm:px-4 font-medium shadow-none transition-all hidden md:flex"
-          >
-            <Link href="/sign-up">Start 3-day free trial</Link>
-          </Button>
+          {!isPending && (
+            <>
+              {session ? (
+                <Button
+                  asChild
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white rounded-md px-3 h-9 text-xs sm:text-sm sm:px-4 font-medium transition-all"
+                >
+                  <Link href="/dashboard">Go to Dashboard</Link>
+                </Button>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    className="text-sm font-medium text-zinc-300 hover:text-white transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                  <Button
+                    asChild
+                    className="bg-[#ff4500] hover:bg-[#e03d00] text-white rounded-md px-3 h-9 text-xs sm:text-sm sm:px-4 font-medium shadow-none transition-all hidden md:flex"
+                  >
+                    <Link href="/sign-up">Start 3-day free trial</Link>
+                  </Button>
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -39,22 +39,39 @@ const softwareApplicationJsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "ThreddIQ for SaaS Validation",
+  title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
   description:
-    "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
+    "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build. Turn Reddit threads into high-growth SaaS tools.",
+  keywords: [
+    ...siteConfig.keywords,
+    "software validation",
+    "reddit market research",
+    "founder tools 2026",
+    "saas marketing reddit",
+  ],
   alternates: {
-    canonical: "/",
+    canonical: siteUrl,
   },
   openGraph: {
-    title: "ThreddIQ for SaaS Validation",
+    title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
     description:
-      "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
+      "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build.",
     url: siteUrl,
+    images: [
+      {
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "ThreddIQ Dashboard Preview",
+      },
+    ],
   },
   twitter: {
-    title: "ThreddIQ for SaaS Validation",
+    card: "summary_large_image",
+    title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
     description:
-      "Mine Reddit conversations to uncover urgent customer pain points, validate SaaS ideas, and prioritize high-opportunity markets faster.",
+      "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build.",
+    images: [`${siteUrl}/og-image.png`],
   },
 };
 

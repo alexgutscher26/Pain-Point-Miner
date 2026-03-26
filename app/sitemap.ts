@@ -1,15 +1,46 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/seo";
 
+const freeTools = [
+  "pain-point-miner",
+  "opportunity-scoreboard",
+  "sentiment-context-map",
+  "reddit-lead-generator",
+];
+
+const resources = [
+  "best-subreddits-by-industry",
+  "monitor-reddit-by-industry",
+  "reddit-monitoring-use-cases",
+  "reddit-marketing-glossary",
+  "reddit-marketing-by-industry",
+  "tool-comparisons",
+  "reddit-tools",
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const toolsEntries = freeTools.map((slug) => ({
+    url: `${siteUrl}/free-tools/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
+  const resourcesEntries = resources.map((slug) => ({
+    url: `${siteUrl}/resources/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
   return [
     {
       url: siteUrl,
-      lastModified: now,
-      changeFrequency: "weekly",
+      lastModified: new Date(),
+      changeFrequency: "daily",
       priority: 1,
     },
+    ...toolsEntries,
+    ...resourcesEntries,
   ];
 }
