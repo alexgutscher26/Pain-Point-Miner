@@ -24,6 +24,24 @@ export interface RedditComment {
 
 type RedditTimeRange = "hour" | "day" | "week" | "month" | "year" | "all";
 
+export type RedditSortMode = "relevance" | "hot" | "new" | "top";
+
+/** Maps each mining depth to the sort modes it should use. */
+export const SORT_MODES_BY_DEPTH: Record<string, RedditSortMode[]> = {
+  basic: ["relevance"],
+  deep: ["relevance", "hot"],
+  advanced: ["relevance", "hot", "new", "top"],
+};
+
+export function getSortModesForDepth(depth: string): RedditSortMode[] {
+  return SORT_MODES_BY_DEPTH[depth] ?? ["relevance"];
+}
+
+export interface RedditPostWithMeta extends RedditPost {
+  /** The sort mode that first surfaced this post. */
+  sortMode: RedditSortMode;
+}
+
 const DEFAULT_USER_AGENT =
   process.env.REDDIT_USER_AGENT ??
   "Threddiq/1.0 (+https://threddiq.com; contact: [EMAIL_ADDRESS])";
@@ -518,6 +536,66 @@ async function fetchFromPullPushComments(
 }
 
 /**
+ * Fetches posts from a subreddit across multiple Reddit sort modes concurrently,
+ * deduplicates the merged results by post ID, and re-ranks them.
+ *
+ * Sort modes per mining depth:
+ *  - basic:    relevance
+ *  - deep:     relevance, hot
+ *  - advanced: relevance, hot, new, top
+ *
+ * @param subreddit - The subreddit to search.
+ * @param keyword - The search keyword.
+ * @param depth - Mining depth string used to resolve sort modes.
+ * @param options - Forwarded to `fetchSubredditPostsBatched` (maxPosts applies per sort mode).
+ * @returns Deduplicated, ranked posts tagged with the sort mode that first returned them.
+ */
+export async function fetchSubredditPostsMultiSort(
+  subreddit: string,
+  keyword: string,
+  depth: string,
+  options?: {
+    maxPosts?: number;
+    time?: RedditTimeRange;
+    delayMs?: number;
+    requestLimit?: number;
+  },
+): Promise<RedditPostWithMeta[]> {
+  const sortModes = getSortModesForDepth(depth);
+
+  // Fetch all sort modes concurrently; individual failures don't abort the whole run
+  const perModeFetches = await Promise.allSettled(
+    sortModes.map((mode) =>
+      fetchSubredditPostsBatched(subreddit, keyword, { ...options, sort: mode }),
+    ),
+  );
+
+  // Merge — first occurrence of a post.id wins (determines sortMode tag)
+  const seen = new Set<string>();
+  const merged: RedditPostWithMeta[] = [];
+
+  for (let i = 0; i < perModeFetches.length; i++) {
+    const result = perModeFetches[i]!;
+    if (result.status !== "fulfilled") {
+      console.error(
+        `Multi-sort fetch failed for r/${subreddit} (${sortModes[i]}):`,
+        result.reason,
+      );
+      continue;
+    }
+    for (const post of result.value) {
+      if (seen.has(post.id)) continue;
+      seen.add(post.id);
+      merged.push({ ...post, sortMode: sortModes[i]! });
+    }
+  }
+
+  // Re-rank the merged set so the best posts surface first
+  const ranked = rankRedditPosts(merged, keyword);
+  return ranked as RedditPostWithMeta[];
+}
+
+/**
  * Fetches posts from a specified subreddit containing a keyword.
  */
 export const fetchSubredditPosts = async (
@@ -557,6 +635,8 @@ export async function fetchSubredditPostsBatched(
     time?: RedditTimeRange;
     delayMs?: number;
     requestLimit?: number;
+    /** Reddit search sort mode. Defaults to "relevance". */
+    sort?: RedditSortMode;
   },
 ): Promise<RedditPost[]> {
   try {
@@ -575,7 +655,7 @@ export async function fetchSubredditPostsBatched(
       const params = new URLSearchParams({
         q: keyword,
         restrict_sr: "1",
-        sort: "relevance",
+        sort: options?.sort ?? "relevance",
         limit: String(limit),
         t: time,
       });

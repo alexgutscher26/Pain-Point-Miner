@@ -13,7 +13,7 @@ import { extractPainPoints } from "@/lib/ai";
 import {
   filterPostsByProblemPatterns,
   fetchComments,
-  fetchSubredditPostsBatched,
+  fetchSubredditPostsMultiSort,
   rankRedditPosts,
   resolveProblemPatterns,
   type RedditPost,
@@ -138,9 +138,12 @@ export async function executeMiningRun({
     let allPosts: RedditPost[] = [];
     const targetSubreddits = subreddits.slice(0, Math.max(1, subLimit));
 
+    // Fetch posts concurrently across all subreddits.
+    // Each subreddit call internally fans out across all sort modes for the
+    // given mining depth (basic=1, deep=2, advanced=4) and deduplicates.
     const subredditFetchResults = await Promise.allSettled(
       targetSubreddits.map((sub) =>
-        fetchSubredditPostsBatched(sub, keyword, {
+        fetchSubredditPostsMultiSort(sub, keyword, miningDepth, {
           maxPosts: postsPerSub,
           time: getRedditTimeRangeForWindow(timeWindow),
         }),

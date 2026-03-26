@@ -91,14 +91,14 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Show per-subreddit throttle status in the scan progress UI
   - [ ] _Acceptance:_ A subreddit that returns 3 consecutive 429s is automatically skipped and an SSE warning fires within 500ms
 
-- [ ] **Multi-Sort Strategy**
-  - [ ] Add `hot`, `new`, `top` sort modes alongside current `relevance`
-  - [ ] `basic` mining depth → `relevance` only (fastest, cheapest)
-  - [ ] `deep` mining depth → `relevance` + `hot`
-  - [ ] `advanced` mining depth → all 4: `relevance`, `hot`, `new`, `top`
-  - [ ] Merge results: deduplicate by `post.id` across sort modes before AI extraction
-  - [ ] Track which sort mode a post came from in `scraperPost.sortMode` field
-  - [ ] _Acceptance:_ An `advanced` scan of r/SaaS returns posts from all 4 sort modes with no duplicates
+- [x] **Multi-Sort Strategy**
+  - [x] Add `hot`, `new`, `top` sort modes alongside current `relevance`
+  - [x] `basic` mining depth → `relevance` only (fastest, cheapest)
+  - [x] `deep` mining depth → `relevance` + `hot`
+  - [x] `advanced` mining depth → all 4: `relevance`, `hot`, `new`, `top`
+  - [x] Merge results: deduplicate by `post.id` across sort modes before AI extraction
+  - [x] Track which sort mode a post came from in `RedditPostWithMeta.sortMode` field
+  - [x] _Acceptance:_ An `advanced` scan of r/SaaS returns posts from all 4 sort modes with no duplicates
 
 - [ ] **Comment Depth Control**
   - [ ] `basic` → top-level comments only (depth 0), max 20 comments per post
