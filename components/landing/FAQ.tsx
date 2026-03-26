@@ -6,24 +6,28 @@ import { Plus, Minus } from "lucide-react";
 export function FAQ() {
   const faqs = [
     {
-      q: "What exactly is Raddle?",
-      a: "Raddle is a Reddit marketing toolkit that automatically finds threads where people are discussing your industry, tracks competitor mentions, and alerts you when there's an opportunity to pitch your product.",
+      q: "What is ThreddIQ exactly?",
+      a: "ThreddIQ is an AI-powered insights engine that mines Reddit to uncover real customer frustrations. We help founders and product teams find validated SaaS opportunities by identifying 'pain points' that people are actively complaining about and willing to pay to solve.",
     },
     {
-      q: "How does the AI lead scoring work?",
-      a: "Our AI model analyzes the context of a mention to determine if the user is showing buying intent (like asking for recommendations) or just making a casual remark, saving you time from reading false positives.",
+      q: "How does the 'Pain Point Miner' work?",
+      a: "Our algorithm scans thousands of threads across targeted subreddits. It uses natural language processing to filter for 'desperate' sentiment markers—like requests for workarounds, complaints about existing tools, and explicit 'I would pay for...' statements.",
     },
     {
-      q: "Can I use it for multiple projects?",
-      a: "Yes, depending on the plan you choose, you can track keywords and configure alerts for multiple distinct projects or brands from a single account.",
+      q: "Can I use ThreddIQ to validate a specific SaaS idea?",
+      a: "Absolutely. You can enter your niche or competitor names, and ThreddIQ will generate a 'Market Density' report, showing you how often that specific problem is discussed and the intensity of the desire for a better solution.",
+    },
+    {
+      q: "How often does the platform scan Reddit?",
+      a: "On the Pro plan, we monitor your target communities in near real-time. You'll get instant alerts when a high-intent 'pain point' is posted, allowing you to reach out to potential users while their frustration is fresh.",
+    },
+    {
+      q: "Is this compliant with Reddit's Terms of Service?",
+      a: "Yes. ThreddIQ is a read-only listening tool that uses official APIs. We provide market intelligence and analytics; we do not automate posting, spamming, or any actions that violate community guidelines.",
     },
     {
       q: "Do you offer a free trial?",
-      a: "We don't have a free trial currently, but we offer a 7-day money-back guarantee if you don't find any relevant discussions in your niche.",
-    },
-    {
-      q: "Is this against Reddit's terms of service?",
-      a: "No. Raddle acts as a listening tool, similar to Google Alerts. We do not automate posting or spam interactions, which keeps your accounts safe.",
+      a: "Yes! We offer a 3-day full-access trial for our Pro plan so you can see the depth of our mining engine yourself. No credit card is required to start your discovery journey.",
     },
   ];
 
@@ -35,7 +39,7 @@ export function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="text-zinc-400 text-sm">
-            Everything you need to know about the product and billing.
+            Everything you need to know about the product and building products that users actually want.
           </p>
         </div>
 
@@ -53,15 +57,14 @@ export function FAQ() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#ff4500] rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight relative z-10">
-            Ready to find your first customers on{" "}
-            <br className="hidden md:block" /> Reddit?
+            Ready to find your next <br className="hidden md:block" /> SaaS opportunity?
           </h2>
           <p className="text-zinc-300 text-sm md:text-base font-medium mb-10 tracking-wide relative z-10">
-            Join 100+ startups getting organic leads today.
+            Join 600+ founders using ThreddIQ to build products people actually want.
           </p>
 
-          <button className="bg-[#ff4500] hover:bg-[#e03d00] text-black px-10 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,69,0,0.4)] relative z-10">
-            Start 7-day free trial
+          <button className="bg-[#ff4500] hover:bg-[#e03d00] text-white px-10 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,69,0,0.4)] relative z-10">
+            Start 3-day free trial
           </button>
           <p className="text-xs text-red-300 font-bold mt-4 tracking-widest uppercase relative z-10">
             No Credit Card Required
