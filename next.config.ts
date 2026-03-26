@@ -12,12 +12,12 @@ const nextConfig: NextConfig = {
   async headers() {
     const cspDirectives = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com https://cdn.userjot.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' blob: data: https://*.reddit.com https://*.redd.it https://images.unsplash.com https://b.thumbs.redditmedia.com https://i.redd.it https://*.stripe.com",
-      "connect-src 'self' https://*.reddit.com https://api.openrouter.ai https://api.stripe.com https://www.google-analytics.com",
+      "img-src 'self' blob: data: https://*.reddit.com https://*.redd.it https://images.unsplash.com https://b.thumbs.redditmedia.com https://i.redd.it https://*.stripe.com https://*.userjot.com",
+      "connect-src 'self' https://*.reddit.com https://api.openrouter.ai https://api.stripe.com https://www.google-analytics.com https://*.userjot.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "frame-src 'self' https://js.stripe.com",
+      "frame-src 'self' https://js.stripe.com https://*.userjot.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

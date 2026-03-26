@@ -130,7 +130,6 @@ export function Testimonial() {
               <button
                 aria-label="Previous testimonial"
                 onClick={prev}
-                aria-label="Previous testimonial"
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
                 <ChevronLeft className="w-5 h-5" aria-hidden="true" />
@@ -138,7 +137,6 @@ export function Testimonial() {
               <button
                 aria-label="Next testimonial"
                 onClick={next}
-                aria-label="Next testimonial"
                 className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
               >
                 <ChevronRight className="w-5 h-5" aria-hidden="true" />
