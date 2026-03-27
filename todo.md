@@ -886,11 +886,11 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [ ] Auto-flag for review if a newer model scores 5%+ higher on F1
   - [ ] Decision logged in `ai_eval_log` with `switched` boolean and reasoning
 
-- [ ] **Monthly Dependency Updates**
-  - [ ] Run `npm outdated` on the first Monday of each month
-  - [ ] Update: Drizzle ORM, Next.js, Tailwind CSS, Shadcn components on minor versions
-  - [ ] Pin major versions; upgrade only with full test run confirmation
-  - [ ] Open a PR for dependency updates; auto-merge if CI passes
+- [x] **Monthly Dependency Updates**
+  - [x] Run `npm outdated` on the first Monday of each month (Executed manually on 2026-03-27)
+  - [x] Update: Drizzle ORM, Next.js, Tailwind CSS, Shadcn components on minor versions
+  - [x] Pin major versions; upgrade only with full test run confirmation
+  - [x] Open a PR for dependency updates; auto-merge if CI passes
 
 ### Monitoring & Alerts
 

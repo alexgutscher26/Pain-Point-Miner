@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock dependencies
@@ -20,7 +21,7 @@ vi.mock("@/lib/ai", () => ({
 vi.mock("@/lib/reddit", () => ({
   filterPostsByProblemPatterns: vi.fn(),
   fetchComments: vi.fn(),
-  fetchSubredditPostsBatched: vi.fn(),
+  fetchSubredditPostsMultiSort: vi.fn(),
   rankRedditPosts: vi.fn(),
   resolveProblemPatterns: vi.fn(),
 }));
@@ -86,7 +87,7 @@ describe("executeMiningRun", () => {
       (db.query.user.findFirst as any).mockResolvedValueOnce({ id: "test-user", anonymizeRedditUsernames: false });
 
       // Mock one subreddit succeeding and one failing
-      (reddit.fetchSubredditPostsBatched as any).mockImplementation((sub: string) => {
+      (reddit.fetchSubredditPostsMultiSort as any).mockImplementation((sub: string) => {
         if (sub === "fail-sub") {
           return Promise.reject(new Error("API Error"));
         }
@@ -127,7 +128,7 @@ describe("executeMiningRun", () => {
         subreddit: "test-sub", url: "http://test", num_comments: 1, created_utc: Date.now() / 1000
       };
 
-      (reddit.fetchSubredditPostsBatched as any).mockResolvedValue([mockPost]);
+      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([mockPost]);
       (reddit.resolveProblemPatterns as any).mockReturnValue([]);
       (reddit.rankRedditPosts as any).mockImplementation((posts: any[]) => posts);
       (reddit.filterPostsByProblemPatterns as any).mockImplementation((posts: any[]) => posts);
@@ -179,7 +180,7 @@ describe("executeMiningRun", () => {
         subreddit: "test-sub", url: "http://test", num_comments: 1, created_utc: Date.now() / 1000
       };
 
-      (reddit.fetchSubredditPostsBatched as any).mockResolvedValue([mockPost]);
+      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([mockPost]);
       (reddit.resolveProblemPatterns as any).mockReturnValue([]);
       (reddit.rankRedditPosts as any).mockImplementation((posts: any[]) => posts);
       (reddit.filterPostsByProblemPatterns as any).mockImplementation((posts: any[]) => posts);
