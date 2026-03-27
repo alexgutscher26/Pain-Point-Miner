@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self' https://rankinpublic.xyz",
       "upgrade-insecure-requests",
     ];
 
@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "X-Frame-Options",
-            value: "DENY",
+            value: "SAMEORIGIN",
           },
           {
             key: "X-Content-Type-Options",
