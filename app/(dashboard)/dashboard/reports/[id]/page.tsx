@@ -31,6 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
 
 interface PainPoint {
   id: string;
@@ -969,6 +970,9 @@ export default function ReportDetailPage() {
                     <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
                       Pain Score
                     </p>
+                  </div>
+                  <div className="mt-4 flex justify-center md:justify-end">
+                    <PainPointFeedback painPointId={pain.id} />
                   </div>
                 </div>
 

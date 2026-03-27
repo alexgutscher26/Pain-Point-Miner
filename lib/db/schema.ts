@@ -45,6 +45,7 @@ export const user = pgTable(
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     anonymizeRedditUsernames: boolean().default(false).notNull(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
+    role: text().default("user").notNull(),
   },
   (table) => [
     uniqueIndex("user_email_key").using(
@@ -648,3 +649,36 @@ export const redditRateLimitLog = pgTable("reddit_rate_limit_log", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+export const painPointFeedback = pgTable(
+  "pain_point_feedback",
+  {
+    id: text().primaryKey().notNull(),
+    painPointId: text().notNull(),
+    userId: text().notNull(),
+    vote: integer().notNull(), // 1 for up, -1 for down
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.painPointId],
+      foreignColumns: [painPoint.id],
+      name: "pain_point_feedback_painPointId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "pain_point_feedback_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    uniqueIndex("pain_point_feedback_painPointId_userId_key").on(
+      table.painPointId,
+      table.userId,
+    ),
+  ],
+);

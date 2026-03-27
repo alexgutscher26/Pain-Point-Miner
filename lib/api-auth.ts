@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { and, eq, isNull } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
@@ -19,6 +20,7 @@ type ApiContext = {
   userId: string;
   userEmail: string;
   workspaceId: string | null;
+  role: string;
 };
 
 export function workspaceScope(
@@ -162,6 +164,27 @@ export async function requireApiContext(req: Request) {
       userId: session.user.id,
       userEmail: session.user.email,
       workspaceId,
+      role: (session.user as any).role || "user",
     } satisfies ApiContext,
   };
+}
+
+export async function requireAdminContext(req: Request) {
+  const result = await requireApiContext(req);
+  if (!result.ok) return result;
+
+  if (result.context.role !== "admin") {
+    return {
+      ok: false as const,
+      response: apiError(
+        403,
+        "FORBIDDEN",
+        "Admin access required",
+        undefined,
+        result.context.correlationId,
+      ),
+    };
+  }
+
+  return result;
 }

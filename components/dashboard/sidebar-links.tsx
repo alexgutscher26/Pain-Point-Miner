@@ -8,10 +8,14 @@ import {
   FileText,
   CreditCard,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
 
 export function SidebarLinks() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === "admin";
 
   const links = [
     {
@@ -40,6 +44,14 @@ export function SidebarLinks() {
       label: "Settings",
     },
   ];
+
+  if (isAdmin) {
+    links.push({
+      href: "/dashboard/admin",
+      icon: <ShieldCheck className="w-[18px] h-[18px]" />,
+      label: "Admin",
+    });
+  }
 
   return (
     <nav className="space-y-2">

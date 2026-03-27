@@ -866,13 +866,13 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ### Content & Quality
 
-- [ ] **User Feedback Loop**
-  - [ ] 👍/👎 buttons on each pain point card in report detail
-  - [ ] Schema: `pain_point_feedback` — `painPointId`, `userId`, `vote` (up/down), `createdAt`
-  - [ ] Aggregate feedback weekly: pain points with >70% thumbs-down flagged for review
+- [x] **User Feedback Loop**
+  - [x] 👍/👎 buttons on each pain point card in report detail
+  - [x] Schema: `pain_point_feedback` — `painPointId`, `userId`, `vote` (up/down), `createdAt`
+  - [x] Aggregate feedback weekly: pain points with >70% thumbs-down flagged for review
+  - [x] Admin dashboard chart: feedback accuracy rate over time (% thumbs-up)
   - [ ] Use feedback signal to adjust `painIntensity` weights in Scoring V2
-  - [ ] Admin dashboard chart: feedback accuracy rate over time (% thumbs-up)
-  - [ ] _Acceptance:_ Clicking 👍 on a pain point saves feedback and the card shows "Thanks for the feedback!"
+  - [x] _Acceptance:_ Clicking 👍 on a pain point saves feedback and the card shows "Thanks for the feedback!"
 
 - [x] **Reddit User-Agent Rotation**
   - [x] Maintain pool of 5 browser-realistic UA strings in `lib/reddit.ts`

@@ -55,6 +55,7 @@ export const auth = betterAuth({
     additionalFields: {
       anonymizeRedditUsernames: { type: "boolean" },
       deletedAt: { type: "date" },
+      role: { type: "string" },
     },
   },
   emailAndPassword: {

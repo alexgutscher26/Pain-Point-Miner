@@ -114,7 +114,9 @@ export function resolvePlanForIdentity(input: {
   const defaultPlan = normalizeBillingPlan(process.env.DEFAULT_BILLING_PLAN);
   const overrides = parsePlanOverrides(process.env.BILLING_PLAN_OVERRIDES_JSON);
 
-  const byUserId = overrides[input.userId.trim().toLowerCase()];
+  const byUserId = input.userId
+    ? overrides[input.userId.trim().toLowerCase()]
+    : undefined;
   if (byUserId) return byUserId;
 
   const email = input.email?.trim().toLowerCase();
