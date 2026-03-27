@@ -117,7 +117,7 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] _Acceptance:_ A `basic` scan of r/startups skips deleted/removed posts and logs skip reason
 
 - [ ] **Subreddit Discovery Engine**
-  - [ ] Given a keyword (e.g., "SEO"), auto-suggest relevant subreddits via Reddit `/subreddits/search`
+  - [x] Given a keyword (e.g., "SEO"), auto-suggest relevant subreddits via Reddit `/subreddits/search`
   - [ ] Score suggestions by: subscriber count, activity level, relevance to keyword
   - [ ] Return top 10 suggestions with subscriber count + description in `/api/search/suggest-subreddits`
   - [ ] Show suggestions inline in the search form before the user starts a scan

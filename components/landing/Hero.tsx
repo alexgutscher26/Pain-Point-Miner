@@ -251,29 +251,17 @@ export function Hero() {
           </div>
 
           {/* Video Container */}
-          <div className="w-full bg-[#050505] p-2 md:p-3 rounded-2xl shadow-2xl border border-white/5 relative group cursor-pointer">
-            <div className="w-full aspect-16/10 bg-[#111] rounded-xl relative overflow-hidden flex items-center justify-center">
-              <Image
-                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop"
-                alt="Product Demo Video Thumbnail"
-                fill
-                className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500"></div>
-              {/* Play Button */}
-              <div className="relative z-10 flex h-16 w-16 items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 md:h-24 md:w-24">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="ml-1 h-[64px] w-[64px] text-white drop-shadow-xl md:ml-2 md:h-[84px] md:w-[84px]"
-                >
-                  <path
-                    d="M8 5v14l11-7z"
-                    stroke="rgba(0,0,0,0.1)"
-                    strokeWidth="0.5"
-                  />
-                </svg>
-              </div>
+          <div className="w-full bg-[#050505] p-2 md:p-3 rounded-2xl shadow-2xl border border-white/5 relative overflow-hidden">
+            <div className="w-full aspect-video bg-[#111] rounded-xl relative overflow-hidden shadow-inner">
+              <iframe
+                src="https://share.descript.com/embed/A0At69QCEAQ"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+                title="ThreddIQ Product Demo"
+              ></iframe>
             </div>
           </div>
         </div>
