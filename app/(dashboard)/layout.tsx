@@ -9,6 +9,7 @@ import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-li
 import { resolveCurrentPlan } from "@/lib/plan-resolver";
 import { Plus, Crown, LayoutDashboard } from "lucide-react";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
+import { SystemBanner } from "@/components/dashboard/system-banner";
 
 export const metadata: Metadata = {
   title: {
@@ -181,6 +182,12 @@ export default async function DashboardLayout({
             </div>
           </div>
         </header>
+
+        {/* Global System Alerts (Used for Runbook Notifications) */}
+        <SystemBanner 
+          isVisible={process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true" || false} 
+          message={process.env.NEXT_PUBLIC_MAINTENANCE_MESSAGE || "System degraded - using backup sources."}
+        />
 
         {/* Dynamic Content */}
         <div className="relative flex-1">{children}</div>

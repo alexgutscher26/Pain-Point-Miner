@@ -906,10 +906,10 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ### Runbooks
 
-- [ ] **Runbook: Database Connection Exhaustion** — steps to reset connection pool, identify long-running queries, scale `max` connections
-- [ ] **Runbook: Reddit API Block** — switch to PullPush fallback, notify users of scan delay via in-app banner, monitor until restored
+- [x] **Runbook: Database Connection Exhaustion** — steps to reset connection pool, identify long-running queries, scale `max` connections — [database-connection-exhaustion.md](file:///c:/Users/gutsc/OneDrive/Desktop/Pain-Point-Miner/docs/runbooks/database-connection-exhaustion.md)
+- [x] **Runbook: Reddit API Block** — switch to PullPush fallback, notify users of scan delay via in-app banner, monitor until restored — [reddit-api-block.md](file:///c:/Users/gutsc/OneDrive/Desktop/Pain-Point-Miner/docs/runbooks/reddit-api-block.md)
 - [ ] **Runbook: OpenRouter Outage** — fallback to direct OpenAI API if OpenRouter returns 5xx for > 5 minutes; alert users of extended scan times
-- [ ] **Runbook: High AI Cost Spike** — identify which user/scraper caused spike, invoke per-scan cost cap, notify user
+- [x] **Runbook: High AI Cost Spike** — identify which user/scraper caused spike, invoke per-scan cost cap, notify user — [high-ai-cost-spike.md](file:///c:/Users/gutsc/OneDrive/Desktop/Pain-Point-Miner/docs/runbooks/high-ai-cost-spike.md)
 
 ---
 
