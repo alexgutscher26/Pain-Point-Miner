@@ -3,6 +3,7 @@ import { requireApiContext } from "@/lib/api-auth";
 import { z } from "zod";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
+import { DEFAULT_AI_MODEL } from "@/lib/ai";
 
 const suggestPayloadSchema = z.object({
   keyword: z.string().trim().min(3).max(120),
@@ -52,30 +53,36 @@ const parseSuggestedSubreddits = (
   rawContent: unknown,
   cappedCount: number,
 ): string[] => {
-  const normalizedContent = extractMessageContent(rawContent)
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
+  const rawContentStr = extractMessageContent(rawContent);
+  const firstBrace = rawContentStr.indexOf("[");
+  const lastBrace = rawContentStr.lastIndexOf("]");
 
-  if (!normalizedContent) {
+  if (firstBrace === -1 || lastBrace === -1) {
     return [];
   }
 
-  const parsed = JSON.parse(normalizedContent);
-  const rawSubreddits = Array.isArray(parsed)
-    ? parsed
-    : parsed.subreddits || parsed.data || [];
+  const normalizedContent = rawContentStr.substring(firstBrace, lastBrace + 1);
 
-  if (!Array.isArray(rawSubreddits)) {
+  try {
+    const parsed = JSON.parse(normalizedContent);
+    const rawSubreddits = Array.isArray(parsed)
+      ? parsed
+      : parsed.subreddits || parsed.data || [];
+
+    if (!Array.isArray(rawSubreddits)) {
+      return [];
+    }
+
+    return rawSubreddits
+      .map((item) => subredditNameSchema.safeParse(item))
+      .filter((result) => result.success)
+      .map((result) => result.data)
+      .filter((value, index, arr) => arr.indexOf(value) === index)
+      .slice(0, cappedCount);
+  } catch (error) {
+    console.error("Error parsing subreddits JSON:", error);
     return [];
   }
-
-  return rawSubreddits
-    .map((item) => subredditNameSchema.safeParse(item))
-    .filter((result) => result.success)
-    .map((result) => result.data)
-    .filter((value, index, arr) => arr.indexOf(value) === index)
-    .slice(0, cappedCount);
 };
 
 export async function POST(req: Request) {
@@ -137,7 +144,7 @@ export async function POST(req: Request) {
           "X-Title": "ThreddIQ - Reddit Intelligence Engine",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.0-flash-001",
+          model: DEFAULT_AI_MODEL,
           messages: [{ role: "user", content: prompt }],
         }),
       },

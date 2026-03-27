@@ -226,7 +226,7 @@ export const userPreferences = pgTable(
     id: text().primaryKey().notNull(),
     userId: text().notNull(),
     theme: text().default("system").notNull(),
-    defaultAiModel: text().default("google/gemini-2.0-flash-001").notNull(),
+    defaultAiModel: text().default("anthropic/claude-3.5-sonnet").notNull(),
     emailNotifications: boolean().default(true).notNull(),
     timezone: text(),
     dashboardLayout: jsonb(),
@@ -605,3 +605,35 @@ export const painPointEmbedding = pgTable(
       .onDelete("cascade"),
   ],
 );
+
+export const aiGoldenDataset = pgTable("ai_golden_dataset", {
+  id: text().primaryKey().notNull(),
+  title: text().notNull(),
+  selftext: text(),
+  subreddit: text().notNull(),
+  comments: jsonb().$type<{ body: string }[]>().notNull(),
+  expectedPainPoints: jsonb().notNull(), // Stores PainPointData[]
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const aiEvalLog = pgTable("ai_eval_log", {
+  id: text().primaryKey().notNull(),
+  modelId: text().notNull(),
+  f1Score: doublePrecision().notNull(),
+  precision: doublePrecision().notNull(),
+  recall: doublePrecision().notNull(),
+  runDate: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  switched: boolean().default(false).notNull(),
+  flaggedForReview: boolean().default(false).notNull(),
+  reasoning: text().notNull(),
+  comparisonModelId: text(),
+  improvementPercentage: doublePrecision(),
+  evalMetadata: jsonb(), // Stores detailed model-by-model metrics
+});

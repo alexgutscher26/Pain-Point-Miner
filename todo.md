@@ -880,11 +880,13 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [ ] Refresh UA pool monthly with current Chrome/Firefox version strings
   - [ ] Log which UA triggered a 403 to `reddit_rate_limit_log`
 
-- [ ] **Monthly AI Model Evaluation**
-  - [ ] Run golden dataset against currently deployed model
-  - [ ] Compare F1 score against the best available model on OpenRouter
-  - [ ] Auto-flag for review if a newer model scores 5%+ higher on F1
-  - [ ] Decision logged in `ai_eval_log` with `switched` boolean and reasoning
+  - [x] **Monthly AI Model Evaluation**
+    - [x] Create `ai_golden_dataset` and `ai_eval_log` schema
+    - [x] Implement `scripts/ai-eval.ts` with LLM-as-a-judge (GPT-4o)
+    - [x] Run golden dataset against currently deployed model
+    - [x] Compare F1 score against the best available model on OpenRouter (Claude 3.5 Sonnet, GPT-4o)
+    - [x] Auto-flag for review if a newer model scores 5%+ higher on F1
+    - [x] Decision logged in `ai_eval_log` with `switched` boolean and reasoning
 
 - [x] **Monthly Dependency Updates**
   - [x] Run `npm outdated` on the first Monday of each month (Executed manually on 2026-03-27)

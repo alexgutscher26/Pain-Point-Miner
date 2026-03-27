@@ -4,6 +4,14 @@ import {
   type BudgetCadence,
 } from "@/lib/budget-signals";
 
+export const AI_MODELS = {
+  GEMINI_FLASH: "google/gemini-2.0-flash-001",
+  CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
+  GPT4O: "openai/gpt-4o",
+} as const;
+
+export const DEFAULT_AI_MODEL = AI_MODELS.CLAUDE_SONNET;
+
 export interface PainPointData {
   title: string;
   body: string;
@@ -60,8 +68,9 @@ export const extractPainPoints = async (
     comments: { body: string }[];
   },
   customPatterns: string[] = [],
+  modelOverride?: string,
 ) => {
-  const model = "google/gemini-2.0-flash-001";
+  const model = modelOverride || DEFAULT_AI_MODEL;
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
@@ -203,10 +212,15 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     }
 
     const data = await response.json();
-    const content = extractMessageContent(data?.choices?.[0]?.message?.content)
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/, "")
-      .trim();
+    const rawContent = extractMessageContent(data?.choices?.[0]?.message?.content);
+    const firstBrace = rawContent.indexOf("{");
+    const lastBrace = rawContent.lastIndexOf("}");
+    
+    if (firstBrace === -1 || lastBrace === -1) {
+      throw new Error("No JSON object found in AI response");
+    }
+
+    const content = rawContent.substring(firstBrace, lastBrace + 1);
     const parsed = JSON.parse(content);
 
     interface RawPainPoint {
