@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { db } from "./db";
+import { redditRateLimitLog } from "./db/schema";
+
 export interface RedditPost {
   id: string;
   title: string;
@@ -42,9 +45,32 @@ export interface RedditPostWithMeta extends RedditPost {
   sortMode: RedditSortMode;
 }
 
-const DEFAULT_USER_AGENT =
-  process.env.REDDIT_USER_AGENT ??
-  "Threddiq/1.0 (+https://threddiq.com; contact: [EMAIL_ADDRESS])";
+const ENV_UA = process.env.REDDIT_USER_AGENT;
+
+/** Pool of browser-realistic User-Agents. Updated for March 2026. */
+export const UA_POOL = [
+  ...(ENV_UA ? [ENV_UA] : []),
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.7; rv:140.0) Gecko/20100101 Firefox/140.0",
+].filter(Boolean) as string[];
+
+function getRandomUA() {
+  return UA_POOL[Math.floor(Math.random() * UA_POOL.length)] ?? "Threddiq/1.0";
+}
+
+/** The currently active User-Agent string for the current execution instance. */
+let currentUA = getRandomUA();
+
+/** Switches to a different UA from the pool. */
+function rotateUA() {
+  const others = UA_POOL.filter((ua) => ua !== currentUA);
+  const pool = others.length > 0 ? others : UA_POOL;
+  currentUA = pool[Math.floor(Math.random() * pool.length)] ?? getRandomUA();
+  return currentUA;
+}
 const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID?.trim();
 const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET?.trim();
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -172,6 +198,39 @@ async function fetchWithRetry(
 
       if (response.ok) return response;
 
+      if (response.status === 403) {
+        // Log the block before rotating
+        const uaUsed = (init.headers as Record<string, string>)?.["User-Agent"] || currentUA;
+        try {
+          await db.insert(redditRateLimitLog).values({
+            id: crypto.randomUUID(),
+            userAgent: uaUsed,
+            url,
+            statusCode: 403,
+            error: `Forbidden/Blocked: ${response.statusText}`,
+          });
+        } catch (dbErr) {
+          console.error("Failed to log 403 error to DB:", dbErr);
+        }
+
+        // Rotate UA and update the headers for the next attempt
+        const nextUA = rotateUA();
+        if (init.headers instanceof Headers) {
+          init.headers.set("User-Agent", nextUA);
+        } else if (init.headers) {
+          (init.headers as Record<string, string>)["User-Agent"] = nextUA;
+        } else {
+          init.headers = { "User-Agent": nextUA };
+        }
+
+        if (attempt === retries) {
+          throw new Error(
+            `Reddit API returned 403 (Forbidden) after trying different User-Agents`,
+          );
+        }
+        continue;
+      }
+
       const isRetriable = response.status === 429 || response.status >= 500;
       if (!isRetriable || attempt === retries) {
         throw new Error(
@@ -221,7 +280,7 @@ async function getRedditAccessToken(
       headers: {
         Authorization: `Basic ${basicAuth}`,
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": DEFAULT_USER_AGENT,
+        "User-Agent": currentUA,
       },
       body: "grant_type=client_credentials",
     },
@@ -254,7 +313,7 @@ async function fetchRedditResponse(url: string): Promise<Response> {
       const response = await fetchWithRetry(oauthUrl, {
         headers: {
           Authorization: `Bearer ${authToken}`,
-          "User-Agent": DEFAULT_USER_AGENT,
+          "User-Agent": currentUA,
         },
       });
       return response;
@@ -269,7 +328,7 @@ async function fetchRedditResponse(url: string): Promise<Response> {
           return fetchWithRetry(oauthUrl, {
             headers: {
               Authorization: `Bearer ${refreshedToken}`,
-              "User-Agent": DEFAULT_USER_AGENT,
+              "User-Agent": currentUA,
             },
           });
         }
@@ -287,7 +346,7 @@ async function fetchRedditResponse(url: string): Promise<Response> {
 
   return fetchWithRetry(url, {
     headers: {
-      "User-Agent": DEFAULT_USER_AGENT,
+      "User-Agent": currentUA,
     },
   });
 }

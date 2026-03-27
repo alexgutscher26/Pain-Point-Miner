@@ -874,11 +874,11 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [ ] Admin dashboard chart: feedback accuracy rate over time (% thumbs-up)
   - [ ] _Acceptance:_ Clicking 👍 on a pain point saves feedback and the card shows "Thanks for the feedback!"
 
-- [ ] **Reddit User-Agent Rotation**
-  - [ ] Maintain pool of 5 browser-realistic UA strings in `lib/reddit.ts`
-  - [ ] Rotate: randomly select UA per request batch; switch to next on 403 error
-  - [ ] Refresh UA pool monthly with current Chrome/Firefox version strings
-  - [ ] Log which UA triggered a 403 to `reddit_rate_limit_log`
+- [x] **Reddit User-Agent Rotation**
+  - [x] Maintain pool of 5 browser-realistic UA strings in `lib/reddit.ts`
+  - [x] Rotate: randomly select UA per request batch; switch to next on 403 error
+  - [x] Refresh UA pool monthly with current Chrome/Firefox version strings
+  - [x] Log which UA triggered a 403 to `reddit_rate_limit_log`
 
   - [x] **Monthly AI Model Evaluation**
     - [x] Create `ai_golden_dataset` and `ai_eval_log` schema

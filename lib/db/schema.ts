@@ -637,3 +637,14 @@ export const aiEvalLog = pgTable("ai_eval_log", {
   improvementPercentage: doublePrecision(),
   evalMetadata: jsonb(), // Stores detailed model-by-model metrics
 });
+
+export const redditRateLimitLog = pgTable("reddit_rate_limit_log", {
+  id: text().primaryKey().notNull(),
+  userAgent: text().notNull(),
+  url: text().notNull(),
+  statusCode: integer().notNull(),
+  error: text(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
