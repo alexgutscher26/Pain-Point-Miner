@@ -6,6 +6,7 @@ import {
   painPointCluster,
   painPointComment,
   painPointEmbedding,
+  painPointFeedback,
   scraper,
   scraperRun,
   session,
@@ -28,6 +29,7 @@ export const userRelations = relations(user, ({ many }) => ({
   painPoints: many(painPoint),
   painPointClusters: many(painPointCluster),
   painPointEmbeddings: many(painPointEmbedding),
+  painPointFeedback: many(painPointFeedback),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -138,6 +140,7 @@ export const painPointRelations = relations(painPoint, ({ one, many }) => ({
   }),
   painPointComments: many(painPointComment),
   painPointEmbeddings: many(painPointEmbedding),
+  painPointFeedback: many(painPointFeedback),
 }));
 
 export const painPointCommentRelations = relations(
@@ -179,6 +182,19 @@ export const painPointEmbeddingRelations = relations(
     workspace: one(workspace, {
       fields: [painPointEmbedding.workspaceId],
       references: [workspace.id],
+    }),
+  }),
+);
+export const painPointFeedbackRelations = relations(
+  painPointFeedback,
+  ({ one }) => ({
+    painPoint: one(painPoint, {
+      fields: [painPointFeedback.painPointId],
+      references: [painPoint.id],
+    }),
+    user: one(user, {
+      fields: [painPointFeedback.userId],
+      references: [user.id],
     }),
   }),
 );

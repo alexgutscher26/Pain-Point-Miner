@@ -73,6 +73,13 @@ const getCachedDashboardData = unstable_cache(
             subreddit: true,
             subredditDisplayName: true,
           },
+          with: {
+            painPointFeedback: {
+              columns: {
+                vote: true,
+              },
+            },
+          },
         },
       },
     });
@@ -156,11 +163,28 @@ export default async function DashboardPage({
   const selectedWindowLabel =
     selectedWindow === "30d" ? "the past 30 days" : "the last 24 hours";
 
-  const reports = await getCachedDashboardData(
-    session.user.id,
-    workspaceId,
-    stableWindowDateMs,
-  );
+  const reports = (
+    await getCachedDashboardData(
+      session.user.id,
+      workspaceId,
+      stableWindowDateMs,
+    )
+  ).map((report) => ({
+    ...report,
+    painPoints: report.painPoints.map((point) => {
+      const userUpvotes = (point.painPointFeedback ?? []).filter(
+        (v) => v.vote === 1,
+      ).length;
+      const userDownvotes = (point.painPointFeedback ?? []).filter(
+        (v) => v.vote === -1,
+      ).length;
+      return {
+        ...point,
+        userUpvotes,
+        userDownvotes,
+      };
+    }),
+  }));
 
   const painPointsFound = reports.reduce(
     (sum, report) => sum + report.painPoints.length,

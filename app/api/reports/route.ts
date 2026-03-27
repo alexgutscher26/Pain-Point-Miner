@@ -75,6 +75,11 @@ export async function GET(req: Request) {
               orderBy: (comment, { desc }) => [desc(comment.score)],
               limit: 5,
             },
+            painPointFeedback: {
+              columns: {
+                vote: true,
+              },
+            },
           },
         },
       },
@@ -123,6 +128,7 @@ export async function GET(req: Request) {
         commentCount: number;
         mentionCount: number;
         painPointComments?: Array<{ score: number }>;
+        painPointFeedback?: Array<{ vote: number }>;
       }>;
       const keywordKey = (r.keywords?.[0] || "").trim().toLowerCase();
       const trend = keywordKey ? trendByKeyword.get(keywordKey) : undefined;
@@ -139,9 +145,14 @@ export async function GET(req: Request) {
                 ) / topCommentScores.length,
               )
             : 0;
+        const userUpvotes = (point.painPointFeedback ?? []).filter(v => v.vote === 1).length;
+        const userDownvotes = (point.painPointFeedback ?? []).filter(v => v.vote === -1).length;
+
         return {
           ...point,
           upvoteSignal,
+          userUpvotes,
+          userDownvotes,
         };
       });
 

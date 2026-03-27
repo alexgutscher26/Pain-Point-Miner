@@ -7,6 +7,8 @@ export type DashboardPainPoint = {
   mentionCount?: number | null;
   commentCount?: number | null;
   upvoteSignal?: number | null;
+  userUpvotes?: number;
+  userDownvotes?: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -33,7 +35,12 @@ export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
   if (painPoints.length === 0) return 0;
 
   const factors = painPoints.map((point) => {
-    const pain = (point.score || 0) * 0.35;
+    const feedbackBalance = (point.userUpvotes ?? 0) - (point.userDownvotes ?? 0);
+    // Use feedback signal to adjust painIntensity (point.score) weights
+    const feedbackIntensityWeight =
+      feedbackBalance > 0 ? 1.05 : feedbackBalance < 0 ? 0.85 : 1.0;
+
+    const pain = (point.score || 0) * 0.35 * feedbackIntensityWeight;
     const urgency = (point.urgency || 0) * 0.25;
     const monetization = (point.monetizationScore || 0) * 0.3;
 
@@ -51,9 +58,13 @@ export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
     };
     const modifier = sentimentMap[point.sentiment || ""] || 1.0;
     const validation = toValidationScore(point);
+    const feedbackBoost =
+      feedbackBalance > 0 ? Math.min(feedbackBalance * 2, 10) : 0;
+    const feedbackPenalty =
+      feedbackBalance < 0 ? Math.max(feedbackBalance * 4, -20) : 0;
 
     const base =
-      ((pain + urgency + monetization) * 10 + maturityBonus) * modifier;
+      ((pain + urgency + monetization) * 10 + maturityBonus + feedbackBoost + feedbackPenalty) * modifier;
     return base * 0.75 + validation * 0.25;
   });
 

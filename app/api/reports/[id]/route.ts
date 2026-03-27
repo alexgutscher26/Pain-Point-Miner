@@ -164,6 +164,9 @@ interface DBPainPoint {
     body: string;
     score: number;
   }>;
+  painPointFeedback?: Array<{
+    vote: number;
+  }>;
 }
 
 export async function GET(
@@ -240,6 +243,11 @@ export async function GET(
               orderBy: (comment, { desc }) => [desc(comment.score)],
               limit: 12,
             },
+            painPointFeedback: {
+              columns: {
+                vote: true,
+              },
+            },
           },
         },
       },
@@ -305,11 +313,16 @@ export async function GET(
               ) / topCommentScores.length,
             )
           : 0;
+      const userUpvotes = (point.painPointFeedback ?? []).filter(v => v.vote === 1).length;
+      const userDownvotes = (point.painPointFeedback ?? []).filter(v => v.vote === -1).length;
+
       return {
         ...point,
         budgetSignals,
         hasWillingnessToPay: hasWillingnessToPaySignals(budgetSignals),
         upvoteSignal,
+        userUpvotes,
+        userDownvotes,
       };
     });
     const opportunityScore = toOpportunityScore(enrichedPainPoints);
