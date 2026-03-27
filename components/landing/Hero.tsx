@@ -141,7 +141,7 @@ export function Hero() {
             </div>
           </form>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-90 mx-auto">
+          {/* <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-90 mx-auto">
             <div className="flex items-center justify-center gap-3">
               <div className="flex -space-x-3">
                 {[
@@ -173,7 +173,7 @@ export function Hero() {
                 founders & marketers
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

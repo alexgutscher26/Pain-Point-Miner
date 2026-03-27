@@ -72,7 +72,7 @@ export function Testimonial() {
   return (
     <section className="w-full bg-[#0a0a0a] border-y border-white/5 overflow-hidden">
       {/* Logo Marquee */}
-      <div className="py-12 border-b border-white/5">
+      {/* <div className="py-12 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase mb-10">
             Trusted by founders from
@@ -83,12 +83,11 @@ export function Testimonial() {
                 <span className="text-white font-black text-xl md:text-2xl tracking-tighter">
                   {logo.name}
                 </span>
-                {/* Note: In a real app we'd use <Image src={logo.src} .../> but for demo text branding looks premium too */}
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Testimonial Carousel */}
       <div className="py-24 md:py-32 flex justify-center px-6">
