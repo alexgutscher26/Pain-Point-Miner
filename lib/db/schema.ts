@@ -324,6 +324,7 @@ export const scraperRun = pgTable(
     throttleWarnings: text()
       .array()
       .default(sql`'{}'::text[]`),
+    postsSkipped: integer().default(0).notNull(),
   },
   (table) => [
     foreignKey({
@@ -347,6 +348,8 @@ export const scraperPost = pgTable(
     runId: text().notNull(),
     postId: text().notNull(),
     commentCount: integer().default(0).notNull(),
+    qualityScore: doublePrecision().default(0).notNull(),
+    skipReason: text(),
     createdAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

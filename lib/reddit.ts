@@ -14,6 +14,7 @@ export interface RedditPost {
   url: string;
   num_comments: number;
   created_utc: number;
+  is_self?: boolean;
 }
 
 export interface RedditComment {
@@ -176,6 +177,7 @@ type PullPushListingResponse = {
     num_comments?: number;
     created_utc?: number;
     created?: number;
+    is_self?: boolean;
   }>;
 };
 
@@ -627,6 +629,7 @@ async function fetchFromPullPushSubmissions(
       num_comments: row.num_comments ?? 0,
       created_utc:
         row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+      is_self: row.is_self ?? true, // PullPush usually returns self-posts for search
     }));
 }
 

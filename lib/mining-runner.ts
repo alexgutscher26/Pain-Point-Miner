@@ -200,10 +200,38 @@ export async function executeMiningRun({
     const fetchedPosts = dedupePosts(allPosts);
     allPosts = rankRedditPosts(fetchedPosts, keyword, problemPatterns);
 
-    // Update phase: scanning → extracting
+    // Filter by age first
     const nowSeconds = Math.floor(Date.now() / 1_000);
     const oldestAllowedUtc = nowSeconds - getTimeWindowAgeSeconds(timeWindow);
     allPosts = allPosts.filter((post) => post.created_utc >= oldestAllowedUtc);
+
+    /**
+     * POST QUALITY PRE-FILTER
+     * Implement the criteria for dropping low-value noise BEFORE AI analysis.
+     */
+    const hasSelfPosts = allPosts.some((p) => p.is_self !== false);
+    const preFiltered = allPosts.filter((post) => {
+      // 1. Skip removed/deleted content
+      const body = (post.selftext || "").toLowerCase();
+      if (body === "[removed]" || body === "[deleted]") return false;
+
+      // 2. Score threshold for basic depth
+      if (miningDepth === "basic" && post.score < 2 && post.num_comments < 3) {
+        return false;
+      }
+
+      // 3. Skip link posts unless no self-posts exist
+      if (post.is_self === false && hasSelfPosts) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const postsSkipped = allPosts.length - preFiltered.length;
+    allPosts = preFiltered;
+
+    // Update phase: scanning → extracting
     allPosts = rankRedditPosts(allPosts, keyword, problemPatterns);
 
     await db
@@ -212,6 +240,7 @@ export async function executeMiningRun({
         status: "extracting",
         postsFetched: fetchedPosts.length,
         postsMatched: allPosts.length,
+        postsSkipped,
         throttleWarnings,
       })
       .where(eq(scraperRun.id, runId));
@@ -247,16 +276,37 @@ export async function executeMiningRun({
       { concurrency: 5 },
     );
 
+function calculatePostQualityScore(post: RedditPost): number {
+  let score = 1.0;
+  const body = (post.selftext || "").toLowerCase();
+
+  // Low engagement penalty
+  if (post.score < 5 && post.num_comments < 10) score -= 0.2;
+  
+  // High engagement boost
+  if (post.score > 100 || post.num_comments > 50) score += 0.2;
+
+  // Link post penalty if the body is very sparse
+  if (post.is_self === false && body.length < 50) score -= 0.3;
+
+  return Math.max(0, Math.min(1.0, Number(score.toFixed(2))));
+}
+
     // Track every post analyzed in this run
     if (postsToAnalyze.length > 0) {
       const scraperPostsBatch = commentFetchResults
         .filter((r) => r.status === "fulfilled")
-        .map((r) => ({
-          id: crypto.randomUUID(),
-          runId,
-          postId: r.value.postId,
-          commentCount: r.value.comments.length,
-        }));
+        .map((r) => {
+          const post = postsToAnalyze.find((p) => p.id === r.value.postId);
+          const qScore = post ? calculatePostQualityScore(post) : 0;
+          return {
+            id: crypto.randomUUID(),
+            runId,
+            postId: r.value.postId,
+            commentCount: r.value.comments.length,
+            qualityScore: qScore,
+          };
+        });
 
       if (scraperPostsBatch.length > 0) {
         await db.insert(scraperPost).values(scraperPostsBatch);

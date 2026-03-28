@@ -20,6 +20,7 @@ type StreamEvent = {
   progress: number;
   painPointCount: number;
   postsFetched: number;
+  postsSkipped: number;
   commentsFetched: number;
   status: RunStatus;
   subreddits: string[];
@@ -53,6 +54,7 @@ function phaseToMessage(
   subreddits: string[],
   painPointCount: number,
   postsFetched: number,
+  postsSkipped: number,
 ): string {
   switch (phase) {
     case "queued":
@@ -63,7 +65,7 @@ function phaseToMessage(
         ? `Scanning r/${subreddits[0]}${subreddits.length > 1 ? ` and ${subreddits.length - 1} more...` : "..."}`
         : "Scanning Reddit communities...";
     case "extracting":
-      return `Analyzing ${postsFetched} posts for pain points...`;
+      return `Analyzing ${postsFetched} high-signal posts. Skipped ${postsSkipped} noisy results.`;
     case "clustering":
       return `Extracted ${painPointCount} opportunities. Clustering insights...`;
     case "completed":
@@ -142,10 +144,12 @@ export async function GET(req: Request) {
               subreddits,
               painPointCount,
               latestRun?.postsFetched ?? 0,
+              latestRun?.postsSkipped ?? 0,
             ),
             progress: phaseToProgress(phase),
             painPointCount,
             postsFetched: latestRun?.postsFetched ?? 0,
+            postsSkipped: latestRun?.postsSkipped ?? 0,
             commentsFetched: latestRun?.commentsFetched ?? 0,
             status: phase,
             subreddits,

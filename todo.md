@@ -108,13 +108,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [x] Log comment count per post in `scraperPost.commentCount`
   - [x] _Acceptance:_ `basic` scan never fetches reply comments; `deep` fetches exactly one reply tier
 
-- [ ] **Post Quality Pre-Filter**
-  - [ ] Skip posts where `score < 2` AND `num_comments < 3` (for `basic` depth)
-  - [ ] Skip posts where `selftext` equals `[removed]` or `[deleted]`
-  - [ ] Skip link posts (where `is_self === false`) unless no self-posts exist for keyword
-  - [ ] Add `qualityScore` field to `scraperPost` (0–1) for downstream filtering
-  - [ ] Expose pre-filter stats in SSE: "Skipped 12 low-quality posts"
-  - [ ] _Acceptance:_ A `basic` scan of r/startups skips deleted/removed posts and logs skip reason
+- [x] **Post Quality Pre-Filter**
+  - [x] Skip posts where `score < 2` AND `num_comments < 3` (for `basic` depth)
+  - [x] Skip posts where `selftext` equals `[removed]` or `[deleted]`
+  - [x] Skip link posts (where `is_self === false`) unless no self-posts exist for keyword
+  - [x] Add `qualityScore` field to `scraperPost` (0–1) for downstream filtering
+  - [x] Expose pre-filter stats in SSE: "Skipped 12 low-quality posts"
+  - [x] _Acceptance:_ A `basic` scan of r/startups skips deleted/removed posts and logs skip reason
 
 - [ ] **Subreddit Discovery Engine**
   - [x] Given a keyword (e.g., "SEO"), auto-suggest relevant subreddits via Reddit `/subreddits/search`
