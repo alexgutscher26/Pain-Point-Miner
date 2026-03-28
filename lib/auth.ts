@@ -170,6 +170,9 @@ export const auth = betterAuth({
   ],
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      // Satisfy async contract for BetterAuth types
+      await Promise.resolve();
+
       if (ctx.path !== "/sign-up/email" && ctx.path !== "/sign-in/email") {
         return;
       }

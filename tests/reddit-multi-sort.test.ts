@@ -71,32 +71,34 @@ import { fetchSubredditPostsMultiSort } from "@/lib/reddit";
 /** Minimal Reddit OAuth token response */
 const FAKE_TOKEN_RESPONSE = {
   ok: true,
-  json: async () => ({ access_token: "fake-token", expires_in: 3600 }),
+  json: () =>
+    Promise.resolve({ access_token: "fake-token", expires_in: 3600 }),
 };
 
 /** Minimal Reddit listing API response */
 function makeListingResponse(postIds: string[]) {
   return {
     ok: true,
-    json: async () => ({
-      data: {
-        after: null,
-        children: postIds.map((id) => ({
-          data: {
-            id,
-            title: `Post ${id}`,
-            selftext: "struggling with this tool",
-            author: "user1",
-            score: 10,
-            subreddit: "SaaS",
-            url: `https://reddit.com/${id}`,
-            num_comments: 5,
-            // Recent enough to not be filtered by any age window
-            created_utc: Math.floor(Date.now() / 1000) - 600,
-          },
-        })),
-      },
-    }),
+    json: () =>
+      Promise.resolve({
+        data: {
+          after: null,
+          children: postIds.map((id) => ({
+            data: {
+              id,
+              title: `Post ${id}`,
+              selftext: "struggling with this tool",
+              author: "user1",
+              score: 10,
+              subreddit: "SaaS",
+              url: `https://reddit.com/${id}`,
+              num_comments: 5,
+              // Recent enough to not be filtered by any age window
+              created_utc: Math.floor(Date.now() / 1000) - 600,
+            },
+          })),
+        },
+      }),
   };
 }
 
@@ -108,13 +110,13 @@ function makeListingResponse(postIds: string[]) {
 function buildFetchMock(
   handler: (sortMode: string) => ReturnType<typeof makeListingResponse>,
 ) {
-  return vi.fn().mockImplementation(async (url: string) => {
+  return vi.fn().mockImplementation((url: string) => {
     if ((url as string).includes("api/v1/access_token")) {
-      return FAKE_TOKEN_RESPONSE;
+      return Promise.resolve(FAKE_TOKEN_RESPONSE);
     }
     const match = /[?&]sort=([^&]+)/.exec(url as string);
     const sort = match?.[1] ?? "relevance";
-    return handler(sort);
+    return Promise.resolve(handler(sort));
   });
 }
 

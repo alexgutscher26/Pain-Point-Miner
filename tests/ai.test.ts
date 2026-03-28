@@ -58,7 +58,7 @@ describe("extractPainPoints", () => {
 
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
+      json: () => Promise.resolve(mockResponse),
     } as Response);
 
     const result = await extractPainPoints(mockPost);
@@ -99,7 +99,7 @@ describe("extractPainPoints", () => {
 
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
+      json: () => Promise.resolve(mockResponse),
     } as Response);
 
     const result = await extractPainPoints(mockPost);
@@ -120,7 +120,7 @@ describe("extractPainPoints", () => {
       ok: false,
       status: 500,
       statusText: "Internal Server Error",
-      text: async () => "API is down",
+      text: () => Promise.resolve("API is down"),
     } as Response);
 
     const result = await extractPainPoints(mockPost);
@@ -153,7 +153,7 @@ describe("extractPainPoints", () => {
 
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
-      json: async () => mockResponse,
+      json: () => Promise.resolve(mockResponse),
     } as Response);
 
     const result = await extractPainPoints(mockPost);

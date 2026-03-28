@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { generateEmbedding } from "@/lib/embeddings";
 
@@ -27,9 +28,10 @@ describe("generateEmbedding", () => {
 
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [{ embedding: mockEmbedding }],
-      }),
+      json: () =>
+        Promise.resolve({
+          data: [{ embedding: mockEmbedding }],
+        }),
     });
 
     const result = await generateEmbedding("test text");
@@ -56,9 +58,10 @@ describe("generateEmbedding", () => {
 
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [{ embedding: mockEmbedding }],
-      }),
+      json: () =>
+        Promise.resolve({
+          data: [{ embedding: mockEmbedding }],
+        }),
     });
 
     const longText = "a".repeat(10000);
@@ -92,9 +95,10 @@ describe("generateEmbedding", () => {
 
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [{ embedding: wrongDimensions }],
-      }),
+      json: () =>
+        Promise.resolve({
+          data: [{ embedding: wrongDimensions }],
+        }),
     });
 
     await expect(generateEmbedding("test text")).rejects.toThrow(
@@ -105,9 +109,10 @@ describe("generateEmbedding", () => {
   it("throws an error if the embedding is missing from response", async () => {
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [{}], // missing embedding
-      }),
+      json: () =>
+        Promise.resolve({
+          data: [{}], // missing embedding
+        }),
     });
 
     await expect(generateEmbedding("test text")).rejects.toThrow(
