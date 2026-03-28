@@ -542,16 +542,16 @@ export function scoreRedditPostRelevance(
   if (patternStats.matchCount > 1 && body) score += 4;
 
   score += Math.min(20, Math.log10(Math.max(1, post.score) + 1) * 8);
-  score += Math.min(18, Math.log10(Math.max(1, post.num_comments) + 1) * 9);
+  score += Math.min(25, Math.log10(Math.max(1, post.num_comments) + 1) * 12);
 
   const ageHours = Math.max(
     0,
     (Date.now() / 1_000 - Math.max(0, post.created_utc ?? 0)) / 3600,
   );
-  if (ageHours <= 24) score += 14;
-  else if (ageHours <= 24 * 7) score += 10;
-  else if (ageHours <= 24 * 30) score += 6;
-  else if (ageHours <= 24 * 90) score += 2;
+  if (ageHours <= 24) score += 6;
+  else if (ageHours <= 24 * 7) score += 4;
+  else if (ageHours <= 24 * 30) score += 2;
+  else if (ageHours <= 24 * 90) score += 1;
 
   return score;
 }
@@ -848,33 +848,54 @@ export async function fetchSubredditPostsBatched(
 export const fetchComments = async (
   postId: string,
   subreddit: string,
+  options?: { maxDepth?: number; maxComments?: number },
 ): Promise<RedditComment[]> => {
+  const maxDepth = options?.maxDepth ?? 100;
+  const maxComments = options?.maxComments ?? 200;
+
   try {
     const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json`;
     const response = await fetchRedditResponse(url);
 
     const data = await response.json();
     const commentNodes = data[1].data.children;
+    const collectedComments: RedditComment[] = [];
 
-    const extractReplies = (replies: {
-      data?: { children?: any[] };
-    }): RedditComment[] => {
-      if (!replies || !replies.data || !replies.data.children) return [];
+    const extractReplies = (
+      replies: {
+        data?: { children?: any[] };
+      },
+      currentDepth: number,
+    ): void => {
+      if (
+        currentDepth >= maxDepth ||
+        collectedComments.length >= maxComments ||
+        !replies ||
+        !replies.data ||
+        !replies.data.children
+      )
+        return;
 
-      return replies.data.children.flatMap(
-        (child: { kind: string; data: any }) => {
-          if (child.kind !== "t1") return [];
-          const comment = child.data;
-          return [comment, ...extractReplies(comment.replies)];
-        },
-      );
+      for (const child of replies.data.children) {
+        if (child.kind !== "t1") continue;
+        if (collectedComments.length >= maxComments) break;
+
+        const comment = child.data;
+        collectedComments.push(comment);
+        extractReplies(comment.replies, currentDepth + 1);
+      }
     };
 
-    return commentNodes.flatMap((child: { kind: string; data: any }) => {
-      if (child.kind !== "t1") return [];
+    for (const child of commentNodes) {
+      if (child.kind !== "t1") continue;
+      if (collectedComments.length >= maxComments) break;
+
       const comment = child.data;
-      return [comment, ...extractReplies(comment.replies)];
-    });
+      collectedComments.push(comment);
+      extractReplies(comment.replies, 1); // Depth 1 for replies to top-level
+    }
+
+    return collectedComments;
   } catch (error) {
     if (isRedditBlockedError(error)) {
       try {

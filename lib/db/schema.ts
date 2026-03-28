@@ -340,6 +340,30 @@ export const scraperRun = pgTable(
   ],
 );
 
+export const scraperPost = pgTable(
+  "scraper_post",
+  {
+    id: text().primaryKey().notNull(),
+    runId: text().notNull(),
+    postId: text().notNull(),
+    commentCount: integer().default(0).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.runId],
+      foreignColumns: [scraperRun.id],
+      name: "scraper_post_runId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    index("scraper_post_runId_idx").on(table.runId),
+    index("scraper_post_postId_idx").on(table.postId),
+  ],
+);
+
 export const redditAiIdempotency = pgTable(
   "reddit_ai_idempotency",
   {

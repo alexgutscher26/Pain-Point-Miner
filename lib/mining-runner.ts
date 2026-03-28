@@ -7,11 +7,11 @@ import {
   painPointComment,
   scraper,
   scraperRun,
+  scraperPost,
   user,
 } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import {
-  filterPostsByProblemPatterns,
   fetchComments,
   fetchSubredditPostsMultiSort,
   rankRedditPosts,
@@ -115,7 +115,20 @@ export async function executeMiningRun({
     maxPostsPerSubreddit ??
     (isAdvanced ? 350 : miningDepth === "deep" ? 250 : 120);
   const analyzeLimit =
-    processingLimit ?? (isAdvanced ? 20 : miningDepth === "deep" ? 10 : 3);
+    processingLimit ?? (isAdvanced ? 50 : miningDepth === "deep" ? 25 : 6);
+  
+  const commentOptions = (() => {
+    switch (miningDepth) {
+      case "basic":
+        return { maxDepth: 0, maxComments: 40 };
+      case "deep":
+        return { maxDepth: 1, maxComments: 100 };
+      case "advanced":
+        return { maxDepth: 10, maxComments: 300 };
+      default:
+        return { maxDepth: 0, maxComments: 20 };
+    }
+  })();
 
   try {
     const userRecord = await db.query.user.findFirst({
@@ -185,8 +198,7 @@ export async function executeMiningRun({
 
     const problemPatterns = resolveProblemPatterns(customPatterns);
     const fetchedPosts = dedupePosts(allPosts);
-    const rankedPosts = rankRedditPosts(fetchedPosts, keyword, problemPatterns);
-    allPosts = filterPostsByProblemPatterns(rankedPosts, problemPatterns);
+    allPosts = rankRedditPosts(fetchedPosts, keyword, problemPatterns);
 
     // Update phase: scanning → extracting
     const nowSeconds = Math.floor(Date.now() / 1_000);
@@ -219,7 +231,11 @@ export async function executeMiningRun({
       postsToAnalyze,
       async (post) => {
         try {
-          const comments = await fetchComments(post.id, post.subreddit);
+          const comments = await fetchComments(
+            post.id,
+            post.subreddit,
+            commentOptions,
+          );
           return {
             status: "fulfilled" as const,
             value: { postId: post.id, comments },
@@ -230,6 +246,22 @@ export async function executeMiningRun({
       },
       { concurrency: 5 },
     );
+
+    // Track every post analyzed in this run
+    if (postsToAnalyze.length > 0) {
+      const scraperPostsBatch = commentFetchResults
+        .filter((r) => r.status === "fulfilled")
+        .map((r) => ({
+          id: crypto.randomUUID(),
+          runId,
+          postId: r.value.postId,
+          commentCount: r.value.comments.length,
+        }));
+
+      if (scraperPostsBatch.length > 0) {
+        await db.insert(scraperPost).values(scraperPostsBatch);
+      }
+    }
 
     for (const result of commentFetchResults) {
       if (result.status !== "fulfilled") {

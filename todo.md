@@ -100,13 +100,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [x] Track which sort mode a post came from in `RedditPostWithMeta.sortMode` field
   - [x] _Acceptance:_ An `advanced` scan of r/SaaS returns posts from all 4 sort modes with no duplicates
 
-- [ ] **Comment Depth Control**
-  - [ ] `basic` → top-level comments only (depth 0), max 20 comments per post
-  - [ ] `deep` → top-level + first-level replies (depth 1), max 50 comments
-  - [ ] `advanced` → full recursive extraction (current behavior), max 200 comments
-  - [ ] Pass `maxDepth` and `maxComments` to `fetchComments()` based on mining depth
-  - [ ] Log comment count per post in `scraperPost.commentCount`
-  - [ ] _Acceptance:_ `basic` scan never fetches reply comments; `deep` fetches exactly one reply tier
+- [x] **Comment Depth Control**
+  - [x] `basic` → top-level comments only (depth 0), max 20 comments per post
+  - [x] `deep` → top-level + first-level replies (depth 1), max 50 comments
+  - [x] `advanced` → full recursive extraction (current behavior), max 200 comments
+  - [x] Pass `maxDepth` and `maxComments` to `fetchComments()` based on mining depth
+  - [x] Log comment count per post in `scraperPost.commentCount`
+  - [x] _Acceptance:_ `basic` scan never fetches reply comments; `deep` fetches exactly one reply tier
 
 - [ ] **Post Quality Pre-Filter**
   - [ ] Skip posts where `score < 2` AND `num_comments < 3` (for `basic` depth)

@@ -88,11 +88,11 @@ ${customPatterns.map((pattern, index) => `${index + 1}. ${pattern}`).join("\n")}
 Your job is to identify concrete user pain points, not to brainstorm startup ideas or inflate weak signals.
 
 Rules:
-- Be skeptical. Prefer under-scoring over over-scoring.
-- Use only evidence from the post and comments. Do not invent facts, budgets, or intent.
-- Focus on the underlying problem, not superficial feature requests.
-- Only extract pain points that appear actionable, recurring, or costly enough to matter.
-- If the thread is vague, off-topic, celebratory, or lacks a real problem, return an empty painPoints array.
+- Be a "greedy" researcher. Your primary goal is to find any friction, dissatisfaction, or frustration mentioned in the text.
+- Even if a problem seems small or currently unvalidated, extract it as an "emerging signal."
+- Prioritize high-volume threads, but don't ignore unique complaints that reveal niche unmet needs.
+- If a user mentions a struggle or a manual workaround, treat it as a SaaS opportunity.
+- Aim to always extract at least one pain point if the thread contains any non-zero friction.
 - Avoid duplicates. Merge overlapping complaints into one root pain point.
 - Write concise, plain-English titles and summaries.
 
