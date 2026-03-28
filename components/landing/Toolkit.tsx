@@ -182,11 +182,21 @@ export function Toolkit() {
         {/* Card 3: Sentiment Tracker */}
         <div className="group relative flex h-80 flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
           <div className="absolute right-8 bottom-8 left-8 flex h-24 items-end gap-[3px] transition-transform duration-500 group-hover:-translate-y-2">
-            {[3, 5, 4, 7, 5, 8, 4, 9, 7].map((h, i) => (
+            {[
+              { h: 3, id: "h1" },
+              { h: 5, id: "h2" },
+              { h: 4, id: "h3" },
+              { h: 7, id: "h4" },
+              { h: 5, id: "h5" },
+              { h: 8, id: "h6" },
+              { h: 4, id: "h7" },
+              { h: 9, id: "h8" },
+              { h: 7, id: "h9" },
+            ].map((bar) => (
               <div
-                key={`bar-${i}`}
+                key={bar.id}
                 className="flex-1 rounded-t-[2px] bg-red-500 opacity-20"
-                style={{ height: `${h * 10}%` }}
+                style={{ height: `${bar.h * 10}%` }}
               ></div>
             ))}
             <div className="absolute right-0 bottom-0 flex h-24 w-[40px] items-end gap-1">

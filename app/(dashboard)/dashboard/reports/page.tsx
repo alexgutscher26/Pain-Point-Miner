@@ -547,8 +547,8 @@ function ReportsTableSkeleton() {
         </tr>
       </thead>
       <tbody className="divide-y divide-white/5">
-        {Array.from({ length: 6 }).map((_, idx) => (
-          <tr key={`skeleton-row-${idx}`} className="group">
+        {["sk1", "sk2", "sk3", "sk4", "sk5", "sk6"].map((skId) => (
+          <tr key={skId} className="group">
             <td className="px-8 py-6">
               <div className="flex min-w-0 items-center gap-4">
                 <Skeleton className="skeleton-shimmer h-10 w-10 rounded-none border border-white/20 bg-[#ff4500]/8" />

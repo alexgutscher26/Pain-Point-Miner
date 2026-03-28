@@ -1127,9 +1127,9 @@ export default function ReportDetailPage() {
                         <div className="space-y-2">
                           {formatPainDescription(
                             pain.userLanguage.overview,
-                          ).map((paragraph, idx) => (
+                          ).map((paragraph) => (
                             <p
-                              key={`${pain.id}-overview-${idx}`}
+                              key={paragraph.slice(0, 100)}
                               className="text-sm leading-relaxed font-medium text-zinc-300"
                             >
                               {paragraph}
@@ -1138,28 +1138,26 @@ export default function ReportDetailPage() {
                         </div>
                       </div>
                     )}
-                    {pain.communityVoices.map((voice, i) => (
+                    {pain.communityVoices.map((voice) => (
                       <div
-                        key={i}
+                        key={voice.slice(0, 100)}
                         className="border border-l-4 border-white/20 border-l-[#ff4500] bg-white/2 p-6"
                       >
                         <div className="space-y-2">
-                          {formatPainDescription(voice).map(
-                            (paragraph, paragraphIdx) => (
-                              <p
-                                key={`${pain.id}-voice-${i}-${paragraphIdx}`}
-                                className="text-[14px] leading-relaxed font-medium text-zinc-300 italic"
-                              >
-                                {paragraph}
-                              </p>
-                            ),
-                          )}
+                          {formatPainDescription(voice).map((paragraph) => (
+                            <p
+                              key={paragraph.slice(0, 100)}
+                              className="text-[14px] leading-relaxed font-medium text-zinc-300 italic"
+                            >
+                              {paragraph}
+                            </p>
+                          ))}
                         </div>
                       </div>
                     ))}
-                    {pain.userLanguage?.sections?.map((section, sectionIdx) => (
+                    {pain.userLanguage?.sections?.map((section) => (
                       <div
-                        key={`${pain.id}-lang-${sectionIdx}`}
+                        key={`${pain.id}-lang-${section.label}`}
                         className="space-y-3 border border-white/20 bg-white/2 p-6"
                       >
                         <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
@@ -1167,9 +1165,9 @@ export default function ReportDetailPage() {
                         </p>
                         <div className="space-y-2">
                           {formatPainDescription(section.summary).map(
-                            (paragraph, idx) => (
+                            (paragraph) => (
                               <p
-                                key={`${pain.id}-lang-${sectionIdx}-summary-${idx}`}
+                                key={paragraph.slice(0, 100)}
                                 className="text-xs leading-relaxed font-medium text-zinc-500"
                               >
                                 {paragraph}
@@ -1178,15 +1176,12 @@ export default function ReportDetailPage() {
                           )}
                         </div>
                         <div className="space-y-2">
-                          {section.examples.map((example, exampleIdx) => (
-                            <div
-                              key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}`}
-                              className="space-y-1"
-                            >
+                          {section.examples.map((example) => (
+                            <div key={example.slice(0, 100)} className="space-y-1">
                               {formatPainDescription(example).map(
                                 (paragraph, paragraphIdx) => (
                                   <p
-                                    key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}-${paragraphIdx}`}
+                                    key={paragraph.slice(0, 100)}
                                     className="text-sm leading-relaxed font-medium text-zinc-300"
                                   >
                                     {paragraphIdx === 0
@@ -1213,9 +1208,9 @@ export default function ReportDetailPage() {
                         <div className="space-y-2">
                           {pain.triedSolutions &&
                           pain.triedSolutions.length > 0 ? (
-                            pain.triedSolutions.map((sol, i) => (
+                            pain.triedSolutions.map((sol) => (
                               <div
-                                key={i}
+                                key={sol}
                                 className="flex items-center gap-3 font-medium text-zinc-400"
                               >
                                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30"></div>
@@ -1234,9 +1229,9 @@ export default function ReportDetailPage() {
                           <Lightbulb className="h-4 w-4" /> Suggested Angles
                         </p>
                         <div className="space-y-2">
-                          {pain.angles.map((angle, i) => (
+                          {pain.angles.map((angle) => (
                             <div
-                              key={i}
+                              key={angle}
                               className="flex items-center gap-3 font-medium text-zinc-400"
                             >
                               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/30"></div>
@@ -1420,9 +1415,9 @@ export default function ReportDetailPage() {
                   SaaS Opportunities
                 </h4>
                 <div className="space-y-4">
-                  {reportData.saasOpportunities.slice(0, 3).map((opp, idx) => (
+                  {reportData.saasOpportunities.slice(0, 3).map((opp) => (
                     <div
-                      key={idx}
+                      key={opp.title}
                       className="space-y-3 border border-white/20 bg-white/2 p-5"
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -1435,9 +1430,9 @@ export default function ReportDetailPage() {
                       </div>
                       <div className="space-y-2">
                         {formatPainDescription(opp.problemStatement).map(
-                          (paragraph, pIdx) => (
+                          (paragraph) => (
                             <p
-                              key={`opp-${idx}-p-stmt-${pIdx}`}
+                              key={paragraph.slice(0, 100)}
                               className="text-xs leading-relaxed font-medium text-zinc-400"
                             >
                               {paragraph}
@@ -1450,9 +1445,9 @@ export default function ReportDetailPage() {
                       </p>
                       <div className="space-y-2">
                         {formatPainDescription(opp.valueProposition).map(
-                          (paragraph, pIdx) => (
+                          (paragraph) => (
                             <p
-                              key={`opp-${idx}-v-prop-${pIdx}`}
+                              key={paragraph.slice(0, 100)}
                               className="text-xs leading-relaxed font-medium text-zinc-300"
                             >
                               {paragraph}
@@ -1462,9 +1457,9 @@ export default function ReportDetailPage() {
                       </div>
                       <div className="space-y-2">
                         {formatPainDescription(opp.launchAngle).map(
-                          (paragraph, pIdx) => (
+                          (paragraph) => (
                             <p
-                              key={`opp-${idx}-l-angle-${pIdx}`}
+                              key={paragraph.slice(0, 100)}
                               className="text-[11px] leading-relaxed font-bold text-zinc-500"
                             >
                               {paragraph}
