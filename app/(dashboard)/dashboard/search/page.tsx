@@ -63,6 +63,7 @@ type BillingEntitlementsResponse = {
     canSaveReports: boolean;
     hasTrendDetection: boolean;
     hasSaasOpportunities: boolean;
+    hasCustomPatterns: boolean;
   };
   usage: {
     monthlyScansUsed: number;
@@ -164,6 +165,9 @@ export default function SearchPage() {
     (billing?.usage.monthlyScansUsed ?? 0) +
       MINING_PRESETS[miningDepth].estimatedCredits >
       (billing?.usage.monthlyScansLimit ?? 0);
+
+  const hasCustomPatternsEntitlement =
+    billing?.entitlements.hasCustomPatterns ?? false;
 
   useEffect(() => {
     try {
@@ -597,27 +601,64 @@ export default function SearchPage() {
               </p>
             </div>
 
-            {/* Custom Extraction Parameters */}
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                Custom Intelligence Patterns{" "}
-                <span className="font-mono text-[9px] text-zinc-600">
-                  (Optional)
-                </span>
-              </label>
+            <div className={`space-y-3 transition-opacity duration-300 ${!hasCustomPatternsEntitlement && "opacity-75"}`}>
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                  Custom Intelligence Patterns{" "}
+                  <span className="font-mono text-[9px] text-zinc-600">
+                    (Optional)
+                  </span>
+                </label>
+                {!hasCustomPatternsEntitlement && (
+                  <Link
+                    href="/dashboard/billing"
+                    className="flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-widest text-amber-500 hover:text-amber-400 transition-colors"
+                  >
+                    <Lock className="w-3 h-3" />
+                    Pro Only
+                  </Link>
+                )}
+              </div>
               <div className="relative group">
                 <input
                   type="text"
                   value={customPatterns}
                   onChange={(e) => setCustomPatterns(e.target.value)}
-                  placeholder="e.g. mentions of HubSpot, frustration with pricing, legal compliance, developer experience"
-                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-amber-400/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
+                  disabled={!hasCustomPatternsEntitlement}
+                  placeholder={
+                    hasCustomPatternsEntitlement
+                      ? "e.g. mentions of HubSpot, frustration with pricing, legal compliance"
+                      : "Upgrade to Pro to unlock custom signals"
+                  }
+                  className={`w-full relative z-10 bg-[#0c0c0c] border-2 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] ${
+                    hasCustomPatternsEntitlement
+                      ? "border-white/15 focus:border-amber-400/70 placeholder:text-zinc-700"
+                      : "border-amber-500/20 cursor-not-allowed placeholder:text-zinc-800"
+                  }`}
                 />
-                <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500/60 z-20 pointer-events-none" />
+                <Sparkles 
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-20 pointer-events-none transition-colors ${
+                    hasCustomPatternsEntitlement ? "text-amber-500/60" : "text-zinc-800"
+                  }`} 
+                />
+                
+                {!hasCustomPatternsEntitlement && (
+                  <div 
+                    className="absolute inset-x-0 -bottom-2 flex justify-center z-20 pointer-events-none"
+                    aria-hidden="true"
+                  >
+                    <div className="bg-[#111] border border-amber-500/30 px-3 py-1 shadow-xl">
+                      <p className="font-mono text-[8px] font-black uppercase tracking-tighter text-amber-500/80">
+                        Restricted Parameter
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
               <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                Comma-separated signals you want the AI to specifically hunt
-                for.
+                {hasCustomPatternsEntitlement 
+                  ? "Comma-separated signals you want the AI to specifically hunt for."
+                  : "Precision targeting for niche problems is a Pro-tier exclusive."}
               </p>
             </div>
 

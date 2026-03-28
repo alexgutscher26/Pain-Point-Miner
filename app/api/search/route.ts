@@ -7,12 +7,8 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
-  getMonthlyScanUsage,
-  getPlanEntitlements,
-  isDepthAllowed,
-  calculateMiningCost,
-  MINING_PRESETS,
-} from "@/lib/plan-gating";
+import { getMonthlyScanUsage, getPlanEntitlements, isDepthAllowed, calculateMiningCost } from "@/lib/plan-gating";
+import { MINING_PRESETS } from "@/lib/mining-presets";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
 
@@ -310,7 +306,7 @@ export async function POST(req: Request) {
       .filter(Boolean);
 
     const preset = MINING_PRESETS[miningDepth];
-    const depthLimit = preset.subreddits;
+    const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
     const planLimit = entitlements.maxSubredditsPerSearch ?? depthLimit;
 
     if (rawSubreddits.length > planLimit) {
@@ -372,6 +368,19 @@ export async function POST(req: Request) {
     const patterns = customPatterns
       .map((pattern) => pattern.trim())
       .filter(Boolean);
+
+    if (patterns.length > 0 && !entitlements.hasCustomPatterns) {
+      return apiError(
+        403,
+        "PLAN_UPGRADE_REQUIRED",
+        `Your ${plan} plan does not include custom intelligence patterns. Upgrade to Pro to unlock this feature.`,
+        {
+          plan,
+          hasCustomPatterns: false,
+        },
+        correlationId,
+      );
+    }
 
     /**
      * Execute a search operation for scraping data.

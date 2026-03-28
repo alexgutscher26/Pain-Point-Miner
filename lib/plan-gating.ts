@@ -4,6 +4,9 @@ import { db } from "@/lib/db";
 import { scraper, scraperRun } from "@/lib/db/schema";
 import { MINING_PRESETS, type MiningDepth } from "./mining-presets";
 
+export { MINING_PRESETS };
+export type { MiningDepth };
+
 export type BillingPlan = "starter" | "growth" | "pro";
 
 export type PlanEntitlements = {
@@ -13,6 +16,7 @@ export type PlanEntitlements = {
   canSaveReports: boolean;
   hasTrendDetection: boolean;
   hasSaasOpportunities: boolean;
+  hasCustomPatterns: boolean;
 };
 
 export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
@@ -23,6 +27,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     canSaveReports: false,
     hasTrendDetection: false,
     hasSaasOpportunities: false,
+    hasCustomPatterns: false,
   },
   growth: {
     monthlyScans: 50,
@@ -31,6 +36,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     canSaveReports: true,
     hasTrendDetection: false,
     hasSaasOpportunities: false,
+    hasCustomPatterns: false,
   },
   pro: {
     monthlyScans: null,
@@ -39,6 +45,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     canSaveReports: true,
     hasTrendDetection: true,
     hasSaasOpportunities: true,
+    hasCustomPatterns: true,
   },
 };
 

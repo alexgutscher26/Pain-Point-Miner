@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
-import { redditRateLimitLog, scraperRun } from "@/lib/db/schema";
+import { redditRateLimitLog, scraperRun, scraper } from "@/lib/db/schema";
 import { eq, sql, and, gte, desc } from "drizzle-orm";
 
 export async function getScraperHealthStats(userId: string) {
@@ -19,9 +20,9 @@ export async function getScraperHealthStats(userId: string) {
     .orderBy(desc(sql`count(*)`));
 
   const subHealth = subredditStats
-    .filter((s) => s.subreddit)
-    .map((s) => ({
-      subreddit: s.subreddit!,
+    .filter((s: any) => s.subreddit)
+    .map((s: any) => ({
+      subreddit: s.subreddit as string,
       successRate: Math.round(((s.total - s.errors) / s.total) * 100),
       totalRequests: s.total,
     }));
@@ -35,15 +36,12 @@ export async function getScraperHealthStats(userId: string) {
       status: scraperRun.status,
     })
     .from(scraperRun)
-    .innerJoin(
-      db.select({ id: sql`id`, userId: sql`userId` }).from(sql`scraper`).as("s"),
-      eq(scraperRun.scraperId, sql`s.id`)
-    )
-    .where(and(eq(sql`s.userId`, userId), gte(scraperRun.startedAt, sevenDaysAgo)));
+    .innerJoin(scraper, eq(scraperRun.scraperId, scraper.id))
+    .where(and(eq(scraper.userId, userId), gte(scraperRun.startedAt, sevenDaysAgo)));
 
-  const completedRuns = runs.filter((r) => r.status === "completed");
+  const completedRuns = runs.filter((r: any) => r.status === "completed");
   const avgPostsPerScan = completedRuns.length > 0
-    ? Math.round(completedRuns.reduce((acc, r) => acc + (r.postsFetched || 0), 0) / completedRuns.length)
+    ? Math.round(completedRuns.reduce((acc: number, r: any) => acc + (r.postsFetched || 0), 0) / completedRuns.length)
     : 0;
 
   // 3. 7-Day Trend Chart
@@ -53,9 +51,9 @@ export async function getScraperHealthStats(userId: string) {
     d.setDate(d.getDate() - (6 - i));
     const dateStr = d.toISOString().split("T")[0];
     
-    const dayRuns = runs.filter(r => r.startedAt.toISOString().split("T")[0] === dateStr);
-    const daySuccess = dayRuns.filter(r => r.status === "completed").length;
-    const dayDiscovery = dayRuns.reduce((acc, r) => acc + (r.newPainPoints || 0), 0);
+    const dayRuns = runs.filter((r: any) => r.startedAt.toISOString().split("T")[0] === dateStr);
+    const daySuccess = dayRuns.filter((r: any) => r.status === "completed").length;
+    const dayDiscovery = dayRuns.reduce((acc: number, r: any) => acc + (r.newPainPoints || 0), 0);
 
     return {
       date: dateStr,

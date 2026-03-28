@@ -72,7 +72,17 @@ export function ScraperHealthDashboard() {
     );
   }
 
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <div className="bg-[#111] border-2 border-white/10 p-12 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <Activity className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+        <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight">No Health Data Available</h3>
+        <p className="text-zinc-500 font-mono text-xs max-w-sm mx-auto uppercase tracking-widest">
+          Initiate your first investigation to begin tracking operational metrics.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 pb-12">
