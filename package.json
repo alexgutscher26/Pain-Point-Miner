@@ -38,6 +38,7 @@
     "react": "19.2.4",
     "react-day-picker": "^9.14.0",
     "react-dom": "19.2.4",
+    "react-is": "^19.2.4",
     "react-query": "^3.39.3",
     "react-resizable-panels": "4.7.6",
     "recharts": "3.8.1",
