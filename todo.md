@@ -490,6 +490,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Monthly `ANALYZE` on key tables to keep query planner statistics fresh
   - [ ] _Acceptance:_ `findSimilarPainPoints()` returns results in < 50ms for a corpus of 10,000 embeddings
 
+- [ ] **Pinecone.io Integration (Vector Scaling)**
+  - [ ] Migrate vector similarity search from local PGVector to dedicated Pinecone infrastructure
+  - [ ] Implement `upsert` logic in `lib/embeddings.ts` alongside Postgres primary storage
+  - [ ] Leverage Pinecone metadata filtering for millisecond-latency search across multiple environments
+  - [ ] Support hybrid search (keyword + semantic) natively via Pinecone's vector engine
+  - [ ] _Acceptance:_ Latency for top-K similar pain point queries remains < 50ms even with 1M+ embeddings
+
 ---
 
 ## 💰 PHASE 5 — Revenue & Growth

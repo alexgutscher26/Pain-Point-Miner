@@ -40,7 +40,7 @@ const softwareApplicationJsonLd = {
 export const metadata: Metadata = {
   title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
   description:
-    "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build. Turn Reddit threads into high-growth SaaS tools.",
+    "ThreddIQ uses AI to mine Reddit for urgent customer pain points. Validate software ideas before you build and turn Reddit threads into high-growth SaaS tools.",
   keywords: [
     ...siteConfig.keywords,
     "software validation",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
     description:
-      "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build.",
+      "ThreddIQ uses AI to mine Reddit for urgent customer pain points, validating software ideas before you build.",
     url: siteUrl,
     images: [
       {
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ThreddIQ | Reddit Pain Point Mining & SaaS Validation",
     description:
-      "ThreddIQ uses AI to mine Reddit conversations for urgent customer pain points, validatng software ideas before you build.",
+      "ThreddIQ uses AI to mine Reddit for urgent customer pain points, validating software ideas before you build.",
     images: [`${siteUrl}/og-image.png`],
   },
 };
