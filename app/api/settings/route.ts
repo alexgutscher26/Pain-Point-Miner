@@ -232,7 +232,7 @@ export async function PATCH(req: Request) {
       console.error("[Settings API] Background re-score trigger failed:", err),
     );
 
-    revalidateTag("dashboard");
+    revalidateTag("dashboard", "max");
 
     return apiJson(payload, 200, correlationId);
   } catch (error) {
