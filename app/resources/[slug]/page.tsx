@@ -176,9 +176,9 @@ export default async function ResourcePage({
           </div>
 
           <div className="grid gap-16">
-            {res.content.map((item, i) => (
+            {res.content.map((item) => (
               <section
-                key={i}
+                key={item.heading}
                 className="border-t border-white/5 pt-12 first:border-0 first:pt-0"
               >
                 <h2 className="mb-6 text-2xl font-bold text-white md:text-3xl">

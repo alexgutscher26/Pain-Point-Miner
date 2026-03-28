@@ -226,8 +226,8 @@ export default async function FreeToolPage({
                   "Filter by specific sentiment markers (e.g. 'I hate that...').",
                   "Export your research as high-quality validation data.",
                   "Use it for programmatic SEO and market targeting.",
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-4">
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-4">
                     <Zap className="mt-0.5 h-6 w-6 shrink-0 text-[#ff4500]" />
                     <span className="text-lg font-bold text-zinc-300">
                       {feature}

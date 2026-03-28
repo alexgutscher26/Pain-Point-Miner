@@ -168,9 +168,9 @@ export default async function FeaturePage({
               {feature.details}
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {feature.benefits.map((benefit, i) => (
+              {feature.benefits.map((benefit) => (
                 <div
-                  key={i}
+                  key={benefit}
                   className="flex items-center gap-3 font-bold text-zinc-200"
                 >
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />

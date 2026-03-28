@@ -110,9 +110,9 @@ export default function DocsPage() {
           </header>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {docSections.map((section, i) => (
+            {docSections.map((section) => (
               <div
-                key={i}
+                key={section.title}
                 className="group relative flex flex-col items-start overflow-hidden rounded-[32px] border border-white/5 bg-[#0f0f0f] p-8 shadow-2xl backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/2"
               >
                 <div className="mb-8 flex items-center gap-4">
@@ -125,8 +125,8 @@ export default function DocsPage() {
                 </div>
 
                 <ul className="w-full flex-1 space-y-4">
-                  {section.items.map((item, j) => (
-                    <li key={j} className="group/item">
+                  {section.items.map((item) => (
+                    <li key={item} className="group/item">
                       <Link
                         href="#"
                         className="group/link flex items-center justify-between rounded-xl border border-transparent p-3 transition-colors hover:border-white/5 hover:bg-white/5"
