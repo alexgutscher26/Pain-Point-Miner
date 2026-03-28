@@ -773,6 +773,19 @@ export default function ReportDetailPage() {
             <Filter className="w-3.5 h-3.5 text-amber-400" />
             Window: {reportData.timeWindowLabel ?? "Last 90d"}
           </div>
+          {reportData.customPatterns && reportData.customPatterns.length > 0 && (
+            <div className="flex items-start gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-1">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+              <div className="flex flex-wrap gap-1.5">
+                <span>Patterns:</span>
+                {reportData.customPatterns.map((p, i) => (
+                  <span key={i} className="text-emerald-300 font-black">
+                    "{p}"{i < (reportData.customPatterns?.length ?? 0) - 1 ? "," : ""}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           {reportData.trend && (
             <div className="pt-3">
               <span

@@ -25,6 +25,7 @@ type StreamEvent = {
   status: RunStatus;
   subreddits: string[];
   timeWindow: string;
+  customPatterns: string[];
   throttleWarnings: string[];
 };
 
@@ -154,6 +155,7 @@ export async function GET(req: Request) {
             status: phase,
             subreddits,
             timeWindow,
+            customPatterns: scraperRecord.customPatterns ?? [],
             throttleWarnings: (latestRun?.throttleWarnings as string[]) ?? [],
           };
 

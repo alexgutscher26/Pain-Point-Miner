@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { scraper } from "@/lib/db/schema";
 import { executeMiningRun } from "@/lib/mining-runner";
 import { isScraperDue, parsePositiveIntFromEnv } from "@/lib/scheduler";
-import type { MiningDepth } from "@/lib/mining-runner";
+import type { MiningDepth } from "@/lib/mining-presets";
 import { normalizeTimeWindow } from "@/lib/time-window";
 
 const querySchema = z.object({

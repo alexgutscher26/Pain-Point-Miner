@@ -30,6 +30,7 @@ export default function AnalysisPage() {
     postsFetched,
     subreddits,
     timeWindow,
+    customPatterns,
     throttleWarnings,
     isDone,
     hasFailed,
@@ -258,22 +259,42 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      {/* Pro Tip */}
-      <div className="mt-8 w-full max-w-2xl bg-[#ff4500]/5 border-2 border-[#ff4500]/25 p-6 flex gap-4 items-start relative overflow-hidden">
-        <div className="p-2 bg-[#ff4500]/10 border border-[#ff4500]/35 text-[#ff4500] relative z-10">
-          <Sparkles className="w-5 h-5" />
-        </div>
-        <div className="relative z-10">
-          <p className="font-mono text-[10px] font-black text-[#ff4500] uppercase tracking-widest mb-1.5 flex items-center gap-2">
-            Intelligence Protocol Active
-          </p>
-          <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
-            Our engine is specifically hunting for{" "}
-            <span className="text-zinc-200">Pain Intensity</span>,{" "}
-            <span className="text-zinc-200">Budgets</span>, and{" "}
-            <span className="text-zinc-200">Switching Costs</span>. We ignore
-            generic comments to find high-conviction market gaps.
-          </p>
+      {/* Pro Tip & Active Signals */}
+      <div className="mt-8 w-full max-w-2xl flex flex-col gap-4">
+        {customPatterns.length > 0 && (
+          <div className="bg-amber-500/5 border-2 border-amber-500/25 p-6 relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="font-mono text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                Active Custom Intelligence Signals
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {customPatterns.map((pattern, idx) => (
+                  <div key={idx} className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-xs font-mono font-bold text-amber-400">
+                    {pattern}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-[#ff4500]/5 border-2 border-[#ff4500]/25 p-6 flex gap-4 items-start relative overflow-hidden">
+          <div className="p-2 bg-[#ff4500]/10 border border-[#ff4500]/35 text-[#ff4500] relative z-10">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div className="relative z-10">
+            <p className="font-mono text-[10px] font-black text-[#ff4500] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+              Intelligence Protocol Active
+            </p>
+            <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
+              Our engine is specifically hunting for{" "}
+              <span className="text-zinc-200">Pain Intensity</span>,{" "}
+              <span className="text-zinc-200">Budgets</span>, and{" "}
+              <span className="text-zinc-200">Switching Costs</span>. We ignore
+              generic comments to find high-conviction market gaps.
+            </p>
+          </div>
         </div>
       </div>
     </div>
