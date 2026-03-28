@@ -13,6 +13,7 @@ import {
   Loader2,
   Lock,
   Database,
+  HelpCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
@@ -719,13 +720,28 @@ export default function SearchPage() {
                 })}
               </div>
               {billing ? (
-                <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                  Plan: {billing.plan.toUpperCase()} | Credit usage:{" "}
-                  {billing.usage.monthlyScansUsed.toFixed(1)}
-                  {billing.usage.monthlyScansLimit === null
-                    ? "/Unlimited"
-                    : `/${billing.usage.monthlyScansLimit.toFixed(1)}`}
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+                  <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                    Plan: {billing.plan.toUpperCase()} | Monthly Credit Pool:{" "}
+                    {billing.usage.monthlyScansUsed.toFixed(1)}
+                    {billing.usage.monthlyScansLimit === null
+                      ? "/Unlimited"
+                      : `/${billing.usage.monthlyScansLimit.toFixed(1)}`}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanDialogMessage(
+                        "Credits (CR) represent the resource intensity of a scan. Basic = 0.5 CR, Deep = 2 CR, Advanced = 5 CR. Your monthly plan gives you a fixed pool of credits that reset every 30 days. No hidden fees, just value-based mining."
+                      );
+                      setPlanDialogOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8a57] transition-colors"
+                  >
+                    <HelpCircle className="w-3 h-3" />
+                    How do credits work?
+                  </button>
+                </div>
               ) : null}
             </div>
 

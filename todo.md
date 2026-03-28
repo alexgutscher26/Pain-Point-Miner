@@ -124,13 +124,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [x] Cache suggestions for 24h per keyword to avoid redundant Reddit API calls
   - [x] _Acceptance:_ Typing "email marketing" into the search form suggests r/emailmarketing, r/Entrepreneur, r/SaaS within 500ms
 
-- [ ] **Mining Depth Presets**
-  - [ ] Define 3 standard presets with cost estimates shown before scan
-  - [ ] `basic`: 3 subreddits, `relevance` only, depth 0 comments — ~0.5 credits
-  - [ ] `deep`: 5 subreddits, 2 sort modes, depth 1 comments — ~2 credits
-  - [ ] `advanced`: 10 subreddits, 4 sort modes, full recursive comments — ~5 credits
-  - [ ] Show "Estimated cost: 2 credits" in the search form before user submits
-  - [ ] _Acceptance:_ Pre-scan cost estimate matches actual credit deduction ±10%
+- [x] **Mining Depth Presets**
+  - [x] Define 3 standard presets with cost estimates shown before scan
+  - [x] `basic`: 3 subreddits, `relevance` only, depth 0 comments — ~0.5 credits
+  - [x] `deep`: 5 subreddits, 2 sort modes, depth 1 comments — ~2 credits
+  - [x] `advanced`: 10 subreddits, 4 sort modes, full recursive comments — ~5 credits
+  - [x] Show "Estimated cost: 2 credits" in the search form before user submits
+  - [x] _Acceptance:_ Pre-scan cost estimate matches actual credit deduction ±10%
 
 ### ⬜ Planned (Future)
 
