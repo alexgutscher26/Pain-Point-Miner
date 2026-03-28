@@ -1,0 +1,33 @@
+version = 1
+
+# RPP DeepSource Configuration
+# Focus: Next.js + TypeScript
+
+exclude_patterns = [
+  ".next/**",
+  "node_modules/**",
+  "dist/**",
+  "out/**",
+  ".git/**",
+  ".claude/**",
+  ".agent/**",
+  ".agents/**",
+  ".lighthouseci/**",
+  ".vscode/**"
+]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  plugins = ["react"]
+  environment = ["browser", "node"]
+
+[[analyzers]]
+name = "secrets"
+enabled = true
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true
