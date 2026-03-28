@@ -1,0 +1,58 @@
+export type MiningDepth = "basic" | "deep" | "advanced";
+
+export const MINING_PRESETS: Record<
+  MiningDepth,
+  {
+    name: string;
+    subreddits: number;
+    sortModes: number;
+    maxDepth: number;
+    maxComments: number;
+    postsPerSub: number;
+    analyzeLimit: number;
+    estimatedCredits: number;
+    description: string;
+    timeEstimate: string;
+  }
+> = {
+  basic: {
+    name: "Basic Scan",
+    subreddits: 3,
+    sortModes: 1,
+    maxDepth: 0,
+    maxComments: 40,
+    postsPerSub: 120,
+    analyzeLimit: 6,
+    estimatedCredits: 0.5,
+    description: "Surface-level discovery. Top threads, no comments.",
+    timeEstimate: "~3-5 mins",
+  },
+  deep: {
+    name: "Deep Mine",
+    subreddits: 5,
+    sortModes: 2,
+    maxDepth: 1,
+    maxComments: 100,
+    postsPerSub: 250,
+    analyzeLimit: 25,
+    estimatedCredits: 2,
+    description: "Complete context extraction. Top posts + main comments.",
+    timeEstimate: "~10-15 mins",
+  },
+  advanced: {
+    name: "Advanced Clustering",
+    subreddits: 10,
+    sortModes: 4,
+    maxDepth: 10,
+    maxComments: 300,
+    postsPerSub: 400,
+    analyzeLimit: 50,
+    estimatedCredits: 5,
+    description: "Deep recursive mining. Full thread analysis + clustering.",
+    timeEstimate: "~30+ mins",
+  },
+};
+
+export function calculateMiningCost(depth: MiningDepth): number {
+  return MINING_PRESETS[depth]?.estimatedCredits ?? 1;
+}

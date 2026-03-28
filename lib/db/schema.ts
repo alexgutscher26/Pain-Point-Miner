@@ -282,6 +282,7 @@ export const scraper = pgTable(
     reportSavedAt: timestamp({ precision: 3, mode: "date" }),
     workspaceId: text(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
+    cost: doublePrecision().default(1.0).notNull(),
   },
   (table) => [
     foreignKey({
@@ -325,6 +326,7 @@ export const scraperRun = pgTable(
       .array()
       .default(sql`'{}'::text[]`),
     postsSkipped: integer().default(0).notNull(),
+    cost: doublePrecision().default(0.0).notNull(),
   },
   (table) => [
     foreignKey({

@@ -7,10 +7,11 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
-import {
   getMonthlyScanUsage,
   getPlanEntitlements,
   isDepthAllowed,
+  calculateMiningCost,
+  MINING_PRESETS,
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
@@ -308,7 +309,8 @@ export async function POST(req: Request) {
       .map((sub) => sub.trim())
       .filter(Boolean);
 
-    const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
+    const preset = MINING_PRESETS[miningDepth];
+    const depthLimit = preset.subreddits;
     const planLimit = entitlements.maxSubredditsPerSearch ?? depthLimit;
 
     if (rawSubreddits.length > planLimit) {
@@ -455,7 +457,10 @@ export async function POST(req: Request) {
           userId,
           workspaceId,
           updatedAt: new Date(),
+          cost: calculateMiningCost(miningDepth),
         });
+
+        const presetConfig = MINING_PRESETS[miningDepth];
 
         void executeMiningRun({
           scraperId,
@@ -467,9 +472,9 @@ export async function POST(req: Request) {
           userId,
           workspaceId,
           maxPostsPerSubreddit:
-            miningDepth === "advanced" ? 40 : miningDepth === "deep" ? 25 : 15,
+            miningDepth === "advanced" ? 400 : miningDepth === "deep" ? 250 : 120, // Keep these high for actual results
           processingLimit:
-            miningDepth === "advanced" ? 20 : miningDepth === "deep" ? 10 : 3,
+            miningDepth === "advanced" ? 50 : miningDepth === "deep" ? 25 : 6,
         }).catch((error) => {
           console.error(
             `Async mining run failed for scraper ${scraperId}:`,

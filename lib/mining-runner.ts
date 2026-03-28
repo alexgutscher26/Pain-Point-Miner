@@ -19,6 +19,7 @@ import {
   isSubredditThrottled,
   type RedditPost,
 } from "@/lib/reddit";
+import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
 import { clusterPainPoint } from "@/lib/clustering";
 import { claimRedditPostForAiProcessing } from "@/lib/reddit-idempotency";
 import {
@@ -26,8 +27,6 @@ import {
   getTimeWindowAgeSeconds,
   type TimeWindow,
 } from "@/lib/time-window";
-
-export type MiningDepth = "basic" | "deep" | "advanced";
 
 type ExecuteMiningRunInput = {
   scraperId: string;
@@ -108,27 +107,16 @@ export async function executeMiningRun({
 }: ExecuteMiningRunInput): Promise<ExecuteMiningRunResult> {
   const runId = crypto.randomUUID();
   const startTime = new Date();
-  const isAdvanced = miningDepth === "advanced";
-  const subLimit =
-    maxSubreddits ?? (isAdvanced ? 15 : miningDepth === "deep" ? 10 : 5);
-  const postsPerSub =
-    maxPostsPerSubreddit ??
-    (isAdvanced ? 350 : miningDepth === "deep" ? 250 : 120);
-  const analyzeLimit =
-    processingLimit ?? (isAdvanced ? 50 : miningDepth === "deep" ? 25 : 6);
-  
-  const commentOptions = (() => {
-    switch (miningDepth) {
-      case "basic":
-        return { maxDepth: 0, maxComments: 40 };
-      case "deep":
-        return { maxDepth: 1, maxComments: 100 };
-      case "advanced":
-        return { maxDepth: 10, maxComments: 300 };
-      default:
-        return { maxDepth: 0, maxComments: 20 };
-    }
-  })();
+  const preset = MINING_PRESETS[miningDepth];
+
+  const subLimit = maxSubreddits ?? preset.subreddits;
+  const postsPerSub = maxPostsPerSubreddit ?? preset.postsPerSub;
+  const analyzeLimit = processingLimit ?? preset.analyzeLimit;
+
+  const commentOptions = {
+    maxDepth: preset.maxDepth,
+    maxComments: preset.maxComments,
+  };
 
   try {
     const userRecord = await db.query.user.findFirst({
@@ -147,6 +135,7 @@ export async function executeMiningRun({
       postsMatched: 0,
       commentsFetched: 0,
       newPainPoints: 0,
+      cost: preset.estimatedCredits,
     });
 
     let allPosts: RedditPost[] = [];

@@ -12,8 +12,10 @@ import {
   Sparkles,
   Loader2,
   Lock,
+  Database,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
 import {
   Dialog,
   DialogContent,
@@ -46,7 +48,6 @@ type SubredditSuggestion = {
   activeUsers?: number;
 };
 
-type MiningDepth = SearchDraft["miningDepth"];
 type BillingEntitlementsResponse = {
   plan: "starter" | "growth" | "pro";
   hasActiveSubscription: boolean;
@@ -159,7 +160,8 @@ export default function SearchPage() {
   const trialEnded = billing?.planPurchaseRequired ?? false;
   const isAtScanLimit =
     billing?.usage.monthlyScansLimit !== null &&
-    (billing?.usage.monthlyScansUsed ?? 0) >=
+    (billing?.usage.monthlyScansUsed ?? 0) +
+      MINING_PRESETS[miningDepth].estimatedCredits >
       (billing?.usage.monthlyScansLimit ?? 0);
 
   useEffect(() => {
@@ -589,8 +591,8 @@ export default function SearchPage() {
               </div>
 
               <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                Leave blank to use your default locale and subreddit count from
-                settings.
+                Max {MINING_PRESETS[miningDepth].subreddits} subreddits for {MINING_PRESETS[miningDepth].name}.
+                Separate multiple with commas.
               </p>
             </div>
 
@@ -618,149 +620,111 @@ export default function SearchPage() {
               </p>
             </div>
 
-            {/* Mining Depth Selection */}
             <div className="space-y-4">
               <label className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
-                Mining Depth
+                Expert Discovery Presets
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setMiningDepth("basic")}
-                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group ${
-                    miningDepth === "basic"
-                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
-                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
-                  }`}
-                >
-                  <div
-                    className={`p-3 border ${miningDepth === "basic" ? "bg-[#ff4500] border-[#ff8a57] text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
-                  >
-                    <Zap className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p
-                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "basic" ? "text-white" : "text-zinc-400"}`}
-                    >
-                      Basic Scan
-                    </p>
-                    <p className="text-zinc-500 text-[11px] font-bold">
-                      Last 3 months, top 100 threads
-                    </p>
-                  </div>
-                  <div
-                    className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${miningDepth === "basic" ? "border-[#ff4500]" : "border-zinc-800"}`}
-                  >
-                    {miningDepth === "basic" && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
-                    )}
-                  </div>
-                </button>
+                {(["basic", "deep", "advanced"] as const).map((depth) => {
+                  const preset = MINING_PRESETS[depth];
+                  const isAllowed = billing
+                    ? billing.entitlements.allowedMiningDepths.includes(depth)
+                    : true;
+                  const isActive = miningDepth === depth;
 
-                <button
-                  onClick={() => setMiningDepth("deep")}
-                  disabled={
-                    billing
-                      ? !billing.entitlements.allowedMiningDepths.includes(
-                          "deep",
-                        )
-                      : false
-                  }
-                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
-                    miningDepth === "deep"
-                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
-                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
-                  }`}
-                >
-                  <div
-                    className={`p-3 border ${miningDepth === "deep" ? "bg-amber-500 border-amber-300 text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
-                  >
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p
-                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "deep" ? "text-white" : "text-zinc-400"}`}
+                  return (
+                    <button
+                      key={depth}
+                      onClick={() => setMiningDepth(depth)}
+                      disabled={!isAllowed}
+                      className={`relative p-6 border-2 transition-all text-left flex flex-col gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
+                        isActive
+                          ? "bg-[#ff4500]/10 border-[#ff4500]/70 shadow-[4px_4px_0px_0px_rgba(255,69,0,0.3)]"
+                          : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
+                      }`}
                     >
-                      Deep Mine
-                    </p>
-                    <p className="text-zinc-500 text-[11px] font-bold">
-                      Last 12 months, recursive comment scan
-                    </p>
-                  </div>
-                  <div
-                    className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${miningDepth === "deep" ? "border-[#ff4500]" : "border-zinc-800"}`}
-                  >
-                    {miningDepth === "deep" && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
-                    )}
-                  </div>
-                  {billing &&
-                  !billing.entitlements.allowedMiningDepths.includes("deep") ? (
-                    <div className="absolute top-0 right-0 p-2">
-                      <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
-                        <Lock className="w-2.5 h-2.5" />
-                        Pro
-                      </span>
-                    </div>
-                  ) : null}
-                </button>
+                      <div className="flex items-center justify-between w-full">
+                        <div
+                          className={`p-3 border ${
+                            isActive
+                              ? "bg-[#ff4500] border-[#ff8a57] text-white"
+                              : "bg-white/5 border-white/15 text-zinc-500"
+                          }`}
+                        >
+                          {depth === "basic" ? (
+                            <Zap className="w-5 h-5" />
+                          ) : (
+                            <Sparkles className="w-5 h-5" />
+                          )}
+                        </div>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            isActive ? "border-[#ff4500]" : "border-zinc-800"
+                          }`}
+                        >
+                          {isActive && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
+                          )}
+                        </div>
+                      </div>
 
-                <button
-                  onClick={() => setMiningDepth("advanced")}
-                  disabled={
-                    billing
-                      ? !billing.entitlements.allowedMiningDepths.includes(
-                          "advanced",
-                        )
-                      : false
-                  }
-                  className={`relative p-6 border-2 transition-colors text-left flex items-start gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
-                    miningDepth === "advanced"
-                      ? "bg-[#ff4500]/6 border-[#ff4500]/65 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.25)]"
-                      : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
-                  }`}
-                >
-                  <div
-                    className={`p-3 border ${miningDepth === "advanced" ? "bg-violet-500 border-violet-300 text-white" : "bg-white/5 border-white/15 text-zinc-500"}`}
-                  >
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p
-                      className={`font-mono font-black uppercase tracking-widest text-[12px] mb-1 ${miningDepth === "advanced" ? "text-white" : "text-zinc-400"}`}
-                    >
-                      Advanced Clustering
-                    </p>
-                    <p className="text-zinc-500 text-[11px] font-bold">
-                      Deep scan + advanced pain-point clustering
-                    </p>
-                  </div>
-                  <div
-                    className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center ${miningDepth === "advanced" ? "border-[#ff4500]" : "border-zinc-800"}`}
-                  >
-                    {miningDepth === "advanced" && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
-                    )}
-                  </div>
-                  {billing &&
-                  !billing.entitlements.allowedMiningDepths.includes(
-                    "advanced",
-                  ) ? (
-                    <div className="absolute top-0 right-0 p-2">
-                      <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
-                        <Lock className="w-2.5 h-2.5" />
-                        Growth
-                      </span>
-                    </div>
-                  ) : null}
-                </button>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p
+                            className={`font-mono font-black uppercase tracking-widest text-[12px] ${
+                              isActive ? "text-white" : "text-zinc-400"
+                            }`}
+                          >
+                            {preset.name}
+                          </p>
+                          <span className="font-mono text-[9px] font-black px-1.5 py-0.5 bg-white/5 border border-white/10 text-zinc-500">
+                            {preset.estimatedCredits} CR
+                          </span>
+                        </div>
+                        <p className="text-zinc-500 text-[11px] font-bold leading-relaxed">
+                          {preset.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-auto pt-4 border-t border-white/5 grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <p className="font-mono text-[8px] text-zinc-600 uppercase font-black">
+                            Subreddits
+                          </p>
+                          <p className="text-[10px] text-zinc-400 font-bold">
+                            {preset.subreddits} communities
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-mono text-[8px] text-zinc-600 uppercase font-black">
+                            Analysis
+                          </p>
+                          <p className="text-[10px] text-zinc-400 font-bold">
+                            {preset.sortModes} mode
+                            {preset.sortModes > 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+
+                      {!isAllowed && (
+                        <div className="absolute top-0 right-0 p-2">
+                          <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
+                            <Lock className="w-2.5 h-2.5" />
+                            Upgrade
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               {billing ? (
                 <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                  Plan: {billing.plan.toUpperCase()} | Monthly scans:{" "}
-                  {billing.usage.monthlyScansUsed}
+                  Plan: {billing.plan.toUpperCase()} | Credit usage:{" "}
+                  {billing.usage.monthlyScansUsed.toFixed(1)}
                   {billing.usage.monthlyScansLimit === null
                     ? "/Unlimited"
-                    : `/${billing.usage.monthlyScansLimit}`}
+                    : `/${billing.usage.monthlyScansLimit.toFixed(1)}`}
                 </p>
               ) : null}
             </div>
@@ -800,24 +764,15 @@ export default function SearchPage() {
 
             {/* Footer Actions */}
             <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-3 text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
-                <Clock className="w-4 h-4" />
-                Est. time: ~
-                {(() => {
-                  const subCount =
-                    subreddits.split(",").filter((s) => s.trim()).length ||
-                    Math.max(1, Math.min(defaultSubredditCount, 10));
-                  const depthMultiplier =
-                    miningDepth === "advanced"
-                      ? 5
-                      : miningDepth === "deep"
-                        ? 3
-                        : 1;
-                  const totalSeconds = subCount * 15 * depthMultiplier;
-                  return totalSeconds >= 60
-                    ? `${Math.round(totalSeconds / 60)} minutes`
-                    : `${totalSeconds} seconds`;
-                })()}
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="flex items-center gap-3 text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
+                  <Clock className="w-4 h-4" />
+                  Est. time: {MINING_PRESETS[miningDepth].timeEstimate}
+                </div>
+                <div className="flex items-center gap-3 text-[#ff4500] font-mono text-[11px] font-bold uppercase tracking-widest">
+                  <Database className="w-4 h-4" />
+                  Est. cost: {MINING_PRESETS[miningDepth].estimatedCredits} CR
+                </div>
               </div>
               <div className="text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
                 Min score default: {minimumOpportunityScore}+

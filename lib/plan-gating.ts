@@ -1,9 +1,10 @@
-import { and, count, eq, gte } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
+import { startOfMonth } from "date-fns";
 import { db } from "@/lib/db";
-import { scraper } from "@/lib/db/schema";
+import { scraper, scraperRun } from "@/lib/db/schema";
+import { MINING_PRESETS, type MiningDepth } from "./mining-presets";
 
 export type BillingPlan = "starter" | "growth" | "pro";
-export type MiningDepth = "basic" | "deep" | "advanced";
 
 export type PlanEntitlements = {
   monthlyScans: number | null;
@@ -26,7 +27,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
   growth: {
     monthlyScans: 50,
     maxSubredditsPerSearch: 10,
-    allowedMiningDepths: ["basic", "advanced"],
+    allowedMiningDepths: ["basic", "deep"],
     canSaveReports: true,
     hasTrendDetection: false,
     hasSaasOpportunities: false,
@@ -40,6 +41,10 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     hasSaasOpportunities: true,
   },
 };
+
+export function calculateMiningCost(depth: MiningDepth): number {
+  return MINING_PRESETS[depth]?.estimatedCredits ?? 1;
+}
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
   "active",
@@ -151,17 +156,15 @@ export function resolvePlanForIdentity(input: {
   );
 }
 
-function startOfMonth(date = new Date()) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
 
 export async function getMonthlyScanUsage(userId: string, now = new Date()) {
   const fromDate = startOfMonth(now);
   const result = await db
-    .select({ total: count() })
-    .from(scraper)
-    .where(and(eq(scraper.userId, userId), gte(scraper.createdAt, fromDate)));
-  return result[0]?.total ?? 0;
+    .select({ total: sql<number>`COALESCE(SUM(${scraperRun.cost}), 0)` })
+    .from(scraperRun)
+    .innerJoin(scraper, eq(scraperRun.scraperId, scraper.id))
+    .where(and(eq(scraper.userId, userId), gte(scraperRun.startedAt, fromDate)));
+  return Number(result[0]?.total ?? 0);
 }
 
 export function getMonthlyUsageSummary(
