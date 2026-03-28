@@ -5,7 +5,7 @@ import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { db } from "@/lib/db";
 import { discoveryCache } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { searchSubreddits, type SubredditSuggestion } from "@/lib/reddit";
 
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
