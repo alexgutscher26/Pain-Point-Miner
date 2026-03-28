@@ -5,16 +5,9 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Search,
-  BookOpen,
-  Map,
-  Users,
-  Layout,
-  Zap,
-  BarChart3,
-  ListChecks,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import Image from "next/image";
+
 
 const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 

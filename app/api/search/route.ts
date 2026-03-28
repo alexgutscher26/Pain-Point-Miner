@@ -13,7 +13,7 @@ import {
   isDepthAllowed,
   calculateMiningCost,
 } from "@/lib/plan-gating";
-import { MINING_PRESETS } from "@/lib/mining-presets";
+
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
 
@@ -310,7 +310,6 @@ export async function POST(req: Request) {
       .map((sub) => sub.trim())
       .filter(Boolean);
 
-    const preset = MINING_PRESETS[miningDepth];
     const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
     const planLimit = entitlements.maxSubredditsPerSearch ?? depthLimit;
 
@@ -474,7 +473,7 @@ export async function POST(req: Request) {
           cost: calculateMiningCost(miningDepth),
         });
 
-        const presetConfig = MINING_PRESETS[miningDepth];
+
 
         void executeMiningRun({
           scraperId,

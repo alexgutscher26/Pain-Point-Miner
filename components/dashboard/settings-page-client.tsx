@@ -28,7 +28,6 @@ import {
 import { signOut } from "@/lib/auth-client";
 
 import {
-  DEFAULT_WEIGHTS,
   generateScoreExplanation,
   ScoringWeights,
   toOpportunityScore,
@@ -965,7 +964,7 @@ function WeightSlider({
         max={100}
         step={5}
         onValueChange={(vals) => onChange(vals[0] / 100)}
-        className="[&_[role=slider]]:border-[#ff4500] [&_[role=slider]]:bg-[#ff4500]"
+        className="**:[[role=slider]]:border-[#ff4500] **:[[role=slider]]:bg-[#ff4500]"
       />
     </div>
   );
