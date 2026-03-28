@@ -850,9 +850,9 @@ export default function ReportDetailPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {reportData.metrics.map((metric, idx) => (
+        {reportData.metrics.map((metric) => (
           <div
-            key={idx}
+            key={metric.label}
             className="group relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
           >
             <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-white/2 blur-2xl transition-all group-hover:bg-[#ff4500]/5"></div>
@@ -896,9 +896,9 @@ export default function ReportDetailPage() {
                   <Sparkles className="h-3.5 w-3.5" /> AI Intelligence Patterns
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {reportData.customPatterns.map((pattern, i) => (
+                  {reportData.customPatterns.map((pattern) => (
                     <span
-                      key={i}
+                      key={pattern}
                       className="rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[11px] font-bold text-zinc-400"
                     >
                       {pattern}
@@ -940,9 +940,9 @@ export default function ReportDetailPage() {
                     </div>
                     <div className="max-w-2xl space-y-3 rounded-xl border border-white/5 bg-[#111]/30 p-4">
                       {formatPainDescription(pain.description).map(
-                        (paragraph, idx) => (
+                        (paragraph) => (
                           <p
-                            key={`${pain.id}-desc-${idx}`}
+                            key={paragraph.slice(0, 100)}
                             className="leading-relaxed font-medium text-zinc-400"
                           >
                             {paragraph}
@@ -961,9 +961,9 @@ export default function ReportDetailPage() {
                           Validation {pain.validationScore}/100
                         </div>
                       )}
-                      {pain.subreddits.map((sub, i) => (
+                      {pain.subreddits.map((sub) => (
                         <div
-                          key={i}
+                          key={sub}
                           className="flex items-center gap-1.5 text-zinc-500"
                         >
                           <Users className="h-3.5 w-3.5" />
@@ -1092,9 +1092,9 @@ export default function ReportDetailPage() {
                           ) : null}
                         </div>
                         <div className="space-y-2">
-                          {pain.budgetSignals?.map((signal, idx) => (
+                          {pain.budgetSignals?.map((signal) => (
                             <div
-                              key={`${pain.id}-budget-${idx}`}
+                              key={signal.quote.slice(0, 100)}
                               className="space-y-1 border border-white/10 bg-black/20 p-3"
                             >
                               <p className="text-sm leading-relaxed font-medium text-zinc-200">

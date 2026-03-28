@@ -350,8 +350,8 @@ function AnalysisSkeletonView() {
 
           <div className="relative space-y-0">
             <div className="absolute top-6 bottom-6 left-[19px] w-px bg-white/10"></div>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <AnalysisSkeletonStep key={index} />
+            {["st-sk1", "st-sk2", "st-sk3", "st-sk4"].map((stepId) => (
+              <AnalysisSkeletonStep key={stepId} />
             ))}
           </div>
         </div>

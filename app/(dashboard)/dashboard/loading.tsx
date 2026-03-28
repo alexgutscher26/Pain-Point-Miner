@@ -52,10 +52,10 @@ export default function DashboardLoading() {
           <Skeleton className="h-9 w-28 rounded-none bg-white/8" />
         </div>
         <div className="grid gap-4 md:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5", "sk-c6"].map((key) => (
             <div
-              key={index}
-              className="border border-white/10 bg-white/[0.02] p-4"
+              key={key}
+              className="border border-white/10 bg-white/2 p-4"
             >
               <div className="mb-4 flex items-start justify-between gap-4">
                 <Skeleton className="h-4 w-24 rounded-none bg-white/10" />
@@ -81,16 +81,16 @@ export default function DashboardLoading() {
             <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
-                  {Array.from({ length: 4 }).map((_, index) => (
-                    <th key={index} className="px-8 py-4">
+                  {["h-sk1", "h-sk2", "h-sk3", "h-sk4"].map((key) => (
+                    <th key={key} className="px-8 py-4">
                       <Skeleton className="h-3 w-24 rounded-none bg-white/8" />
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <tr key={index}>
+                {["r-sk1", "r-sk2", "r-sk3"].map((key) => (
+                  <tr key={key}>
                     <td className="px-8 py-6">
                       <Skeleton className="mb-3 h-5 w-40 rounded-none bg-white/10" />
                       <Skeleton className="h-3 w-16 rounded-none bg-white/8" />
