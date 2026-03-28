@@ -69,11 +69,11 @@ export default function HelpSupportPage() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.9fr)]">
-        <section className="bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden">
+        <section className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
           <div className="border-b border-white/10 px-8 py-7">
             <div className="mb-3 flex items-center gap-2">
               <div className="h-px w-8 bg-[#ff4500]"></div>
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#ff4500]">
+              <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
                 Help Desk
               </p>
             </div>
@@ -102,11 +102,11 @@ export default function HelpSupportPage() {
                     <p className="text-base font-black tracking-tight text-white">
                       {title}
                     </p>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
+                    <p className="mt-2 text-sm leading-relaxed font-medium text-zinc-400">
                       {description}
                     </p>
                   </div>
-                  <div className="hidden items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-500 transition-colors group-hover:text-[#ff4500] sm:flex">
+                  <div className="hidden items-center gap-2 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase transition-colors group-hover:text-[#ff4500] sm:flex">
                     {cta}
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
@@ -117,26 +117,26 @@ export default function HelpSupportPage() {
         </section>
 
         <aside className="space-y-8">
-          <section className="bg-[#111] border-2 border-white/10 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <section className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <h3 className="flex items-center gap-3 text-lg font-black tracking-tight text-white">
               <LifeBuoy className="h-5 w-5 text-[#ff4500]" />
               Support Checklist
             </h3>
             <div className="mt-6 space-y-5">
               <div className="border-l-2 border-[#ff4500] pl-4">
-                <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                <p className="font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
                   Before You Retry
                 </p>
-                <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed font-medium text-zinc-400">
                   Double-check your keyword scope, subreddit count, and current
                   plan limits.
                 </p>
               </div>
               <div className="border-l-2 border-white/10 pl-4">
-                <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                <p className="font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
                   Best Next Step
                 </p>
-                <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed font-medium text-zinc-400">
                   If the issue is plan-related, head to Billing. If it affects
                   search quality, update your defaults in Settings first.
                 </p>
@@ -144,19 +144,19 @@ export default function HelpSupportPage() {
             </div>
           </section>
 
-          <section className="bg-[#111] border-2 border-white/10 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <section className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <h3 className="flex items-center gap-3 text-lg font-black tracking-tight text-white">
               <MessageSquareWarning className="h-5 w-5 text-[#ff4500]" />
               Need Deeper Troubleshooting?
             </h3>
-            <p className="mt-4 text-sm font-medium leading-relaxed text-zinc-400">
+            <p className="mt-4 text-sm leading-relaxed font-medium text-zinc-400">
               Review your most recent run status in Reports, then compare it
               with your current plan and settings. That usually identifies
               whether the blocker is scope, permissions, or billing.
             </p>
             <Link
               href="/dashboard/reports"
-              className="mt-6 inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-4 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#e63e00]"
+              className="mt-6 inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-4 py-2.5 font-mono text-[11px] font-bold tracking-widest text-white uppercase transition-colors hover:bg-[#e63e00]"
             >
               Open Reports
               <ArrowRight className="h-3.5 w-3.5" />
@@ -165,7 +165,7 @@ export default function HelpSupportPage() {
         </aside>
       </div>
 
-      <section className="bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden">
+      <section className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
         <div className="border-b border-white/10 px-8 py-6">
           <h3 className="flex items-center gap-3 text-xl font-black tracking-tight text-white">
             <HelpCircle className="h-5 w-5 text-[#ff4500]" />
@@ -175,10 +175,10 @@ export default function HelpSupportPage() {
         <div className="grid gap-px bg-white/5 md:grid-cols-2">
           {faqs.map((faq) => (
             <div key={faq.question} className="bg-[#111] p-6">
-              <p className="font-mono text-[11px] font-black uppercase tracking-[0.15em] text-[#ff4500]">
+              <p className="font-mono text-[11px] font-black tracking-[0.15em] text-[#ff4500] uppercase">
                 {faq.question}
               </p>
-              <p className="mt-3 text-sm font-medium leading-relaxed text-zinc-400">
+              <p className="mt-3 text-sm leading-relaxed font-medium text-zinc-400">
                 {faq.answer}
               </p>
             </div>

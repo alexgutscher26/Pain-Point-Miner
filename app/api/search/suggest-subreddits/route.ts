@@ -19,7 +19,10 @@ const suggestPayloadSchema = z.object({
 /**
  * Weighted scoring for subreddit relevance.
  */
-function calculateRelevanceScore(sub: SubredditSuggestion, rank: number): number {
+function calculateRelevanceScore(
+  sub: SubredditSuggestion,
+  rank: number,
+): number {
   let score = (20 - rank) * 5; // Preference for Reddit's relevance ranking
   score += Math.log10(Math.max(1, sub.subscribers)) * 8; // Popularity weight
   score += Math.log10(Math.max(1, sub.activeUsers ?? 0)) * 12; // Real-time activity weight
@@ -48,7 +51,7 @@ export async function POST(req: Request) {
       email: userEmail,
       requestHeaders: req.headers,
     });
-    
+
     if (planContext.planPurchaseRequired) {
       return apiError(
         403,
@@ -71,20 +74,27 @@ export async function POST(req: Request) {
       where: eq(discoveryCache.keyword, normalizedKeyword),
     });
 
-    const isCacheValid = 
-      cached && 
+    const isCacheValid =
+      cached &&
       Date.now() - new Date(cached.cachedAt).getTime() < CACHE_DURATION_MS;
 
     if (isCacheValid) {
-      return apiJson({ 
-        subreddits: (cached.suggestions as SubredditSuggestion[]).slice(0, cappedCount),
-        cached: true 
-      }, 200, correlationId);
+      return apiJson(
+        {
+          subreddits: (cached.suggestions as SubredditSuggestion[]).slice(
+            0,
+            cappedCount,
+          ),
+          cached: true,
+        },
+        200,
+        correlationId,
+      );
     }
 
     // 2. Fetch from Reddit
     const suggestions = await searchSubreddits(normalizedKeyword, 25);
-    
+
     // 3. Score and Sort
     const scoredSuggestions = suggestions
       .map((sub, i) => ({
@@ -110,10 +120,14 @@ export async function POST(req: Request) {
         },
       });
 
-    return apiJson({ 
-      subreddits: scoredSuggestions.slice(0, cappedCount),
-      cached: false 
-    }, 200, correlationId);
+    return apiJson(
+      {
+        subreddits: scoredSuggestions.slice(0, cappedCount),
+        cached: false,
+      },
+      200,
+      correlationId,
+    );
   } catch (error) {
     console.error("Subreddit suggestion error:", error);
     return apiJson({ subreddits: [] }, 200, correlationId);

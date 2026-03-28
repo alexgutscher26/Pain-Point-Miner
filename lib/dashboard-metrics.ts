@@ -56,7 +56,11 @@ export function generateScoreExplanation(
 
   const contributions = [
     { label: "pain intensity", value: pain, weight: weights.w1 },
-    { label: "monetization potential", value: monetization, weight: weights.w2 },
+    {
+      label: "monetization potential",
+      value: monetization,
+      weight: weights.w2,
+    },
     { label: "urgency", value: urgency, weight: weights.w3 },
     { label: "market maturity", value: maturity, weight: weights.w4 },
   ].sort((a, b) => b.value * b.weight - a.value * a.weight);

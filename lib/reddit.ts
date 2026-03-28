@@ -147,7 +147,9 @@ export async function getGlobal429Rate(): Promise<number> {
 
     if (recentLogs.length === 0) return 0;
 
-    const errorCount = recentLogs.filter((log) => log.statusCode === 429).length;
+    const errorCount = recentLogs.filter(
+      (log) => log.statusCode === 429,
+    ).length;
     return errorCount / recentLogs.length;
   } catch (err) {
     console.error("Failed to calculate global 429 rate:", err);
@@ -725,7 +727,10 @@ export async function fetchSubredditPostsMultiSort(
   // Fetch all sort modes concurrently; individual failures don't abort the whole run
   const perModeFetches = await Promise.allSettled(
     sortModes.map((mode) =>
-      fetchSubredditPostsBatched(subreddit, keyword, { ...options, sort: mode }),
+      fetchSubredditPostsBatched(subreddit, keyword, {
+        ...options,
+        sort: mode,
+      }),
     ),
   );
 
@@ -883,10 +888,7 @@ export const fetchComments = async (
   const maxComments = options?.maxComments ?? 200;
 
   // Validate subreddit to prevent malformed URLs and restrict path injection.
-  if (
-    !subreddit ||
-    !/^[A-Za-z0-9_]{3,21}$/.test(subreddit)
-  ) {
+  if (!subreddit || !/^[A-Za-z0-9_]{3,21}$/.test(subreddit)) {
     throw new Error(`Invalid subreddit name: ${String(subreddit)}`);
   }
 
@@ -960,7 +962,7 @@ export interface SubredditSuggestion {
 
 /**
  * Searches for relevant subreddits by name or topic using Reddit's search API.
- * 
+ *
  * @param query - The search query.
  * @param limit - Maximum number of results to return.
  * @returns An array of subreddit suggestions with metadata.
@@ -991,7 +993,9 @@ export async function searchSubreddits(
           activeUsers: item.active_user_count || 0,
         };
       })
-      .filter((sub: SubredditSuggestion) => sub.name && !sub.name.startsWith("u/"))
+      .filter(
+        (sub: SubredditSuggestion) => sub.name && !sub.name.startsWith("u/"),
+      )
       .slice(0, limit);
   } catch (error) {
     console.error("Error searching subreddits:", error);

@@ -7,7 +7,12 @@ import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { runWithIdempotency } from "@/lib/idempotency";
 import { normalizeRunStatus } from "@/lib/run-status";
 import { executeMiningRun } from "@/lib/mining-runner";
-import { getMonthlyScanUsage, getPlanEntitlements, isDepthAllowed, calculateMiningCost } from "@/lib/plan-gating";
+import {
+  getMonthlyScanUsage,
+  getPlanEntitlements,
+  isDepthAllowed,
+  calculateMiningCost,
+} from "@/lib/plan-gating";
 import { MINING_PRESETS } from "@/lib/mining-presets";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
@@ -481,7 +486,11 @@ export async function POST(req: Request) {
           userId,
           workspaceId,
           maxPostsPerSubreddit:
-            miningDepth === "advanced" ? 400 : miningDepth === "deep" ? 250 : 120, // Keep these high for actual results
+            miningDepth === "advanced"
+              ? 400
+              : miningDepth === "deep"
+                ? 250
+                : 120, // Keep these high for actual results
           processingLimit:
             miningDepth === "advanced" ? 50 : miningDepth === "deep" ? 25 : 6,
         }).catch((error) => {

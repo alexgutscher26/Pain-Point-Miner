@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { GoldMine } from "@/components/landing/GoldMine";
 import { Steps } from "@/components/landing/Steps";
@@ -77,7 +76,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans selection:bg-[#ff4500]/30 overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-[#0a0a0a] font-sans text-zinc-300 selection:bg-[#ff4500]/30">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd) }}
@@ -89,7 +88,7 @@ export default function Home() {
         }}
       />
       <Header />
-      <main className="flex flex-col items-center w-full">
+      <main className="flex w-full flex-col items-center">
         <Hero />
         {/* <Testimonial /> */}
         <InteractiveDemo />

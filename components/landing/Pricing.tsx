@@ -35,79 +35,79 @@ export function Pricing() {
 
   return (
     <section
-      className="w-full py-24 sm:py-32 px-4 sm:px-6 flex flex-col items-center bg-[#111] border-y-2 border-white/[0.03]"
+      className="flex w-full flex-col items-center border-y-2 border-white/[0.03] bg-[#111] px-4 py-24 sm:px-6 sm:py-32"
       id="pricing"
     >
-      <div className="text-center max-w-2xl mb-12">
-        <h2 className="text-[11px] font-extrabold tracking-widest text-[#ff4500] uppercase mb-4">
+      <div className="mb-12 max-w-2xl text-center">
+        <h2 className="mb-4 text-[11px] font-extrabold tracking-widest text-[#ff4500] uppercase">
           PRICING
         </h2>
-        <h3 className="text-[40px] md:text-[56px] font-extrabold tracking-[-0.02em] text-[#f4f4f5] mb-6 leading-[1.1]">
+        <h3 className="mb-6 text-[40px] leading-[1.1] font-extrabold tracking-[-0.02em] text-[#f4f4f5] md:text-[56px]">
           Pricing Plans
         </h3>
-        <p className="text-[17px] text-zinc-400 font-medium mb-10">
+        <p className="mb-10 text-[17px] font-medium text-zinc-400">
           Scale your market research as you grow from idea to product.
         </p>
 
-        <div className="inline-flex flex-wrap items-center justify-center gap-2 p-1.5 bg-[#1a1a1a] rounded-2xl sm:rounded-full shadow-inner mb-6 border border-white/5">
+        <div className="mb-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/5 bg-[#1a1a1a] p-1.5 shadow-inner sm:rounded-full">
           <button
             type="button"
             onClick={() => setIsYearly(false)}
-            className={`px-6 sm:px-8 py-2.5 rounded-full text-[13px] sm:text-[14px] font-extrabold shadow-sm transition-all ${!isYearly ? "bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20" : "text-zinc-400 hover:text-white border border-transparent"}`}
+            className={`rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${!isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
           >
             Monthly
           </button>
           <button
             type="button"
             onClick={() => setIsYearly(true)}
-            className={`px-6 sm:px-8 py-2.5 rounded-full text-[13px] sm:text-[14px] font-extrabold shadow-sm transition-all flex items-center gap-2 ${isYearly ? "bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/20" : "text-zinc-400 hover:text-white border border-transparent"}`}
+            className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
           >
             Yearly{" "}
-            <span className="text-[#ff4500] text-[10px] tracking-wider uppercase font-black">
+            <span className="text-[10px] font-black tracking-wider text-[#ff4500] uppercase">
               Save 2 months
             </span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-[1100px] w-full mb-12 items-stretch">
+      <div className="mb-12 grid w-full max-w-[1100px] grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
         {/* Starter Plan */}
-        <div className="bg-[#141414] border-2 border-white/5 rounded-2xl flex flex-col hover:border-[#ff4500]/20 transition-all shadow-2xl relative overflow-hidden group">
-          <div className="p-8 pb-6 relative z-10">
-            <h3 className="text-[19px] font-extrabold text-white mb-2">
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
+          <div className="relative z-10 p-8 pb-6">
+            <h3 className="mb-2 text-[19px] font-extrabold text-white">
               Starter
             </h3>
-            <p className="text-zinc-500 text-[13px] font-medium mb-6">
+            <p className="mb-6 text-[13px] font-medium text-zinc-500">
               Perfect for founders exploring early ideas.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
                 {starterPricing.displayPrice}
               </span>
-              <span className="text-zinc-400 text-[14px] font-semibold">
+              <span className="text-[14px] font-semibold text-zinc-400">
                 {starterPricing.suffix}
               </span>
             </div>
             {starterPricing.detail ? (
-              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
                 {starterPricing.detail}
               </p>
             ) : null}
           </div>
 
-          <div className="flex-1 px-8 relative z-10 w-full mb-8">
+          <div className="relative z-10 mb-8 w-full flex-1 px-8">
             <SectionHeader
-              icon={<Magnet className="w-3.5 h-3.5" />}
+              icon={<Magnet className="h-3.5 w-3.5" />}
               label="INBOUND"
             />
-            <ul className="space-y-4 mb-8">
+            <ul className="mb-8 space-y-4">
               <FeatureItem label="10 Reddit scans per month" />
               <FeatureItem label="Up to 3 subreddits per search" />
               <FeatureItem label="Access to top Reddit posts" />
             </ul>
 
             <SectionHeader
-              icon={<RotateCw className="w-3.5 h-3.5" />}
+              icon={<RotateCw className="h-3.5 w-3.5" />}
               label="ENGAGE"
             />
             <ul className="space-y-4">
@@ -118,65 +118,65 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-white/[0.01]">
+          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
             <Link
               href={`/sign-up?plan=starter&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
             >
               Get Started
             </Link>
-            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
+            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
               Best for:
             </p>
-            <p className="text-[13px] text-zinc-300 font-medium leading-tight">
+            <p className="text-[13px] leading-tight font-medium text-zinc-300">
               Early-stage founders validating first ideas.
             </p>
           </div>
         </div>
 
         {/* Growth Plan - Featured */}
-        <div className="bg-[#141414] border-2 border-[#ff4500]/40 rounded-2xl flex flex-col shadow-[0_0_40px_rgba(255,69,0,0.1)] relative overflow-hidden group lg:scale-105 z-20">
-          <div className="absolute top-0 right-0 bg-linear-to-r from-[#ff4500] to-[#ff571a] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-lg flex items-center gap-1.5 shadow-lg border-b border-l border-white/20">
+        <div className="group relative z-20 flex flex-col overflow-hidden rounded-2xl border-2 border-[#ff4500]/40 bg-[#141414] shadow-[0_0_40px_rgba(255,69,0,0.1)] lg:scale-105">
+          <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-white/20 bg-linear-to-r from-[#ff4500] to-[#ff571a] px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg">
             <span className="text-[12px]">⭐</span> Most Popular
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-[#ff4500]/5 to-transparent"></div>
 
-          <div className="p-8 pb-6 relative z-10">
-            <h3 className="text-[19px] font-extrabold text-white mb-2">
+          <div className="relative z-10 p-8 pb-6">
+            <h3 className="mb-2 text-[19px] font-extrabold text-white">
               Growth
             </h3>
-            <p className="text-zinc-500 text-[13px] font-medium mb-6">
+            <p className="mb-6 text-[13px] font-medium text-zinc-500">
               For builders actively researching markets.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
                 {growthPricing.displayPrice}
               </span>
-              <span className="text-zinc-400 text-[14px] font-semibold">
+              <span className="text-[14px] font-semibold text-zinc-400">
                 {growthPricing.suffix}
               </span>
             </div>
             {growthPricing.detail ? (
-              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
                 {growthPricing.detail}
               </p>
             ) : null}
           </div>
 
-          <div className="flex-1 px-8 relative z-10 w-full mb-8">
+          <div className="relative z-10 mb-8 w-full flex-1 px-8">
             <SectionHeader
-              icon={<Magnet className="w-3.5 h-3.5" />}
+              icon={<Magnet className="h-3.5 w-3.5" />}
               label="INBOUND"
               spotlight
             />
-            <ul className="space-y-4 mb-8">
+            <ul className="mb-8 space-y-4">
               <FeatureItem label="50 Reddit scans per month" />
               <FeatureItem label="Up to 10 subreddits per search" />
               <FeatureItem label="Everything in Starter" />
             </ul>
 
             <SectionHeader
-              icon={<RotateCw className="w-3.5 h-3.5" />}
+              icon={<RotateCw className="h-3.5 w-3.5" />}
               label="ENGAGE"
               spotlight
             />
@@ -190,57 +190,57 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-[#ff4500]/5">
+          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-[#ff4500]/5 p-8 pt-6">
             <Link
               href={`/sign-up?plan=growth&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="w-full h-11 rounded-lg bg-[#ff4500] hover:bg-[#ff571a] border border-[#ff4500] text-black font-extrabold text-[14px] transition-all shadow-lg shadow-[#ff4500]/20 flex items-center justify-center gap-2 mb-4"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#ff4500] bg-[#ff4500] text-[14px] font-extrabold text-black shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a]"
             >
-              Get Started <ArrowRight className="w-4 h-4" />
+              Get Started <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="text-[11px] font-bold text-[#ff4500] uppercase tracking-widest mb-1">
+            <p className="mb-1 text-[11px] font-bold tracking-widest text-[#ff4500] uppercase">
               Best for:
             </p>
-            <p className="text-[13px] text-zinc-300 font-semibold leading-tight">
+            <p className="text-[13px] leading-tight font-semibold text-zinc-300">
               Indie hackers and SaaS founders building products.
             </p>
           </div>
         </div>
 
         {/* Pro Plan */}
-        <div className="bg-[#141414] border-2 border-white/5 rounded-2xl flex flex-col hover:border-[#ff4500]/20 transition-all shadow-2xl relative overflow-hidden group">
-          <div className="p-8 pb-6 relative z-10">
-            <h3 className="text-[19px] font-extrabold text-white mb-2">Pro</h3>
-            <p className="text-zinc-500 text-[13px] font-medium mb-6">
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
+          <div className="relative z-10 p-8 pb-6">
+            <h3 className="mb-2 text-[19px] font-extrabold text-white">Pro</h3>
+            <p className="mb-6 text-[13px] font-medium text-zinc-500">
               For teams doing serious market research.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] font-extrabold text-white leading-none tracking-tight">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
                 {proPricing.displayPrice}
               </span>
-              <span className="text-zinc-400 text-[14px] font-semibold">
+              <span className="text-[14px] font-semibold text-zinc-400">
                 {proPricing.suffix}
               </span>
             </div>
             {proPricing.detail ? (
-              <p className="text-zinc-500 text-[12px] font-semibold -mt-3">
+              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
                 {proPricing.detail}
               </p>
             ) : null}
           </div>
 
-          <div className="flex-1 px-8 relative z-10 w-full mb-8">
+          <div className="relative z-10 mb-8 w-full flex-1 px-8">
             <SectionHeader
-              icon={<Magnet className="w-3.5 h-3.5" />}
+              icon={<Magnet className="h-3.5 w-3.5" />}
               label="INBOUND"
             />
-            <ul className="space-y-4 mb-8">
+            <ul className="mb-8 space-y-4">
               <FeatureItem label="Unlimited Reddit scans" />
               <FeatureItem label="Analyze unlimited subreddits" />
               <FeatureItem label="Everything in Growth" />
             </ul>
 
             <SectionHeader
-              icon={<RotateCw className="w-3.5 h-3.5" />}
+              icon={<RotateCw className="h-3.5 w-3.5" />}
               label="ENGAGE"
             />
             <ul className="space-y-4">
@@ -253,26 +253,26 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="p-8 pt-6 relative z-10 w-full mt-auto border-t border-white/5 bg-white/[0.01]">
+          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
             <Link
               href={`/sign-up?plan=pro&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="w-full h-11 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold text-[14px] transition-all flex items-center justify-center gap-2 mb-4"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
             >
               Get Started
             </Link>
-            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
+            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
               Best for:
             </p>
-            <p className="text-[13px] text-zinc-300 font-medium leading-tight">
+            <p className="text-[13px] leading-tight font-medium text-zinc-300">
               Startup teams, agencies, and product researchers.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="border border-[#7a281c] bg-[#140a08] rounded-xl px-5 sm:px-12 py-8 max-w-[700px] w-full flex flex-col items-center justify-center shadow-lg text-center mt-6 mx-0 sm:mx-4 relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
-        <h4 className="text-[18px] font-extrabold text-white tracking-tight mb-2">
+      <div className="relative mx-0 mt-6 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+        <h4 className="mb-2 text-[18px] font-extrabold tracking-tight text-white">
           Start your 3-day free trial. No credit card required.
         </h4>
       </div>
@@ -290,7 +290,7 @@ function SectionHeader({
   spotlight?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 w-full mb-6 mt-2">
+    <div className="mt-2 mb-6 flex w-full items-center gap-3">
       <div className={`${spotlight ? "text-[#ff4500]" : "text-zinc-400"}`}>
         {icon}
       </div>
@@ -316,12 +316,12 @@ function FeatureItem({
   return (
     <li className="flex items-start gap-4">
       <div
-        className={`mt-1 h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${spotlight ? "bg-[#ff4500] text-white" : "bg-[#ff4500]/10 text-[#ff4500]"}`}
+        className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${spotlight ? "bg-[#ff4500] text-white" : "bg-[#ff4500]/10 text-[#ff4500]"}`}
       >
-        <Check className="w-2.5 h-2.5" strokeWidth={4} />
+        <Check className="h-2.5 w-2.5" strokeWidth={4} />
       </div>
       <span
-        className={`text-[13px] font-extrabold flex-1 leading-snug ${spotlight ? "text-white" : "text-zinc-200"}`}
+        className={`flex-1 text-[13px] leading-snug font-extrabold ${spotlight ? "text-white" : "text-zinc-200"}`}
       >
         {label}
       </span>

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { checkRateLimit } from '../lib/rate-limit';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { checkRateLimit } from "../lib/rate-limit";
 
-describe('checkRateLimit', () => {
+describe("checkRateLimit", () => {
   beforeEach(() => {
     // Enable fake timers
     vi.useFakeTimers();
@@ -13,8 +13,8 @@ describe('checkRateLimit', () => {
     vi.clearAllMocks();
   });
 
-  it('allows requests within the limit', () => {
-    const identifier = 'user-1';
+  it("allows requests within the limit", () => {
+    const identifier = "user-1";
     const limit = 5;
 
     for (let i = 0; i < limit; i++) {
@@ -25,8 +25,8 @@ describe('checkRateLimit', () => {
     }
   });
 
-  it('blocks requests exceeding the limit', () => {
-    const identifier = 'user-2';
+  it("blocks requests exceeding the limit", () => {
+    const identifier = "user-2";
     const limit = 3;
 
     // First 3 requests should be allowed
@@ -41,8 +41,8 @@ describe('checkRateLimit', () => {
     expect(result.reset).toBeGreaterThan(0);
   });
 
-  it('resets the window after 60 seconds', () => {
-    const identifier = 'user-3';
+  it("resets the window after 60 seconds", () => {
+    const identifier = "user-3";
     const limit = 2;
 
     // Consume the limit
@@ -62,22 +62,22 @@ describe('checkRateLimit', () => {
     expect(allowedResult.remaining).toBe(1); // One used out of 2
   });
 
-  it('handles independent identifiers correctly', () => {
+  it("handles independent identifiers correctly", () => {
     const limit = 2;
 
     // User A consumes their limit
-    checkRateLimit('user-A', limit);
-    checkRateLimit('user-A', limit);
-    expect(checkRateLimit('user-A', limit).allowed).toBe(false);
+    checkRateLimit("user-A", limit);
+    checkRateLimit("user-A", limit);
+    expect(checkRateLimit("user-A", limit).allowed).toBe(false);
 
     // User B should still be allowed
-    const resultB = checkRateLimit('user-B', limit);
+    const resultB = checkRateLimit("user-B", limit);
     expect(resultB.allowed).toBe(true);
     expect(resultB.remaining).toBe(1);
   });
 
-  it('calculates the correct reset time', () => {
-    const identifier = 'user-4';
+  it("calculates the correct reset time", () => {
+    const identifier = "user-4";
     const limit = 1;
 
     // Make the first request at t=0

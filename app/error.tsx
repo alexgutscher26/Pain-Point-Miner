@@ -14,9 +14,9 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans flex items-center justify-center p-6">
+    <main className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-6 font-sans text-zinc-100">
       <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#111111] p-8 shadow-xl">
-        <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[#ff4500]">
+        <p className="text-xs font-semibold tracking-[0.18em] text-[#ff4500] uppercase">
           Something went wrong
         </p>
         <h1 className="mt-3 text-3xl font-black tracking-tight text-white">

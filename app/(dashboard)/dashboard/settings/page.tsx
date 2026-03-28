@@ -85,7 +85,8 @@ export default async function SettingsPage() {
     defaultSubredditCount: scanDefaults.defaultSubredditCount ?? 5,
     minimumOpportunityScore: scanDefaults.minimumOpportunityScore ?? 70,
     defaultLocale: scanDefaults.defaultLocale ?? "United States",
-    scoringWeights: (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
+    scoringWeights:
+      (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
   };
 
   return (

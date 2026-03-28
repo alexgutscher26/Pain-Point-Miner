@@ -47,28 +47,28 @@ export function InteractiveDemo() {
   };
 
   return (
-    <section className="w-full py-24 px-6 flex justify-center bg-[#0a0a0a]">
-      <div className="max-w-5xl w-full">
-        <div className="text-center mb-16">
-          <h2 className="text-[12px] font-black tracking-[0.2em] text-[#ff4500] uppercase mb-4">
+    <section className="flex w-full justify-center bg-[#0a0a0a] px-6 py-24">
+      <div className="w-full max-w-5xl">
+        <div className="mb-16 text-center">
+          <h2 className="mb-4 text-[12px] font-black tracking-[0.2em] text-[#ff4500] uppercase">
             LIVE PREVIEW
           </h2>
-          <h3 className="text-4xl md:text-5xl font-black text-white mb-6">
+          <h3 className="mb-6 text-4xl font-black text-white md:text-5xl">
             Test our AI in <span className="text-[#ff4500]">Seconds</span>
           </h3>
-          <p className="text-zinc-400 max-w-2xl mx-auto font-medium text-lg">
+          <p className="mx-auto max-w-2xl text-lg font-medium text-zinc-400">
             Curious what we find? Enter a niche below to see a simulated
             analysis. No account required.
           </p>
         </div>
 
-        <div className="bg-[#111] border-2 border-white/10 p-8 md:p-12 relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#ff4500]/30 to-transparent"></div>
+        <div className="relative overflow-hidden border-2 border-white/10 bg-[#111] p-8 shadow-2xl md:p-12">
+          <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-transparent via-[#ff4500]/30 to-transparent"></div>
 
           {step === "not-started" && (
             <form
               onSubmit={startDemo}
-              className="space-y-8 max-w-xl mx-auto text-center"
+              className="mx-auto max-w-xl space-y-8 text-center"
             >
               <div className="relative">
                 <input
@@ -77,34 +77,34 @@ export function InteractiveDemo() {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management..."
-                  className="w-full bg-[#0c0c0c] border border-white/10 px-6 py-5 rounded-none text-white text-lg font-medium focus:outline-none focus:border-[#ff4500]/50 transition-colors"
+                  className="w-full rounded-none border border-white/10 bg-[#0c0c0c] px-6 py-5 text-lg font-medium text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none"
                   required
                 />
-                <Search className="absolute right-6 top-1/2 -translate-y-1/2 w-6 h-6 text-zinc-600" />
+                <Search className="absolute top-1/2 right-6 h-6 w-6 -translate-y-1/2 text-zinc-600" />
               </div>
               <button
                 type="submit"
-                className="w-full py-5 bg-[#ff4500] text-white font-black uppercase tracking-widest hover:bg-[#ff5500] transition-colors flex items-center justify-center gap-3 group"
+                className="group flex w-full items-center justify-center gap-3 bg-[#ff4500] py-5 font-black tracking-widest text-white uppercase transition-colors hover:bg-[#ff5500]"
               >
                 Run Sample Scan{" "}
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </button>
             </form>
           )}
 
           {(step === "searching" || step === "mining") && (
-            <div className="flex flex-col items-center py-12 space-y-8 animate-in fade-in duration-500">
+            <div className="animate-in fade-in flex flex-col items-center space-y-8 py-12 duration-500">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full border-4 border-white/5 border-t-[#ff4500] animate-spin"></div>
-                <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-[#ff4500] animate-pulse" />
+                <div className="h-24 w-24 animate-spin rounded-full border-4 border-white/5 border-t-[#ff4500]"></div>
+                <Sparkles className="absolute inset-0 m-auto h-8 w-8 animate-pulse text-[#ff4500]" />
               </div>
-              <div className="text-center space-y-4 w-full max-w-md">
-                <p className="font-mono text-[11px] font-black uppercase tracking-widest text-[#ff4500]">
+              <div className="w-full max-w-md space-y-4 text-center">
+                <p className="font-mono text-[11px] font-black tracking-widest text-[#ff4500] uppercase">
                   {step === "searching"
                     ? "Scanning Subreddits..."
                     : "AI Extraction in Progress..."}
                 </p>
-                <div className="h-1 w-full bg-white/5 overflow-hidden">
+                <div className="h-1 w-full overflow-hidden bg-white/5">
                   <div
                     className="h-full bg-[#ff4500] transition-all duration-300"
                     style={{ width: `${progress}%` }}
@@ -119,30 +119,30 @@ export function InteractiveDemo() {
 
           {step === "results" && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                <div className="p-2 bg-green-500/10 border border-green-500/30 text-green-500 rounded-full">
-                  <CheckCircle2 className="w-5 h-5" />
+              <div className="mb-8 flex items-center gap-3 border-b border-white/5 pb-4">
+                <div className="rounded-full border border-green-500/30 bg-green-500/10 p-2 text-green-500">
+                  <CheckCircle2 className="h-5 w-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white uppercase tracking-tight">
+                <h4 className="text-xl font-bold tracking-tight text-white uppercase">
                   Sample Analysis:{" "}
                   <span className="text-[#ff4500]">{keyword}</span>
                 </h4>
               </div>
 
-              <div className="grid gap-4 mb-10">
+              <div className="mb-10 grid gap-4">
                 {demoData.map((item) => (
                   <div
                     key={item.id}
-                    className="p-5 bg-white/2 border border-white/5 flex items-start justify-between gap-4"
+                    className="flex items-start justify-between gap-4 border border-white/5 bg-white/2 p-5"
                   >
-                    <p className="text-zinc-200 font-medium">
+                    <p className="font-medium text-zinc-200">
                       &ldquo;{item.text}&rdquo;
                     </p>
                     <span
-                      className={`px-2 py-1 font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${
+                      className={`px-2 py-1 font-mono text-[10px] font-black tracking-widest whitespace-nowrap uppercase ${
                         item.intensity === "High"
-                          ? "bg-red-500/10 text-red-400 border border-red-500/30"
-                          : "bg-amber-500/10 text-amber-400 border border-amber-500/30"
+                          ? "border border-red-500/30 bg-red-500/10 text-red-400"
+                          : "border border-amber-500/30 bg-amber-500/10 text-amber-400"
                       }`}
                     >
                       {item.intensity} Intensity
@@ -151,18 +151,18 @@ export function InteractiveDemo() {
                 ))}
               </div>
 
-              <div className="bg-[#ff4500]/5 border border-[#ff4500]/20 p-8 text-center flex flex-col items-center">
-                <p className="text-white font-bold text-xl mb-2">
+              <div className="flex flex-col items-center border border-[#ff4500]/20 bg-[#ff4500]/5 p-8 text-center">
+                <p className="mb-2 text-xl font-bold text-white">
                   Want to see the real deal?
                 </p>
-                <p className="text-zinc-400 text-sm mb-8 max-w-md">
+                <p className="mb-8 max-w-md text-sm text-zinc-400">
                   We found 42+ potential entry points for{" "}
                   <strong className="text-zinc-200">{keyword}</strong>. Unlock
                   the full reports, budget extraction, and market scores now.
                 </p>
                 <Link
                   href="/sign-up"
-                  className="px-10 py-4 bg-[#ff4500] text-white font-black uppercase tracking-widest hover:bg-[#ff5500] transition-colors"
+                  className="bg-[#ff4500] px-10 py-4 font-black tracking-widest text-white uppercase transition-colors hover:bg-[#ff5500]"
                 >
                   Start Mining for Free
                 </Link>

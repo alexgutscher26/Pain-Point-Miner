@@ -84,13 +84,13 @@ Sitemap: https://example.com/sitemap.xml
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://example.com/</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://example.com/products</loc>
-    <lastmod>2024-01-14</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -114,7 +114,7 @@ https://example.com/blog/how-to-use-widgets
 
 ❌ Poor URLs:
 https://example.com/p?id=12345
-https://example.com/products/item/category/subcategory/blue-widget-2024-sale-discount
+https://example.com/products/item/category/subcategory/blue-widget-2026-sale-discount
 ```
 
 **URL guidelines:**
@@ -306,8 +306,8 @@ X-Frame-Options: DENY
         "url": "https://example.com/logo.png"
       }
     },
-    "datePublished": "2024-01-15",
-    "dateModified": "2024-01-20"
+    "datePublished": "2026-01-15",
+    "dateModified": "2026-01-20"
   }
 </script>
 ```

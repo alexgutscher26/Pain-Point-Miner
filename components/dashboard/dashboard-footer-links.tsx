@@ -13,10 +13,10 @@ export function DashboardFooterLinks() {
     <div className="flex flex-col gap-1 border-t border-white/10 pt-4">
       <Link
         href="/dashboard/help-support"
-        className={`flex items-center gap-3 px-3 py-2 transition-colors w-full text-left font-mono uppercase tracking-wide text-[11px] ${
+        className={`flex w-full items-center gap-3 px-3 py-2 text-left font-mono text-[11px] tracking-wide uppercase transition-colors ${
           isHelpActive
             ? "border border-[#ff8a57] bg-[#ff4500] text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]"
-            : "border border-transparent text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5"
+            : "border border-transparent text-zinc-400 hover:border-white/20 hover:bg-white/5 hover:text-white"
         }`}
       >
         <HelpCircle

@@ -699,7 +699,7 @@ Add comments in migration files:
 ```sql
 -- Breaking change: Removing deprecated 'username' column
 -- Applications must use 'email' instead
--- Migration date: 2024-01-15
+-- Migration date: 2026-01-15
 ALTER TABLE users DROP COLUMN username;
 ```
 

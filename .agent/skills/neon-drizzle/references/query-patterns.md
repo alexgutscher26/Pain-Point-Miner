@@ -116,7 +116,7 @@ const filteredUsers = await db
   .select()
   .from(users)
   .where(
-    and(eq(users.isActive, true), gt(users.createdAt, new Date("2024-01-01"))),
+    and(eq(users.isActive, true), gt(users.createdAt, new Date("2026-01-01"))),
   );
 ```
 
@@ -213,7 +213,7 @@ const adults = await db.select().from(users).where(gte(users.age, 18));
 const recentPosts = await db
   .select()
   .from(posts)
-  .where(gt(posts.createdAt, new Date("2024-01-01")));
+  .where(gt(posts.createdAt, new Date("2026-01-01")));
 
 const excludeAdmin = await db
   .select()
@@ -273,7 +273,7 @@ const postsThisMonth = await db
   .select()
   .from(posts)
   .where(
-    between(posts.createdAt, new Date("2024-01-01"), new Date("2024-01-31")),
+    between(posts.createdAt, new Date("2026-01-01"), new Date("2026-01-31")),
   );
 ```
 
@@ -372,7 +372,7 @@ const postsWithAuthorsAndComments = await db.query.posts.findMany({
 const usersWithRecentPosts = await db.query.users.findMany({
   with: {
     posts: {
-      where: gt(posts.createdAt, new Date("2024-01-01")),
+      where: gt(posts.createdAt, new Date("2026-01-01")),
       orderBy: desc(posts.createdAt),
       limit: 5,
     },
@@ -477,7 +477,7 @@ const postsFromActiveUsers = await db
 const recentPosts = db
   .select()
   .from(posts)
-  .where(gt(posts.createdAt, new Date("2024-01-01")))
+  .where(gt(posts.createdAt, new Date("2026-01-01")))
   .as("recentPosts");
 
 const authorsOfRecentPosts = await db

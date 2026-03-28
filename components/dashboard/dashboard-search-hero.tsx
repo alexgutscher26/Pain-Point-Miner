@@ -49,37 +49,37 @@ export function DashboardSearchHero({
   };
 
   return (
-    <div className="relative group">
-      <div className="relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-12 flex flex-col items-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
+    <div className="group relative">
+      <div className="relative flex flex-col items-center overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-12 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <div className="absolute top-0 left-0 h-px w-full bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
 
         <div className="relative mb-8">
-          <div className="relative w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-[#ff4500] border border-[#ff4500]/45 shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)] group-hover:border-[#ff4500] transition-colors duration-500">
-            <Sparkles className="w-7 h-7" />
+          <div className="relative flex h-14 w-14 items-center justify-center border border-[#ff4500]/45 bg-[#0a0a0a] text-[#ff4500] shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)] transition-colors duration-500 group-hover:border-[#ff4500]">
+            <Sparkles className="h-7 w-7" />
           </div>
         </div>
 
-        <h3 className="text-3xl font-black text-white mb-4 tracking-tighter leading-none">
+        <h3 className="mb-4 text-3xl leading-none font-black tracking-tighter text-white">
           Scale your validation with{" "}
           <span className="bg-linear-to-r from-[#ff4500] to-[#ff8c00] bg-clip-text text-transparent italic">
             Reddit Intel
           </span>
         </h3>
-        <p className="text-zinc-500 max-w-lg mb-10 text-[15px] font-medium leading-relaxed">
+        <p className="mb-10 max-w-lg text-[15px] leading-relaxed font-medium text-zinc-500">
           Uncover high-intent pain points and &quot;workarounds&quot; that
           signal profitable SaaS opportunities in minutes, not weeks.
         </p>
 
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-xl relative group/search"
+          className="group/search relative w-full max-w-xl"
         >
-          <div className="relative flex items-center bg-[#111] border-2 border-white/20 p-1.5 focus-within:border-[#ff4500]/70 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]">
-            <span className="pl-4 pr-2 text-zinc-500 shrink-0">
-              <Search className="w-5 h-5 group-focus-within/search:text-[#ff4500] transition-colors" />
+          <div className="relative flex items-center border-2 border-white/20 bg-[#111] p-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors focus-within:border-[#ff4500]/70">
+            <span className="shrink-0 pr-2 pl-4 text-zinc-500">
+              <Search className="h-5 w-5 transition-colors group-focus-within/search:text-[#ff4500]" />
             </span>
             <input
-              className="w-full bg-transparent border-none text-white px-2 py-3.5 focus:ring-0 outline-none text-base font-medium placeholder-zinc-700"
+              className="w-full border-none bg-transparent px-2 py-3.5 text-base font-medium text-white placeholder-zinc-700 outline-none focus:ring-0"
               placeholder="Search niche, e.g. 'cold email deliverability'..."
               type="text"
               value={keyword}
@@ -88,22 +88,22 @@ export function DashboardSearchHero({
             />
             <button
               type="submit"
-              className="shrink-0 whitespace-nowrap border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-7 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center gap-2.5"
+              className="flex shrink-0 items-center gap-2.5 border border-[#ff8a57] bg-[#ff4500] px-7 py-3.5 font-mono text-[12px] font-black tracking-wider whitespace-nowrap text-white uppercase transition-colors hover:bg-[#ff571a]"
             >
               Begin Analysis{" "}
-              <ArrowRight className="w-4 h-4 group-hover/search:translate-x-1 transition-transform" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover/search:translate-x-1" />
             </button>
           </div>
 
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <p className="font-mono text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
               Trending:
             </p>
             {visibleTags.map((tag) => (
               <button
                 key={tag}
                 type="button"
-                className="border border-white/10 px-2 py-1 font-mono text-[10px] font-bold text-zinc-400 hover:text-white hover:border-[#ff4500]/70 transition-colors uppercase tracking-widest"
+                className="border border-white/10 px-2 py-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase transition-colors hover:border-[#ff4500]/70 hover:text-white"
                 onClick={() => setKeyword(normalizeTagToKeyword(tag))}
               >
                 {tag}

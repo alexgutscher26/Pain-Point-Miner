@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+dist/
+build/
+.next/
+
+# Configuration
+tsconfig.tsbuildinfo
+package-lock.json
+bun.lock
+
+# Environment variables
+.env
+.env.*
+
+# AI artifacts
+scripts/
+.agent/
+.deepsource.toml
+llms.txt
+
+# Temp/Logs
+tmp/
+*.log

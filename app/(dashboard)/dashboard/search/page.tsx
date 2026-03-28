@@ -435,7 +435,7 @@ export default function SearchPage() {
   return (
     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="bg-[#111] border-2 border-white/15 text-white">
+        <DialogContent className="border-2 border-white/15 bg-[#111] text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-black">
               Plan Required
@@ -448,13 +448,13 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="px-4 py-2 bg-white/5 border border-white/20 font-mono text-sm font-bold uppercase tracking-wide"
+              className="border border-white/20 bg-white/5 px-4 py-2 font-mono text-sm font-bold tracking-wide uppercase"
             >
               Close
             </button>
             <Link
               href="/dashboard/billing"
-              className="px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-sm font-bold uppercase tracking-wide"
+              className="border border-[#ff8a57] bg-[#ff4500] px-4 py-2 font-mono text-sm font-bold tracking-wide text-white uppercase"
             >
               Purchase Plan
             </Link>
@@ -463,29 +463,29 @@ export default function SearchPage() {
       </Dialog>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
         {/* Main Form Area */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="space-y-10 lg:col-span-2">
           {trialEnded ? (
             <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4">
-              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+              <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
                 Read-Only After Trial
               </p>
-              <p className="text-sm text-amber-100 font-semibold">
+              <p className="text-sm font-semibold text-amber-100">
                 You can still explore the app and review past results. New scans
                 and AI suggestions require a paid plan.
               </p>
             </div>
           ) : null}
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="mb-3 flex items-center gap-2">
               <div className="h-px w-8 bg-[#ff4500]"></div>
-              <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+              <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
                 New Investigation
               </p>
             </div>
-            <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-4">
+            <h2 className="mb-4 text-3xl leading-none font-black tracking-tight text-white">
               What are we looking for?
             </h2>
-            <p className="text-zinc-400 font-medium text-sm max-w-xl">
+            <p className="max-w-xl text-sm font-medium text-zinc-400">
               Define the niche or problem space you want to explore across
               Reddit communities. Our AI will extract high-intent pain points.
             </p>
@@ -494,9 +494,9 @@ export default function SearchPage() {
           <div className="space-y-8">
             {/* Keyword Input */}
             <div className="space-y-3">
-              <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
+              <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                 Keyword or Niche
-                <div className="w-1.5 h-1.5 bg-[#ff4500]"></div>
+                <div className="h-1.5 w-1.5 bg-[#ff4500]"></div>
               </label>
               <div className="relative">
                 <input
@@ -504,7 +504,7 @@ export default function SearchPage() {
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="e.g. cold email, property management, SaaS churn"
-                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
+                  className="relative z-10 w-full border-2 border-white/15 bg-[#0c0c0c] px-4 py-4 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors placeholder:text-zinc-700 focus:border-[#ff4500]/70 focus:outline-none"
                 />
               </div>
             </div>
@@ -512,7 +512,7 @@ export default function SearchPage() {
             {/* Subreddits Input */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                   Target Subreddits{" "}
                   <span className="font-mono text-[9px] text-zinc-600">
                     (Optional)
@@ -521,45 +521,45 @@ export default function SearchPage() {
                 <button
                   onClick={handleSuggestSubreddits}
                   disabled={isSuggesting || !keyword}
-                  className="font-mono text-[10px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8c00] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed group/suggest"
+                  className="group/suggest flex items-center gap-1.5 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:text-[#ff8c00] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSuggesting ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
-                    <Sparkles className="w-3 h-3 group-hover/suggest:scale-125 transition-transform" />
+                    <Sparkles className="h-3 w-3 transition-transform group-hover/suggest:scale-125" />
                   )}
                   Auto-Suggest (
                   {Math.max(1, Math.min(defaultSubredditCount, 15))})
                 </button>
               </div>
-              <div className="relative group">
+              <div className="group relative">
                 <input
                   type="text"
                   value={subreddits}
                   onChange={(e) => setSubreddits(e.target.value)}
                   placeholder="r/sales, r/realestate, r/entrepreneur"
-                  className="w-full relative z-10 bg-[#0c0c0c] border-2 border-white/15 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none focus:border-[#ff4500]/70 transition-colors placeholder:text-zinc-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)]"
+                  className="relative z-10 w-full border-2 border-white/15 bg-[#0c0c0c] px-4 py-4 pl-12 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors placeholder:text-zinc-700 focus:border-[#ff4500]/70 focus:outline-none"
                 />
-                <Target className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 z-20 pointer-events-none" />
+                <Target className="pointer-events-none absolute top-1/2 left-4 z-20 h-5 w-5 -translate-y-1/2 text-zinc-600" />
               </div>
 
               {suggestedSubreddits.length > 0 && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <p className="font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                <div className="animate-in fade-in slide-in-from-top-2 space-y-3 duration-500">
+                  <p className="mb-1 font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
                     AI & Reddit Discovery Results
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     {suggestedSubreddits.map((sub, i) => (
                       <button
                         key={i}
                         onClick={() => addSubreddit(sub.name)}
-                        className="group/item relative flex flex-col p-4 border border-[#ff4500]/30 bg-[#ff4500]/5 hover:bg-[#ff4500]/10 hover:border-[#ff4500]/60 transition-all text-left shadow-[2px_2px_0px_0px_rgba(255,69,0,0.1)]"
+                        className="group/item relative flex flex-col border border-[#ff4500]/30 bg-[#ff4500]/5 p-4 text-left shadow-[2px_2px_0px_0px_rgba(255,69,0,0.1)] transition-all hover:border-[#ff4500]/60 hover:bg-[#ff4500]/10"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-mono text-sm font-black text-white group-hover/item:text-[#ff8a57] transition-colors">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="font-mono text-sm font-black text-white transition-colors group-hover/item:text-[#ff8a57]">
                             r/{sub.name}
                           </span>
-                          <span className="font-mono text-[10px] text-[#ff8a57] font-bold">
+                          <span className="font-mono text-[10px] font-bold text-[#ff8a57]">
                             {Intl.NumberFormat("en-US", {
                               notation: "compact",
                               maximumFractionDigits: 1,
@@ -567,11 +567,11 @@ export default function SearchPage() {
                             subs
                           </span>
                         </div>
-                        <p className="text-[11px] text-zinc-400 font-medium line-clamp-2 leading-relaxed h-8">
+                        <p className="line-clamp-2 h-8 text-[11px] leading-relaxed font-medium text-zinc-400">
                           {sub.description || "No description provided."}
                         </p>
-                        <div className="mt-2 flex items-center gap-1 font-mono text-[9px] font-black text-[#ff4500] uppercase opacity-0 group-hover/item:opacity-100 transition-opacity">
-                          <CheckCircle2 className="w-2.5 h-2.5" />
+                        <div className="mt-2 flex items-center gap-1 font-mono text-[9px] font-black text-[#ff4500] uppercase opacity-0 transition-opacity group-hover/item:opacity-100">
+                          <CheckCircle2 className="h-2.5 w-2.5" />
                           Add to Scan
                         </div>
                       </button>
@@ -581,29 +581,32 @@ export default function SearchPage() {
               )}
 
               <div className="flex flex-wrap gap-2">
-                <p className="w-full font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                <p className="mb-1 w-full font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
                   Common Core Communities ({defaultLocale})
                 </p>
                 {visibleCommunities.map((sub, i) => (
                   <button
                     key={i}
                     onClick={() => addSubreddit(sub)}
-                    className="px-3 py-1.5 border border-white/15 bg-white/2 font-mono text-[11px] font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                    className="border border-white/15 bg-white/2 px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
                   >
                     + r/{sub}
                   </button>
                 ))}
               </div>
 
-              <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                Max {MINING_PRESETS[miningDepth].subreddits} subreddits for {MINING_PRESETS[miningDepth].name}.
-                Separate multiple with commas.
+              <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+                Max {MINING_PRESETS[miningDepth].subreddits} subreddits for{" "}
+                {MINING_PRESETS[miningDepth].name}. Separate multiple with
+                commas.
               </p>
             </div>
 
-            <div className={`space-y-3 transition-opacity duration-300 ${!hasCustomPatternsEntitlement && "opacity-75"}`}>
+            <div
+              className={`space-y-3 transition-opacity duration-300 ${!hasCustomPatternsEntitlement && "opacity-75"}`}
+            >
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                   Custom Intelligence Patterns{" "}
                   <span className="font-mono text-[9px] text-zinc-600">
                     (Optional)
@@ -612,14 +615,14 @@ export default function SearchPage() {
                 {!hasCustomPatternsEntitlement && (
                   <Link
                     href="/dashboard/billing"
-                    className="flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-widest text-amber-500 hover:text-amber-400 transition-colors"
+                    className="flex items-center gap-1.5 font-mono text-[9px] font-black tracking-widest text-amber-500 uppercase transition-colors hover:text-amber-400"
                   >
-                    <Lock className="w-3 h-3" />
+                    <Lock className="h-3 w-3" />
                     Pro Only
                   </Link>
                 )}
               </div>
-              <div className="relative group">
+              <div className="group relative">
                 <input
                   type="text"
                   value={customPatterns}
@@ -630,43 +633,45 @@ export default function SearchPage() {
                       ? "e.g. mentions of HubSpot, frustration with pricing, legal compliance"
                       : "Upgrade to Pro to unlock custom signals"
                   }
-                  className={`w-full relative z-10 bg-[#0c0c0c] border-2 px-4 py-4 pl-12 text-white text-base font-medium focus:outline-none transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] ${
+                  className={`relative z-10 w-full border-2 bg-[#0c0c0c] px-4 py-4 pl-12 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors focus:outline-none ${
                     hasCustomPatternsEntitlement
-                      ? "border-white/15 focus:border-amber-400/70 placeholder:text-zinc-700"
-                      : "border-amber-500/20 cursor-not-allowed placeholder:text-zinc-800"
+                      ? "border-white/15 placeholder:text-zinc-700 focus:border-amber-400/70"
+                      : "cursor-not-allowed border-amber-500/20 placeholder:text-zinc-800"
                   }`}
                 />
-                <Sparkles 
-                  className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 z-20 pointer-events-none transition-colors ${
-                    hasCustomPatternsEntitlement ? "text-amber-500/60" : "text-zinc-800"
-                  }`} 
+                <Sparkles
+                  className={`pointer-events-none absolute top-1/2 left-4 z-20 h-5 w-5 -translate-y-1/2 transition-colors ${
+                    hasCustomPatternsEntitlement
+                      ? "text-amber-500/60"
+                      : "text-zinc-800"
+                  }`}
                 />
-                
+
                 {!hasCustomPatternsEntitlement && (
-                  <div 
-                    className="absolute inset-x-0 -bottom-2 flex justify-center z-20 pointer-events-none"
+                  <div
+                    className="pointer-events-none absolute inset-x-0 -bottom-2 z-20 flex justify-center"
                     aria-hidden="true"
                   >
-                    <div className="bg-[#111] border border-amber-500/30 px-3 py-1 shadow-xl">
-                      <p className="font-mono text-[8px] font-black uppercase tracking-tighter text-amber-500/80">
+                    <div className="border border-amber-500/30 bg-[#111] px-3 py-1 shadow-xl">
+                      <p className="font-mono text-[8px] font-black tracking-tighter text-amber-500/80 uppercase">
                         Restricted Parameter
                       </p>
                     </div>
                   </div>
                 )}
               </div>
-              <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                {hasCustomPatternsEntitlement 
+              <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+                {hasCustomPatternsEntitlement
                   ? "Comma-separated signals you want the AI to specifically hunt for."
                   : "Precision targeting for niche problems is a Pro-tier exclusive."}
               </p>
             </div>
 
             <div className="space-y-4">
-              <label className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
+              <label className="block font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                 Expert Discovery Presets
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {(["basic", "deep", "advanced"] as const).map((depth) => {
                   const preset = MINING_PRESETS[depth];
                   const isAllowed = billing
@@ -679,69 +684,69 @@ export default function SearchPage() {
                       key={depth}
                       onClick={() => setMiningDepth(depth)}
                       disabled={!isAllowed}
-                      className={`relative p-6 border-2 transition-all text-left flex flex-col gap-4 overflow-hidden group disabled:opacity-45 disabled:cursor-not-allowed ${
+                      className={`group relative flex flex-col gap-4 overflow-hidden border-2 p-6 text-left transition-all disabled:cursor-not-allowed disabled:opacity-45 ${
                         isActive
-                          ? "bg-[#ff4500]/10 border-[#ff4500]/70 shadow-[4px_4px_0px_0px_rgba(255,69,0,0.3)]"
-                          : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
+                          ? "border-[#ff4500]/70 bg-[#ff4500]/10 shadow-[4px_4px_0px_0px_rgba(255,69,0,0.3)]"
+                          : "border-white/15 bg-[#0c0c0c] hover:border-white/35"
                       }`}
                     >
-                      <div className="flex items-center justify-between w-full">
+                      <div className="flex w-full items-center justify-between">
                         <div
-                          className={`p-3 border ${
+                          className={`border p-3 ${
                             isActive
-                              ? "bg-[#ff4500] border-[#ff8a57] text-white"
-                              : "bg-white/5 border-white/15 text-zinc-500"
+                              ? "border-[#ff8a57] bg-[#ff4500] text-white"
+                              : "border-white/15 bg-white/5 text-zinc-500"
                           }`}
                         >
                           {depth === "basic" ? (
-                            <Zap className="w-5 h-5" />
+                            <Zap className="h-5 w-5" />
                           ) : (
-                            <Sparkles className="w-5 h-5" />
+                            <Sparkles className="h-5 w-5" />
                           )}
                         </div>
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
                             isActive ? "border-[#ff4500]" : "border-zinc-800"
                           }`}
                         >
                           {isActive && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#ff4500]"></div>
+                            <div className="h-2.5 w-2.5 rounded-full bg-[#ff4500]"></div>
                           )}
                         </div>
                       </div>
 
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="mb-1 flex items-center gap-2">
                           <p
-                            className={`font-mono font-black uppercase tracking-widest text-[12px] ${
+                            className={`font-mono text-[12px] font-black tracking-widest uppercase ${
                               isActive ? "text-white" : "text-zinc-400"
                             }`}
                           >
                             {preset.name}
                           </p>
-                          <span className="font-mono text-[9px] font-black px-1.5 py-0.5 bg-white/5 border border-white/10 text-zinc-500">
+                          <span className="border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[9px] font-black text-zinc-500">
                             {preset.estimatedCredits} CR
                           </span>
                         </div>
-                        <p className="text-zinc-500 text-[11px] font-bold leading-relaxed">
+                        <p className="text-[11px] leading-relaxed font-bold text-zinc-500">
                           {preset.description}
                         </p>
                       </div>
 
-                      <div className="mt-auto pt-4 border-t border-white/5 grid grid-cols-2 gap-2">
+                      <div className="mt-auto grid grid-cols-2 gap-2 border-t border-white/5 pt-4">
                         <div className="space-y-1">
-                          <p className="font-mono text-[8px] text-zinc-600 uppercase font-black">
+                          <p className="font-mono text-[8px] font-black text-zinc-600 uppercase">
                             Subreddits
                           </p>
-                          <p className="text-[10px] text-zinc-400 font-bold">
+                          <p className="text-[10px] font-bold text-zinc-400">
                             {preset.subreddits} communities
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="font-mono text-[8px] text-zinc-600 uppercase font-black">
+                          <p className="font-mono text-[8px] font-black text-zinc-600 uppercase">
                             Analysis
                           </p>
-                          <p className="text-[10px] text-zinc-400 font-bold">
+                          <p className="text-[10px] font-bold text-zinc-400">
                             {preset.sortModes} mode
                             {preset.sortModes > 1 ? "s" : ""}
                           </p>
@@ -750,8 +755,8 @@ export default function SearchPage() {
 
                       {!isAllowed && (
                         <div className="absolute top-0 right-0 p-2">
-                          <span className="inline-flex items-center gap-1 font-mono text-[8px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-400/35">
-                            <Lock className="w-2.5 h-2.5" />
+                          <span className="inline-flex items-center gap-1 border border-amber-400/35 bg-amber-500/10 px-2 py-0.5 font-mono text-[8px] font-black tracking-widest text-amber-400 uppercase">
+                            <Lock className="h-2.5 w-2.5" />
                             Upgrade
                           </span>
                         </div>
@@ -761,8 +766,8 @@ export default function SearchPage() {
                 })}
               </div>
               {billing ? (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-                  <p className="font-mono text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                <div className="flex flex-col justify-between gap-4 pt-2 sm:flex-row sm:items-center">
+                  <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
                     Plan: {billing.plan.toUpperCase()} | Monthly Credit Pool:{" "}
                     {billing.usage.monthlyScansUsed.toFixed(1)}
                     {billing.usage.monthlyScansLimit === null
@@ -773,13 +778,13 @@ export default function SearchPage() {
                     type="button"
                     onClick={() => {
                       setPlanDialogMessage(
-                        "Credits (CR) represent the resource intensity of a scan. Basic = 0.5 CR, Deep = 2 CR, Advanced = 5 CR. Your monthly plan gives you a fixed pool of credits that reset every 30 days. No hidden fees, just value-based mining."
+                        "Credits (CR) represent the resource intensity of a scan. Basic = 0.5 CR, Deep = 2 CR, Advanced = 5 CR. Your monthly plan gives you a fixed pool of credits that reset every 30 days. No hidden fees, just value-based mining.",
                       );
                       setPlanDialogOpen(true);
                     }}
-                    className="flex items-center gap-1.5 font-mono text-[9px] font-black uppercase tracking-widest text-[#ff4500] hover:text-[#ff8a57] transition-colors"
+                    className="flex items-center gap-1.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:text-[#ff8a57]"
                   >
-                    <HelpCircle className="w-3 h-3" />
+                    <HelpCircle className="h-3 w-3" />
                     How do credits work?
                   </button>
                 </div>
@@ -787,10 +792,10 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4">
-              <label className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400 block">
+              <label className="block font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                 Time Window
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {(["24h", "7d", "30d", "90d"] as const).map((window) => (
                   <button
                     key={window}
@@ -798,12 +803,12 @@ export default function SearchPage() {
                     onClick={() => setTimeWindow(window)}
                     className={`border-2 px-4 py-4 text-left transition-colors ${
                       timeWindow === window
-                        ? "bg-amber-500/10 border-amber-400/60 shadow-[3px_3px_0px_0px_rgba(245,158,11,0.18)]"
-                        : "bg-[#0c0c0c] border-white/15 hover:border-white/35"
+                        ? "border-amber-400/60 bg-amber-500/10 shadow-[3px_3px_0px_0px_rgba(245,158,11,0.18)]"
+                        : "border-white/15 bg-[#0c0c0c] hover:border-white/35"
                     }`}
                   >
                     <p
-                      className={`font-mono text-[11px] font-black uppercase tracking-widest ${
+                      className={`font-mono text-[11px] font-black tracking-widest uppercase ${
                         timeWindow === window
                           ? "text-amber-300"
                           : "text-zinc-400"
@@ -820,31 +825,31 @@ export default function SearchPage() {
             </div>
 
             {/* Footer Actions */}
-            <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className="flex items-center gap-3 text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
-                  <Clock className="w-4 h-4" />
+            <div className="flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-6 sm:flex-row">
+              <div className="flex flex-col items-center gap-6 sm:flex-row">
+                <div className="flex items-center gap-3 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+                  <Clock className="h-4 w-4" />
                   Est. time: {MINING_PRESETS[miningDepth].timeEstimate}
                 </div>
-                <div className="flex items-center gap-3 text-[#ff4500] font-mono text-[11px] font-bold uppercase tracking-widest">
-                  <Database className="w-4 h-4" />
+                <div className="flex items-center gap-3 font-mono text-[11px] font-bold tracking-widest text-[#ff4500] uppercase">
+                  <Database className="h-4 w-4" />
                   Est. cost: {MINING_PRESETS[miningDepth].estimatedCredits} CR
                 </div>
               </div>
-              <div className="text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
+              <div className="font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
                 Min score default: {minimumOpportunityScore}+
               </div>
-              <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex w-full items-center gap-4 sm:w-auto">
                 <button
                   onClick={handleSaveDraft}
                   disabled={isLoading}
-                  className="flex-1 sm:flex-none font-mono text-[12px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
+                  className="flex-1 font-mono text-[12px] font-black tracking-widest text-zinc-400 uppercase transition-colors hover:text-white disabled:opacity-50 sm:flex-none"
                   type="button"
                 >
                   {draftSavedAt ? "Update Draft" : "Save Draft"}
                 </button>
                 {isAtScanLimit || trialEnded ? (
-                  <div className="flex flex-col items-center sm:items-end gap-2">
+                  <div className="flex flex-col items-center gap-2 sm:items-end">
                     <p className="font-serif text-[13px] text-amber-300 italic">
                       {trialEnded
                         ? "Free trial ended — upgrade to start a new investigation."
@@ -852,26 +857,26 @@ export default function SearchPage() {
                     </p>
                     <Link
                       href="/dashboard/billing"
-                      className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group"
+                      className="group flex flex-1 items-center justify-center gap-3 border border-[#ff8a57] bg-[#ff4500] px-8 py-3.5 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-95 sm:flex-none"
                     >
                       {trialEnded ? "Unlock New Scans" : "Upgrade to Continue"}
-                      <Sparkles className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                      <Sparkles className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                   </div>
                 ) : (
                   <button
                     onClick={handleStartMining}
                     disabled={isLoading}
-                    className="flex-1 sm:flex-none border border-[#ff8a57] bg-[#ff4500] hover:bg-[#ff571a] text-white px-8 py-3.5 font-mono font-black text-[12px] uppercase tracking-wider transition-colors flex items-center justify-center gap-3 active:scale-95 group disabled:opacity-75 disabled:cursor-not-allowed"
+                    className="group flex flex-1 items-center justify-center gap-3 border border-[#ff8a57] bg-[#ff4500] px-8 py-3.5 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-75 sm:flex-none"
                   >
                     {isLoading ? (
                       <>
-                        Processing <Loader2 className="w-4 h-4 animate-spin" />
+                        Processing <Loader2 className="h-4 w-4 animate-spin" />
                       </>
                     ) : (
                       <>
                         Start Mining
-                        <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                        <Rocket className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </>
                     )}
                   </button>
@@ -883,22 +888,22 @@ export default function SearchPage() {
 
         {/* Info Sidebar */}
         <div className="space-y-8">
-          <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden">
-            <h4 className="font-black text-white text-lg mb-8 flex items-center gap-3 tracking-tight">
-              <Zap className="w-6 h-6 text-[#ff4500]" />
+          <div className="relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+            <h4 className="mb-8 flex items-center gap-3 text-lg font-black tracking-tight text-white">
+              <Zap className="h-6 w-6 text-[#ff4500]" />
               Expert Tips
             </h4>
 
             <div className="space-y-8">
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-black text-white uppercase tracking-tight mb-1">
+                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
                     Be Specific
                   </p>
-                  <p className="text-[12px] text-zinc-500 leading-relaxed">
+                  <p className="text-[12px] leading-relaxed text-zinc-500">
                     Instead of &quot;marketing&quot;, use &quot;B2B marketing
                     for AI startups&quot;.
                   </p>
@@ -906,14 +911,14 @@ export default function SearchPage() {
               </div>
 
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-black text-white uppercase tracking-tight mb-1">
+                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
                     Focus on Frustration
                   </p>
-                  <p className="text-[12px] text-zinc-500 leading-relaxed">
+                  <p className="text-[12px] leading-relaxed text-zinc-500">
                     Our AI looks for patterns like &quot;I hate when...&quot; or
                     &quot;Why is it so hard to...&quot;.
                   </p>
@@ -921,14 +926,14 @@ export default function SearchPage() {
               </div>
 
               <div className="flex gap-4">
-                <div className="shrink-0 w-6 h-6 bg-[#ff4500]/10 border border-[#ff4500]/35 flex items-center justify-center">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#ff4500]" />
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-black text-white uppercase tracking-tight mb-1">
+                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
                     Subreddit Context
                   </p>
-                  <p className="text-[12px] text-zinc-500 leading-relaxed">
+                  <p className="text-[12px] leading-relaxed text-zinc-500">
                     Narrowing down to specific niche subreddits gives higher
                     quality pain points.
                   </p>

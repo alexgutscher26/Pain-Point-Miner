@@ -33,17 +33,21 @@ export function FAQ() {
 
   return (
     <>
-      <section id="faq" className="w-full py-24 px-6 flex flex-col items-center bg-[#080808]">
-        <div className="text-center max-w-2xl mb-16">
-          <h2 className="text-3xl font-bold text-white mb-4">
+      <section
+        id="faq"
+        className="flex w-full flex-col items-center bg-[#080808] px-6 py-24"
+      >
+        <div className="mb-16 max-w-2xl text-center">
+          <h2 className="mb-4 text-3xl font-bold text-white">
             Frequently Asked Questions
           </h2>
-          <p className="text-zinc-400 text-sm">
-            Everything you need to know about the product and building products that users actually want.
+          <p className="text-sm text-zinc-400">
+            Everything you need to know about the product and building products
+            that users actually want.
           </p>
         </div>
 
-        <div className="max-w-2xl w-full border border-white/5 rounded-2xl bg-[#0a0a0a] p-2 md:p-6 shadow-xl">
+        <div className="w-full max-w-2xl rounded-2xl border border-white/5 bg-[#0a0a0a] p-2 shadow-xl md:p-6">
           {faqs.map((faq, i) => (
             <FAQItem key={i} question={faq.q} answer={faq.a} />
           ))}
@@ -51,22 +55,24 @@ export function FAQ() {
       </section>
 
       {/* CTA Block explicitly broken out per screenshot under FAQ */}
-      <section className="w-full pb-32 pt-16 px-6 flex justify-center bg-[#080808]">
-        <div className="max-w-4xl w-full border border-red-500/20 rounded-3xl bg-linear-to-b from-[#141414] to-[#ff4500]/10 p-12 md:p-16 text-center flex flex-col items-center shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff4500] rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#ff4500] rounded-full blur-[150px] opacity-20 pointer-events-none"></div>
+      <section className="flex w-full justify-center bg-[#080808] px-6 pt-16 pb-32">
+        <div className="relative flex w-full max-w-4xl flex-col items-center overflow-hidden rounded-3xl border border-red-500/20 bg-linear-to-b from-[#141414] to-[#ff4500]/10 p-12 text-center shadow-2xl md:p-16">
+          <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 rounded-full bg-[#ff4500] opacity-20 blur-[150px]"></div>
+          <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full bg-[#ff4500] opacity-20 blur-[150px]"></div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight relative z-10">
-            Ready to find your next <br className="hidden md:block" /> SaaS opportunity?
+          <h2 className="relative z-10 mb-6 text-3xl leading-tight font-bold text-white md:text-4xl lg:text-5xl">
+            Ready to find your next <br className="hidden md:block" /> SaaS
+            opportunity?
           </h2>
-          <p className="text-zinc-300 text-sm md:text-base font-medium mb-10 tracking-wide relative z-10">
-            Join 600+ founders using ThreddIQ to build products people actually want.
+          <p className="relative z-10 mb-10 text-sm font-medium tracking-wide text-zinc-300 md:text-base">
+            Join 600+ founders using ThreddIQ to build products people actually
+            want.
           </p>
 
-          <button className="bg-[#ff4500] hover:bg-[#e03d00] text-white px-10 py-4 rounded-lg font-bold text-lg transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,69,0,0.4)] relative z-10">
+          <button className="relative z-10 rounded-lg bg-[#ff4500] px-10 py-4 text-lg font-bold text-white shadow-[0_0_30px_rgba(255,69,0,0.4)] transition-transform hover:scale-105 hover:bg-[#e03d00]">
             Start 3-day free trial
           </button>
-          <p className="text-xs text-red-300 font-bold mt-4 tracking-widest uppercase relative z-10">
+          <p className="relative z-10 mt-4 text-xs font-bold tracking-widest text-red-300 uppercase">
             No Credit Card Required
           </p>
         </div>
@@ -79,29 +85,29 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-white/5 last:border-0 p-4">
+    <div className="border-b border-white/5 p-4 last:border-0">
       <button
         aria-expanded={open}
-        className="w-full flex items-center justify-between text-left text-white font-semibold text-sm hover:text-[#ff4500] transition-colors gap-4"
+        className="flex w-full items-center justify-between gap-4 text-left text-sm font-semibold text-white transition-colors hover:text-[#ff4500]"
         onClick={() => setOpen(!open)}
       >
         <span className="leading-snug">{question}</span>
         <div
-          className={`w-6 h-6 rounded flex items-center justify-center shrink-0 border ${open ? "border-[#ff4500]/50 bg-[#ff4500]/10" : "border-white/10 bg-white/5"} transition-colors`}
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border ${open ? "border-[#ff4500]/50 bg-[#ff4500]/10" : "border-white/10 bg-white/5"} transition-colors`}
         >
           {open ? (
             <Minus
-              className={`w-3 h-3 ${open ? "text-[#ff4500]" : "text-zinc-500"}`}
+              className={`h-3 w-3 ${open ? "text-[#ff4500]" : "text-zinc-500"}`}
             />
           ) : (
-            <Plus className="w-3 h-3 text-zinc-400" />
+            <Plus className="h-3 w-3 text-zinc-400" />
           )}
         </div>
       </button>
       <div
         className={`overflow-hidden transition-all duration-300 ${open ? "max-h-40 pt-4 opacity-100" : "max-h-0 opacity-0"}`}
       >
-        <p className="text-zinc-400 text-xs leading-relaxed max-w-[90%]">
+        <p className="max-w-[90%] text-xs leading-relaxed text-zinc-400">
           {answer}
         </p>
       </div>

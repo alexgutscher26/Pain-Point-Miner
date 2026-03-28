@@ -149,19 +149,19 @@ export function BillingPageClient({
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="mx-auto w-full max-w-7xl space-y-8 p-8">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
               Billing & Subscription
             </p>
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
+          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-white">
             Manage Your Plan
           </h2>
-          <p className="text-zinc-400 font-medium text-sm">
+          <p className="text-sm font-medium text-zinc-400">
             Update your payment method, review invoices, and manage your
             subscription in Stripe.
           </p>
@@ -170,10 +170,10 @@ export function BillingPageClient({
 
       {planPurchaseRequired ? (
         <div className="border-2 border-rose-400/60 bg-rose-500/10 px-5 py-4">
-          <p className="font-mono text-[11px] font-black uppercase tracking-widest text-rose-300 mb-1">
+          <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-rose-300 uppercase">
             Plan Inactive
           </p>
-          <p className="text-sm text-rose-100 font-semibold">
+          <p className="text-sm font-semibold text-rose-100">
             Your account is in read-only mode. Purchase a plan to resume new
             searches and paid features.
           </p>
@@ -182,10 +182,10 @@ export function BillingPageClient({
 
       {trialActive && trialDaysRemaining !== null ? (
         <div className="border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4">
-          <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+          <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
             Trial Active
           </p>
-          <p className="text-sm text-amber-100 font-semibold">
+          <p className="text-sm font-semibold text-amber-100">
             {trialDaysRemaining <= 1
               ? "Your free trial ends in 1 day."
               : `Your free trial ends in ${trialDaysRemaining} days.`}{" "}
@@ -200,14 +200,14 @@ export function BillingPageClient({
       ) : null}
 
       {availablePlans.length > 0 ? (
-        <div className="bg-[#111] border-2 border-white/15 p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
-            <h3 className="text-white text-lg font-black">Purchase Plan</h3>
-            <div className="inline-flex items-center gap-2 bg-[#161616] p-1 border border-white/15">
+        <div className="border-2 border-white/15 bg-[#111] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
+          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h3 className="text-lg font-black text-white">Purchase Plan</h3>
+            <div className="inline-flex items-center gap-2 border border-white/15 bg-[#161616] p-1">
               <button
                 type="button"
                 onClick={() => setBillingInterval("monthly")}
-                className={`px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest ${
+                className={`px-3 py-1.5 font-mono text-[10px] font-bold tracking-widest uppercase ${
                   billingInterval === "monthly"
                     ? "bg-[#ff4500] text-white"
                     : "text-zinc-400 hover:text-white"
@@ -218,7 +218,7 @@ export function BillingPageClient({
               <button
                 type="button"
                 onClick={() => setBillingInterval("yearly")}
-                className={`px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest ${
+                className={`px-3 py-1.5 font-mono text-[10px] font-bold tracking-widest uppercase ${
                   billingInterval === "yearly"
                     ? "bg-[#ff4500] text-white"
                     : "text-zinc-400 hover:text-white"
@@ -228,7 +228,7 @@ export function BillingPageClient({
               </button>
             </div>
           </div>
-          <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+          <p className="mb-6 text-sm leading-relaxed text-zinc-400">
             Choose a paid plan to restore access after trial expiry or upgrade
             your current account.{" "}
             {billingInterval === "yearly"
@@ -254,12 +254,12 @@ export function BillingPageClient({
                     !stripeConfigured ||
                     yearlyDisabled
                   }
-                  className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white font-mono text-sm font-bold uppercase tracking-wide px-5 py-2.5 transition-colors"
+                  className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-5 py-2.5 font-mono text-sm font-bold tracking-wide text-white uppercase transition-colors hover:bg-[#e03d00] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="h-4 w-4" />
                   )}
                   {isCurrentPlan
                     ? `${targetPlan} current`
@@ -273,13 +273,13 @@ export function BillingPageClient({
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-[#111] border-2 border-white/15 p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
-          <h3 className="text-white text-lg font-black mb-4 flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-[#ff4500]" />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="border-2 border-white/15 bg-[#111] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)] lg:col-span-2">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-white">
+            <CreditCard className="h-5 w-5 text-[#ff4500]" />
             Billing Portal
           </h3>
-          <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+          <p className="mb-6 text-sm leading-relaxed text-zinc-400">
             Open your Stripe billing portal to update payment methods, view
             invoices, cancel, or restore your subscription.
           </p>
@@ -287,12 +287,12 @@ export function BillingPageClient({
             type="button"
             onClick={openBillingPortal}
             disabled={openingPortal}
-            className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e03d00] disabled:opacity-60 disabled:cursor-not-allowed text-white font-mono text-sm font-bold uppercase tracking-wide px-5 py-2.5 transition-colors"
+            className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-5 py-2.5 font-mono text-sm font-bold tracking-wide text-white uppercase transition-colors hover:bg-[#e03d00] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {openingPortal ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="h-4 w-4" />
             )}
             Open Billing Portal
           </button>
@@ -303,15 +303,15 @@ export function BillingPageClient({
           ) : null}
         </div>
 
-        <div className="bg-[#111] border-2 border-white/15 p-6 space-y-4 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
-          <h3 className="text-white text-lg font-black">Current Access</h3>
+        <div className="space-y-4 border-2 border-white/15 bg-[#111] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
+          <h3 className="text-lg font-black text-white">Current Access</h3>
           <p className="text-2xl font-black text-[#ff4500] uppercase">
             {planPurchaseRequired ? "Read Only" : plan}
           </p>
           <div className="space-y-2 font-mono text-sm text-zinc-400">
             <p>
               Status:{" "}
-              <span className="text-white font-bold">
+              <span className="font-bold text-white">
                 {planPurchaseRequired
                   ? "Plan inactive"
                   : trialActive
@@ -321,7 +321,7 @@ export function BillingPageClient({
             </p>
             <p>
               Scans this month:{" "}
-              <span className="text-white font-bold">
+              <span className="font-bold text-white">
                 {planPurchaseRequired
                   ? "Read only"
                   : `${usage.monthlyScansUsed}${
@@ -333,7 +333,7 @@ export function BillingPageClient({
             </p>
             <p>
               Max subreddits/search:{" "}
-              <span className="text-white font-bold">
+              <span className="font-bold text-white">
                 {planPurchaseRequired
                   ? "Requires paid plan"
                   : entitlements.maxSubredditsPerSearch === null
@@ -343,7 +343,7 @@ export function BillingPageClient({
             </p>
             <p>
               Save reports:{" "}
-              <span className="text-white font-bold">
+              <span className="font-bold text-white">
                 {planPurchaseRequired
                   ? "Past reports stay available"
                   : entitlements.canSaveReports

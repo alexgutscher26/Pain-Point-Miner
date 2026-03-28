@@ -163,14 +163,15 @@ export function resolvePlanForIdentity(input: {
   );
 }
 
-
 export async function getMonthlyScanUsage(userId: string, now = new Date()) {
   const fromDate = startOfMonth(now);
   const result = await db
     .select({ total: sql<number>`COALESCE(SUM(${scraperRun.cost}), 0)` })
     .from(scraperRun)
     .innerJoin(scraper, eq(scraperRun.scraperId, scraper.id))
-    .where(and(eq(scraper.userId, userId), gte(scraperRun.startedAt, fromDate)));
+    .where(
+      and(eq(scraper.userId, userId), gte(scraperRun.startedAt, fromDate)),
+    );
   return Number(result[0]?.total ?? 0);
 }
 

@@ -94,10 +94,10 @@ function CommunityPainPointCard({
     <div className="border border-white/10 bg-black/20 p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-sm font-black text-white leading-tight">
+          <p className="text-sm leading-tight font-black text-white">
             {painPoint.title}
           </p>
-          <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-black tracking-widest text-zinc-500 uppercase">
             <span>{formatUrgency(painPoint.urgency)}</span>
             <span className="h-1 w-1 bg-zinc-700" />
             <span>{formatSentiment(painPoint.sentiment)}</span>
@@ -106,7 +106,7 @@ function CommunityPainPointCard({
           </div>
         </div>
         <div
-          className="shrink-0 border px-2 py-1 text-[10px] font-black uppercase tracking-widest"
+          className="shrink-0 border px-2 py-1 text-[10px] font-black tracking-widest uppercase"
           style={{
             color: tone.text,
             borderColor: tone.border,
@@ -118,7 +118,7 @@ function CommunityPainPointCard({
       </div>
       <div className="mt-4 flex items-center justify-between gap-4 border-t border-white/5 pt-3">
         <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
+          <p className="font-mono text-[10px] font-black tracking-widest text-zinc-500 uppercase">
             Investigation
           </p>
           <p className="text-sm font-bold text-zinc-200">
@@ -127,7 +127,7 @@ function CommunityPainPointCard({
         </div>
         <Link
           href={`/dashboard/reports/${painPoint.reportId}`}
-          className="inline-flex items-center gap-2 border border-white/15 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-200 transition-colors hover:border-[#ff8a57] hover:bg-[#ff4500] hover:text-white"
+          className="inline-flex items-center gap-2 border border-white/15 px-3 py-2 font-mono text-[10px] font-black tracking-widest text-zinc-200 uppercase transition-colors hover:border-[#ff8a57] hover:bg-[#ff4500] hover:text-white"
         >
           Open report
           <ExternalLink className="h-3.5 w-3.5" />
@@ -147,20 +147,20 @@ export function CommunityMapPanel({
 
   return (
     <>
-      <div className="bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden">
+      <div className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
         <div className="flex items-center justify-between gap-4 border-b border-white/10 px-8 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-[#ff4500]" />
+            <div className="h-2 w-2 bg-[#ff4500]" />
             <div>
-              <h4 className="font-black text-white text-lg tracking-tight">
+              <h4 className="text-lg font-black tracking-tight text-white">
                 Community Map
               </h4>
-              <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+              <p className="mt-1 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
                 Subreddit problem density over {selectedWindowLabel}
               </p>
             </div>
           </div>
-          <div className="hidden items-center gap-2 border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 md:flex">
+          <div className="hidden items-center gap-2 border border-white/10 bg-white/5 px-3 py-2 font-mono text-[10px] font-black tracking-widest text-zinc-400 uppercase md:flex">
             <Flame className="h-3.5 w-3.5 text-[#ff4500]" />
             Color = avg intensity
           </div>
@@ -183,7 +183,7 @@ export function CommunityMapPanel({
           </div>
         ) : (
           <>
-            <div className="hidden gap-4 p-5 md:grid md:grid-cols-12 md:auto-rows-[120px]">
+            <div className="hidden gap-4 p-5 md:grid md:auto-rows-[120px] md:grid-cols-12">
               {nodes.map((node) => {
                 const tone = toIntensityTone(node.averageIntensity);
                 const span = getDesktopSpan(node, largestCount);
@@ -207,11 +207,11 @@ export function CommunityMapPanel({
                           <p className="text-base font-black text-white">
                             {node.label}
                           </p>
-                          <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
+                          <p className="mt-1 font-mono text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
                             {node.painPointCount} pain points
                           </p>
                         </div>
-                        <span className="border border-white/10 bg-black/20 px-2 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-zinc-100">
+                        <span className="border border-white/10 bg-black/20 px-2 py-1 font-mono text-[9px] font-black tracking-widest text-zinc-100 uppercase">
                           {tone.badge}
                         </span>
                       </div>
@@ -220,7 +220,7 @@ export function CommunityMapPanel({
                           <p className="text-3xl font-black text-white">
                             {node.averageIntensity}/10
                           </p>
-                          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
+                          <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
                             avg intensity
                           </p>
                         </div>
@@ -228,7 +228,7 @@ export function CommunityMapPanel({
                           <p className="text-sm font-black text-white">
                             {node.averageUrgency}/10
                           </p>
-                          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
+                          <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
                             urgency
                           </p>
                         </div>
@@ -258,7 +258,7 @@ export function CommunityMapPanel({
                         <p className="text-sm font-black text-white">
                           {node.label}
                         </p>
-                        <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
+                        <p className="mt-1 font-mono text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
                           {node.painPointCount} pain points
                         </p>
                       </div>
@@ -266,7 +266,7 @@ export function CommunityMapPanel({
                         <p className="text-lg font-black text-white">
                           {node.averageIntensity}/10
                         </p>
-                        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-200">
+                        <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
                           avg intensity
                         </p>
                       </div>
@@ -277,7 +277,7 @@ export function CommunityMapPanel({
             </div>
 
             <div className="border-t border-white/10 px-8 py-4">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                 Largest blocks reflect pain-point count. Hotter tones indicate
                 stronger average intensity.
               </p>
@@ -301,7 +301,7 @@ export function CommunityMapPanel({
               <DrawerHeader className="border-b border-white/10 px-6 py-5 text-left">
                 <div className="flex items-center gap-2 text-[#ff4500]">
                   <Layers3 className="h-4 w-4" />
-                  <p className="font-mono text-[10px] font-black uppercase tracking-widest">
+                  <p className="font-mono text-[10px] font-black tracking-widest uppercase">
                     Community drill-in
                   </p>
                 </div>

@@ -145,8 +145,12 @@ export async function GET(req: Request) {
                 ) / topCommentScores.length,
               )
             : 0;
-        const userUpvotes = (point.painPointFeedback ?? []).filter(v => v.vote === 1).length;
-        const userDownvotes = (point.painPointFeedback ?? []).filter(v => v.vote === -1).length;
+        const userUpvotes = (point.painPointFeedback ?? []).filter(
+          (v) => v.vote === 1,
+        ).length;
+        const userDownvotes = (point.painPointFeedback ?? []).filter(
+          (v) => v.vote === -1,
+        ).length;
 
         return {
           ...point,

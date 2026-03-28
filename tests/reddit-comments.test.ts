@@ -21,8 +21,8 @@ const mockCommentData = [
                       id: "2",
                       author: "user2",
                       body: "Reply 1",
-                      replies: "" // Sometimes empty string in Reddit API
-                    }
+                      replies: "", // Sometimes empty string in Reddit API
+                    },
                   },
                   {
                     kind: "t1",
@@ -39,28 +39,28 @@ const mockCommentData = [
                                 id: "4",
                                 author: "user4",
                                 body: "Nested reply",
-                                replies: ""
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
+                                replies: "",
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
         {
           kind: "more", // Non-t1 kind, should be filtered
           data: {
-            count: 5
-          }
-        }
-      ]
-    }
-  }
+            count: 5,
+          },
+        },
+      ],
+    },
+  },
 ];
 
 describe("fetchComments", () => {
@@ -99,11 +99,11 @@ describe("fetchComments", () => {
                 id: "1",
                 author: "user1",
                 body: "Top level comment with no replies",
-              }
-            }
-          ]
-        }
-      }
+              },
+            },
+          ],
+        },
+      },
     ];
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -124,7 +124,7 @@ describe("fetchComments", () => {
 
   it("handles fetch errors gracefully", async () => {
     // Mock the specific fallback function and error logging behavior
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Make fetch throw a generic error to test the default error handling route
     global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
@@ -135,34 +135,35 @@ describe("fetchComments", () => {
   });
 
   it("handles fallback to PullPush on reddit block", async () => {
-     vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
-     const blockedError = new Error("Reddit API error: 403 Forbidden");
+    const blockedError = new Error("Reddit API error: 403 Forbidden");
 
-     global.fetch = vi.fn()
-       .mockImplementationOnce(() => Promise.reject(blockedError)) // auth token attempt or reddit api attempt 1
-       .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
-       .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
-       .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
-       .mockImplementationOnce(() => Promise.resolve({
-         ok: true,
-         json: async () => ({
-           data: [
-             { id: "pp1", author: "pp_user", body: "PullPush comment" }
-           ]
-         })
-       }))
-       .mockImplementation(() => Promise.resolve({
-         ok: true,
-         json: async () => ({
-           data: [
-             { id: "pp1", author: "pp_user", body: "PullPush comment" }
-           ]
-         })
-       }));
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(() => Promise.reject(blockedError)) // auth token attempt or reddit api attempt 1
+      .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
+      .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
+      .mockImplementationOnce(() => Promise.reject(blockedError)) // retry
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+          }),
+        }),
+      )
+      .mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+          }),
+        }),
+      );
 
-     const comments = await fetchComments("testsub", "testpost");
-     expect(comments).toHaveLength(1);
-     expect(comments[0].id).toBe("pp1");
+    const comments = await fetchComments("testsub", "testpost");
+    expect(comments).toHaveLength(1);
+    expect(comments[0].id).toBe("pp1");
   });
 });

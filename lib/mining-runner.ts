@@ -159,29 +159,37 @@ export async function executeMiningRun({
 
     const baseSubConcurrency = 5;
     const baseCommentConcurrency = 5;
-    
+
     const global429Rate = await getGlobal429Rate();
     const adaptiveSubConcurrency = global429Rate > 0.2 ? 1 : baseSubConcurrency;
-    const adaptiveCommentConcurrency = global429Rate > 0.2 ? 2 : baseCommentConcurrency;
+    const adaptiveCommentConcurrency =
+      global429Rate > 0.2 ? 2 : baseCommentConcurrency;
 
     if (global429Rate > 0.2) {
-      throttleWarnings.push(`⚠️ Detected high 429 rate (${(global429Rate * 100).toFixed(0)}%), lowering parallelism to ${adaptiveSubConcurrency}...`);
+      throttleWarnings.push(
+        `⚠️ Detected high 429 rate (${(global429Rate * 100).toFixed(0)}%), lowering parallelism to ${adaptiveSubConcurrency}...`,
+      );
     }
 
     const subredditFetchResults = await pMap(
       targetSubreddits,
       async (sub) => {
         try {
-          const res = await fetchSubredditPostsMultiSort(sub, keyword, miningDepth, {
-            maxPosts: postsPerSub,
-            time: getRedditTimeRangeForWindow(timeWindow),
-          });
+          const res = await fetchSubredditPostsMultiSort(
+            sub,
+            keyword,
+            miningDepth,
+            {
+              maxPosts: postsPerSub,
+              time: getRedditTimeRangeForWindow(timeWindow),
+            },
+          );
           return { status: "fulfilled" as const, value: res };
         } catch (err) {
           return { status: "rejected" as const, reason: err };
         }
       },
-      { concurrency: adaptiveSubConcurrency }
+      { concurrency: adaptiveSubConcurrency },
     );
 
     for (let i = 0; i < subredditFetchResults.length; i++) {
@@ -282,21 +290,21 @@ export async function executeMiningRun({
       { concurrency: adaptiveCommentConcurrency },
     );
 
-function calculatePostQualityScore(post: RedditPost): number {
-  let score = 1.0;
-  const body = (post.selftext || "").toLowerCase();
+    function calculatePostQualityScore(post: RedditPost): number {
+      let score = 1.0;
+      const body = (post.selftext || "").toLowerCase();
 
-  // Low engagement penalty
-  if (post.score < 5 && post.num_comments < 10) score -= 0.2;
-  
-  // High engagement boost
-  if (post.score > 100 || post.num_comments > 50) score += 0.2;
+      // Low engagement penalty
+      if (post.score < 5 && post.num_comments < 10) score -= 0.2;
 
-  // Link post penalty if the body is very sparse
-  if (post.is_self === false && body.length < 50) score -= 0.3;
+      // High engagement boost
+      if (post.score > 100 || post.num_comments > 50) score += 0.2;
 
-  return Math.max(0, Math.min(1.0, Number(score.toFixed(2))));
-}
+      // Link post penalty if the body is very sparse
+      if (post.is_self === false && body.length < 50) score -= 0.3;
+
+      return Math.max(0, Math.min(1.0, Number(score.toFixed(2))));
+    }
 
     // Track every post analyzed in this run
     if (postsToAnalyze.length > 0) {

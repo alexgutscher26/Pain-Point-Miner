@@ -12,7 +12,7 @@ export default function DashboardLoading() {
           <Skeleton className="h-10 w-64 rounded-none bg-white/10" />
           <Skeleton className="h-4 w-72 rounded-none bg-white/8" />
         </div>
-        <div className="hidden items-center gap-3 bg-[#161616] p-1.5 border border-white/15 lg:flex">
+        <div className="hidden items-center gap-3 border border-white/15 bg-[#161616] p-1.5 lg:flex">
           <Skeleton className="h-10 w-28 rounded-none bg-white/10" />
           <Skeleton className="h-10 w-32 rounded-none bg-white/8" />
         </div>
@@ -78,7 +78,7 @@ export default function DashboardLoading() {
             <Skeleton className="h-4 w-16 rounded-none bg-white/8" />
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-[720px] w-full table-fixed border-collapse text-left">
+            <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
                   {Array.from({ length: 4 }).map((_, index) => (
@@ -132,7 +132,7 @@ export default function DashboardLoading() {
               </div>
               <div className="border-t border-white/10 pt-6">
                 <Skeleton className="mb-4 h-3 w-32 rounded-none bg-white/8" />
-                <div className="border-y border-r border-white/10 border-l-4 border-l-[#ff4500]/50 bg-zinc-900 p-5">
+                <div className="border-y border-r border-l-4 border-white/10 border-l-[#ff4500]/50 bg-zinc-900 p-5">
                   <Skeleton className="mb-3 h-4 w-full rounded-none bg-white/10" />
                   <Skeleton className="h-4 w-5/6 rounded-none bg-white/8" />
                 </div>

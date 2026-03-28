@@ -302,19 +302,19 @@ export function SettingsPageClient({
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="mx-auto w-full max-w-5xl space-y-8 p-8">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <div className="h-px w-8 bg-[#ff4500]" />
-            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
               Dashboard Settings
             </p>
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
+          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-white">
             Settings
           </h2>
-          <p className="text-zinc-400 font-medium text-sm">
+          <p className="text-sm font-medium text-zinc-400">
             Manage your account preferences, notifications, and scan defaults.
           </p>
         </div>
@@ -322,9 +322,9 @@ export function SettingsPageClient({
           type="submit"
           form="settings-form"
           disabled={isSaving}
-          className="border border-[#ff8a57] bg-[#ff4500] hover:bg-[#e63e00] disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 font-mono text-[12px] font-black uppercase tracking-[0.15em] transition-colors inline-flex items-center gap-2"
+          className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-6 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-colors hover:bg-[#e63e00] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
@@ -336,13 +336,13 @@ export function SettingsPageClient({
       )}
 
       <form id="settings-form" onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <section className="xl:col-span-2 bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-6">
-              <User2 className="w-5 h-5 text-[#ff4500]" />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8 xl:col-span-2">
+            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+              <User2 className="h-5 w-5 text-[#ff4500]" />
               Profile
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field
                 label="Full Name"
                 value={values.fullName}
@@ -375,9 +375,9 @@ export function SettingsPageClient({
             </div>
           </section>
 
-          <section className="bg-[#111] border-2 border-white/15 p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-5">
-              <Shield className="w-5 h-5 text-[#ff4500]" />
+          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+            <h3 className="mb-5 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+              <Shield className="h-5 w-5 text-[#ff4500]" />
               Security
             </h3>
             <div className="space-y-3">
@@ -396,23 +396,23 @@ export function SettingsPageClient({
           </section>
         </div>
 
-        <section className="bg-black/40 border-2 border-[#ff4500]/30 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(255,69,0,0.15)] relative overflow-hidden group">
+        <section className="group relative overflow-hidden border-2 border-[#ff4500]/30 bg-black/40 p-6 shadow-[6px_6px_0px_0px_rgba(255,69,0,0.15)] md:p-8">
           <div className="absolute top-0 right-0 p-4">
-            <span className="px-2.5 py-1 border border-[#ff4500]/45 bg-[#ff4500]/10 text-[#ff4500] font-mono text-[10px] font-black uppercase tracking-[0.15em]">
+            <span className="border border-[#ff4500]/45 bg-[#ff4500]/10 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-[#ff4500] uppercase">
               Pro Feature
             </span>
           </div>
 
-          <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-2">
-            <SlidersHorizontal className="w-5 h-5 text-[#ff4500]" />
+          <h3 className="mb-2 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+            <SlidersHorizontal className="h-5 w-5 text-[#ff4500]" />
             Opportunity Scoring Engine
           </h3>
-          <p className="text-zinc-400 text-sm mb-8 max-w-2xl">
+          <p className="mb-8 max-w-2xl text-sm text-zinc-400">
             Fine-tune the weights for the Opportunity Score. Changes are applied
             dynamically to all extracted insights.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             <div className="space-y-8">
               <WeightSlider
                 label="Pain Intensity (w1)"
@@ -459,9 +459,9 @@ export function SettingsPageClient({
                 }
               />
 
-              <div className="pt-4 border-t border-white/10">
+              <div className="border-t border-white/10 pt-4">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                     Total Weight Sum
                   </p>
                   <p
@@ -489,34 +489,40 @@ export function SettingsPageClient({
               </div>
             </div>
 
-            <div className="bg-white/2 border border-white/10 p-6">
-              <h4 className="font-mono text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[#ff4500] rounded-full" />
+            <div className="border border-white/10 bg-white/2 p-6">
+              <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#ff4500]" />
                 Live Opportunity Preview
               </h4>
               <div className="space-y-4">
                 {sampleOpportunities.length === 0 ? (
-                  <div className="py-12 text-center text-zinc-600 font-mono text-xs">
+                  <div className="py-12 text-center font-mono text-xs text-zinc-600">
                     No opportunities found to preview.
                   </div>
                 ) : (
                   sampleOpportunities.map((opp) => {
-                    const score = toOpportunityScore([opp], values.scoringWeights);
-                    const explanation = generateScoreExplanation(opp, values.scoringWeights);
+                    const score = toOpportunityScore(
+                      [opp],
+                      values.scoringWeights,
+                    );
+                    const explanation = generateScoreExplanation(
+                      opp,
+                      values.scoringWeights,
+                    );
                     return (
                       <div
                         key={opp.id}
-                        className="p-4 bg-white/2 border border-white/5 space-y-3"
+                        className="space-y-3 border border-white/5 bg-white/2 p-4"
                       >
-                        <div className="flex justify-between items-start gap-4">
-                          <p className="text-sm font-bold text-white leading-tight">
+                        <div className="flex items-start justify-between gap-4">
+                          <p className="text-sm leading-tight font-bold text-white">
                             {opp.title}
                           </p>
-                          <span className="shrink-0 text-xl font-black text-[#ff4500] px-3 py-1 bg-[#ff4500]/10 border border-[#ff4500]/20">
+                          <span className="shrink-0 border border-[#ff4500]/20 bg-[#ff4500]/10 px-3 py-1 text-xl font-black text-[#ff4500]">
                             {score}
                           </span>
                         </div>
-                        <p className="text-[11px] text-zinc-500 font-medium italic leading-relaxed">
+                        <p className="text-[11px] leading-relaxed font-medium text-zinc-500 italic">
                           &quot;{explanation}&quot;
                         </p>
                       </div>
@@ -528,20 +534,20 @@ export function SettingsPageClient({
           </div>
         </section>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <section className="bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <div className="flex items-center justify-between gap-3 mb-6">
-              <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5">
-                <Bell className="w-5 h-5 text-[#ff4500]" />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <h3 className="flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+                <Bell className="h-5 w-5 text-[#ff4500]" />
                 Notifications
               </h3>
-              <span className="px-2.5 py-1 border border-amber-400/45 bg-amber-500/10 text-amber-300 font-mono text-[10px] font-black uppercase tracking-[0.15em]">
+              <span className="border border-amber-400/45 bg-amber-500/10 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-amber-300 uppercase">
                 Coming Soon
               </span>
             </div>
             <fieldset
               disabled
-              className="space-y-4 opacity-60 pointer-events-none"
+              className="pointer-events-none space-y-4 opacity-60"
             >
               <ToggleRow
                 title="Weekly market digest"
@@ -576,9 +582,9 @@ export function SettingsPageClient({
             </fieldset>
           </section>
 
-          <section className="bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-6">
-              <SlidersHorizontal className="w-5 h-5 text-[#ff4500]" />
+          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
+            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+              <SlidersHorizontal className="h-5 w-5 text-[#ff4500]" />
               Scan Defaults
             </h3>
             <div className="space-y-4">
@@ -626,11 +632,11 @@ export function SettingsPageClient({
                 }
               />
             </div>
-            <p className="font-mono text-xs text-zinc-500 mt-4">
+            <p className="mt-4 font-mono text-xs text-zinc-500">
               Need higher limits?{" "}
               <Link
                 href="/dashboard/billing"
-                className="text-[#ff4500] hover:text-[#ff6d33] font-bold"
+                className="font-bold text-[#ff4500] hover:text-[#ff6d33]"
               >
                 Upgrade your plan
               </Link>
@@ -640,11 +646,11 @@ export function SettingsPageClient({
         </div>
       </form>
 
-      <section className="bg-[#111] border-2 border-rose-500/35 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-        <h3 className="text-rose-400 font-black text-lg tracking-tight mb-2">
+      <section className="border-2 border-rose-500/35 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
+        <h3 className="mb-2 text-lg font-black tracking-tight text-rose-400">
           Danger Zone
         </h3>
-        <p className="text-sm text-zinc-400 mb-5">
+        <p className="mb-5 text-sm text-zinc-400">
           Deleting your account removes all reports, scans, and team workspaces
           permanently.
         </p>
@@ -652,20 +658,20 @@ export function SettingsPageClient({
           <AlertDialogTrigger asChild>
             <button
               type="button"
-              className="bg-rose-600 hover:bg-rose-500 border border-rose-300/45 text-white px-5 py-2.5 font-mono text-[12px] font-black uppercase tracking-[0.15em] transition-colors"
+              className="border border-rose-300/45 bg-rose-600 px-5 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-colors hover:bg-rose-500"
             >
               Delete Account
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0e0e0e] border-2 border-rose-500/35 text-zinc-100">
-            <AlertDialogHeader className="text-left place-items-start">
-              <AlertDialogTitle className="text-rose-400 font-black">
+          <AlertDialogContent className="border-2 border-rose-500/35 bg-[#0e0e0e] text-zinc-100">
+            <AlertDialogHeader className="place-items-start text-left">
+              <AlertDialogTitle className="font-black text-rose-400">
                 Delete your account?
               </AlertDialogTitle>
               <AlertDialogDescription className="text-zinc-400">
                 This action is permanent and removes your account and all
                 associated data. Type{" "}
-                <span className="text-zinc-100 font-bold">DELETE</span> to
+                <span className="font-bold text-zinc-100">DELETE</span> to
                 continue.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -674,11 +680,11 @@ export function SettingsPageClient({
               value={deleteConfirmation}
               onChange={(event) => setDeleteConfirmation(event.target.value)}
               placeholder="Type DELETE"
-              className="w-full h-11 border border-white/20 bg-black/30 font-mono text-sm text-zinc-100 px-3 outline-none focus:border-rose-500/60"
+              className="h-11 w-full border border-white/20 bg-black/30 px-3 font-mono text-sm text-zinc-100 outline-none focus:border-rose-500/60"
             />
             <AlertDialogFooter>
               <AlertDialogCancel
-                className="bg-zinc-900 border-white/10 text-zinc-200 hover:bg-zinc-800"
+                className="border-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
                 onClick={() => setDeleteConfirmation("")}
               >
                 Cancel
@@ -689,7 +695,7 @@ export function SettingsPageClient({
                   void handleDeleteAccount();
                 }}
                 disabled={deleteConfirmation !== "DELETE" || isDeleting}
-                className="bg-rose-600 text-white hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-rose-600 text-white hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Delete Account"}
               </AlertDialogAction>
@@ -702,9 +708,9 @@ export function SettingsPageClient({
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
       >
-        <DialogContent className="bg-[#0e0e0e] border-2 border-white/15 text-zinc-100">
+        <DialogContent className="border-2 border-white/15 bg-[#0e0e0e] text-zinc-100">
           <DialogHeader>
-            <DialogTitle className="text-white font-black">
+            <DialogTitle className="font-black text-white">
               Change Password
             </DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -763,41 +769,41 @@ export function SettingsPageClient({
       </Dialog>
 
       <Dialog open={isSessionsOpen} onOpenChange={setIsSessionsOpen}>
-        <DialogContent className="bg-[#0e0e0e] border-2 border-white/15 text-zinc-100 sm:max-w-2xl">
+        <DialogContent className="border-2 border-white/15 bg-[#0e0e0e] text-zinc-100 sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white font-black">
+            <DialogTitle className="font-black text-white">
               Active Sessions
             </DialogTitle>
             <DialogDescription className="text-zinc-400">
               Review and revoke active sessions for this account.
             </DialogDescription>
           </DialogHeader>
-          <div className="max-h-[360px] overflow-y-auto space-y-3 pr-1">
+          <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
             {isLoadingSessions ? (
-              <div className="py-8 text-center text-zinc-500 text-sm">
+              <div className="py-8 text-center text-sm text-zinc-500">
                 Loading sessions...
               </div>
             ) : sessions.length === 0 ? (
-              <div className="py-8 text-center text-zinc-500 text-sm">
+              <div className="py-8 text-center text-sm text-zinc-500">
                 No active sessions found.
               </div>
             ) : (
               sessions.map((session) => (
                 <div
                   key={session.id}
-                  className="border border-white/20 bg-black/30 p-4 flex items-start justify-between gap-4"
+                  className="flex items-start justify-between gap-4 border border-white/20 bg-black/30 p-4"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-white truncate">
+                    <p className="truncate text-sm font-bold text-white">
                       {session.userAgent || "Unknown device"}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">
+                    <p className="mt-1 text-xs text-zinc-500">
                       IP: {session.ipAddress || "Unknown"} | Started:{" "}
                       {session.createdAt
                         ? new Date(session.createdAt).toLocaleString()
                         : "Unknown"}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">
+                    <p className="mt-1 text-xs text-zinc-500">
                       Expires:{" "}
                       {session.expiresAt
                         ? new Date(session.expiresAt).toLocaleString()
@@ -870,7 +876,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+      <span className="font-mono text-[11px] font-bold tracking-[0.14em] text-zinc-500 uppercase">
         {label}
       </span>
       <input
@@ -879,7 +885,7 @@ function Field({
         min={min}
         max={max}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full h-11 border border-white/20 bg-black/30 text-sm text-zinc-100 px-3 outline-none focus:border-[#ff4500]/60"
+        className="mt-2 h-11 w-full border border-white/20 bg-black/30 px-3 text-sm text-zinc-100 outline-none focus:border-[#ff4500]/60"
       />
     </label>
   );
@@ -897,10 +903,10 @@ function ToggleRow({
   onCheckedChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-start justify-between gap-4 p-4 rounded-2xl border border-white/5 bg-black/20 cursor-pointer">
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-white/5 bg-black/20 p-4">
       <div>
         <p className="text-sm font-bold text-white">{title}</p>
-        <p className="text-xs text-zinc-500 mt-1">{description}</p>
+        <p className="mt-1 text-xs text-zinc-500">{description}</p>
       </div>
       <input
         type="checkbox"
@@ -923,7 +929,7 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left border border-white/20 hover:border-[#ff4500]/55 bg-black/20 hover:bg-black/40 px-4 py-3 font-mono text-sm font-semibold uppercase tracking-wide text-zinc-200 transition-colors"
+      className="w-full border border-white/20 bg-black/20 px-4 py-3 text-left font-mono text-sm font-semibold tracking-wide text-zinc-200 uppercase transition-colors hover:border-[#ff4500]/55 hover:bg-black/40"
     >
       {label}
     </button>
@@ -943,12 +949,12 @@ function WeightSlider({
 }) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-end">
+      <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-[11px] font-bold text-white uppercase tracking-widest leading-none">
+          <p className="font-mono text-[11px] leading-none font-bold tracking-widest text-white uppercase">
             {label}
           </p>
-          <p className="text-[11px] text-zinc-500 mt-1">{description}</p>
+          <p className="mt-1 text-[11px] text-zinc-500">{description}</p>
         </div>
         <p className="font-mono text-xs font-black text-[#ff4500]">
           {(value * 100).toFixed(0)}%
@@ -959,7 +965,7 @@ function WeightSlider({
         max={100}
         step={5}
         onValueChange={(vals) => onChange(vals[0] / 100)}
-        className="[&_[role=slider]]:bg-[#ff4500] [&_[role=slider]]:border-[#ff4500]"
+        className="[&_[role=slider]]:border-[#ff4500] [&_[role=slider]]:bg-[#ff4500]"
       />
     </div>
   );

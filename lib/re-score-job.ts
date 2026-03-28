@@ -60,8 +60,10 @@ export async function reScoreUserOpportunities(
         mentionCount: point.mentionCount,
         commentCount: point.commentCount,
         upvoteSignal: 0, // placeholder if not available directly
-        userUpvotes: point.painPointFeedback?.filter((f) => f.vote === 1).length || 0,
-        userDownvotes: point.painPointFeedback?.filter((f) => f.vote === -1).length || 0,
+        userUpvotes:
+          point.painPointFeedback?.filter((f) => f.vote === 1).length || 0,
+        userDownvotes:
+          point.painPointFeedback?.filter((f) => f.vote === -1).length || 0,
       };
 
       const newScore = toOpportunityScore([dashboardPoint], weights);

@@ -74,7 +74,7 @@ describe("executeMiningRun", () => {
           timeWindow: "7d",
           userId: "test-user",
           workspaceId: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("Database connection failed");
 
       // Verify the catch block logic
@@ -84,23 +84,42 @@ describe("executeMiningRun", () => {
 
     it("handles subreddit fetch errors but continues processing other subreddits", async () => {
       // Mock successful DB queries
-      (db.query.user.findFirst as any).mockResolvedValueOnce({ id: "test-user", anonymizeRedditUsernames: false });
-
-      // Mock one subreddit succeeding and one failing
-      (reddit.fetchSubredditPostsMultiSort as any).mockImplementation((sub: string) => {
-        if (sub === "fail-sub") {
-          return Promise.reject(new Error("API Error"));
-        }
-        return Promise.resolve([{
-          id: "post1", title: "Test", selftext: "Test", author: "User1",
-          subreddit: sub, url: "http://test", num_comments: 0, created_utc: Date.now() / 1000
-        }]);
+      (db.query.user.findFirst as any).mockResolvedValueOnce({
+        id: "test-user",
+        anonymizeRedditUsernames: false,
       });
 
-      (reddit.fetchComments as any).mockImplementation(() => Promise.resolve([]));
+      // Mock one subreddit succeeding and one failing
+      (reddit.fetchSubredditPostsMultiSort as any).mockImplementation(
+        (sub: string) => {
+          if (sub === "fail-sub") {
+            return Promise.reject(new Error("API Error"));
+          }
+          return Promise.resolve([
+            {
+              id: "post1",
+              title: "Test",
+              selftext: "Test",
+              author: "User1",
+              subreddit: sub,
+              url: "http://test",
+              num_comments: 0,
+              created_utc: Date.now() / 1000,
+            },
+          ]);
+        },
+      );
+
+      (reddit.fetchComments as any).mockImplementation(() =>
+        Promise.resolve([]),
+      );
       (reddit.resolveProblemPatterns as any).mockReturnValue([]);
-      (reddit.rankRedditPosts as any).mockImplementation((posts: any[]) => posts);
-      (reddit.filterPostsByProblemPatterns as any).mockImplementation((posts: any[]) => posts);
+      (reddit.rankRedditPosts as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
+      (reddit.filterPostsByProblemPatterns as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
 
       const result = await executeMiningRun({
         scraperId: "test-scraper",
@@ -121,33 +140,55 @@ describe("executeMiningRun", () => {
   describe("Happy Path Execution", () => {
     it("successfully runs through scanning, extracting, clustering to completed", async () => {
       // Setup successful mocks
-      (db.query.user.findFirst as any).mockResolvedValueOnce({ id: "test-user" });
+      (db.query.user.findFirst as any).mockResolvedValueOnce({
+        id: "test-user",
+      });
 
       const mockPost = {
-        id: "post1", title: "Test", selftext: "Test", author: "User1",
-        subreddit: "test-sub", url: "http://test", num_comments: 1, created_utc: Date.now() / 1000
+        id: "post1",
+        title: "Test",
+        selftext: "Test",
+        author: "User1",
+        subreddit: "test-sub",
+        url: "http://test",
+        num_comments: 1,
+        created_utc: Date.now() / 1000,
       };
 
-      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([mockPost]);
+      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([
+        mockPost,
+      ]);
       (reddit.resolveProblemPatterns as any).mockReturnValue([]);
-      (reddit.rankRedditPosts as any).mockImplementation((posts: any[]) => posts);
-      (reddit.filterPostsByProblemPatterns as any).mockImplementation((posts: any[]) => posts);
+      (reddit.rankRedditPosts as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
+      (reddit.filterPostsByProblemPatterns as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
 
-      (reddit.fetchComments as any).mockResolvedValue([{ body: "A comment", author: "User2", score: 1 }]);
+      (reddit.fetchComments as any).mockResolvedValue([
+        { body: "A comment", author: "User2", score: 1 },
+      ]);
 
       const idempotency = await import("@/lib/reddit-idempotency");
-      (idempotency.claimRedditPostForAiProcessing as any).mockResolvedValue(true);
-      (reddit.fetchComments as any).mockImplementation(() => Promise.resolve([{ body: "A comment", author: "User2", score: 1 }]));
+      (idempotency.claimRedditPostForAiProcessing as any).mockResolvedValue(
+        true,
+      );
+      (reddit.fetchComments as any).mockImplementation(() =>
+        Promise.resolve([{ body: "A comment", author: "User2", score: 1 }]),
+      );
 
       const clustering = await import("@/lib/clustering");
       (clustering.clusterPainPoint as any).mockResolvedValue(true);
 
-      (ai.extractPainPoints as any).mockResolvedValue([{
-        title: "Pain point",
-        body: "Description",
-        painIntensity: 8,
-        urgency: "high"
-      }]);
+      (ai.extractPainPoints as any).mockResolvedValue([
+        {
+          title: "Pain point",
+          body: "Description",
+          painIntensity: 8,
+          urgency: "high",
+        },
+      ]);
 
       const result = await executeMiningRun({
         scraperId: "test-scraper",
@@ -173,31 +214,51 @@ describe("executeMiningRun", () => {
 
     it("handles comments fetch errors but continues processing other parts", async () => {
       // Setup successful mocks
-      (db.query.user.findFirst as any).mockResolvedValueOnce({ id: "test-user" });
+      (db.query.user.findFirst as any).mockResolvedValueOnce({
+        id: "test-user",
+      });
 
       const mockPost = {
-        id: "post2", title: "Test", selftext: "Test", author: "User1",
-        subreddit: "test-sub", url: "http://test", num_comments: 1, created_utc: Date.now() / 1000
+        id: "post2",
+        title: "Test",
+        selftext: "Test",
+        author: "User1",
+        subreddit: "test-sub",
+        url: "http://test",
+        num_comments: 1,
+        created_utc: Date.now() / 1000,
       };
 
-      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([mockPost]);
+      (reddit.fetchSubredditPostsMultiSort as any).mockResolvedValue([
+        mockPost,
+      ]);
       (reddit.resolveProblemPatterns as any).mockReturnValue([]);
-      (reddit.rankRedditPosts as any).mockImplementation((posts: any[]) => posts);
-      (reddit.filterPostsByProblemPatterns as any).mockImplementation((posts: any[]) => posts);
+      (reddit.rankRedditPosts as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
+      (reddit.filterPostsByProblemPatterns as any).mockImplementation(
+        (posts: any[]) => posts,
+      );
 
       const idempotency = await import("@/lib/reddit-idempotency");
-      (idempotency.claimRedditPostForAiProcessing as any).mockResolvedValue(true);
-      (reddit.fetchComments as any).mockImplementation(() => Promise.reject(new Error("Comments API Error")));
+      (idempotency.claimRedditPostForAiProcessing as any).mockResolvedValue(
+        true,
+      );
+      (reddit.fetchComments as any).mockImplementation(() =>
+        Promise.reject(new Error("Comments API Error")),
+      );
 
       const clustering = await import("@/lib/clustering");
       (clustering.clusterPainPoint as any).mockResolvedValue(true);
 
-      (ai.extractPainPoints as any).mockResolvedValue([{
-        title: "Pain point without comments",
-        body: "Description",
-        painIntensity: 8,
-        urgency: "high"
-      }]);
+      (ai.extractPainPoints as any).mockResolvedValue([
+        {
+          title: "Pain point without comments",
+          body: "Description",
+          painIntensity: 8,
+          urgency: "high",
+        },
+      ]);
 
       const result = await executeMiningRun({
         scraperId: "test-scraper",

@@ -40,7 +40,7 @@ const LazyCommunityMapPanel = dynamicLoader(
     ),
   {
     loading: () => (
-      <div className="h-[400px] w-full animate-pulse bg-white/5 border-2 border-white/10" />
+      <div className="h-[400px] w-full animate-pulse border-2 border-white/10 bg-white/5" />
     ),
   },
 );
@@ -173,7 +173,8 @@ export default async function DashboardPage({
     where: eq(userPreferences.userId, session.user.id),
     columns: { scoringWeights: true },
   });
-  const scoringWeights = (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS;
+  const scoringWeights =
+    (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS;
 
   const reports = (
     await getCachedDashboardData(
@@ -268,80 +269,80 @@ export default async function DashboardPage({
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
       {planContext.planPurchaseRequired ? (
-        <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 border border-amber-400/35 bg-amber-500/8 px-5 py-4">
           <div>
-            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+            <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
               Read-Only After Trial
             </p>
-            <p className="text-sm text-amber-100 font-semibold">
+            <p className="text-sm font-semibold text-amber-100">
               You can still review past results and explore the app. New scans
               and AI actions require a paid plan.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-xs font-black uppercase tracking-widest"
+            className="shrink-0 border border-[#ff8a57] bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase"
           >
             Purchase Plan
           </Link>
         </div>
       ) : null}
       {planContext.trialActive && (planContext.trialDaysRemaining ?? 0) <= 1 ? (
-        <div className="border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4">
           <div>
-            <p className="font-mono text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">
+            <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
               Trial Ending Soon
             </p>
-            <p className="text-sm text-amber-100 font-semibold">
+            <p className="text-sm font-semibold text-amber-100">
               Your free trial ends in 1 day. Purchase a paid plan to continue
               using all features.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 px-4 py-2 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-xs font-black uppercase tracking-widest"
+            className="shrink-0 border border-[#ff8a57] bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase"
           >
             Purchase Plan
           </Link>
         </div>
       ) : null}
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <div className="h-px w-8 bg-[#ff4500]"></div>
-            <p className="font-mono text-[11px] font-bold text-[#ff4500] uppercase tracking-[0.2em]">
+            <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
               Dashboard Overview
             </p>
           </div>
-          <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-3">
+          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-white">
             Welcome, {userFirstName}
           </h2>
-          <p className="text-zinc-400 font-medium text-sm">
+          <p className="text-sm font-medium text-zinc-400">
             Your market research engine has analyzed{" "}
-            <span className="text-white font-bold">
+            <span className="font-bold text-white">
               {reportsSaved} investigations
             </span>
             .
           </p>
         </div>
-        <div className="hidden lg:flex items-center gap-3 bg-[#161616] p-1.5 border border-white/15">
+        <div className="hidden items-center gap-3 border border-white/15 bg-[#161616] p-1.5 lg:flex">
           <Link
             href="/dashboard?window=realtime"
-            className={`px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider border ${
+            className={`border px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase ${
               selectedWindow === "realtime"
-                ? "bg-[#ff4500] border-[#ff8a57] text-white"
-                : "border-transparent text-zinc-500 hover:text-zinc-300 transition-colors"
+                ? "border-[#ff8a57] bg-[#ff4500] text-white"
+                : "border-transparent text-zinc-500 transition-colors hover:text-zinc-300"
             }`}
           >
             Realtime
           </Link>
           <Link
             href="/dashboard?window=30d"
-            className={`px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wider border ${
+            className={`border px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase ${
               selectedWindow === "30d"
-                ? "bg-[#ff4500] border-[#ff8a57] text-white"
-                : "border-transparent text-zinc-500 hover:text-zinc-300 transition-colors"
+                ? "border-[#ff8a57] bg-[#ff4500] text-white"
+                : "border-transparent text-zinc-500 transition-colors hover:text-zinc-300"
             }`}
           >
             Past 30 Days
@@ -350,30 +351,30 @@ export default async function DashboardPage({
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Monthly Scans"
           value={searchesRemainingLabel}
-          icon={<Search className="w-4 h-4 text-white" />}
+          icon={<Search className="h-4 w-4 text-white" />}
           progress={searchesProgress}
           subtext={searchesSubtext}
         />
         <MetricCard
           title="Reports Saved"
           value={reportsSaved.toString()}
-          icon={<BarChart3 className="w-4 h-4 text-white" />}
+          icon={<BarChart3 className="h-4 w-4 text-white" />}
           trendSub="Total investigations"
         />
         <MetricCard
           title="Pain Points Found"
           value={painPointsFound.toString()}
-          icon={<AlertCircle className="w-4 h-4 text-white" />}
+          icon={<AlertCircle className="h-4 w-4 text-white" />}
           trendSub="Across all reports"
         />
         <MetricCard
           title="Market Score"
           value={marketScore.toString()}
-          icon={<Zap className="w-4 h-4 text-[#ff4500]" />}
+          icon={<Zap className="h-4 w-4 text-[#ff4500]" />}
           badge={marketBadge}
           isHighlight
         />
@@ -387,37 +388,37 @@ export default async function DashboardPage({
         selectedWindowLabel={selectedWindowLabel}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Recent Reports Table */}
-        <div className="lg:col-span-2 bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden">
-          <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center">
+        <div className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-white/10 px-8 py-6">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-[#ff4500]"></div>
-              <h4 className="font-black text-white text-lg tracking-tight">
+              <div className="h-2 w-2 bg-[#ff4500]"></div>
+              <h4 className="text-lg font-black tracking-tight text-white">
                 Recent Investigations
               </h4>
             </div>
             <Link
-              className="font-mono text-[11px] font-bold text-zinc-400 hover:text-[#ff4500] transition-colors uppercase tracking-widest"
+              className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase transition-colors hover:text-[#ff4500]"
               href="/dashboard/reports"
             >
               View All
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-[720px] w-full table-fixed text-left border-collapse">
+            <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
               <thead>
                 <tr className="bg-white/2 text-zinc-500">
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
                     Investigation
                   </th>
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
                     Key Insight
                   </th>
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-center">
+                  <th className="px-8 py-4 text-center font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
                     Score
                   </th>
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
                     Status
                   </th>
                 </tr>
@@ -427,7 +428,7 @@ export default async function DashboardPage({
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-8 py-10 text-center text-zinc-500 font-mono text-sm font-medium"
+                      className="px-8 py-10 text-center font-mono text-sm font-medium text-zinc-500"
                     >
                       No investigations yet. Run your first analysis to populate
                       this table.
@@ -482,14 +483,14 @@ export default async function DashboardPage({
 
         {/* Insight Panel */}
         <div className="flex flex-col gap-8">
-          <div className="bg-[#111] border-2 border-white/10 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] p-8 relative overflow-hidden">
-            <h4 className="font-black text-white text-lg mb-8 flex items-center gap-3">
-              <TrendingUp className="w-6 h-6 text-[#ff4500]" />
+          <div className="relative overflow-hidden border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+            <h4 className="mb-8 flex items-center gap-3 text-lg font-black text-white">
+              <TrendingUp className="h-6 w-6 text-[#ff4500]" />
               Market Pulse
             </h4>
             <div className="space-y-8">
               <div>
-                <p className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+                <p className="mb-4 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
                   Trending Niche
                 </p>
                 <Link
@@ -498,10 +499,10 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${trendingReport.id}`
                       : `/dashboard/search?keyword=${encodeURIComponent(trendingInsight?.key || "")}`
                   }
-                  className="flex items-center gap-4 bg-white/3 p-4 border border-white/15 hover:border-[#ff4500]/40 transition-colors"
+                  className="flex items-center gap-4 border border-white/15 bg-white/3 p-4 transition-colors hover:border-[#ff4500]/40"
                 >
-                  <div className="w-12 h-12 bg-[#ff4500]/10 border border-[#ff4500]/40 flex items-center justify-center text-[#ff4500]">
-                    <Sparkles className="w-6 h-6" />
+                  <div className="flex h-12 w-12 items-center justify-center border border-[#ff4500]/40 bg-[#ff4500]/10 text-[#ff4500]">
+                    <Sparkles className="h-6 w-6" />
                   </div>
                   <div>
                     <p className="text-[15px] font-bold text-white">
@@ -517,8 +518,8 @@ export default async function DashboardPage({
                   </div>
                 </Link>
               </div>
-              <div className="pt-6 border-t border-white/10">
-                <p className="font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+              <div className="border-t border-white/10 pt-6">
+                <p className="mb-4 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
                   Urgent Pain Point
                 </p>
                 <Link
@@ -527,17 +528,17 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${urgentPainPointReport.id}`
                       : "/dashboard/reports"
                   }
-                  className="block bg-zinc-900 p-5 border-l-4 border-[#ff4500] border-y border-r border-white/10 hover:bg-zinc-800/60 transition-colors"
+                  className="block border-y border-r border-l-4 border-[#ff4500] border-white/10 bg-zinc-900 p-5 transition-colors hover:bg-zinc-800/60"
                 >
-                  <p className="text-[14px] text-zinc-200 font-medium italic leading-relaxed">
+                  <p className="text-[14px] leading-relaxed font-medium text-zinc-200 italic">
                     &quot;
                     {urgentPainPoint?.title ||
                       "No high-urgency pain point detected yet."}
                     &quot;
                   </p>
                 </Link>
-                <p className="font-mono text-[11px] text-zinc-500 mt-4 font-bold flex items-center gap-2 uppercase tracking-wide">
-                  <Database className="w-3.5 h-3.5" /> Found in{" "}
+                <p className="mt-4 flex items-center gap-2 font-mono text-[11px] font-bold tracking-wide text-zinc-500 uppercase">
+                  <Database className="h-3.5 w-3.5" /> Found in{" "}
                   {urgentPainPointMentions || 0} investigations
                 </p>
               </div>
@@ -572,20 +573,20 @@ function MetricCard({
 }) {
   return (
     <div
-      className={`bg-[#111] p-5 border-2 ${isHighlight ? "border-[#ff4500]/60" : "border-white/12"} shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden group`}
+      className={`border-2 bg-[#111] p-5 ${isHighlight ? "border-[#ff4500]/60" : "border-white/12"} group relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)]`}
     >
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-2 bg-white/5 border border-white/15 group-hover:-translate-y-0.5 group-hover:-translate-x-0.5 transition-transform">
+      <div className="mb-4 flex items-start justify-between">
+        <div className="border border-white/15 bg-white/5 p-2 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5">
           {icon}
         </div>
         {badge && (
-          <span className="font-mono text-[9px] font-black px-2 py-0.5 bg-[#ff4500]/12 text-[#ff4500] uppercase tracking-widest border border-[#ff4500]/35">
+          <span className="border border-[#ff4500]/35 bg-[#ff4500]/12 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase">
             {badge}
           </span>
         )}
       </div>
       <div>
-        <p className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">
+        <p className="mb-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
           {title}
         </p>
         <div className="flex items-baseline gap-2">
@@ -595,26 +596,26 @@ function MetricCard({
             {value}
           </p>
           {trend && (
-            <p className="text-emerald-400 text-[12px] font-black flex items-center gap-0.5">
-              <TrendingUp className="w-3 h-3" /> {trend}
+            <p className="flex items-center gap-0.5 text-[12px] font-black text-emerald-400">
+              <TrendingUp className="h-3 w-3" /> {trend}
             </p>
           )}
         </div>
         {progress !== undefined && (
           <div className="mt-3">
-            <div className="h-1.5 w-full bg-white/5 overflow-hidden border border-white/10">
+            <div className="h-1.5 w-full overflow-hidden border border-white/10 bg-white/5">
               <div
                 className="h-full bg-[#ff4500] shadow-[0_0_10px_rgba(255,69,0,0.65)]"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="font-mono text-[9px] text-zinc-500 mt-2 font-bold uppercase tracking-widest">
+            <p className="mt-2 font-mono text-[9px] font-bold tracking-widest text-zinc-500 uppercase">
               {subtext}
             </p>
           </div>
         )}
         {trendSub && (
-          <p className="font-mono text-[9px] text-zinc-500 mt-0.5 font-bold uppercase tracking-widest">
+          <p className="mt-0.5 font-mono text-[9px] font-bold tracking-widest text-zinc-500 uppercase">
             {trendSub}
           </p>
         )}
@@ -641,24 +642,24 @@ function ReportRow({
   explanation?: string | null;
 }) {
   return (
-    <tr className="hover:bg-white/4 transition-colors cursor-pointer group">
+    <tr className="group cursor-pointer transition-colors hover:bg-white/4">
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-[15px] font-bold text-white mb-1 break-words group-hover:text-[#ff4500] transition-colors">
+          <p className="mb-1 text-[15px] font-bold break-words text-white transition-colors group-hover:text-[#ff4500]">
             {keyword}
           </p>
-          <p className="font-mono text-[11px] text-zinc-500 font-bold uppercase tracking-wider">
+          <p className="font-mono text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
             {date}
           </p>
         </Link>
       </td>
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-[14px] text-zinc-400 font-medium truncate max-w-[250px] mb-1">
+          <p className="mb-1 max-w-[250px] truncate text-[14px] font-medium text-zinc-400">
             {painPoint}
           </p>
           {explanation && (
-            <p className="text-[11px] text-zinc-600 font-medium italic truncate max-w-[250px]">
+            <p className="max-w-[250px] truncate text-[11px] font-medium text-zinc-600 italic">
               {explanation}
             </p>
           )}
@@ -666,7 +667,7 @@ function ReportRow({
       </td>
       <td className="px-8 py-6 text-center">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <span className="text-lg font-black text-white px-3 py-1 bg-white/5 border border-white/20">
+          <span className="border border-white/20 bg-white/5 px-3 py-1 text-lg font-black text-white">
             {score}
           </span>
         </Link>
@@ -677,7 +678,7 @@ function ReportRow({
           className="flex items-center gap-2.5"
         >
           <div
-            className={`w-2.5 h-2.5 ${
+            className={`h-2.5 w-2.5 ${
               status === "Live"
                 ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"
                 : status === "Failed"
@@ -686,12 +687,12 @@ function ReportRow({
             }`}
           ></div>
           <span
-            className={`font-mono text-[10px] font-black uppercase tracking-widest px-2 py-1 border ${
+            className={`border px-2 py-1 font-mono text-[10px] font-black tracking-widest uppercase ${
               status === "Live"
-                ? "text-amber-200 border-amber-400/40 bg-amber-500/10"
+                ? "border-amber-400/40 bg-amber-500/10 text-amber-200"
                 : status === "Failed"
-                  ? "text-rose-200 border-rose-400/40 bg-rose-500/10"
-                  : "text-emerald-200 border-emerald-400/40 bg-emerald-500/10"
+                  ? "border-rose-400/40 bg-rose-500/10 text-rose-200"
+                  : "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
             }`}
           >
             {status}

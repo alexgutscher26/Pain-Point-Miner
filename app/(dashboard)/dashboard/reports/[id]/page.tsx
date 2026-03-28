@@ -639,18 +639,18 @@ export default function ReportDetailPage() {
   ]);
 
   const iconMap: Record<string, React.ReactNode> = {
-    AlertTriangle: <AlertTriangle className="w-4 h-4" />,
-    MessageSquare: <MessageSquare className="w-4 h-4" />,
-    Star: <Star className="w-4 h-4" />,
-    Users: <Users className="w-4 h-4" />,
-    BarChart3: <BarChart3 className="w-4 h-4" />,
+    AlertTriangle: <AlertTriangle className="h-4 w-4" />,
+    MessageSquare: <MessageSquare className="h-4 w-4" />,
+    Star: <Star className="h-4 w-4" />,
+    Users: <Users className="h-4 w-4" />,
+    BarChart3: <BarChart3 className="h-4 w-4" />,
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="w-10 h-10 text-[#ff4500] animate-spin" />
-        <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-[#ff4500]" />
+        <p className="font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
           Decrypting Insights...
         </p>
       </div>
@@ -659,17 +659,17 @@ export default function ReportDetailPage() {
 
   if (!reportData) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-8">
-        <h2 className="text-2xl font-black text-white mb-4 uppercase">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center">
+        <h2 className="mb-4 text-2xl font-black text-white uppercase">
           Report Not Found
         </h2>
-        <p className="text-zinc-500 mb-8 max-w-md">
+        <p className="mb-8 max-w-md text-zinc-500">
           We couldn't find the investigation archives you're looking for. It
           might have been deleted or moved.
         </p>
         <Link
           href="/dashboard/reports"
-          className="px-6 py-3 bg-[#ff4500] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+          className="rounded-xl bg-[#ff4500] px-6 py-3 text-[11px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95"
         >
           Back to Archives
         </Link>
@@ -714,9 +714,9 @@ export default function ReportDetailPage() {
   );
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-700">
+    <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-8 p-8 duration-700">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="bg-[#111] border border-white/10 text-white">
+        <DialogContent className="border border-white/10 bg-[#111] text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-black">
               Plan Required
@@ -729,13 +729,13 @@ export default function ReportDetailPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-bold"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold"
             >
               Close
             </button>
             <Link
               href="/dashboard/billing"
-              className="px-4 py-2 rounded-lg bg-[#ff4500] text-white text-sm font-bold"
+              className="rounded-lg bg-[#ff4500] px-4 py-2 text-sm font-bold text-white"
             >
               Purchase Plan
             </Link>
@@ -743,53 +743,57 @@ export default function ReportDetailPage() {
         </DialogContent>
       </Dialog>
       {/* Breadcrumbs & Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-2">
+          <div className="mb-2 flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
             <Link
               href="/dashboard"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               Dashboard
             </Link>
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="h-3 w-3" />
             <Link
               href="/dashboard/reports"
-              className="hover:text-white transition-colors"
+              className="transition-colors hover:text-white"
             >
               Reports
             </Link>
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="h-3 w-3" />
             <span className="text-zinc-200">{reportData.title}</span>
           </div>
-          <h2 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">
+          <h2 className="text-4xl leading-none font-black tracking-tighter text-white uppercase">
             Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
           </h2>
-          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#ff4500]" />
+          <div className="flex items-center gap-2 pt-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#ff4500]" />
             Scanned on {reportData.date}
           </div>
-          <div className="flex items-center gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest">
-            <Filter className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
+            <Filter className="h-3.5 w-3.5 text-amber-400" />
             Window: {reportData.timeWindowLabel ?? "Last 90d"}
           </div>
-          {reportData.customPatterns && reportData.customPatterns.length > 0 && (
-            <div className="flex items-start gap-2 text-zinc-500 font-mono font-bold text-[12px] uppercase tracking-widest pt-1">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
-              <div className="flex flex-wrap gap-1.5">
-                <span>Patterns:</span>
-                {reportData.customPatterns.map((p, i) => (
-                  <span key={i} className="text-emerald-300 font-black">
-                    "{p}"{i < (reportData.customPatterns?.length ?? 0) - 1 ? "," : ""}
-                  </span>
-                ))}
+          {reportData.customPatterns &&
+            reportData.customPatterns.length > 0 && (
+              <div className="flex items-start gap-2 pt-1 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
+                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                <div className="flex flex-wrap gap-1.5">
+                  <span>Patterns:</span>
+                  {reportData.customPatterns.map((p, i) => (
+                    <span key={i} className="font-black text-emerald-300">
+                      "{p}"
+                      {i < (reportData.customPatterns?.length ?? 0) - 1
+                        ? ","
+                        : ""}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {reportData.trend && (
             <div className="pt-3">
               <span
-                className={`inline-flex items-center rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border ${
+                className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-[10px] font-black tracking-widest uppercase ${
                   reportData.trend.direction === "up" ||
                   reportData.trend.direction === "new"
                     ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
@@ -807,7 +811,7 @@ export default function ReportDetailPage() {
           <select
             value={selectedCategory}
             onChange={(event) => handleCategoryChange(event.target.value)}
-            className="px-4 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors [&>option]:bg-white [&>option]:text-black"
+            className="border border-white/20 bg-zinc-900 px-4 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 [&>option]:bg-white [&>option]:text-black"
           >
             {categoryOptions.map((categoryOption) => (
               <option key={categoryOption} value={categoryOption}>
@@ -818,7 +822,7 @@ export default function ReportDetailPage() {
           <button
             onClick={() => handleSaveToggle(!reportData.saved)}
             disabled={isSaving}
-            className="px-5 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving
               ? "Saving..."
@@ -829,7 +833,7 @@ export default function ReportDetailPage() {
           <button
             type="button"
             onClick={handleExportData}
-            className="px-5 py-2.5 bg-zinc-900 border border-white/20 font-mono text-[11px] font-black text-white uppercase tracking-widest hover:bg-white/5 transition-colors flex items-center gap-2"
+            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5"
           >
             Export Data
           </button>
@@ -837,7 +841,7 @@ export default function ReportDetailPage() {
             type="button"
             onClick={handleRunAgain}
             disabled={isRerunning}
-            className="bg-[#ff4500] hover:bg-[#ff571a] text-white px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#ff4500]/20 active:scale-95 group min-w-[140px] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group flex min-w-[140px] items-center justify-center gap-2 rounded-xl bg-[#ff4500] px-6 py-3 text-[11px] font-black tracking-wider text-white uppercase shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isRerunning ? "Running..." : "Run Again"}
           </button>
@@ -845,23 +849,23 @@ export default function ReportDetailPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {reportData.metrics.map((metric, idx) => (
           <div
             key={idx}
-            className="bg-[#0c0c0c] border-2 border-white/15 p-6 relative overflow-hidden group shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
+            className="group relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/2 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-[#ff4500]/5 transition-all"></div>
-            <div className="flex justify-between items-start mb-4 relative z-10">
-              <div className={`p-2 rounded-lg ${metric.bg} ${metric.color}`}>
-                {iconMap[metric.icon] || <Star className="w-4 h-4" />}
+            <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-white/2 blur-2xl transition-all group-hover:bg-[#ff4500]/5"></div>
+            <div className="relative z-10 mb-4 flex items-start justify-between">
+              <div className={`rounded-lg p-2 ${metric.bg} ${metric.color}`}>
+                {iconMap[metric.icon] || <Star className="h-4 w-4" />}
               </div>
             </div>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
+            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
               {metric.label}
             </p>
             <div className="flex items-baseline gap-2">
-              <h4 className="text-2xl font-black text-white tracking-tight">
+              <h4 className="text-2xl font-black tracking-tight text-white">
                 {metric.value}
               </h4>
               <p
@@ -875,27 +879,27 @@ export default function ReportDetailPage() {
       </div>
 
       {/* Main Content Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {/* Left Column: Pain Points */}
-        <div className="lg:col-span-8 space-y-8">
-          <div className="flex items-center justify-between mb-2 px-2">
-            <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-2 uppercase">
-              <TrendingUp className="w-5 h-5 text-[#ff4500]" />
+        <div className="space-y-8 lg:col-span-8">
+          <div className="mb-2 flex items-center justify-between px-2">
+            <h3 className="flex items-center gap-2 text-xl font-black tracking-tight text-white uppercase">
+              <TrendingUp className="h-5 w-5 text-[#ff4500]" />
               Top Frustrations Identified
             </h3>
           </div>
 
           {reportData.customPatterns &&
             reportData.customPatterns.length > 0 && (
-              <div className="bg-amber-500/5 border border-amber-400/35 p-6 mb-6">
-                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-2 mb-3">
-                  <Sparkles className="w-3.5 h-3.5" /> AI Intelligence Patterns
+              <div className="mb-6 border border-amber-400/35 bg-amber-500/5 p-6">
+                <p className="mb-3 flex items-center gap-2 text-[10px] font-black tracking-widest text-amber-500 uppercase">
+                  <Sparkles className="h-3.5 w-3.5" /> AI Intelligence Patterns
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {reportData.customPatterns.map((pattern, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-lg text-[11px] font-bold text-zinc-400"
+                      className="rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[11px] font-bold text-zinc-400"
                     >
                       {pattern}
                     </span>
@@ -908,52 +912,52 @@ export default function ReportDetailPage() {
             {visiblePainPoints.map((pain) => (
               <div
                 key={pain.id}
-                className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-8 hover:border-[#ff4500]/40 transition-colors group shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden"
+                className="group relative space-y-8 overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-[#ff4500]/40"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#ff4500]/2 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+                <div className="absolute top-0 right-0 -mt-32 -mr-32 h-64 w-64 rounded-full bg-[#ff4500]/2 blur-[80px]"></div>
 
                 {/* Pain Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start gap-4 relative z-10">
+                <div className="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h4 className="text-2xl font-black text-white tracking-tight group-hover:text-[#ff4500] transition-colors">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h4 className="text-2xl font-black tracking-tight text-white transition-colors group-hover:text-[#ff4500]">
                         {pain.title}
                       </h4>
                       <span
-                        className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${
+                        className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${
                           pain.urgency === "High Urgency"
-                            ? "bg-rose-500/10 border-rose-500/20 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
-                            : "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                            ? "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
+                            : "border-amber-500/20 bg-amber-500/10 text-amber-500"
                         }`}
                       >
                         {pain.urgency}
                       </span>
                       {pain.hasWillingnessToPay && (
-                        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border bg-emerald-500/10 border-emerald-400/30 text-emerald-300">
+                        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black tracking-widest text-emerald-300 uppercase">
                           💰 Willingness to Pay
                         </span>
                       )}
                     </div>
-                    <div className="max-w-2xl bg-[#111]/30 p-4 rounded-xl border border-white/5 space-y-3">
+                    <div className="max-w-2xl space-y-3 rounded-xl border border-white/5 bg-[#111]/30 p-4">
                       {formatPainDescription(pain.description).map(
                         (paragraph, idx) => (
                           <p
                             key={`${pain.id}-desc-${idx}`}
-                            className="text-zinc-400 font-medium leading-relaxed"
+                            className="leading-relaxed font-medium text-zinc-400"
                           >
                             {paragraph}
                           </p>
                         ),
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-black uppercase tracking-widest">
+                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-black tracking-widest uppercase">
                       <div className="flex items-center gap-1.5 text-[#ff4500]">
-                        <MessageSquare className="w-3.5 h-3.5" />
+                        <MessageSquare className="h-3.5 w-3.5" />
                         {pain.mentions} mentions
                       </div>
                       {typeof pain.validationScore === "number" && (
                         <div className="flex items-center gap-1.5 text-sky-400">
-                          <BarChart3 className="w-3.5 h-3.5" />
+                          <BarChart3 className="h-3.5 w-3.5" />
                           Validation {pain.validationScore}/100
                         </div>
                       )}
@@ -962,7 +966,7 @@ export default function ReportDetailPage() {
                           key={i}
                           className="flex items-center gap-1.5 text-zinc-500"
                         >
-                          <Users className="w-3.5 h-3.5" />
+                          <Users className="h-3.5 w-3.5" />
                           r/{sub}
                         </div>
                       ))}
@@ -970,17 +974,17 @@ export default function ReportDetailPage() {
                         className={`flex items-center gap-1.5 ${pain.sentiment === "frustrated" ? "text-rose-500" : "text-zinc-500"}`}
                       >
                         <div
-                          className={`w-1.5 h-1.5 rounded-full ${pain.sentiment === "frustrated" ? "bg-rose-500 animate-pulse" : "bg-zinc-700"}`}
+                          className={`h-1.5 w-1.5 rounded-full ${pain.sentiment === "frustrated" ? "animate-pulse bg-rose-500" : "bg-zinc-700"}`}
                         ></div>
                         Vibe: {pain.sentiment}
                       </div>
                     </div>
                   </div>
-                  <div className="text-center md:text-right shrink-0 bg-white/2 border border-white/20 px-6 py-4">
+                  <div className="shrink-0 border border-white/20 bg-white/2 px-6 py-4 text-center md:text-right">
                     <p className="text-4xl font-black text-white">
                       {pain.intensity}/10
                     </p>
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold tracking-widest text-zinc-600 uppercase">
                       Pain Score
                     </p>
                   </div>
@@ -990,7 +994,7 @@ export default function ReportDetailPage() {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex flex-wrap items-center gap-2 relative z-10">
+                <div className="relative z-10 flex flex-wrap items-center gap-2">
                   {[
                     { key: "signals", label: "Signals" },
                     { key: "community", label: "Community Pulse" },
@@ -1004,10 +1008,10 @@ export default function ReportDetailPage() {
                         onClick={() =>
                           setActiveTab(pain.id, tab.key as CardTab)
                         }
-                        className={`px-3 py-2 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${
+                        className={`rounded-lg border px-3 py-2 text-[10px] font-black tracking-widest uppercase transition-all ${
                           isActive
-                            ? "bg-[#ff4500]/20 border-[#ff4500]/40 text-[#ff4500]"
-                            : "bg-zinc-900 border-white/10 text-zinc-400 hover:bg-white/5"
+                            ? "border-[#ff4500]/40 bg-[#ff4500]/20 text-[#ff4500]"
+                            : "border-white/10 bg-zinc-900 text-zinc-400 hover:bg-white/5"
                         }`}
                       >
                         {tab.label}
@@ -1017,10 +1021,10 @@ export default function ReportDetailPage() {
                 </div>
 
                 {getActiveTab(pain.id) === "signals" && (
-                  <div className="space-y-4 relative z-10">
+                  <div className="relative z-10 space-y-4">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
                       <InfoSquare
-                        icon={<DollarSign className="w-3.5 h-3.5" />}
+                        icon={<DollarSign className="h-3.5 w-3.5" />}
                         label="Budget"
                         value={formatBudgetValue(
                           pain.budgetSignals,
@@ -1032,7 +1036,7 @@ export default function ReportDetailPage() {
                         preserveCase
                       />
                       <InfoSquare
-                        icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
+                        icon={<ArrowRightLeft className="h-3.5 w-3.5" />}
                         label="Switching"
                         value={formatSwitchingValue(
                           pain.switchingCosts,
@@ -1042,13 +1046,13 @@ export default function ReportDetailPage() {
                         color="text-amber-500"
                       />
                       <InfoSquare
-                        icon={<Wrench className="w-3.5 h-3.5" />}
+                        icon={<Wrench className="h-3.5 w-3.5" />}
                         label="Tried"
                         value={formatTriedValue(pain.triedSolutions)}
                         color="text-blue-500"
                       />
                       <InfoSquare
-                        icon={<TrendingUp className="w-3.5 h-3.5" />}
+                        icon={<TrendingUp className="h-3.5 w-3.5" />}
                         label="Pay Signal"
                         value={
                           pain.hasWillingnessToPay
@@ -1058,7 +1062,7 @@ export default function ReportDetailPage() {
                         color="text-violet-500"
                       />
                       <InfoSquare
-                        icon={<DollarSign className="w-3.5 h-3.5" />}
+                        icon={<DollarSign className="h-3.5 w-3.5" />}
                         label="Estimated TAM"
                         value={formatCurrency(
                           pain.cluster?.estimatedTamUsdAnnual,
@@ -1067,7 +1071,7 @@ export default function ReportDetailPage() {
                         preserveCase
                       />
                       <InfoSquare
-                        icon={<BarChart3 className="w-3.5 h-3.5" />}
+                        icon={<BarChart3 className="h-3.5 w-3.5" />}
                         label="Stage"
                         value={formatStageValue(pain.maturity)}
                         color="text-rose-500"
@@ -1075,13 +1079,13 @@ export default function ReportDetailPage() {
                     </div>
                     {pain.hasWillingnessToPay &&
                     (pain.budgetSignals?.length ?? 0) > 0 ? (
-                      <div className="border border-emerald-400/20 bg-emerald-500/5 p-5 space-y-3">
-                        <div className="flex items-center justify-between gap-3 flex-wrap">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                      <div className="space-y-3 border border-emerald-400/20 bg-emerald-500/5 p-5">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <p className="text-[10px] font-black tracking-widest text-emerald-300 uppercase">
                             WTP Quotes
                           </p>
                           {pain.cluster?.budgetSignalCount ? (
-                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                            <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                               {pain.cluster.budgetSignalCount} cluster quote
                               {pain.cluster.budgetSignalCount === 1 ? "" : "s"}
                             </p>
@@ -1091,12 +1095,12 @@ export default function ReportDetailPage() {
                           {pain.budgetSignals?.map((signal, idx) => (
                             <div
                               key={`${pain.id}-budget-${idx}`}
-                              className="border border-white/10 bg-black/20 p-3 space-y-1"
+                              className="space-y-1 border border-white/10 bg-black/20 p-3"
                             >
-                              <p className="text-sm text-zinc-200 font-medium leading-relaxed">
+                              <p className="text-sm leading-relaxed font-medium text-zinc-200">
                                 "{signal.quote}"
                               </p>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                                 {signal.source} signal
                                 {signal.annualizedMidpointUsd !== null
                                   ? ` • ${formatCurrency(signal.annualizedMidpointUsd)} annualized`
@@ -1111,13 +1115,13 @@ export default function ReportDetailPage() {
                 )}
 
                 {getActiveTab(pain.id) === "community" && (
-                  <div className="space-y-4 relative z-10">
-                    <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                  <div className="relative z-10 space-y-4">
+                    <p className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
                       Community Pulse
                     </p>
                     {pain.userLanguage && (
-                      <div className="border border-white/20 bg-zinc-900/40 p-5 space-y-3">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                      <div className="space-y-3 border border-white/20 bg-zinc-900/40 p-5">
+                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                           Language Overview
                         </p>
                         <div className="space-y-2">
@@ -1126,7 +1130,7 @@ export default function ReportDetailPage() {
                           ).map((paragraph, idx) => (
                             <p
                               key={`${pain.id}-overview-${idx}`}
-                              className="text-sm text-zinc-300 font-medium leading-relaxed"
+                              className="text-sm leading-relaxed font-medium text-zinc-300"
                             >
                               {paragraph}
                             </p>
@@ -1137,14 +1141,14 @@ export default function ReportDetailPage() {
                     {pain.communityVoices.map((voice, i) => (
                       <div
                         key={i}
-                        className="bg-white/2 border border-white/20 p-6 border-l-4 border-l-[#ff4500]"
+                        className="border border-l-4 border-white/20 border-l-[#ff4500] bg-white/2 p-6"
                       >
                         <div className="space-y-2">
                           {formatPainDescription(voice).map(
                             (paragraph, paragraphIdx) => (
                               <p
                                 key={`${pain.id}-voice-${i}-${paragraphIdx}`}
-                                className="text-[14px] text-zinc-300 italic font-medium leading-relaxed"
+                                className="text-[14px] leading-relaxed font-medium text-zinc-300 italic"
                               >
                                 {paragraph}
                               </p>
@@ -1156,9 +1160,9 @@ export default function ReportDetailPage() {
                     {pain.userLanguage?.sections?.map((section, sectionIdx) => (
                       <div
                         key={`${pain.id}-lang-${sectionIdx}`}
-                        className="bg-white/2 border border-white/20 p-6 space-y-3"
+                        className="space-y-3 border border-white/20 bg-white/2 p-6"
                       >
-                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                           {section.label}
                         </p>
                         <div className="space-y-2">
@@ -1166,7 +1170,7 @@ export default function ReportDetailPage() {
                             (paragraph, idx) => (
                               <p
                                 key={`${pain.id}-lang-${sectionIdx}-summary-${idx}`}
-                                className="text-xs text-zinc-500 font-medium leading-relaxed"
+                                className="text-xs leading-relaxed font-medium text-zinc-500"
                               >
                                 {paragraph}
                               </p>
@@ -1183,7 +1187,7 @@ export default function ReportDetailPage() {
                                 (paragraph, paragraphIdx) => (
                                   <p
                                     key={`${pain.id}-lang-${sectionIdx}-ex-${exampleIdx}-${paragraphIdx}`}
-                                    className="text-sm text-zinc-300 font-medium leading-relaxed"
+                                    className="text-sm leading-relaxed font-medium text-zinc-300"
                                   >
                                     {paragraphIdx === 0
                                       ? `- ${paragraph}`
@@ -1200,11 +1204,11 @@ export default function ReportDetailPage() {
                 )}
 
                 {getActiveTab(pain.id) === "build" && (
-                  <div className="space-y-6 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="p-6 rounded-3xl bg-blue-500/5 border border-blue-500/10 space-y-4 shadow-inner">
-                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                          <BarChart3 className="w-4 h-4" /> Marketing Language
+                  <div className="relative z-10 space-y-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <div className="space-y-4 rounded-3xl border border-blue-500/10 bg-blue-500/5 p-6 shadow-inner">
+                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-blue-400 uppercase">
+                          <BarChart3 className="h-4 w-4" /> Marketing Language
                         </p>
                         <div className="space-y-2">
                           {pain.triedSolutions &&
@@ -1212,44 +1216,44 @@ export default function ReportDetailPage() {
                             pain.triedSolutions.map((sol, i) => (
                               <div
                                 key={i}
-                                className="flex items-center gap-3 text-zinc-400 font-medium"
+                                className="flex items-center gap-3 font-medium text-zinc-400"
                               >
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30"></div>
+                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30"></div>
                                 User tried &quot;{sol}&quot;
                               </div>
                             ))
                           ) : (
-                            <p className="text-zinc-600 text-xs italic font-medium">
+                            <p className="text-xs font-medium text-zinc-600 italic">
                               No tools mentioned specifically.
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 space-y-4 shadow-inner">
-                        <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                          <Lightbulb className="w-4 h-4" /> Suggested Angles
+                      <div className="space-y-4 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6 shadow-inner">
+                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-emerald-400 uppercase">
+                          <Lightbulb className="h-4 w-4" /> Suggested Angles
                         </p>
                         <div className="space-y-2">
                           {pain.angles.map((angle, i) => (
                             <div
                               key={i}
-                              className="flex items-center gap-3 text-zinc-400 font-medium"
+                              className="flex items-center gap-3 font-medium text-zinc-400"
                             >
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30"></div>
+                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/30"></div>
                               {angle}
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
-                    <div className="p-6 rounded-3xl bg-[#ff4500]/5 border border-[#ff4500]/15 space-y-4">
-                      <p className="text-[10px] font-black text-[#ff4500] uppercase tracking-widest">
+                    <div className="space-y-4 rounded-3xl border border-[#ff4500]/15 bg-[#ff4500]/5 p-6">
+                      <p className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
                         What to Build
                       </p>
-                      <h5 className="text-lg font-black text-white tracking-tight">
+                      <h5 className="text-lg font-black tracking-tight text-white">
                         {deriveBuildIdea(pain)}
                       </h5>
-                      <p className="text-[12px] text-zinc-300 font-medium">
+                      <p className="text-[12px] font-medium text-zinc-300">
                         Build for:{" "}
                         <span className="text-white">
                           {deriveTargetUser(pain)}
@@ -1259,9 +1263,9 @@ export default function ReportDetailPage() {
                         {deriveMvpFeatures(pain).map((feature) => (
                           <div
                             key={feature}
-                            className="flex items-start gap-3 text-zinc-300 text-[13px] font-medium"
+                            className="flex items-start gap-3 text-[13px] font-medium text-zinc-300"
                           >
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#ff4500] mt-2"></div>
+                            <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#ff4500]"></div>
                             <span>{feature}</span>
                           </div>
                         ))}
@@ -1275,7 +1279,7 @@ export default function ReportDetailPage() {
 
           {totalPainPoints === 0 && (
             <div className="border border-white/20 bg-zinc-900/40 p-6 text-center">
-              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500">
+              <p className="font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
                 No frustrations match the selected filters
               </p>
             </div>
@@ -1283,7 +1287,7 @@ export default function ReportDetailPage() {
 
           {totalPainPoints > PAIN_POINTS_PER_PAGE && (
             <div className="flex items-center justify-between px-2">
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                 Showing {startPainPointIndex + 1}-{endPainPointIndex} of{" "}
                 {totalPainPoints}
               </p>
@@ -1294,12 +1298,12 @@ export default function ReportDetailPage() {
                     setPainPointsPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={painPointsPage === 1}
-                  className="px-3 py-2 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-all flex items-center gap-1"
+                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <ChevronLeft className="h-3.5 w-3.5" />
                   Prev
                 </button>
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 px-2">
+                <span className="px-2 text-[10px] font-black tracking-widest text-zinc-400 uppercase">
                   Page {painPointsPage} / {totalPainPointPages}
                 </span>
                 <button
@@ -1310,10 +1314,10 @@ export default function ReportDetailPage() {
                     )
                   }
                   disabled={painPointsPage === totalPainPointPages}
-                  className="px-3 py-2 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/5 transition-all flex items-center gap-1"
+                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Next
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -1321,17 +1325,17 @@ export default function ReportDetailPage() {
         </div>
 
         {/* Right Column: Sidebar Intel */}
-        <div className="lg:col-span-4 space-y-8">
+        <div className="space-y-8 lg:col-span-4">
           {/* Refine Section */}
-          <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <div className="space-y-8 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
             <div>
-              <h4 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 mb-6">
-                <Filter className="w-4 h-4 text-[#ff4500]" />
+              <h4 className="mb-6 flex items-center gap-2 text-sm font-black tracking-widest text-white uppercase">
+                <Filter className="h-4 w-4 text-[#ff4500]" />
                 Investigation Tools
               </h4>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
                     Filter by Intensity
                   </label>
                   <select
@@ -1341,7 +1345,7 @@ export default function ReportDetailPage() {
                         event.target.value as IntensityFilter,
                       )
                     }
-                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold [&>option]:bg-white [&>option]:text-black"
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
                   >
                     <option value="all">All Intensity Levels</option>
                     <option value="high">High Core Pain (8+)</option>
@@ -1349,7 +1353,7 @@ export default function ReportDetailPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
                     Sentiment Filter
                   </label>
                   <select
@@ -1359,7 +1363,7 @@ export default function ReportDetailPage() {
                         event.target.value as SentimentFilter,
                       )
                     }
-                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#ff4500]/50 transition-colors appearance-none font-bold [&>option]:bg-white [&>option]:text-black"
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
                   >
                     <option value="all">All Sentiment Types</option>
                     <option value="frustrated">Frustrated / Desperate</option>
@@ -1369,7 +1373,7 @@ export default function ReportDetailPage() {
                 <button
                   type="button"
                   onClick={handleApplyFilters}
-                  className="w-full border border-[#ff8a57] bg-[#ff4500] text-white py-4 font-mono font-black text-[11px] uppercase tracking-widest hover:bg-[#ff571a] transition-colors active:scale-[0.98]"
+                  className="w-full border border-[#ff8a57] bg-[#ff4500] py-4 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-[0.98]"
                 >
                   Apply Filter Logic
                 </button>
@@ -1377,31 +1381,31 @@ export default function ReportDetailPage() {
             </div>
 
             {/* Validation Signals */}
-            <div className="pt-8 border-t border-white/5">
-              <h4 className="font-mono text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4" /> Market Signals
+            <div className="border-t border-white/5 pt-8">
+              <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                <BarChart3 className="h-4 w-4" /> Market Signals
               </h4>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <div className="flex justify-between font-mono text-[11px] font-black mb-2">
+                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
                     <span className="text-zinc-400 uppercase">
                       Analysis Confidence
                     </span>
-                    <span className="text-white tracking-widest">94%</span>
+                    <span className="tracking-widest text-white">94%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#ff4500] w-[94%]"></div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div className="h-full w-[94%] bg-[#ff4500]"></div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex justify-between font-mono text-[11px] font-black mb-2">
+                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
                     <span className="text-zinc-400 uppercase">
                       AI Data Fidelity
                     </span>
-                    <span className="text-white tracking-widest">High</span>
+                    <span className="tracking-widest text-white">High</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-[88%]"></div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div className="h-full w-[88%] bg-emerald-500"></div>
                   </div>
                 </div>
               </div>
@@ -1410,22 +1414,22 @@ export default function ReportDetailPage() {
 
           {reportData.saasOpportunities &&
             reportData.saasOpportunities.length > 0 && (
-              <div className="bg-[#0c0c0c] border-2 border-white/15 p-8 space-y-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-                <h4 className="font-mono text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-[#ff4500]" /> AI-Generated
+              <div className="space-y-5 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+                <h4 className="flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <Lightbulb className="h-4 w-4 text-[#ff4500]" /> AI-Generated
                   SaaS Opportunities
                 </h4>
                 <div className="space-y-4">
                   {reportData.saasOpportunities.slice(0, 3).map((opp, idx) => (
                     <div
                       key={idx}
-                      className="border border-white/20 bg-white/2 p-5 space-y-3"
+                      className="space-y-3 border border-white/20 bg-white/2 p-5"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-black text-white leading-tight">
+                        <p className="text-sm leading-tight font-black text-white">
                           {opp.title}
                         </p>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#ff4500]">
+                        <span className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
                           {opp.score}/100
                         </span>
                       </div>
@@ -1434,14 +1438,14 @@ export default function ReportDetailPage() {
                           (paragraph, paragraphIdx) => (
                             <p
                               key={`opp-${idx}-problem-${paragraphIdx}`}
-                              className="text-xs text-zinc-400 font-medium leading-relaxed"
+                              className="text-xs leading-relaxed font-medium text-zinc-400"
                             >
                               {paragraph}
                             </p>
                           ),
                         )}
                       </div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                      <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
                         ICP: {opp.targetCustomer}
                       </p>
                       <div className="space-y-2">
@@ -1449,7 +1453,7 @@ export default function ReportDetailPage() {
                           (paragraph, paragraphIdx) => (
                             <p
                               key={`opp-${idx}-value-${paragraphIdx}`}
-                              className="text-xs text-zinc-300 font-medium leading-relaxed"
+                              className="text-xs leading-relaxed font-medium text-zinc-300"
                             >
                               {paragraph}
                             </p>
@@ -1461,7 +1465,7 @@ export default function ReportDetailPage() {
                           (paragraph, paragraphIdx) => (
                             <p
                               key={`opp-${idx}-launch-${paragraphIdx}`}
-                              className="text-[11px] text-zinc-500 font-bold leading-relaxed"
+                              className="text-[11px] leading-relaxed font-bold text-zinc-500"
                             >
                               {paragraph}
                             </p>
@@ -1493,17 +1497,17 @@ function InfoSquare({
   preserveCase?: boolean;
 }) {
   return (
-    <div className="bg-white/2 border border-white/20 p-4 flex items-start gap-3 min-h-[104px]">
+    <div className="flex min-h-[104px] items-start gap-3 border border-white/20 bg-white/2 p-4">
       <div
-        className={`mt-0.5 p-2.5 rounded-xl bg-zinc-900 border border-white/5 ${color} shrink-0`}
+        className={`mt-0.5 rounded-xl border border-white/5 bg-zinc-900 p-2.5 ${color} shrink-0`}
       >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[10px] font-black text-zinc-600 uppercase tracking-[0.18em]">
+        <p className="font-mono text-[10px] font-black tracking-[0.18em] text-zinc-600 uppercase">
           {label}
         </p>
-        <p className="mt-2 text-base font-black text-white leading-[1.15] wrap-break-word whitespace-normal sm:text-[19px]">
+        <p className="mt-2 text-base leading-[1.15] font-black wrap-break-word whitespace-normal text-white sm:text-[19px]">
           {preserveCase ? value : toTitleCase(value)}
         </p>
       </div>

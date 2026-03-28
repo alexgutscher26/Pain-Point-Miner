@@ -8,10 +8,10 @@ import { processSinglePost } from "@/lib/mining-runner";
 
 /**
  * Reddit RSS Ingestion Webhook.
- * 
+ *
  * Allows near-real-time ingestion by hitting this endpoint from an RSS-to-Webhook service
  * (Zapier, IFTTT, Pipedream, etc).
- * 
+ *
  * Expected payload (JSON):
  * {
  *   "postId": "1bevuvf",     // Optional: will try to parse from link if missing
@@ -20,9 +20,7 @@ import { processSinglePost } from "@/lib/mining-runner";
  *   "link": "https://..."    // Optional
  * }
  */
-export async function POST(
-  req: NextRequest,
-) {
+export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const scraperId = searchParams.get("scraperId");
   const secret = searchParams.get("secret");
@@ -53,7 +51,10 @@ export async function POST(
     }
 
     if (!postId) {
-      return NextResponse.json({ error: "Could not identify postId" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Could not identify postId" },
+        { status: 400 },
+      );
     }
 
     // 3. Resolve Scraper and User Context
@@ -74,9 +75,9 @@ export async function POST(
     // 4. Fetch the full post and comments from Reddit to ensure AI context
     // We only need the post instance; fetchSubredditPostsMultiSort is overkill here,
     // so we build a minimal RedditPost object and then fetch its comments.
-    const comments = await fetchComments(postId, subreddit, { 
-      maxDepth: 50, 
-      maxComments: 100 
+    const comments = await fetchComments(postId, subreddit, {
+      maxDepth: 50,
+      maxComments: 100,
     });
 
     // Mock the post object; processSinglePost only really uses id, title, selftext, url, author, subreddit
@@ -103,17 +104,19 @@ export async function POST(
       customPatterns: scraperRecord.customPatterns ?? [],
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       painPointsFound: count,
-      postId 
+      postId,
     });
-
   } catch (error) {
     console.error("Webhook ingestion failed:", error);
-    return NextResponse.json({ 
-      error: "Internal Server Error",
-      message: error instanceof Error ? error.message : "Unknown error" 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }

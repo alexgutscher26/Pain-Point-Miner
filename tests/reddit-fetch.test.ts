@@ -48,8 +48,8 @@ describe("fetchSubredditPosts", () => {
 
     expect(posts).toHaveLength(2);
     // Sort logic in rankRedditPosts will sort them, but let's just make sure IDs are included
-    expect(posts.map(p => p.id)).toContain("1");
-    expect(posts.map(p => p.id)).toContain("2");
+    expect(posts.map((p) => p.id)).toContain("1");
+    expect(posts.map((p) => p.id)).toContain("2");
   });
 
   it("handles fetch errors gracefully", async () => {

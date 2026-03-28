@@ -212,10 +212,12 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     }
 
     const data = await response.json();
-    const rawContent = extractMessageContent(data?.choices?.[0]?.message?.content);
+    const rawContent = extractMessageContent(
+      data?.choices?.[0]?.message?.content,
+    );
     const firstBrace = rawContent.indexOf("{");
     const lastBrace = rawContent.lastIndexOf("}");
-    
+
     if (firstBrace === -1 || lastBrace === -1) {
       throw new Error("No JSON object found in AI response");
     }

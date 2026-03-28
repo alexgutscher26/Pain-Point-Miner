@@ -369,16 +369,13 @@ export const scraperPost = pgTable(
   ],
 );
 
-export const discoveryCache = pgTable(
-  "discovery_cache",
-  {
-    keyword: text().primaryKey().notNull(),
-    suggestions: jsonb().notNull(),
-    cachedAt: timestamp({ precision: 3, mode: "date" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-  },
-);
+export const discoveryCache = pgTable("discovery_cache", {
+  keyword: text().primaryKey().notNull(),
+  suggestions: jsonb().notNull(),
+  cachedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
 
 export const redditAiIdempotency = pgTable(
   "reddit_ai_idempotency",

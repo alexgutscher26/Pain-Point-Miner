@@ -20,7 +20,13 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  LogOut,
+  LayoutDashboard,
+  Settings,
+  ChevronDown,
+} from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
@@ -35,29 +41,29 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5">
+    <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33] flex items-center justify-center relative overflow-hidden">
+          <Link href="/" className="group flex items-center gap-2">
+            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33]">
               <svg
                 viewBox="0 0 24 24"
-                className="w-4 h-4 text-white fill-current"
+                className="h-4 w-4 fill-current text-white"
               >
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
               </svg>
             </div>
-            <span className="font-bold text-base sm:text-lg text-white tracking-tight">
+            <span className="text-base font-bold tracking-tight text-white sm:text-lg">
               ThreddIQ
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden items-center gap-6 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[13px] font-bold text-zinc-400 hover:text-white transition-colors"
+                className="text-[13px] font-bold text-zinc-400 transition-colors hover:text-white"
               >
                 {link.name}
               </Link>
@@ -72,48 +78,66 @@ export function Header() {
                 <div className="flex items-center gap-4">
                   <Link
                     href="/dashboard"
-                    className="hidden sm:block text-[13px] font-bold text-zinc-400 hover:text-white transition-colors"
+                    className="hidden text-[13px] font-bold text-zinc-400 transition-colors hover:text-white sm:block"
                   >
                     Dashboard
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 outline-hidden group">
-                        <Avatar size="sm" className="border border-white/10 group-hover:border-[#ff4500]/50 transition-colors">
-                          <AvatarImage src={session.user.image || ""} alt={session.user.name} />
-                          <AvatarFallback className="bg-[#ff4500]/10 text-[#ff4500] font-black text-[10px]">
-                            {session.user.name?.substring(0, 2).toUpperCase() || "U"}
+                      <button className="group flex items-center gap-2 outline-hidden">
+                        <Avatar
+                          size="sm"
+                          className="border border-white/10 transition-colors group-hover:border-[#ff4500]/50"
+                        >
+                          <AvatarImage
+                            src={session.user.image || ""}
+                            alt={session.user.name}
+                          />
+                          <AvatarFallback className="bg-[#ff4500]/10 text-[10px] font-black text-[#ff4500]">
+                            {session.user.name?.substring(0, 2).toUpperCase() ||
+                              "U"}
                           </AvatarFallback>
                         </Avatar>
-                        <ChevronDown className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white transition-colors" />
+                        <ChevronDown className="h-3.5 w-3.5 text-zinc-500 transition-colors group-hover:text-white" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#0f0f0f] border-white/10 text-zinc-300">
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 border-white/10 bg-[#0f0f0f] text-zinc-300"
+                    >
                       <DropdownMenuLabel className="font-bold text-white">
                         <div className="flex flex-col gap-0.5">
                           <span>{session.user.name}</span>
-                          <span className="text-[10px] text-zinc-500 font-medium">{session.user.email}</span>
+                          <span className="text-[10px] font-medium text-zinc-500">
+                            {session.user.email}
+                          </span>
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-white/5" />
                       <DropdownMenuItem asChild>
-                        <Link href="/dashboard" className="cursor-pointer flex items-center gap-2">
-                          <LayoutDashboard className="w-4 h-4" />
+                        <Link
+                          href="/dashboard"
+                          className="flex cursor-pointer items-center gap-2"
+                        >
+                          <LayoutDashboard className="h-4 w-4" />
                           <span>Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/dashboard/settings" className="cursor-pointer flex items-center gap-2">
-                          <Settings className="w-4 h-4" />
+                        <Link
+                          href="/dashboard/settings"
+                          className="flex cursor-pointer items-center gap-2"
+                        >
+                          <Settings className="h-4 w-4" />
                           <span>Settings</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-white/5" />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => signOut()}
-                        className="cursor-pointer text-red-400 focus:text-red-400 flex items-center gap-2"
+                        className="flex cursor-pointer items-center gap-2 text-red-400 focus:text-red-400"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="h-4 w-4" />
                         <span>Sign out</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -123,13 +147,13 @@ export function Header() {
                 <div className="flex items-center gap-4">
                   <Link
                     href="/sign-in"
-                    className="text-sm font-bold text-zinc-400 hover:text-white transition-colors"
+                    className="text-sm font-bold text-zinc-400 transition-colors hover:text-white"
                   >
                     Sign in
                   </Link>
                   <Button
                     asChild
-                    className="bg-[#ff4500] hover:bg-[#ff5a1a] text-white rounded-xl px-5 h-10 text-sm font-black shadow-lg shadow-[#ff4500]/10 transition-all hidden md:flex"
+                    className="hidden h-10 rounded-xl bg-[#ff4500] px-5 text-sm font-black text-white shadow-lg shadow-[#ff4500]/10 transition-all hover:bg-[#ff5a1a] md:flex"
                   >
                     <Link href="/sign-up">Start Free Trial</Link>
                   </Button>
@@ -142,17 +166,24 @@ export function Header() {
           <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-white/5">
-                  <Menu className="w-6 h-6" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400 hover:bg-white/5 hover:text-white"
+                >
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0a0a0a] border-white/5 p-8 text-white w-[300px]">
-                <SheetHeader className="mb-12 text-left p-0">
-                  <SheetTitle className="text-white flex items-center gap-2">
-                     <div className="w-6 h-6 rounded-full bg-[#ff4500] flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                     </div>
-                     ThreddIQ
+              <SheetContent
+                side="right"
+                className="w-[300px] border-white/5 bg-[#0a0a0a] p-8 text-white"
+              >
+                <SheetHeader className="mb-12 p-0 text-left">
+                  <SheetTitle className="flex items-center gap-2 text-white">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff4500]">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                    </div>
+                    ThreddIQ
                   </SheetTitle>
                   <SheetDescription className="sr-only">
                     Navigate through ThreddIQ features and pricing.
@@ -164,31 +195,47 @@ export function Header() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className="text-2xl font-black text-zinc-500 hover:text-white transition-colors flex items-center justify-between group"
+                      className="group flex items-center justify-between text-2xl font-black text-zinc-500 transition-colors hover:text-white"
                     >
                       {link.name}
-                      <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                      <ArrowRight className="h-5 w-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                     </Link>
                   ))}
-                  <div className="pt-8 border-t border-white/5 flex flex-col gap-4">
-                     {session ? (
-                        <Button asChild className="bg-zinc-800 hover:bg-zinc-700 text-white font-black py-6 rounded-2xl text-lg">
-                           <Link href="/dashboard" onClick={() => setIsOpen(false)}>Go to Dashboard</Link>
+                  <div className="flex flex-col gap-4 border-t border-white/5 pt-8">
+                    {session ? (
+                      <Button
+                        asChild
+                        className="rounded-2xl bg-zinc-800 py-6 text-lg font-black text-white hover:bg-zinc-700"
+                      >
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          Go to Dashboard
+                        </Link>
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          asChild
+                          className="rounded-2xl bg-[#ff4500] py-6 text-lg font-black text-white hover:bg-[#ff5a1a]"
+                        >
+                          <Link
+                            href="/sign-up"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            Start Free Trial
+                          </Link>
                         </Button>
-                     ) : (
-                        <>
-                           <Button asChild className="bg-[#ff4500] hover:bg-[#ff5a1a] text-white font-black py-6 rounded-2xl text-lg">
-                              <Link href="/sign-up" onClick={() => setIsOpen(false)}>Start Free Trial</Link>
-                           </Button>
-                           <Link 
-                              href="/sign-in" 
-                              onClick={() => setIsOpen(false)}
-                              className="text-center font-bold text-zinc-500 hover:text-white transition-colors"
-                           >
-                              Already have an account? Sign in
-                           </Link>
-                        </>
-                     )}
+                        <Link
+                          href="/sign-in"
+                          onClick={() => setIsOpen(false)}
+                          className="text-center font-bold text-zinc-500 transition-colors hover:text-white"
+                        >
+                          Already have an account? Sign in
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </nav>
               </SheetContent>

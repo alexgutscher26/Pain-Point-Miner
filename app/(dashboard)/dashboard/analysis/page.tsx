@@ -109,7 +109,7 @@ export default function AnalysisPage() {
 
     return [
       {
-        icon: <Search className="w-4 h-4" />,
+        icon: <Search className="h-4 w-4" />,
         title: "Collecting Reddit posts...",
         description:
           postsFetched > 0
@@ -127,7 +127,7 @@ export default function AnalysisPage() {
         status: stepStatus("scanning"),
       },
       {
-        icon: <BrainCircuit className="w-4 h-4" />,
+        icon: <BrainCircuit className="h-4 w-4" />,
         title: "Extracting pain points...",
         description:
           painPointCount > 0
@@ -136,7 +136,7 @@ export default function AnalysisPage() {
         status: stepStatus("extracting"),
       },
       {
-        icon: <Sparkles className="w-4 h-4" />,
+        icon: <Sparkles className="h-4 w-4" />,
         title: "Clustering repeated themes...",
         description:
           phase === "completed" || phase === "clustering"
@@ -145,7 +145,7 @@ export default function AnalysisPage() {
         status: stepStatus("clustering"),
       },
       {
-        icon: <BarChart4 className="w-4 h-4" />,
+        icon: <BarChart4 className="h-4 w-4" />,
         title: "Finalizing Report...",
         description: isDone
           ? "Scoring market viability and difficulty scores."
@@ -160,42 +160,53 @@ export default function AnalysisPage() {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
+    <div className="mx-auto flex min-h-[calc(100vh-10rem)] w-full max-w-4xl flex-col items-center justify-center p-8">
       {/* Top Icon */}
       <div className="relative mb-8">
-        <div className="relative w-20 h-20 bg-[#0c0c0c] flex items-center justify-center text-[#ff4500] border border-[#ff4500]/45 shadow-[3px_3px_0px_0px_rgba(255,69,0,0.3)]">
-          <Eye className="w-10 h-10 animate-pulse" />
+        <div className="relative flex h-20 w-20 items-center justify-center border border-[#ff4500]/45 bg-[#0c0c0c] text-[#ff4500] shadow-[3px_3px_0px_0px_rgba(255,69,0,0.3)]">
+          <Eye className="h-10 w-10 animate-pulse" />
         </div>
       </div>
 
       {/* Header */}
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-black text-white tracking-tight mb-4 uppercase">
+      <div className="mb-12 text-center">
+        <h2 className="mb-4 text-4xl font-black tracking-tight text-white uppercase">
           Mining Market Secrets
         </h2>
-        <p className="text-zinc-400 font-medium text-lg">
+        <p className="text-lg font-medium text-zinc-400">
           Our specialized algorithms are decoding the Reddit pulse for you.
         </p>
-        <p className="mt-3 font-mono text-[11px] font-black uppercase tracking-widest text-amber-400">
+        <p className="mt-3 font-mono text-[11px] font-black tracking-widest text-amber-400 uppercase">
           Active window: {timeWindow}
         </p>
       </div>
 
       {/* Progress Card */}
-      <div className="w-full bg-[#111] border-2 border-white/15 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#ff4500]/20 to-transparent"></div>
+      <div className="relative w-full overflow-hidden border-2 border-white/15 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <div className="absolute top-0 left-0 h-px w-full bg-linear-to-r from-transparent via-[#ff4500]/20 to-transparent"></div>
 
-        <div className="p-10 space-y-10">
+        <div className="space-y-10 p-10">
           {/* Rate Limit Warnings */}
           {throttleWarnings.length > 0 && (
-            <div className="mb-8 space-y-2.5 bg-amber-500/5 border border-amber-500/20 p-5 font-mono text-[11px] text-amber-400 uppercase tracking-widest leading-relaxed">
-              <div className="flex items-center gap-2 mb-2 font-black text-amber-500">
-                <AlertTriangle className="w-3.5 h-3.5" />
+            <div className="mb-8 space-y-2.5 border border-amber-500/20 bg-amber-500/5 p-5 font-mono text-[11px] leading-relaxed tracking-widest text-amber-400 uppercase">
+              <div className="mb-2 flex items-center gap-2 font-black text-amber-500">
+                <AlertTriangle className="h-3.5 w-3.5" />
                 Rate Limit Protocol Alerts
               </div>
               {throttleWarnings.map((warning, idx) => (
-                <div key={idx} className="flex gap-2 border-l-2 border-amber-500/30 pl-3">
-                  <span className="opacity-40 tabular-nums">[{new Date().toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' })}]</span>
+                <div
+                  key={idx}
+                  className="flex gap-2 border-l-2 border-amber-500/30 pl-3"
+                >
+                  <span className="tabular-nums opacity-40">
+                    [
+                    {new Date().toLocaleTimeString([], {
+                      hour12: false,
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
+                    ]
+                  </span>
                   <span className="font-bold">{warning}</span>
                 </div>
               ))}
@@ -204,27 +215,27 @@ export default function AnalysisPage() {
 
           {/* Overall Progress */}
           <div className="space-y-4">
-            <div className="flex justify-between items-end">
-              <p className="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-400">
+            <div className="flex items-end justify-between">
+              <p className="font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                 Analysis Progress
               </p>
               <p className="text-lg font-black text-[#ff4500]">{progress}%</p>
             </div>
-            <div className="h-2 w-full bg-white/5 overflow-hidden border border-white/10">
+            <div className="h-2 w-full overflow-hidden border border-white/10 bg-white/5">
               <div
-                className="h-full bg-[#ff4500] transition-all duration-1000 shadow-[0_0_15px_rgba(255,69,0,0.5)]"
+                className="h-full bg-[#ff4500] shadow-[0_0_15px_rgba(255,69,0,0.5)] transition-all duration-1000"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <div className="flex items-center gap-2 font-mono text-[11px] font-bold text-zinc-500 uppercase tracking-wide">
-              <div className="w-1.5 h-1.5 bg-[#ff4500] animate-ping"></div>
+            <div className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-wide text-zinc-500 uppercase">
+              <div className="h-1.5 w-1.5 animate-ping bg-[#ff4500]"></div>
               {statusText}
             </div>
           </div>
 
           {/* Timeline Steps */}
-          <div className="space-y-0 relative">
-            <div className="absolute left-[19px] top-6 bottom-6 w-px bg-white/10"></div>
+          <div className="relative space-y-0">
+            <div className="absolute top-6 bottom-6 left-[19px] w-px bg-white/10"></div>
 
             {steps.map((step, idx) => (
               <AnalysisStep
@@ -239,38 +250,41 @@ export default function AnalysisPage() {
         </div>
 
         {/* Footer info */}
-        <div className="px-10 py-6 bg-white/2 border-t border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 text-zinc-500 font-mono text-[11px] font-bold uppercase tracking-widest">
-            <Clock className="w-4 h-4" />
+        <div className="flex items-center justify-between border-t border-white/10 bg-white/2 px-10 py-6">
+          <div className="flex items-center gap-2.5 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+            <Clock className="h-4 w-4" />
             {isDone ? "Mining complete" : `${progress}% — ${statusText}`}
           </div>
           <button
             disabled={!isDone}
             onClick={() => router.push(`/dashboard/reports/${scraperId}`)}
-            className="px-6 py-2.5 border border-[#ff8a57] bg-[#ff4500] text-white font-mono text-[12px] font-black uppercase tracking-widest flex items-center gap-2 disabled:bg-white/5 disabled:text-zinc-500 disabled:border-white/20 disabled:cursor-not-allowed group transition-colors"
+            className="group flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-6 py-2.5 font-mono text-[12px] font-black tracking-widest text-white uppercase transition-colors disabled:cursor-not-allowed disabled:border-white/20 disabled:bg-white/5 disabled:text-zinc-500"
           >
             {isDone
               ? "View Detailed Report"
               : hasFailed
                 ? "Scan Failed"
                 : "Processing..."}{" "}
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
       </div>
 
       {/* Pro Tip & Active Signals */}
-      <div className="mt-8 w-full max-w-2xl flex flex-col gap-4">
+      <div className="mt-8 flex w-full max-w-2xl flex-col gap-4">
         {customPatterns.length > 0 && (
-          <div className="bg-amber-500/5 border-2 border-amber-500/25 p-6 relative overflow-hidden">
+          <div className="relative overflow-hidden border-2 border-amber-500/25 bg-amber-500/5 p-6">
             <div className="relative z-10">
-              <p className="font-mono text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5" />
+              <p className="mb-3 flex items-center gap-2 font-mono text-[10px] font-black tracking-widest text-amber-500 uppercase">
+                <Sparkles className="h-3.5 w-3.5" />
                 Active Custom Intelligence Signals
               </p>
               <div className="flex flex-wrap gap-2">
                 {customPatterns.map((pattern, idx) => (
-                  <div key={idx} className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-xs font-mono font-bold text-amber-400">
+                  <div
+                    key={idx}
+                    className="border border-amber-500/20 bg-amber-500/10 px-3 py-1 font-mono text-xs font-bold text-amber-400"
+                  >
                     {pattern}
                   </div>
                 ))}
@@ -279,15 +293,15 @@ export default function AnalysisPage() {
           </div>
         )}
 
-        <div className="bg-[#ff4500]/5 border-2 border-[#ff4500]/25 p-6 flex gap-4 items-start relative overflow-hidden">
-          <div className="p-2 bg-[#ff4500]/10 border border-[#ff4500]/35 text-[#ff4500] relative z-10">
-            <Sparkles className="w-5 h-5" />
+        <div className="relative flex items-start gap-4 overflow-hidden border-2 border-[#ff4500]/25 bg-[#ff4500]/5 p-6">
+          <div className="relative z-10 border border-[#ff4500]/35 bg-[#ff4500]/10 p-2 text-[#ff4500]">
+            <Sparkles className="h-5 w-5" />
           </div>
           <div className="relative z-10">
-            <p className="font-mono text-[10px] font-black text-[#ff4500] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+            <p className="mb-1.5 flex items-center gap-2 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
               Intelligence Protocol Active
             </p>
-            <p className="text-[13px] text-zinc-400 font-medium leading-relaxed">
+            <p className="text-[13px] leading-relaxed font-medium text-zinc-400">
               Our engine is specifically hunting for{" "}
               <span className="text-zinc-200">Pain Intensity</span>,{" "}
               <span className="text-zinc-200">Budgets</span>, and{" "}
@@ -303,10 +317,10 @@ export default function AnalysisPage() {
 
 function AnalysisSkeletonView() {
   return (
-    <div className="p-8 max-w-4xl mx-auto w-full flex flex-col items-center min-h-[calc(100vh-10rem)] justify-center">
+    <div className="mx-auto flex min-h-[calc(100vh-10rem)] w-full max-w-4xl flex-col items-center justify-center p-8">
       <div className="relative mb-8">
         <div className="relative flex h-20 w-20 items-center justify-center border border-[#ff4500]/35 bg-[#0c0c0c] shadow-[3px_3px_0px_0px_rgba(255,69,0,0.2)]">
-          <div className="h-10 w-10 rounded-full border border-[#ff4500]/45 bg-[#ff4500]/12 animate-pulse"></div>
+          <div className="h-10 w-10 animate-pulse rounded-full border border-[#ff4500]/45 bg-[#ff4500]/12"></div>
         </div>
       </div>
 
@@ -326,10 +340,10 @@ function AnalysisSkeletonView() {
               <Skeleton className="h-7 w-14 rounded-none bg-[#ff4500]/12" />
             </div>
             <div className="h-2 w-full overflow-hidden border border-white/10 bg-white/5">
-              <div className="h-full w-1/3 bg-[#ff4500]/25 animate-pulse"></div>
+              <div className="h-full w-1/3 animate-pulse bg-[#ff4500]/25"></div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-[#ff4500]/70 animate-pulse"></div>
+              <div className="h-2 w-2 animate-pulse rounded-full bg-[#ff4500]/70"></div>
               <Skeleton className="h-3 w-48 rounded-none bg-white/8" />
             </div>
           </div>
@@ -368,7 +382,7 @@ function AnalysisSkeletonStep() {
     <div className="flex gap-6 p-5">
       <div className="relative z-10">
         <div className="flex h-10 w-10 items-center justify-center border border-white/15 bg-white/5">
-          <div className="h-4 w-4 rounded-full bg-[#ff4500]/55 animate-pulse"></div>
+          <div className="h-4 w-4 animate-pulse rounded-full bg-[#ff4500]/55"></div>
         </div>
       </div>
       <div className="flex-1">
@@ -400,36 +414,36 @@ function AnalysisStep({
     >
       <div className="relative z-10">
         <div
-          className={`w-10 h-10 flex items-center justify-center border transition-all duration-500 ${
+          className={`flex h-10 w-10 items-center justify-center border transition-all duration-500 ${
             status === "completed"
-              ? "bg-emerald-500/10 border-emerald-400/45 text-emerald-300"
+              ? "border-emerald-400/45 bg-emerald-500/10 text-emerald-300"
               : status === "in-progress"
-                ? "bg-[#ff4500]/20 border-[#ff4500]/70 text-[#ff4500] shadow-[0_0_15px_rgba(255,69,0,0.35)] animate-pulse"
-                : "bg-white/5 border-white/15 text-zinc-600"
+                ? "animate-pulse border-[#ff4500]/70 bg-[#ff4500]/20 text-[#ff4500] shadow-[0_0_15px_rgba(255,69,0,0.35)]"
+                : "border-white/15 bg-white/5 text-zinc-600"
           }`}
         >
-          {status === "completed" ? <CheckCircle2 className="w-5 h-5" /> : icon}
+          {status === "completed" ? <CheckCircle2 className="h-5 w-5" /> : icon}
         </div>
       </div>
       <div className="flex-1">
-        <div className="flex items-center gap-3 mb-1">
+        <div className="mb-1 flex items-center gap-3">
           <p
             className={`text-lg font-black tracking-tight ${status === "pending" ? "text-zinc-500" : "text-zinc-100"}`}
           >
             {title}
           </p>
           {status === "completed" && (
-            <span className="font-mono text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 text-emerald-300 border border-emerald-400/40">
+            <span className="border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-emerald-300 uppercase">
               Analyzed
             </span>
           )}
           {status === "in-progress" && (
-            <span className="font-mono text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-[#ff4500]/10 text-[#ff4500] border border-[#ff4500]/40">
+            <span className="border border-[#ff4500]/40 bg-[#ff4500]/10 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase">
               In Progress
             </span>
           )}
         </div>
-        <p className="text-zinc-500 text-sm font-medium leading-relaxed max-w-lg">
+        <p className="max-w-lg text-sm leading-relaxed font-medium text-zinc-500">
           {description}
         </p>
       </div>

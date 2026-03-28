@@ -18,7 +18,7 @@ describe("generateEmbedding", () => {
   it("throws an error if OPENROUTER_API_KEY is not configured", async () => {
     vi.stubEnv("OPENROUTER_API_KEY", "");
     await expect(generateEmbedding("test text")).rejects.toThrow(
-      "OPENROUTER_API_KEY is not configured."
+      "OPENROUTER_API_KEY is not configured.",
     );
   });
 
@@ -28,8 +28,8 @@ describe("generateEmbedding", () => {
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        data: [{ embedding: mockEmbedding }]
-      })
+        data: [{ embedding: mockEmbedding }],
+      }),
     });
 
     const result = await generateEmbedding("test text");
@@ -47,7 +47,7 @@ describe("generateEmbedding", () => {
           model: "openai/text-embedding-3-small",
           input: "test text",
         }),
-      })
+      }),
     );
   });
 
@@ -57,8 +57,8 @@ describe("generateEmbedding", () => {
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        data: [{ embedding: mockEmbedding }]
-      })
+        data: [{ embedding: mockEmbedding }],
+      }),
     });
 
     const longText = "a".repeat(10000);
@@ -71,7 +71,7 @@ describe("generateEmbedding", () => {
           model: "openai/text-embedding-3-small",
           input: "a".repeat(8000),
         }),
-      })
+      }),
     );
   });
 
@@ -83,7 +83,7 @@ describe("generateEmbedding", () => {
     });
 
     await expect(generateEmbedding("test text")).rejects.toThrow(
-      "Embedding API error: 401 Unauthorized"
+      "Embedding API error: 401 Unauthorized",
     );
   });
 
@@ -93,12 +93,12 @@ describe("generateEmbedding", () => {
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        data: [{ embedding: wrongDimensions }]
-      })
+        data: [{ embedding: wrongDimensions }],
+      }),
     });
 
     await expect(generateEmbedding("test text")).rejects.toThrow(
-      "Unexpected embedding dimensions: got 100, expected 1536"
+      "Unexpected embedding dimensions: got 100, expected 1536",
     );
   });
 
@@ -106,12 +106,12 @@ describe("generateEmbedding", () => {
     (global.fetch as any) = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        data: [{ }] // missing embedding
-      })
+        data: [{}], // missing embedding
+      }),
     });
 
     await expect(generateEmbedding("test text")).rejects.toThrow(
-      "Unexpected embedding dimensions: got 0, expected 1536"
+      "Unexpected embedding dimensions: got 0, expected 1536",
     );
   });
 });

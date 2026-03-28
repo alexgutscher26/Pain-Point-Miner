@@ -190,8 +190,8 @@ Summary and call-to-action.
   "@type": "Article",
   "headline": "Complete Guide to React Hooks",
   "image": "https://example.com/images/react-hooks.jpg",
-  "datePublished": "2024-01-15",
-  "dateModified": "2024-02-01",
+  "datePublished": "2026-01-15",
+  "dateModified": "2026-02-01",
   "author": {
     "@type": "Person",
     "name": "Jane Developer"
@@ -237,13 +237,13 @@ Sitemap: https://example.com/sitemap.xml
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://example.com/</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://example.com/blog/react-hooks-guide</loc>
-    <lastmod>2024-01-10</lastmod>
+    <lastmod>2026-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

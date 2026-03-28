@@ -40,27 +40,27 @@ export function Testimonial() {
   }, []);
 
   return (
-    <section className="w-full bg-[#0a0a0a] border-y border-white/5 overflow-hidden font-sans">
+    <section className="w-full overflow-hidden border-y border-white/5 bg-[#0a0a0a] font-sans">
       {/* Testimonial Carousel */}
-      <div className="py-24 md:py-32 flex justify-center px-6">
-        <div className="max-w-4xl w-full relative">
-          <div className="absolute -top-12 -left-4 md:-left-12 opacity-10">
-            <Quote className="w-24 h-24 text-[#ff4500]" strokeWidth={3} />
+      <div className="flex justify-center px-6 py-24 md:py-32">
+        <div className="relative w-full max-w-4xl">
+          <div className="absolute -top-12 -left-4 opacity-10 md:-left-12">
+            <Quote className="h-24 w-24 text-[#ff4500]" strokeWidth={3} />
           </div>
 
-          <div className="relative z-10 text-center space-y-10">
-            <div className="min-h-[160px] md:min-h-[180px] flex items-center justify-center">
-              <h2 className="text-[24px] md:text-[32px] font-bold text-white leading-relaxed tracking-tight transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+          <div className="relative z-10 space-y-10 text-center">
+            <div className="flex min-h-[160px] items-center justify-center md:min-h-[180px]">
+              <h2 className="animate-in fade-in slide-in-from-bottom-4 text-[24px] leading-relaxed font-bold tracking-tight text-white transition-all duration-500 md:text-[32px]">
                 &ldquo;{testimonials[currentIndex].quote}&rdquo;
               </h2>
             </div>
 
             <div className="flex flex-col items-center gap-2">
               <div>
-                <p className="text-white font-black text-lg">
+                <p className="text-lg font-black text-white">
                   {testimonials[currentIndex].author}
                 </p>
-                <p className="text-[#ff4500] font-mono text-[11px] font-bold uppercase tracking-widest opacity-80">
+                <p className="font-mono text-[11px] font-bold tracking-widest text-[#ff4500] uppercase opacity-80">
                   {testimonials[currentIndex].role}
                 </p>
               </div>
@@ -71,16 +71,16 @@ export function Testimonial() {
               <button
                 aria-label="Previous testimonial"
                 onClick={prev}
-                className="p-3 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-all shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)]"
+                className="border border-white/10 bg-white/5 p-3 text-zinc-400 shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)] transition-all hover:border-white/20 hover:text-white"
               >
-                <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
               <button
                 aria-label="Next testimonial"
                 onClick={next}
-                className="p-3 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-all shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)]"
+                className="border border-white/10 bg-white/5 p-3 text-zinc-400 shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)] transition-all hover:border-white/20 hover:text-white"
               >
-                <ChevronRight className="w-5 h-5" aria-hidden="true" />
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -89,7 +89,7 @@ export function Testimonial() {
               {testimonials.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1 transition-all duration-500 rounded-full ${i === currentIndex ? "w-8 bg-[#ff4500]" : "w-3 bg-white/10"}`}
+                  className={`h-1 rounded-full transition-all duration-500 ${i === currentIndex ? "w-8 bg-[#ff4500]" : "w-3 bg-white/10"}`}
                 />
               ))}
             </div>

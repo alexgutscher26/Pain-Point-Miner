@@ -37,12 +37,20 @@ export async function getScraperHealthStats(userId: string) {
     })
     .from(scraperRun)
     .innerJoin(scraper, eq(scraperRun.scraperId, scraper.id))
-    .where(and(eq(scraper.userId, userId), gte(scraperRun.startedAt, sevenDaysAgo)));
+    .where(
+      and(eq(scraper.userId, userId), gte(scraperRun.startedAt, sevenDaysAgo)),
+    );
 
   const completedRuns = runs.filter((r: any) => r.status === "completed");
-  const avgPostsPerScan = completedRuns.length > 0
-    ? Math.round(completedRuns.reduce((acc: number, r: any) => acc + (r.postsFetched || 0), 0) / completedRuns.length)
-    : 0;
+  const avgPostsPerScan =
+    completedRuns.length > 0
+      ? Math.round(
+          completedRuns.reduce(
+            (acc: number, r: any) => acc + (r.postsFetched || 0),
+            0,
+          ) / completedRuns.length,
+        )
+      : 0;
 
   // 3. 7-Day Trend Chart
   // We Group by day
@@ -50,15 +58,25 @@ export async function getScraperHealthStats(userId: string) {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
     const dateStr = d.toISOString().split("T")[0];
-    
-    const dayRuns = runs.filter((r: any) => r.startedAt.toISOString().split("T")[0] === dateStr);
-    const daySuccess = dayRuns.filter((r: any) => r.status === "completed").length;
-    const dayDiscovery = dayRuns.reduce((acc: number, r: any) => acc + (r.newPainPoints || 0), 0);
+
+    const dayRuns = runs.filter(
+      (r: any) => r.startedAt.toISOString().split("T")[0] === dateStr,
+    );
+    const daySuccess = dayRuns.filter(
+      (r: any) => r.status === "completed",
+    ).length;
+    const dayDiscovery = dayRuns.reduce(
+      (acc: number, r: any) => acc + (r.newPainPoints || 0),
+      0,
+    );
 
     return {
       date: dateStr,
       runs: dayRuns.length,
-      successRate: dayRuns.length > 0 ? Math.round((daySuccess / dayRuns.length) * 100) : 100,
+      successRate:
+        dayRuns.length > 0
+          ? Math.round((daySuccess / dayRuns.length) * 100)
+          : 100,
       discovery: dayDiscovery,
     };
   });
@@ -68,6 +86,9 @@ export async function getScraperHealthStats(userId: string) {
     avgPostsPerScan,
     dailyTrend,
     totalScans: runs.length,
-    successRate: runs.length > 0 ? Math.round((completedRuns.length / runs.length) * 100) : 100,
+    successRate:
+      runs.length > 0
+        ? Math.round((completedRuns.length / runs.length) * 100)
+        : 100,
   };
 }

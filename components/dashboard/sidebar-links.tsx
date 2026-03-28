@@ -22,32 +22,32 @@ export function SidebarLinks() {
   const links = [
     {
       href: "/dashboard",
-      icon: <LayoutDashboard className="w-[18px] h-[18px]" />,
+      icon: <LayoutDashboard className="h-[18px] w-[18px]" />,
       label: "Overview",
     },
     {
       href: "/dashboard/search",
-      icon: <Search className="w-[18px] h-[18px]" />,
+      icon: <Search className="h-[18px] w-[18px]" />,
       label: "New Search",
     },
     {
       href: "/dashboard/reports",
-      icon: <FileText className="w-[18px] h-[18px]" />,
+      icon: <FileText className="h-[18px] w-[18px]" />,
       label: "Reports",
     },
     {
       href: "/dashboard/billing",
-      icon: <CreditCard className="w-[18px] h-[18px]" />,
+      icon: <CreditCard className="h-[18px] w-[18px]" />,
       label: "Billing",
     },
     {
       href: "/dashboard/settings",
-      icon: <Settings className="w-[18px] h-[18px]" />,
+      icon: <Settings className="h-[18px] w-[18px]" />,
       label: "Settings",
     },
     {
       href: "/dashboard/health",
-      icon: <Activity className="w-[18px] h-[18px]" />,
+      icon: <Activity className="h-[18px] w-[18px]" />,
       label: "System Health",
     },
   ];
@@ -55,7 +55,7 @@ export function SidebarLinks() {
   if (isAdmin) {
     links.push({
       href: "/dashboard/admin",
-      icon: <ShieldCheck className="w-[18px] h-[18px]" />,
+      icon: <ShieldCheck className="h-[18px] w-[18px]" />,
       label: "Admin",
     });
   }
@@ -68,10 +68,10 @@ export function SidebarLinks() {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-3.5 px-3.5 py-2.5 border transition-colors font-mono uppercase tracking-wide text-[11px] group ${
+            className={`group flex items-center gap-3.5 border px-3.5 py-2.5 font-mono text-[11px] tracking-wide uppercase transition-colors ${
               isActive
                 ? "border-[#ff8a57] bg-[#ff4500] text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]"
-                : "border-white/10 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/5"
+                : "border-white/10 text-zinc-400 hover:border-white/30 hover:bg-white/5 hover:text-white"
             }`}
           >
             <span

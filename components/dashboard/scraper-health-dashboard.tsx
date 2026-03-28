@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Activity, 
-  BarChart3, 
-  CheckCircle2, 
-  TrendingUp, 
+import {
+  Activity,
+  BarChart3,
+  CheckCircle2,
+  TrendingUp,
   Clock,
   RefreshCcw,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import {
   XAxis,
@@ -62,23 +62,26 @@ export function ScraperHealthDashboard() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+      <div className="grid animate-pulse grid-cols-1 gap-6 md:grid-cols-3">
         {[1, 2, 3].map((key) => (
-          <div key={key} className="h-32 bg-white/5 border-2 border-white/10" />
+          <div key={key} className="h-32 border-2 border-white/10 bg-white/5" />
         ))}
-        <div className="md:col-span-2 h-80 bg-white/5 border-2 border-white/10" />
-        <div className="h-80 bg-white/5 border-2 border-white/10" />
+        <div className="h-80 border-2 border-white/10 bg-white/5 md:col-span-2" />
+        <div className="h-80 border-2 border-white/10 bg-white/5" />
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="bg-[#111] border-2 border-white/10 p-12 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-        <Activity className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
-        <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight">No Health Data Available</h3>
-        <p className="text-zinc-500 font-mono text-xs max-w-sm mx-auto uppercase tracking-widest">
-          Initiate your first investigation to begin tracking operational metrics.
+      <div className="border-2 border-white/10 bg-[#111] p-12 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+        <Activity className="mx-auto mb-4 h-12 w-12 text-zinc-700" />
+        <h3 className="mb-2 text-xl font-black tracking-tight text-white uppercase">
+          No Health Data Available
+        </h3>
+        <p className="mx-auto max-w-sm font-mono text-xs tracking-widest text-zinc-500 uppercase">
+          Initiate your first investigation to begin tracking operational
+          metrics.
         </p>
       </div>
     );
@@ -88,100 +91,121 @@ export function ScraperHealthDashboard() {
     <div className="space-y-8 pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-2xl font-black text-white tracking-tight leading-none mb-2">
+          <h3 className="mb-2 text-2xl leading-none font-black tracking-tight text-white">
             Scraper Health & Reliability
           </h3>
-          <p className="text-zinc-400 text-sm font-medium">
+          <p className="text-sm font-medium text-zinc-400">
             Real-time monitoring of Reddit API performance and ingestion status.
           </p>
         </div>
-        <button 
+        <button
           onClick={fetchStats}
-          className="p-3 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-white"
+          className="border border-white/10 bg-white/5 p-3 text-white transition-colors hover:bg-white/10"
         >
-          <RefreshCcw className="w-5 h-5" />
+          <RefreshCcw className="h-5 w-5" />
         </button>
       </div>
 
       {/* Hero Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <HealthCard 
-          title="Overall Success Rate" 
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <HealthCard
+          title="Overall Success Rate"
           value={`${stats.successRate}%`}
           subtext="Last 7 days of scheduled jobs"
-          icon={<CheckCircle2 className={stats.successRate > 90 ? "text-emerald-400" : "text-amber-400"} />}
+          icon={
+            <CheckCircle2
+              className={
+                stats.successRate > 90 ? "text-emerald-400" : "text-amber-400"
+              }
+            />
+          }
         />
-        <HealthCard 
-          title="Avg Posts Per Scan" 
+        <HealthCard
+          title="Avg Posts Per Scan"
           value={stats.avgPostsPerScan.toString()}
           subtext="Volume of data ingested per run"
           icon={<BarChart3 className="text-[#ff4500]" />}
         />
-        <HealthCard 
-          title="Total API Operations" 
+        <HealthCard
+          title="Total API Operations"
           value={stats.totalScans.toString()}
           subtext="Unique investigation runs executed"
           icon={<Activity className="text-blue-400" />}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Trend Chart */}
-        <div className="lg:col-span-2 bg-[#111] border-2 border-white/10 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="font-black text-white text-lg flex items-center gap-3">
-              <TrendingUp className="w-5 h-5 text-[#ff4500]" />
+        <div className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] lg:col-span-2">
+          <div className="mb-8 flex items-center justify-between">
+            <h4 className="flex items-center gap-3 text-lg font-black text-white">
+              <TrendingUp className="h-5 w-5 text-[#ff4500]" />
               Discovery & Ingestion Trend
             </h4>
-            <div className="flex items-center gap-4 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+            <div className="flex items-center gap-4 font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 bg-[#ff4500]"></div>
+                <div className="h-2 w-2 bg-[#ff4500]"></div>
                 <span>Pain Points Found</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 bg-blue-500"></div>
+                <div className="h-2 w-2 bg-blue-500"></div>
                 <span>Success Rate (%)</span>
               </div>
             </div>
           </div>
-          
+
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.dailyTrend}>
                 <defs>
-                  <linearGradient id="colorDiscovery" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ff4500" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ff4500" stopOpacity={0}/>
+                  <linearGradient
+                    id="colorDiscovery"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#ff4500" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#ff4500" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#555" 
-                  fontSize={10} 
-                  tickFormatter={(val) => val.split('-').slice(1).join('/')}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#ffffff05"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="#555"
+                  fontSize={10}
+                  tickFormatter={(val) => val.split("-").slice(1).join("/")}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis hide />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#161616', border: '1px solid #333', fontSize: '10px', fontFamily: 'monospace' }}
-                  itemStyle={{ color: '#fff' }}
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#161616",
+                    border: "1px solid #333",
+                    fontSize: "10px",
+                    fontFamily: "monospace",
+                  }}
+                  itemStyle={{ color: "#fff" }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="discovery" 
-                  stroke="#ff4500" 
+                <Area
+                  type="monotone"
+                  dataKey="discovery"
+                  stroke="#ff4500"
                   strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorDiscovery)" 
+                  fillOpacity={1}
+                  fill="url(#colorDiscovery)"
                   name="Pain Points"
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="successRate" 
-                  stroke="#3b82f6" 
-                  strokeDasharray="5 5" 
+                <Line
+                  type="monotone"
+                  dataKey="successRate"
+                  stroke="#3b82f6"
+                  strokeDasharray="5 5"
                   strokeWidth={2}
                   dot={false}
                   name="Success Rate"
@@ -192,25 +216,27 @@ export function ScraperHealthDashboard() {
         </div>
 
         {/* Subreddit Performance */}
-        <div className="bg-[#111] border-2 border-white/10 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-          <h4 className="font-black text-white text-lg mb-6 flex items-center gap-3">
-            <Clock className="w-5 h-5 text-amber-400" />
+        <div className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <h4 className="mb-6 flex items-center gap-3 text-lg font-black text-white">
+            <Clock className="h-5 w-5 text-amber-400" />
             Top Subreddits
           </h4>
           <div className="space-y-4">
             {stats.subHealth.map((sub) => (
               <div key={sub.subreddit} className="group">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="font-mono text-[11px] font-bold text-white group-hover:text-[#ff4500] transition-colors cursor-pointer flex items-center gap-1.5">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="flex cursor-pointer items-center gap-1.5 font-mono text-[11px] font-bold text-white transition-colors group-hover:text-[#ff4500]">
                     r/{sub.subreddit}
-                    <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
                   </span>
-                  <span className={`font-mono text-[10px] font-black ${sub.successRate > 90 ? "text-emerald-400" : sub.successRate > 70 ? "text-amber-400" : "text-rose-400"}`}>
+                  <span
+                    className={`font-mono text-[10px] font-black ${sub.successRate > 90 ? "text-emerald-400" : sub.successRate > 70 ? "text-amber-400" : "text-rose-400"}`}
+                  >
                     {sub.successRate}%
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-white/5 border border-white/5 overflow-hidden">
-                  <div 
+                <div className="h-1.5 w-full overflow-hidden border border-white/5 bg-white/5">
+                  <div
                     className={`h-full transition-all duration-1000 ${sub.successRate > 90 ? "bg-emerald-500" : sub.successRate > 70 ? "bg-amber-500" : "bg-rose-500"}`}
                     style={{ width: `${sub.successRate}%` }}
                   />
@@ -224,22 +250,32 @@ export function ScraperHealthDashboard() {
   );
 }
 
-function HealthCard({ title, value, subtext, icon }: { title: string; value: string; subtext: string; icon: React.ReactNode }) {
+function HealthCard({
+  title,
+  value,
+  subtext,
+  icon,
+}: {
+  title: string;
+  value: string;
+  subtext: string;
+  icon: React.ReactNode;
+}) {
   return (
-    <div className="bg-[#111] p-6 border-2 border-white/12 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)] relative overflow-hidden group">
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-2.5 bg-white/5 border border-white/15 group-hover:scale-105 transition-transform">
+    <div className="group relative overflow-hidden border-2 border-white/12 bg-[#111] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)]">
+      <div className="mb-4 flex items-start justify-between">
+        <div className="border border-white/15 bg-white/5 p-2.5 transition-transform group-hover:scale-105">
           {icon}
         </div>
       </div>
       <div>
-        <p className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">
+        <p className="mb-1.5 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
           {title}
         </p>
-        <p className="text-3xl font-black text-white tracking-tight mb-1">
+        <p className="mb-1 text-3xl font-black tracking-tight text-white">
           {value}
         </p>
-        <p className="font-mono text-[9px] text-zinc-500 font-bold uppercase tracking-widest">
+        <p className="font-mono text-[9px] font-bold tracking-widest text-zinc-500 uppercase">
           {subtext}
         </p>
       </div>

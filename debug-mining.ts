@@ -9,19 +9,21 @@ async function debugMining() {
       limit: 5,
       orderBy: [desc(scraperRun.startedAt)],
     });
-    
+
     if (runs.length === 0) {
       console.log("No scraper runs found.");
     } else {
-      console.table(runs.map(r => ({
-        id: r.id.substring(0, 8),
-        status: r.status,
-        fetched: r.postsFetched,
-        matched: r.postsMatched,
-        comments: r.commentsFetched,
-        painPoints: r.newPainPoints,
-        error: r.error ? r.error.substring(0, 30) + "..." : "none"
-      })));
+      console.table(
+        runs.map((r) => ({
+          id: r.id.substring(0, 8),
+          status: r.status,
+          fetched: r.postsFetched,
+          matched: r.postsMatched,
+          comments: r.commentsFetched,
+          painPoints: r.newPainPoints,
+          error: r.error ? r.error.substring(0, 30) + "..." : "none",
+        })),
+      );
     }
 
     console.log("\n--- RECENT ANALYZED POSTS ---");
@@ -29,15 +31,17 @@ async function debugMining() {
       limit: 10,
       orderBy: [desc(scraperPost.createdAt)],
     });
-    
+
     if (posts.length === 0) {
       console.log("No analyzed posts found.");
     } else {
-      console.table(posts.map(p => ({
-        postId: p.postId,
-        comments: p.commentCount,
-        runId: p.runId.substring(0, 8)
-      })));
+      console.table(
+        posts.map((p) => ({
+          postId: p.postId,
+          comments: p.commentCount,
+          runId: p.runId.substring(0, 8),
+        })),
+      );
     }
 
     console.log("\n--- RECENT RATE LIMIT LOGS ---");
@@ -45,15 +49,17 @@ async function debugMining() {
       limit: 5,
       orderBy: [desc(redditRateLimitLog.createdAt)],
     });
-    
+
     if (logs.length === 0) {
       console.log("No rate limit logs found.");
     } else {
-      console.table(logs.map(l => ({
-        sub: l.subreddit,
-        status: l.statusCode,
-        ua: l.userAgent.substring(0, 20) + "..."
-      })));
+      console.table(
+        logs.map((l) => ({
+          sub: l.subreddit,
+          status: l.statusCode,
+          ua: l.userAgent.substring(0, 20) + "...",
+        })),
+      );
     }
   } catch (error) {
     console.error("Debug failed:", error);

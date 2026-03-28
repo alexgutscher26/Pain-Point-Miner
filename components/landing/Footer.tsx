@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#1a1a1a] px-4 pb-8 pt-16 sm:px-6">
+    <footer className="w-full bg-[#1a1a1a] px-4 pt-16 pb-8 sm:px-6">
       <div className="mx-auto mb-20 flex max-w-[1240px] flex-col justify-between gap-12 md:flex-row md:gap-8">
         {/* Left Col: Brand & Theme Toggle */}
-        <div className="flex flex-col items-start max-w-[280px]">
-          <Link href="/" className="flex items-center gap-2 mb-4 group">
+        <div className="flex max-w-[280px] flex-col items-start">
+          <Link href="/" className="group mb-4 flex items-center gap-2">
             <svg
               width="24"
               height="24"
@@ -18,11 +18,11 @@ export function Footer() {
               <path d="M12 2L2 22h20L12 2z" fill="currentColor" />
               <circle cx="12" cy="15" r="3" fill="#1a1a1a" />
             </svg>
-            <span className="font-extrabold text-[15px] text-white tracking-wide">
+            <span className="text-[15px] font-extrabold tracking-wide text-white">
               ThreddIQ
             </span>
           </Link>
-          <p className="text-[14px] text-zinc-400 leading-relaxed font-medium mb-6">
+          <p className="mb-6 text-[14px] leading-relaxed font-medium text-zinc-400">
             Find perfect opportunities on Reddit with AI-powered monitoring
           </p>
           {/* 
@@ -44,134 +44,134 @@ export function Footer() {
         </div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">Features</p>
+            <p className="mb-2 text-[15px] font-bold text-white">Features</p>
             <Link
               href="/features/pain-point-mining"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Pain Point Mining
             </Link>
             <Link
               href="/features/idea-validation"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Idea Validation
             </Link>
             <Link
               href="/features/market-discovery"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Market Discovery
             </Link>
             <Link
               href="/features/keyword-monitoring"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Keyword Monitoring
             </Link>
             <Link
               href="/features/sentiment-analysis"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Sentiment Analysis
             </Link>
           </div>
 
           <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">Product</p>
+            <p className="mb-2 text-[15px] font-bold text-white">Product</p>
             <Link
               href="/#faq"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               FAQ
             </Link>
             <Link
               href="/case-studies"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Case Studies
             </Link>
             <Link
               href="/docs"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Documentation -- Coming Soon
             </Link>
           </div>
 
           <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">Free Tools</p>
+            <p className="mb-2 text-[15px] font-bold text-white">Free Tools</p>
             <Link
               href="/free-tools/pain-point-miner"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors flex items-center gap-2"
+              className="flex items-center gap-2 text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Pain Point Miner{" "}
-              <span className="text-[10px] bg-[#ff4500]/20 text-[#ff4500] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
+              <span className="rounded bg-[#ff4500]/20 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#ff4500] uppercase">
                 Free
               </span>
             </Link>
             <Link
               href="/free-tools/opportunity-scoreboard"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Opportunity Scoreboard
             </Link>
             <Link
               href="/free-tools/sentiment-context-map"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Sentiment Context Map
             </Link>
             <Link
               href="/free-tools/reddit-lead-generator"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors"
+              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Reddit Lead Generator
             </Link>
           </div>
           <div className="flex flex-col gap-5">
-            <p className="font-bold text-white text-[15px] mb-2">Resources</p>
+            <p className="mb-2 text-[15px] font-bold text-white">Resources</p>
             <Link
               href="/resources/best-subreddits-by-industry"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Best Subreddits by Industry
             </Link>
             <Link
               href="/resources/monitor-reddit-by-industry"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Monitor Reddit by Industry
             </Link>
             <Link
               href="/resources/reddit-monitoring-use-cases"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Reddit Monitoring Use Cases
             </Link>
             <Link
               href="/resources/reddit-marketing-glossary"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Reddit Marketing Glossary
             </Link>
             <Link
               href="/resources/reddit-marketing-by-industry"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Reddit Marketing by Industry
             </Link>
             <Link
               href="/resources/tool-comparisons"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Tool Comparisons
             </Link>
             <Link
               href="/resources/reddit-tools"
-              className="text-[13px] text-zinc-400 font-medium hover:text-white transition-colors leading-relaxed"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >
               Reddit Tools
             </Link>
@@ -216,11 +216,11 @@ export function Footer() {
       </div> */}
 
       {/* Copyright Base */}
-      <div className="max-w-[1240px] mx-auto flex flex-col gap-2 md:flex-row justify-between items-center text-[12px] text-zinc-400 border-t border-zinc-800 pt-8 pb-4 text-center md:text-left">
+      <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-2 border-t border-zinc-800 pt-8 pb-4 text-center text-[12px] text-zinc-400 md:flex-row md:text-left">
         <p>© 2026 ThreddIQ. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
           Built with <span className="text-[#a8a8a8]">☕</span> by{" "}
-          <span className="text-white font-bold ml-1">Alex</span>
+          <span className="ml-1 font-bold text-white">Alex</span>
         </div>
       </div>
     </footer>

@@ -4,7 +4,13 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { painPoint, painPointFeedback } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
-import { BarChart3, ThumbsUp, ThumbsDown, AlertTriangle, ShieldCheck } from "lucide-react";
+import {
+  BarChart3,
+  ThumbsUp,
+  ThumbsDown,
+  AlertTriangle,
+  ShieldCheck,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -34,70 +40,93 @@ export default async function AdminDashboardPage() {
     .limit(50);
 
   const flagged = stats.filter((s) => s.accuracy < 30 && s.total >= 3);
-  const overallAccuracy = stats.length > 0 
-    ? stats.reduce((acc, s) => acc + s.accuracy, 0) / stats.length 
-    : 100;
+  const overallAccuracy =
+    stats.length > 0
+      ? stats.reduce((acc, s) => acc + s.accuracy, 0) / stats.length
+      : 100;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-700">
+    <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-8 p-8 duration-700">
       {/* Admin Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-8">
+      <div className="flex flex-col items-start justify-between gap-4 border-b border-white/10 pb-8 md:flex-row md:items-center">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldCheck className="w-5 h-5 text-[#ff4500]" />
-            <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
+          <div className="mb-2 flex items-center gap-3">
+            <ShieldCheck className="h-5 w-5 text-[#ff4500]" />
+            <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
               Admin <span className="text-[#ff4500]">Control</span>
             </h1>
           </div>
-          <p className="text-zinc-500 font-medium font-mono text-xs uppercase tracking-[0.2em]">
+          <p className="font-mono text-xs font-medium tracking-[0.2em] text-zinc-500 uppercase">
             System Oversight & Feedback Accuracy
           </p>
         </div>
 
         <div className="flex gap-4">
-          <div className="bg-zinc-900 border border-white/10 px-6 py-4 rounded-2xl text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
-            <p className="text-2xl font-black text-white">{overallAccuracy.toFixed(1)}%</p>
-            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Global Accuracy</p>
+          <div className="rounded-2xl border border-white/10 bg-zinc-900 px-6 py-4 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+            <p className="text-2xl font-black text-white">
+              {overallAccuracy.toFixed(1)}%
+            </p>
+            <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+              Global Accuracy
+            </p>
           </div>
-          <div className="bg-zinc-900 border border-white/10 px-6 py-4 rounded-2xl text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
-            <p className="text-2xl font-black text-rose-500">{flagged.length}</p>
-            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Flagged Items</p>
+          <div className="rounded-2xl border border-white/10 bg-zinc-900 px-6 py-4 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+            <p className="text-2xl font-black text-rose-500">
+              {flagged.length}
+            </p>
+            <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+              Flagged Items
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left Column: Flagged Items */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-rose-500" />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Requires Review</h2>
+        <div className="space-y-6 lg:col-span-2">
+          <div className="mb-2 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-rose-500" />
+            <h2 className="text-lg font-black tracking-tight text-white uppercase">
+              Requires Review
+            </h2>
           </div>
-          
+
           <div className="space-y-4">
             {flagged.length === 0 ? (
-              <div className="bg-zinc-900/50 border border-white/5 p-12 text-center rounded-3xl">
-                <p className="text-zinc-600 font-black uppercase tracking-widest text-xs italic">
+              <div className="rounded-3xl border border-white/5 bg-zinc-900/50 p-12 text-center">
+                <p className="text-xs font-black tracking-widest text-zinc-600 uppercase italic">
                   No pain points currently flagged for review
                 </p>
               </div>
             ) : (
               flagged.map((item) => (
-                <div key={item.painPointId} className="bg-zinc-900 border border-white/10 p-6 rounded-3xl hover:border-rose-500/40 transition-all group">
-                  <div className="flex justify-between items-start gap-4">
+                <div
+                  key={item.painPointId}
+                  className="group rounded-3xl border border-white/10 bg-zinc-900 p-6 transition-all hover:border-rose-500/40"
+                >
+                  <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">
-                      <h3 className="text-xl font-black text-white group-hover:text-rose-500 transition-colors">
+                      <h3 className="text-xl font-black text-white transition-colors group-hover:text-rose-500">
                         {item.title}
                       </h3>
-                      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                        <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3 text-emerald-500" /> {item.upvotes}</span>
-                        <span className="flex items-center gap-1 text-rose-500"><ThumbsDown className="w-3 h-3" /> {item.downvotes}</span>
+                      <div className="flex items-center gap-4 text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                        <span className="flex items-center gap-1">
+                          <ThumbsUp className="h-3 w-3 text-emerald-500" />{" "}
+                          {item.upvotes}
+                        </span>
+                        <span className="flex items-center gap-1 text-rose-500">
+                          <ThumbsDown className="h-3 w-3" /> {item.downvotes}
+                        </span>
                         <span>Total: {item.total}</span>
                       </div>
                     </div>
-                    <div className="bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-xl text-center">
-                      <p className="text-lg font-black text-rose-500">{item.accuracy.toFixed(0)}%</p>
-                      <p className="text-[8px] font-black text-rose-500/60 uppercase">Accuracy</p>
+                    <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2 text-center">
+                      <p className="text-lg font-black text-rose-500">
+                        {item.accuracy.toFixed(0)}%
+                      </p>
+                      <p className="text-[8px] font-black text-rose-500/60 uppercase">
+                        Accuracy
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -108,23 +137,32 @@ export default async function AdminDashboardPage() {
 
         {/* Right Column: General Stats */}
         <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <BarChart3 className="w-4 h-4 text-[#ff4500]" />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Recent Feedback</h2>
+          <div className="mb-2 flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-[#ff4500]" />
+            <h2 className="text-lg font-black tracking-tight text-white uppercase">
+              Recent Feedback
+            </h2>
           </div>
 
-          <div className="bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-6 space-y-4">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl">
+            <div className="space-y-4 p-6">
               {stats.slice(0, 10).map((s) => (
-                <div key={s.painPointId} className="space-y-2 border-b border-white/5 pb-4 last:border-0 last:pb-0">
-                  <div className="flex justify-between items-center gap-4">
-                    <p className="text-xs font-bold text-zinc-300 truncate max-w-[150px]">{s.title}</p>
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded ${s.accuracy > 70 ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"}`}>
+                <div
+                  key={s.painPointId}
+                  className="space-y-2 border-b border-white/5 pb-4 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="max-w-[150px] truncate text-xs font-bold text-zinc-300">
+                      {s.title}
+                    </p>
+                    <span
+                      className={`rounded px-2 py-0.5 text-[10px] font-black ${s.accuracy > 70 ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"}`}
+                    >
                       {s.accuracy.toFixed(0)}%
                     </span>
                   </div>
-                  <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                    <div 
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                    <div
                       className={`h-full ${s.accuracy > 70 ? "bg-emerald-500" : s.accuracy > 40 ? "bg-amber-500" : "bg-rose-500"}`}
                       style={{ width: `${s.accuracy}%` }}
                     />

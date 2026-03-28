@@ -16,13 +16,13 @@ SaaS founders waste hours manually searching Reddit for idea validation. RPP aut
 
 ### Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 15 (App Router) · Tailwind CSS 4 · Shadcn UI |
-| Backend | Next.js API Routes (TypeScript) |
-| Database | PostgreSQL · Drizzle ORM · PGVector (semantic clustering) |
-| AI | OpenRouter — Gemini 2.0 Flash / GPT-4o / Claude Sonnet 3.5 |
-| Reddit | Native Fetch + OAuth · PullPush fallback |
+| Layer    | Technology                                                 |
+| -------- | ---------------------------------------------------------- |
+| Frontend | Next.js 15 (App Router) · Tailwind CSS 4 · Shadcn UI       |
+| Backend  | Next.js API Routes (TypeScript)                            |
+| Database | PostgreSQL · Drizzle ORM · PGVector (semantic clustering)  |
+| AI       | OpenRouter — Gemini 2.0 Flash / GPT-4o / Claude Sonnet 3.5 |
+| Reddit   | Native Fetch + OAuth · PullPush fallback                   |
 
 ### Pain Point Scoring Formula (v1)
 
@@ -36,27 +36,27 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### Architecture Map
 
-| Module | Purpose |
-|---|---|
-| `lib/mining-runner.ts` | Full pipeline orchestrator: parallel fetch → comment fetch → AI extraction → embedding + clustering |
-| `lib/embeddings.ts` | OpenRouter embedding generation (`text-embedding-3-small`, 1536d) · PGVector cosine search |
-| `lib/clustering.ts` | Auto-groups pain points into `painPointCluster` (threshold: 0.82 cosine similarity) |
-| `lib/ai.ts` | OpenRouter-based pain point extraction from posts + comments |
-| `lib/reddit.ts` | OAuth fetch with retry · PullPush fallback for 403/blocked |
-| `lib/budget-signals.ts` | Extracts willingness-to-pay signals from post bodies and comments |
-| `lib/community-map.ts` | Subreddit density data for the heatmap visualization |
-| `lib/plan-gating.ts` | Starter / Growth / Pro entitlements · scan usage tracking |
-| `lib/plan-resolver.ts` | Subscription state resolution from Stripe |
-| `lib/trend-detection.ts` | Trend direction detection (up / down / flat / new) |
-| `lib/dashboard-metrics.ts` | Opportunity scoring · validation scoring · market badge logic |
-| `lib/scheduler.ts` | `isScraperDue()` frequency-based scheduling |
-| `lib/reddit-idempotency.ts` | 24h guard — never re-process the same Reddit post ID |
-| `lib/rate-limit.ts` | Sliding-window per-user rate limiting |
-| `lib/api-auth.ts` | Route-level auth enforcement |
-| `lib/run-status.ts` | `normalizeRunStatus()` — canonical status string mapping |
-| `lib/time-window.ts` | Time window helpers (24h / 7d / 30d / 90d) |
-| `app/api/search/stream/route.ts` | SSE endpoint for real-time mining progress |
-| `hooks/use-mining-stream.ts` | Client SSE hook with polling fallback |
+| Module                           | Purpose                                                                                             |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `lib/mining-runner.ts`           | Full pipeline orchestrator: parallel fetch → comment fetch → AI extraction → embedding + clustering |
+| `lib/embeddings.ts`              | OpenRouter embedding generation (`text-embedding-3-small`, 1536d) · PGVector cosine search          |
+| `lib/clustering.ts`              | Auto-groups pain points into `painPointCluster` (threshold: 0.82 cosine similarity)                 |
+| `lib/ai.ts`                      | OpenRouter-based pain point extraction from posts + comments                                        |
+| `lib/reddit.ts`                  | OAuth fetch with retry · PullPush fallback for 403/blocked                                          |
+| `lib/budget-signals.ts`          | Extracts willingness-to-pay signals from post bodies and comments                                   |
+| `lib/community-map.ts`           | Subreddit density data for the heatmap visualization                                                |
+| `lib/plan-gating.ts`             | Starter / Growth / Pro entitlements · scan usage tracking                                           |
+| `lib/plan-resolver.ts`           | Subscription state resolution from Stripe                                                           |
+| `lib/trend-detection.ts`         | Trend direction detection (up / down / flat / new)                                                  |
+| `lib/dashboard-metrics.ts`       | Opportunity scoring · validation scoring · market badge logic                                       |
+| `lib/scheduler.ts`               | `isScraperDue()` frequency-based scheduling                                                         |
+| `lib/reddit-idempotency.ts`      | 24h guard — never re-process the same Reddit post ID                                                |
+| `lib/rate-limit.ts`              | Sliding-window per-user rate limiting                                                               |
+| `lib/api-auth.ts`                | Route-level auth enforcement                                                                        |
+| `lib/run-status.ts`              | `normalizeRunStatus()` — canonical status string mapping                                            |
+| `lib/time-window.ts`             | Time window helpers (24h / 7d / 30d / 90d)                                                          |
+| `app/api/search/stream/route.ts` | SSE endpoint for real-time mining progress                                                          |
+| `hooks/use-mining-stream.ts`     | Client SSE hook with polling fallback                                                               |
 
 ---
 
@@ -374,8 +374,6 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] All data tables have `<th scope>` and `<caption>` elements
   - [ ] _Acceptance:_ `axe-core` audit returns zero critical violations on dashboard and report detail pages
 
-
-
 ---
 
 ## 🔐 PHASE 4 — Infrastructure, Security & Multi-Tenancy
@@ -500,11 +498,11 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### Pricing Strategy
 
-| Plan | Monthly | Annual | Scans/Mo | Subreddits | Depth | AI Model |
-|---|---|---|---|---|---|---|
-| **Starter** | Free | Free | 3 | 3 | Basic only | Gemini Flash |
-| **Growth** | $29 | $23/mo | 20 | 8 | Basic + Deep | GPT-4o |
-| **Pro** | $79 | $63/mo | Unlimited | Unlimited | All depths | Claude Sonnet |
+| Plan        | Monthly | Annual | Scans/Mo  | Subreddits | Depth        | AI Model      |
+| ----------- | ------- | ------ | --------- | ---------- | ------------ | ------------- |
+| **Starter** | Free    | Free   | 3         | 3          | Basic only   | Gemini Flash  |
+| **Growth**  | $29     | $23/mo | 20        | 8          | Basic + Deep | GPT-4o        |
+| **Pro**     | $79     | $63/mo | Unlimited | Unlimited  | All depths   | Claude Sonnet |
 
 ### ✅ Completed
 
@@ -588,8 +586,6 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Available only for first 200 users (enforced by `ltd_seats_remaining` counter)
   - [ ] LTD badge in sidebar: "Lifetime Member ✨"
   - [ ] _Acceptance:_ LTD purchasers bypass monthly scan limits indefinitely
-
-
 
 ---
 
@@ -683,8 +679,6 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] "Retry Failed Run" button on analysis page — resumes from the last successful step
   - [ ] Auto-retry failed embedding/clustering operations once on the next scan of the same scraper
   - [ ] _Acceptance:_ A failed AI extraction step still saves any pain points that completed before the failure
-
-
 
 ---
 
@@ -897,15 +891,15 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ### Monitoring & Alerts
 
-| Alert | Threshold | Channel |
-|---|---|---|
-| Uptime Monitoring | External ping every 5 min | PagerDuty / email |
-| API Error Rate | Alert if > 5% in 15-min window | Slack #alerts |
-| OpenRouter Spend | Alert if daily cost > $50 | Email |
-| DB Connection Pool | Alert if utilization > 80% | Slack #alerts |
-| Reddit API Health | Real-time success rate dashboard per subreddit | Internal dashboard |
-| Disk Space | Alert if > 80% on any volume | PagerDuty |
-| Stripe Webhook Failures | Alert on 3+ consecutive failures | Slack #billing |
+| Alert                   | Threshold                                      | Channel            |
+| ----------------------- | ---------------------------------------------- | ------------------ |
+| Uptime Monitoring       | External ping every 5 min                      | PagerDuty / email  |
+| API Error Rate          | Alert if > 5% in 15-min window                 | Slack #alerts      |
+| OpenRouter Spend        | Alert if daily cost > $50                      | Email              |
+| DB Connection Pool      | Alert if utilization > 80%                     | Slack #alerts      |
+| Reddit API Health       | Real-time success rate dashboard per subreddit | Internal dashboard |
+| Disk Space              | Alert if > 80% on any volume                   | PagerDuty          |
+| Stripe Webhook Failures | Alert on 3+ consecutive failures               | Slack #billing     |
 
 ### Runbooks
 
@@ -920,33 +914,32 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 > Items that should be cleaned up but aren't blocking. Address during low-priority sprints.
 
-| Item | File | Priority | Effort |
-|---|---|---|---|
-| Replace `any` types in `lib/reddit.ts` response parsing | `lib/reddit.ts` | Medium | Small |
-| Extract SSE event types into shared `types/sse.ts` file | `app/api/search/stream/` | Low | Small |
-| Consolidate duplicate `workspaceId` extraction logic across API routes | `app/api/**` | High | Medium |
-| Add Zod validation to all API route inputs (some routes use raw `req.json()`) | `app/api/**` | High | Medium |
-| Remove `console.log` statements from production `lib/mining-runner.ts` | `lib/mining-runner.ts` | Low | Small |
-| Migrate from `lib/idempotency.ts` to `lib/reddit-idempotency.ts` (duplicate logic) | `lib/` | Medium | Small |
-| Add `readonly` to all Drizzle query result types | `lib/db/` | Low | Medium |
-| Replace hardcoded `0.82` clustering threshold with configurable env variable | `lib/clustering.ts` | Medium | Small |
+| Item                                                                               | File                     | Priority | Effort |
+| ---------------------------------------------------------------------------------- | ------------------------ | -------- | ------ |
+| Replace `any` types in `lib/reddit.ts` response parsing                            | `lib/reddit.ts`          | Medium   | Small  |
+| Extract SSE event types into shared `types/sse.ts` file                            | `app/api/search/stream/` | Low      | Small  |
+| Consolidate duplicate `workspaceId` extraction logic across API routes             | `app/api/**`             | High     | Medium |
+| Add Zod validation to all API route inputs (some routes use raw `req.json()`)      | `app/api/**`             | High     | Medium |
+| Remove `console.log` statements from production `lib/mining-runner.ts`             | `lib/mining-runner.ts`   | Low      | Small  |
+| Migrate from `lib/idempotency.ts` to `lib/reddit-idempotency.ts` (duplicate logic) | `lib/`                   | Medium   | Small  |
+| Add `readonly` to all Drizzle query result types                                   | `lib/db/`                | Low      | Medium |
+| Replace hardcoded `0.82` clustering threshold with configurable env variable       | `lib/clustering.ts`      | Medium   | Small  |
 
 ---
 
 ## 📊 Progress Summary
 
-| Phase | Status | Completion | Blocker |
-|---|---|---|---|
-| Phase 1 — Mining Engine | 🔄 In Progress | ~75% | Rate limit monitoring |
-| Phase 2 — AI Analysis | 🔄 In Progress | ~25% | Multi-model routing |
-| Phase 3 — UI/UX | 🔄 In Progress | ~35% | Theme toggle, empty states |
-| Phase 4 — Infrastructure | 🔄 In Progress | ~45% | RBAC workspaces |
-| Phase 5 — Revenue & Growth | 🔄 In Progress | ~55% | Overage packs, viral sharing |
-| Phase 6 — Testing & QA | 🔄 In Progress | ~65% | E2E Playwright suite |
-| Phase 7 — Platform Expansion | ⬜ Planned | 0% | Depends on P1 stable |
-| Phase 8 — Communication | ⬜ Planned | 0% | Depends on email provider setup |
-| Phase 9 — Security | 🔄 In Progress | ~70% | API key hashing |
-| Phase 10 — Maintenance | ⬜ Planned | 0% | Depends on Inngest |
+| Phase                        | Status         | Completion | Blocker                         |
+| ---------------------------- | -------------- | ---------- | ------------------------------- |
+| Phase 1 — Mining Engine      | 🔄 In Progress | ~75%       | Rate limit monitoring           |
+| Phase 2 — AI Analysis        | 🔄 In Progress | ~25%       | Multi-model routing             |
+| Phase 3 — UI/UX              | 🔄 In Progress | ~35%       | Theme toggle, empty states      |
+| Phase 4 — Infrastructure     | 🔄 In Progress | ~45%       | RBAC workspaces                 |
+| Phase 5 — Revenue & Growth   | 🔄 In Progress | ~55%       | Overage packs, viral sharing    |
+| Phase 6 — Testing & QA       | 🔄 In Progress | ~65%       | E2E Playwright suite            |
+| Phase 7 — Platform Expansion | ⬜ Planned     | 0%         | Depends on P1 stable            |
+| Phase 8 — Communication      | ⬜ Planned     | 0%         | Depends on email provider setup |
+| Phase 9 — Security           | 🔄 In Progress | ~70%       | API key hashing                 |
+| Phase 10 — Maintenance       | ⬜ Planned     | 0%         | Depends on Inngest              |
 
 **Total open tasks (rough estimate):** ~180 items across all phases
-

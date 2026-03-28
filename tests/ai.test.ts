@@ -133,7 +133,9 @@ describe("extractPainPoints", () => {
     expect(console.error).toHaveBeenCalledWith(
       "Error in AI extraction:",
       expect.objectContaining({
-        message: expect.stringContaining("OpenRouter API error: 500 Internal Server Error - API is down"),
+        message: expect.stringContaining(
+          "OpenRouter API error: 500 Internal Server Error - API is down",
+        ),
       }),
     );
   });

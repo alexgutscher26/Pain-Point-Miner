@@ -43,8 +43,8 @@ export function PainPointFeedback({ painPointId }: PainPointFeedbackProps) {
 
   if (voted) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg animate-in fade-in zoom-in duration-300">
-        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+      <div className="animate-in fade-in zoom-in flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 duration-300">
+        <span className="text-[10px] font-black tracking-widest text-emerald-400 uppercase">
           Thanks for the feedback!
         </span>
       </div>
@@ -52,40 +52,40 @@ export function PainPointFeedback({ painPointId }: PainPointFeedbackProps) {
   }
 
   return (
-    <div className="flex items-center gap-2 items-center">
-      <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mr-2">
+    <div className="flex items-center gap-2">
+      <p className="mr-2 text-[10px] font-black tracking-widest text-zinc-600 uppercase">
         Accurate?
       </p>
       <button
         onClick={() => handleVote(1)}
         disabled={isSubmitting}
-        className={`p-2 rounded-lg border transition-all ${
+        className={`rounded-lg border p-2 transition-all ${
           vote === 1
-            ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-500"
-            : "bg-zinc-900 border-white/10 text-zinc-400 hover:bg-white/5"
+            ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-500"
+            : "border-white/10 bg-zinc-900 text-zinc-400 hover:bg-white/5"
         } disabled:opacity-50`}
         title="Thumbs Up"
       >
         {isSubmitting && vote === 1 ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <ThumbsUp className="w-4 h-4" />
+          <ThumbsUp className="h-4 w-4" />
         )}
       </button>
       <button
         onClick={() => handleVote(-1)}
         disabled={isSubmitting}
-        className={`p-2 rounded-lg border transition-all ${
+        className={`rounded-lg border p-2 transition-all ${
           vote === -1
-            ? "bg-rose-500/20 border-rose-500/40 text-rose-500"
-            : "bg-zinc-900 border-white/10 text-zinc-400 hover:bg-white/5"
+            ? "border-rose-500/40 bg-rose-500/20 text-rose-500"
+            : "border-white/10 bg-zinc-900 text-zinc-400 hover:bg-white/5"
         } disabled:opacity-50`}
         title="Thumbs Down"
       >
         {isSubmitting && vote === -1 ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <ThumbsDown className="w-4 h-4" />
+          <ThumbsDown className="h-4 w-4" />
         )}
       </button>
     </div>
