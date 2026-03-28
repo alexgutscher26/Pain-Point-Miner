@@ -71,15 +71,7 @@ export async function reScoreUserOpportunities(
 
       return {
         id: point.id,
-        // We'll update the record with the new score and explanation.
-        // Wait, the column in schema for the aggregate score of the cluster/point might be different?
-        // Actually, painPoint.score is usually the individual point score.
-        // The dashboard uses these to compute the cluster score.
-        // But the requirement says "re-score ALL opportunities".
-        // Let's assume we update the painPoint.score (not ideal if it's supposed to be raw AI score)
-        // OR we just store it in scoreExplanation if that's meant to be the display score?
-        // Actually, the requirements imply that the dashboard should "re-score and re-sort".
-        // The dashboard calculates scores on the fly usually? Let's check dashboard page.
+        score: newScore,
         scoreExplanation: newExplanation,
       };
     });
@@ -95,8 +87,8 @@ export async function reScoreUserOpportunities(
           db
             .update(painPoint)
             .set({
+              score: upd.score,
               scoreExplanation: upd.scoreExplanation,
-              // If the dashboard uses this column, we should update it.
               updatedAt: new Date(),
             })
             .where(eq(painPoint.id, upd.id)),

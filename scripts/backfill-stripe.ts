@@ -30,7 +30,7 @@ const scriptDb = drizzle(sql, { schema: { user } });
 try {
   const dbUrl = new URL(connectionString);
   console.log(`🔌 Attempting to connect to database at: ${dbUrl.host}`);
-} catch (e) {
+} catch {
   console.log("🔌 Attempting to connect to database...");
 }
 

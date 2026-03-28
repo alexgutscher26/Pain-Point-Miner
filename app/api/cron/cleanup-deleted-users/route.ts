@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { user, workspace } from "@/lib/db/schema";
-import { and, lt, isNotNull, inArray, eq } from "drizzle-orm";
+import { and, lt, isNotNull, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
