@@ -77,16 +77,12 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#0a0a0a] font-sans text-zinc-300 selection:bg-[#ff4500]/30">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: safeJsonLd(softwareApplicationJsonLd),
-        }}
-      />
+      <script type="application/ld+json">
+        {safeJsonLd(organizationJsonLd)}
+      </script>
+      <script type="application/ld+json">
+        {safeJsonLd(softwareApplicationJsonLd)}
+      </script>
       <Header />
       <main className="flex w-full flex-col items-center">
         <Hero />
