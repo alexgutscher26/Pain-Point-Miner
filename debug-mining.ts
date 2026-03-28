@@ -63,8 +63,6 @@ async function debugMining() {
     }
   } catch (error) {
     console.error("Debug failed:", error);
-  } finally {
-    process.exit(0);
   }
 }
 

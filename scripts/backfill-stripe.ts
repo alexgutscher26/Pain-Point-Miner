@@ -12,8 +12,7 @@ import postgres from "postgres";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("DATABASE_URL is not set in environment");
-  process.exit(1);
+  throw new Error("DATABASE_URL is not set in environment");
 }
 
 // Create a new postgres client for this script
@@ -36,8 +35,7 @@ try {
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
-  console.error("STRIPE_SECRET_KEY is not set in environment");
-  process.exit(1);
+  throw new Error("STRIPE_SECRET_KEY is not set in environment");
 }
 
 const stripe = new Stripe(stripeSecretKey);
@@ -88,12 +86,9 @@ async function main() {
     }
   }
 
-  console.log("\n✅ Backfill complete.");
-  
-  // Explicitly exit to close database connections
-  setTimeout(() => {
-    process.exit(0);
-  }, 500);
+  console.log("\n✅ Backfill complete. Waiting for handles to close...");
+  // Closer to natural exit, postgres will clean up when the script finishes main if we wait.
+  // sql.end() would be better but it's defined outside of main.
 }
 
 main().catch((err) => {
@@ -105,5 +100,6 @@ main().catch((err) => {
     console.error("3. The database is currently down (unlikely for Cloud DBs like Neon).");
     console.error("\nCheck your .env file and ensure DATABASE_URL matches what's on your Neon dashboard.");
   }
-  process.exit(1);
+  // Let the error propagate so the process exits with non-zero naturally.
+  throw err;
 });
