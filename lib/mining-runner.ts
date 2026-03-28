@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import pMap from "p-map";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -17,6 +18,7 @@ import {
   rankRedditPosts,
   resolveProblemPatterns,
   isSubredditThrottled,
+  getGlobal429Rate,
   type RedditPost,
 } from "@/lib/reddit";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
@@ -155,16 +157,31 @@ export async function executeMiningRun({
       Math.max(1, subLimit),
     );
 
-    // Fetch posts concurrently across all subreddits.
-    // Each subreddit call internally fans out across all sort modes for the
-    // given mining depth (basic=1, deep=2, advanced=4) and deduplicates.
-    const subredditFetchResults = await Promise.allSettled(
-      targetSubreddits.map((sub) =>
-        fetchSubredditPostsMultiSort(sub, keyword, miningDepth, {
-          maxPosts: postsPerSub,
-          time: getRedditTimeRangeForWindow(timeWindow),
-        }),
-      ),
+    const baseSubConcurrency = 5;
+    const baseCommentConcurrency = 5;
+    
+    const global429Rate = await getGlobal429Rate();
+    const adaptiveSubConcurrency = global429Rate > 0.2 ? 1 : baseSubConcurrency;
+    const adaptiveCommentConcurrency = global429Rate > 0.2 ? 2 : baseCommentConcurrency;
+
+    if (global429Rate > 0.2) {
+      throttleWarnings.push(`⚠️ Detected high 429 rate (${(global429Rate * 100).toFixed(0)}%), lowering parallelism to ${adaptiveSubConcurrency}...`);
+    }
+
+    const subredditFetchResults = await pMap(
+      targetSubreddits,
+      async (sub) => {
+        try {
+          const res = await fetchSubredditPostsMultiSort(sub, keyword, miningDepth, {
+            maxPosts: postsPerSub,
+            time: getRedditTimeRangeForWindow(timeWindow),
+          });
+          return { status: "fulfilled" as const, value: res };
+        } catch (err) {
+          return { status: "rejected" as const, reason: err };
+        }
+      },
+      { concurrency: adaptiveSubConcurrency }
     );
 
     for (let i = 0; i < subredditFetchResults.length; i++) {
@@ -262,7 +279,7 @@ export async function executeMiningRun({
           return { status: "rejected" as const, reason: error };
         }
       },
-      { concurrency: 5 },
+      { concurrency: adaptiveCommentConcurrency },
     );
 
 function calculatePostQualityScore(post: RedditPost): number {
@@ -316,100 +333,17 @@ function calculatePostQualityScore(post: RedditPost): number {
     }
 
     for (const post of postsToAnalyze) {
-      const shouldProcessWithAi = await claimRedditPostForAiProcessing(
-        post.id,
-        userId,
-      );
-      if (!shouldProcessWithAi) {
-        continue;
-      }
-
       const comments = commentsByPostId.get(post.id) ?? [];
-
-      const points = await extractPainPoints(
-        {
-          title: post.title,
-          selftext: post.selftext,
-          url: post.url,
-          author: post.author,
-          subreddit: post.subreddit,
-          comments: comments.map((comment) => ({ body: comment.body })),
-        },
-        patterns,
-      );
-
-      if (!points || points.length === 0) continue;
-
-      const painPointsToInsert = [];
-      const commentsToInsert = [];
-      const clusterJobs = [];
-
-      for (const point of points) {
-        const painPointId = crypto.randomUUID();
-        painPointsToInsert.push({
-          id: painPointId,
-          title: point.title,
-          body: point.body,
-          score: point.painIntensity,
-          urgency: point.urgency,
-          monetizationScore: point.monetizationScore,
-          marketMaturity: point.marketMaturity,
-          budget: point.budget,
-          switchingCosts: point.switchingCosts,
-          triedSolutions: point.triedSolutions,
-          userId,
-          scraperId,
-          subreddit: post.subreddit,
-          postUrl: post.url,
-          author: anonymize ? "[Anonymized]" : post.author,
-          sentiment: point.sentiment,
-          commentCount: comments.length,
-          mentionCount: 1,
-          workspaceId,
-          updatedAt: new Date(),
-        });
-
-        const commentRows = comments
-          .filter((comment) => {
-            const body = cleanCommentBody(comment.body ?? "");
-            if (!body) return false;
-            const normalized = body.toLowerCase();
-            return normalized !== "[deleted]" && normalized !== "[removed]";
-          })
-          .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-          .slice(0, 12)
-          .map((comment) => ({
-            id: crypto.randomUUID(),
-            body: cleanCommentBody(comment.body),
-            author: anonymize ? "[Anonymized]" : comment.author || "unknown",
-            score: comment.score ?? 0,
-            commentUrl: comment.permalink || null,
-            painScore: point.painIntensity ?? 0,
-            painPointId,
-          }));
-
-        if (commentRows.length > 0) {
-          commentsToInsert.push(...commentRows);
-        }
-        newPainPoints += 1;
-
-        clusterJobs.push(painPointId);
-      }
-
-      if (painPointsToInsert.length > 0) {
-        await db.insert(painPoint).values(painPointsToInsert);
-      }
-
-      if (commentsToInsert.length > 0) {
-        await db.insert(painPointComment).values(commentsToInsert);
-      }
-
-      for (const painPointId of clusterJobs) {
-        // Fire-and-forget: embed + cluster this pain point
-        void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
-          console.error(`Embedding/clustering failed for ${painPointId}:`, err),
-        );
-      }
+      const count = await processSinglePost({
+        post,
+        comments,
+        scraperId,
+        userId,
+        workspaceId,
+        anonymize,
+        customPatterns: patterns,
+      });
+      newPainPoints += count;
     }
 
     // Update phase: extracting → clustering
@@ -511,4 +445,121 @@ function calculatePostQualityScore(post: RedditPost): number {
 
     throw error;
   }
+}
+
+type ProcessSinglePostInput = {
+  post: RedditPost;
+  comments: any[];
+  scraperId: string;
+  userId: string;
+  workspaceId: string | null;
+  anonymize: boolean;
+  customPatterns: string[];
+};
+
+/**
+ * Processes a single Reddit post: extracts pain points, saves to DB, and fires off clustering.
+ * Returns the number of pain points found.
+ */
+export async function processSinglePost({
+  post,
+  comments,
+  scraperId,
+  userId,
+  workspaceId,
+  anonymize,
+  customPatterns,
+}: ProcessSinglePostInput): Promise<number> {
+  const shouldProcessWithAi = await claimRedditPostForAiProcessing(
+    post.id,
+    userId,
+  );
+  if (!shouldProcessWithAi) {
+    return 0;
+  }
+
+  const points = await extractPainPoints(
+    {
+      title: post.title,
+      selftext: post.selftext,
+      url: post.url,
+      author: post.author,
+      subreddit: post.subreddit,
+      comments: comments.map((comment) => ({ body: comment.body })),
+    },
+    customPatterns,
+  );
+
+  if (!points || points.length === 0) return 0;
+
+  const painPointsToInsert = [];
+  const commentsToInsert = [];
+  const clusterJobs = [];
+
+  for (const point of points) {
+    const painPointId = crypto.randomUUID();
+    painPointsToInsert.push({
+      id: painPointId,
+      title: point.title,
+      body: point.body,
+      score: point.painIntensity,
+      urgency: point.urgency,
+      monetizationScore: point.monetizationScore,
+      marketMaturity: point.marketMaturity,
+      budget: point.budget,
+      switchingCosts: point.switchingCosts,
+      triedSolutions: point.triedSolutions,
+      userId,
+      scraperId,
+      subreddit: post.subreddit,
+      postUrl: post.url,
+      author: anonymize ? "[Anonymized]" : post.author,
+      sentiment: point.sentiment,
+      commentCount: comments.length,
+      mentionCount: 1,
+      workspaceId,
+      updatedAt: new Date(),
+    });
+
+    const commentRows = comments
+      .filter((comment) => {
+        const body = cleanCommentBody(comment.body ?? "");
+        if (!body) return false;
+        const normalized = body.toLowerCase();
+        return normalized !== "[deleted]" && normalized !== "[removed]";
+      })
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+      .slice(0, 12)
+      .map((comment) => ({
+        id: crypto.randomUUID(),
+        body: cleanCommentBody(comment.body),
+        author: anonymize ? "[Anonymized]" : comment.author || "unknown",
+        score: comment.score ?? 0,
+        commentUrl: comment.permalink || null,
+        painScore: point.painIntensity ?? 0,
+        painPointId,
+      }));
+
+    if (commentRows.length > 0) {
+      commentsToInsert.push(...commentRows);
+    }
+
+    clusterJobs.push(painPointId);
+  }
+
+  if (painPointsToInsert.length > 0) {
+    await db.insert(painPoint).values(painPointsToInsert);
+  }
+
+  if (commentsToInsert.length > 0) {
+    await db.insert(painPointComment).values(commentsToInsert);
+  }
+
+  for (const painPointId of clusterJobs) {
+    void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
+      console.error(`Embedding/clustering failed for ${painPointId}:`, err),
+    );
+  }
+
+  return points.length;
 }

@@ -134,9 +134,9 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### ⬜ Planned (Future)
 
-- [ ] **Adaptive Concurrency Control** — dynamically reduce parallelism if Reddit 429 rate increases above 20%
-- [ ] **Webhook-Based Post Ingestion** — subscribe to new Reddit posts via RSS feeds for near-real-time ingestion
-- [ ] **Scraper Health Dashboard** — per-subreddit success rate, avg posts per scan, last 7d trend chart
+- [x] **Adaptive Concurrency Control** — dynamically reduce parallelism if Reddit 429 rate increases above 20%
+- [x] **Webhook-Based Post Ingestion** — subscribe to new Reddit posts via RSS feeds for near-real-time ingestion
+- [x] **Scraper Health Dashboard** — per-subreddit success rate, avg posts per scan, last 7d trend chart
 - [ ] **Custom Problem Pattern Dictionary** — allow Pro users to define their own trigger phrases per search
 
 ---

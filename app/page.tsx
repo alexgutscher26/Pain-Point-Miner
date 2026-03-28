@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { GoldMine } from "@/components/landing/GoldMine";
 import { Steps } from "@/components/landing/Steps";
@@ -8,7 +9,6 @@ import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
-import { Testimonial } from "@/components/landing/Testimonial";
 import { InteractiveDemo } from "@/components/landing/InteractiveDemo";
 import { siteConfig, siteUrl } from "@/lib/seo";
 
@@ -91,7 +91,7 @@ export default function Home() {
       <Header />
       <main className="flex flex-col items-center w-full">
         <Hero />
-        <Testimonial />
+        {/* <Testimonial /> */}
         <InteractiveDemo />
         <GoldMine />
         <Steps />

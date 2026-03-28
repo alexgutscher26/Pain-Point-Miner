@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { sql } from "drizzle-orm";
 import { db } from "./db";
 import { redditRateLimitLog } from "./db/schema";
 
@@ -126,6 +127,31 @@ async function logRateLimitEvent(
     }
   } else if (subreddit && statusCode >= 200 && statusCode < 300) {
     consecutive429CountMap.set(subreddit, 0);
+  }
+}
+
+/**
+ * Calculates the global 429 (Too Many Requests) rate over the last 5 minutes.
+ * Used for adaptive concurrency control.
+ */
+export async function getGlobal429Rate(): Promise<number> {
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  try {
+    const recentLogs = await db
+      .select({
+        statusCode: redditRateLimitLog.statusCode,
+      })
+      .from(redditRateLimitLog)
+      .where(sql`${redditRateLimitLog.createdAt} > ${fiveMinutesAgo}`)
+      .limit(100);
+
+    if (recentLogs.length === 0) return 0;
+
+    const errorCount = recentLogs.filter((log) => log.statusCode === 429).length;
+    return errorCount / recentLogs.length;
+  } catch (err) {
+    console.error("Failed to calculate global 429 rate:", err);
+    return 0;
   }
 }
 

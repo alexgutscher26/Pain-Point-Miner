@@ -1,56 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
-
-const logos = [
-  {
-    name: "Y Combinator",
-    src: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Y_Combinator_logo.svg",
-  },
-  {
-    name: "Indie Hackers",
-    src: "https://www.indiehackers.com/images/logos/indie-hackers-logo-dark.svg",
-  },
-  {
-    name: "Product Hunt",
-    src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Product_Hunt_Logo.svg",
-  },
-  {
-    name: "Stripe",
-    src: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
-  },
-  {
-    name: "Vercel",
-    src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg",
-  },
-];
 
 const testimonials = [
   {
     quote:
-      "ThreddIQ changed how I validate SaaS ideas. I found 3 high-intent pain points in r/sales that I'd never have spotted manually. It saved me weeks of dev time.",
-    author: "James Chen",
-    role: "Founder, OutreachSync",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop",
+      "The problem with most scrapers is noise. ThreddIQ uses LLMs to filter out the fluff and give me the raw, unvarnished pain points. It's transformed our entire product roadmap.",
+    author: "Elena",
+    role: "Lead Researcher",
   },
   {
     quote:
-      "The ability to see exactly what people are complaining about, with upvote counts and sentiment analysis, is like having a cheat code for market research.",
-    author: "Sarah Jenkins",
-    role: "Growth Lead at Mercury",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=256&auto=format&fit=crop",
+      "I went from 'I think this is a problem' to 'Here are dozens of people actively complaining about this' in under 5 minutes. The ROI on a single search is frankly insane.",
+    author: "David",
+    role: "Founder",
   },
   {
     quote:
-      "Finally, a tool that doesn't just scrape data but actually extracts *problems*. ThreddIQ is now a core part of our product discovery workflow.",
-    author: "Marcus Thorne",
-    role: "Product Manager, ScalePath",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=256&auto=format&fit=crop",
+      "We use ThreddIQ to find sub-niches for our client's ad campaigns. Seeing the exact language users use to describe their frustration is a goldmine for high-converting copy.",
+    author: "Jordan",
+    role: "Agency CEO",
   },
 ];
 
@@ -70,25 +40,7 @@ export function Testimonial() {
   }, []);
 
   return (
-    <section className="w-full bg-[#0a0a0a] border-y border-white/5 overflow-hidden">
-      {/* Logo Marquee */}
-      {/* <div className="py-12 border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase mb-10">
-            Trusted by founders from
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-            {logos.map((logo) => (
-              <div key={logo.name} className="h-6 md:h-8 w-auto relative">
-                <span className="text-white font-black text-xl md:text-2xl tracking-tighter">
-                  {logo.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div> */}
-
+    <section className="w-full bg-[#0a0a0a] border-y border-white/5 overflow-hidden font-sans">
       {/* Testimonial Carousel */}
       <div className="py-24 md:py-32 flex justify-center px-6">
         <div className="max-w-4xl w-full relative">
@@ -103,22 +55,12 @@ export function Testimonial() {
               </h2>
             </div>
 
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-full border-2 border-[#ff4500]/30 p-1 bg-[#0a0a0a]">
-                <div className="w-full h-full rounded-full overflow-hidden relative">
-                  <Image
-                    src={testimonials[currentIndex].avatar}
-                    alt={testimonials[currentIndex].author}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </div>
+            <div className="flex flex-col items-center gap-2">
               <div>
                 <p className="text-white font-black text-lg">
                   {testimonials[currentIndex].author}
                 </p>
-                <p className="text-[#ff4500] font-mono text-[12px] font-bold uppercase tracking-widest">
+                <p className="text-[#ff4500] font-mono text-[11px] font-bold uppercase tracking-widest opacity-80">
                   {testimonials[currentIndex].role}
                 </p>
               </div>
@@ -129,14 +71,14 @@ export function Testimonial() {
               <button
                 aria-label="Previous testimonial"
                 onClick={prev}
-                className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+                className="p-3 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-all shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)]"
               >
                 <ChevronLeft className="w-5 h-5" aria-hidden="true" />
               </button>
               <button
                 aria-label="Next testimonial"
                 onClick={next}
-                className="p-3 rounded-full border border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20 transition-all"
+                className="p-3 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-all shadow-[2px_2px_0px_px_rgba(0,0,0,0.5)]"
               >
                 <ChevronRight className="w-5 h-5" aria-hidden="true" />
               </button>

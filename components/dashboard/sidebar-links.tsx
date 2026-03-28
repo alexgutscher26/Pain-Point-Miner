@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -9,6 +10,7 @@ import {
   CreditCard,
   Settings,
   ShieldCheck,
+  Activity,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 
@@ -42,6 +44,11 @@ export function SidebarLinks() {
       href: "/dashboard/settings",
       icon: <Settings className="w-[18px] h-[18px]" />,
       label: "Settings",
+    },
+    {
+      href: "/dashboard/health",
+      icon: <Activity className="w-[18px] h-[18px]" />,
+      label: "System Health",
     },
   ];
 
