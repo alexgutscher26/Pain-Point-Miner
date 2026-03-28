@@ -168,15 +168,15 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Show "Powered by GPT-4o" label in the report metadata header
   - [ ] _Acceptance:_ A `deep` scan uses GPT-4o exclusively; cost logged to `aiUsage` within 1s of extraction
 
-- [ ] **Scoring Algorithm V2 — Weighted Formula**
-  - [ ] Replace `toOpportunityScore()` in `lib/dashboard-metrics.ts` with a weighted multi-factor formula
-  - [ ] Formula: `score = (painIntensity × w1) + (monetizationScore × w2) + (urgency × w3) + (marketMaturity × w4)`
-  - [ ] Default weights: `w1=0.40`, `w2=0.30`, `w3=0.20`, `w4=0.10`
-  - [ ] Store weights as JSON in `user_preferences.scoringWeights`
-  - [ ] Pro user settings page: sliders for each weight, live preview of re-scored opportunities
-  - [ ] Add `opportunity.scoreExplanation` — human-readable string: "High score driven by 8/10 pain intensity and explicit budget mentions"
-  - [ ] Re-score all opportunities when user saves new weights (background job)
-  - [ ] _Acceptance:_ Changing weights in settings re-scores and re-sorts the opportunity dashboard within 2s
+- [x] **Scoring Algorithm V2 — Weighted Formula**
+  - [x] Replace `toOpportunityScore()` in `lib/dashboard-metrics.ts` with a weighted multi-factor formula
+  - [x] Formula: `score = (painIntensity × w1) + (monetizationScore × w2) + (urgency × w3) + (marketMaturity × w4)`
+  - [x] Default weights: `w1=0.40`, `w2=0.30`, `w3=0.20`, `w4=0.10`
+  - [x] Store weights as JSON in `user_preferences.scoringWeights`
+  - [x] Pro user settings page: sliders for each weight, live preview of re-scored opportunities
+  - [x] Add `opportunity.scoreExplanation` — human-readable string: "High score driven by 8/10 pain intensity and explicit budget mentions"
+  - [x] Re-score all opportunities when user saves new weights (background job)
+  - [x] _Acceptance:_ Changing weights in settings re-scores and re-sorts the opportunity dashboard within 2s
 
 ### ⬜ Planned
 

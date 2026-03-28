@@ -45,4 +45,35 @@ describe("dashboard metrics", () => {
     expect(strong).toBeGreaterThan(weak);
     expect(strong).toBeLessThanOrEqual(100);
   });
+
+  it("applies custom weights correctly", () => {
+    const points = [
+      {
+        score: 10, // pain
+        monetizationScore: 2,
+        urgency: 2,
+        marketMaturity: 2,
+        sentiment: "neutral",
+      },
+    ];
+
+    // High weight on pain (w1)
+    const highPain = toOpportunityScore(points, {
+      w1: 0.9,
+      w2: 0.05,
+      w3: 0.02,
+      w4: 0.03,
+    });
+
+    // High weight on monetization (w2)
+    const highMonetization = toOpportunityScore(points, {
+      w1: 0.05,
+      w2: 0.9,
+      w3: 0.02,
+      w4: 0.03,
+    });
+
+    // Since score (10) is much higher than monetization (2), highPain should be significantly larger
+    expect(highPain).toBeGreaterThan(highMonetization);
+  });
 });

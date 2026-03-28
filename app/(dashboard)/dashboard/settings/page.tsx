@@ -2,9 +2,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { userPreferences } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { SettingsPageClient } from "@/components/dashboard/settings-page-client";
+import { painPoint, userPreferences } from "@/lib/db/schema";
+import { DEFAULT_WEIGHTS, ScoringWeights } from "@/lib/dashboard-metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,25 @@ export default async function SettingsPage() {
     columns: {
       emailNotifications: true,
       dashboardLayout: true,
+      scoringWeights: true,
+    },
+  });
+
+  // Fetch sample opportunities for live preview
+  const sampleOpportunities = await db.query.painPoint.findMany({
+    where: eq(painPoint.userId, session.user.id),
+    limit: 3,
+    orderBy: [desc(painPoint.createdAt)],
+    columns: {
+      id: true,
+      title: true,
+      score: true,
+      urgency: true,
+      monetizationScore: true,
+      marketMaturity: true,
+      sentiment: true,
+      mentionCount: true,
+      commentCount: true,
     },
   });
 
@@ -65,7 +85,13 @@ export default async function SettingsPage() {
     defaultSubredditCount: scanDefaults.defaultSubredditCount ?? 5,
     minimumOpportunityScore: scanDefaults.minimumOpportunityScore ?? 70,
     defaultLocale: scanDefaults.defaultLocale ?? "United States",
+    scoringWeights: (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
   };
 
-  return <SettingsPageClient initialValues={initialValues} />;
+  return (
+    <SettingsPageClient
+      initialValues={initialValues}
+      sampleOpportunities={sampleOpportunities}
+    />
+  );
 }

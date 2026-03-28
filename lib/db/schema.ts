@@ -231,6 +231,12 @@ export const userPreferences = pgTable(
     emailNotifications: boolean().default(true).notNull(),
     timezone: text(),
     dashboardLayout: jsonb(),
+    scoringWeights: jsonb().$type<{
+      w1: number; // painIntensity
+      w2: number; // monetizationScore
+      w3: number; // urgency
+      w4: number; // marketMaturity
+    }>(),
   },
   (table) => [
     uniqueIndex("user_preferences_userId_key").using(
@@ -486,6 +492,7 @@ export const painPoint = pgTable(
     thumbnailUrl: text(),
     clusterId: text(),
     clusterSimilarity: doublePrecision(),
+    scoreExplanation: text(),
   },
   (table) => [
     index("pain_point_userId_clusterId_createdAt_idx").using(

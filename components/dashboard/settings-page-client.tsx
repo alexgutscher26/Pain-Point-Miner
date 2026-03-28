@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { FormEvent, useState } from "react";
@@ -26,6 +27,14 @@ import {
 } from "@/components/ui/dialog";
 import { signOut } from "@/lib/auth-client";
 
+import {
+  DEFAULT_WEIGHTS,
+  generateScoreExplanation,
+  ScoringWeights,
+  toOpportunityScore,
+} from "@/lib/dashboard-metrics";
+import { Slider } from "@/components/ui/slider";
+
 export interface SettingsFormValues {
   fullName: string;
   email: string;
@@ -37,12 +46,15 @@ export interface SettingsFormValues {
   defaultSubredditCount: number;
   minimumOpportunityScore: number;
   defaultLocale: string;
+  scoringWeights: ScoringWeights;
 }
 
 export function SettingsPageClient({
   initialValues,
+  sampleOpportunities = [],
 }: {
   initialValues: SettingsFormValues;
+  sampleOpportunities?: any[];
 }) {
   const router = useRouter();
   const [values, setValues] = useState<SettingsFormValues>(initialValues);
@@ -383,6 +395,138 @@ export function SettingsPageClient({
             </div>
           </section>
         </div>
+
+        <section className="bg-black/40 border-2 border-[#ff4500]/30 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(255,69,0,0.15)] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4">
+            <span className="px-2.5 py-1 border border-[#ff4500]/45 bg-[#ff4500]/10 text-[#ff4500] font-mono text-[10px] font-black uppercase tracking-[0.15em]">
+              Pro Feature
+            </span>
+          </div>
+
+          <h3 className="text-white font-black text-lg tracking-tight flex items-center gap-2.5 mb-2">
+            <SlidersHorizontal className="w-5 h-5 text-[#ff4500]" />
+            Opportunity Scoring Engine
+          </h3>
+          <p className="text-zinc-400 text-sm mb-8 max-w-2xl">
+            Fine-tune the weights for the Opportunity Score. Changes are applied
+            dynamically to all extracted insights.
+          </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="space-y-8">
+              <WeightSlider
+                label="Pain Intensity (w1)"
+                value={values.scoringWeights.w1}
+                description="How severe is the problem being described?"
+                onChange={(v) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    scoringWeights: { ...prev.scoringWeights, w1: v },
+                  }))
+                }
+              />
+              <WeightSlider
+                label="Monetization Score (w2)"
+                value={values.scoringWeights.w2}
+                description="Willingness to pay and budget indicators."
+                onChange={(v) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    scoringWeights: { ...prev.scoringWeights, w2: v },
+                  }))
+                }
+              />
+              <WeightSlider
+                label="Urgency (w3)"
+                value={values.scoringWeights.w3}
+                description="How soon does the user need a solution?"
+                onChange={(v) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    scoringWeights: { ...prev.scoringWeights, w3: v },
+                  }))
+                }
+              />
+              <WeightSlider
+                label="Market Maturity (w4)"
+                value={values.scoringWeights.w4}
+                description="Level of existing solution saturation."
+                onChange={(v) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    scoringWeights: { ...prev.scoringWeights, w4: v },
+                  }))
+                }
+              />
+
+              <div className="pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                    Total Weight Sum
+                  </p>
+                  <p
+                    className={`font-mono text-sm font-black ${
+                      Math.abs(
+                        values.scoringWeights.w1 +
+                          values.scoringWeights.w2 +
+                          values.scoringWeights.w3 +
+                          values.scoringWeights.w4 -
+                          1.0,
+                      ) < 0.01
+                        ? "text-emerald-400"
+                        : "text-rose-400"
+                    }`}
+                  >
+                    {(
+                      values.scoringWeights.w1 +
+                      values.scoringWeights.w2 +
+                      values.scoringWeights.w3 +
+                      values.scoringWeights.w4
+                    ).toFixed(2)}
+                    / 1.00
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/2 border border-white/10 p-6">
+              <h4 className="font-mono text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#ff4500] rounded-full" />
+                Live Opportunity Preview
+              </h4>
+              <div className="space-y-4">
+                {sampleOpportunities.length === 0 ? (
+                  <div className="py-12 text-center text-zinc-600 font-mono text-xs">
+                    No opportunities found to preview.
+                  </div>
+                ) : (
+                  sampleOpportunities.map((opp) => {
+                    const score = toOpportunityScore([opp], values.scoringWeights);
+                    const explanation = generateScoreExplanation(opp, values.scoringWeights);
+                    return (
+                      <div
+                        key={opp.id}
+                        className="p-4 bg-white/2 border border-white/5 space-y-3"
+                      >
+                        <div className="flex justify-between items-start gap-4">
+                          <p className="text-sm font-bold text-white leading-tight">
+                            {opp.title}
+                          </p>
+                          <span className="shrink-0 text-xl font-black text-[#ff4500] px-3 py-1 bg-[#ff4500]/10 border border-[#ff4500]/20">
+                            {score}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-zinc-500 font-medium italic leading-relaxed">
+                          &quot;{explanation}&quot;
+                        </p>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <section className="bg-[#111] border-2 border-white/15 p-6 md:p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
@@ -783,5 +927,40 @@ function ActionButton({
     >
       {label}
     </button>
+  );
+}
+
+function WeightSlider({
+  label,
+  value,
+  description,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  description: string;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-end">
+        <div>
+          <p className="font-mono text-[11px] font-bold text-white uppercase tracking-widest leading-none">
+            {label}
+          </p>
+          <p className="text-[11px] text-zinc-500 mt-1">{description}</p>
+        </div>
+        <p className="font-mono text-xs font-black text-[#ff4500]">
+          {(value * 100).toFixed(0)}%
+        </p>
+      </div>
+      <Slider
+        value={[value * 100]}
+        max={100}
+        step={5}
+        onValueChange={(vals) => onChange(vals[0] / 100)}
+        className="[&_[role=slider]]:bg-[#ff4500] [&_[role=slider]]:border-[#ff4500]"
+      />
+    </div>
   );
 }

@@ -31,23 +31,74 @@ export function toValidationScore(
   return Math.round(upvotes * 0.4 + comments * 0.35 + mentions * 0.25);
 }
 
-export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
+export interface ScoringWeights {
+  w1: number; // painIntensity
+  w2: number; // monetizationScore
+  w3: number; // urgency
+  w4: number; // marketMaturity
+}
+
+export const DEFAULT_WEIGHTS: ScoringWeights = {
+  w1: 0.4,
+  w2: 0.3,
+  w3: 0.2,
+  w4: 0.1,
+};
+
+export function generateScoreExplanation(
+  point: DashboardPainPoint,
+  weights: ScoringWeights = DEFAULT_WEIGHTS,
+) {
+  const pain = point.score || 0;
+  const monetization = point.monetizationScore || 0;
+  const urgency = point.urgency || 0;
+  const maturity = point.marketMaturity || 0;
+
+  const contributions = [
+    { label: "pain intensity", value: pain, weight: weights.w1 },
+    { label: "monetization potential", value: monetization, weight: weights.w2 },
+    { label: "urgency", value: urgency, weight: weights.w3 },
+    { label: "market maturity", value: maturity, weight: weights.w4 },
+  ].sort((a, b) => b.value * b.weight - a.value * a.weight);
+
+  const topFactor = contributions[0];
+  const secondFactor = contributions[1];
+
+  let explanation = `Score primarily driven by ${topFactor.value}/10 ${topFactor.label}`;
+
+  if (secondFactor && secondFactor.value >= 7) {
+    explanation += ` and high ${secondFactor.label}`;
+  }
+
+  // Special checks for budget/signals
+  if (point.upvoteSignal && point.upvoteSignal > 50) {
+    explanation += ". Significant community validation detected via upvotes";
+  } else if (point.commentCount && point.commentCount > 15) {
+    explanation += ". Heavy discussion volume indicates strong market interest";
+  }
+
+  return explanation;
+}
+
+export function toOpportunityScore(
+  painPoints: DashboardPainPoint[],
+  weights: ScoringWeights = DEFAULT_WEIGHTS,
+) {
   if (painPoints.length === 0) return 0;
 
   const factors = painPoints.map((point) => {
-    const feedbackBalance = (point.userUpvotes ?? 0) - (point.userDownvotes ?? 0);
-    // Use feedback signal to adjust painIntensity (point.score) weights
-    const feedbackIntensityWeight =
-      feedbackBalance > 0 ? 1.05 : feedbackBalance < 0 ? 0.85 : 1.0;
+    // Basic weight-based components
+    const painIntensity = point.score || 0;
+    const monetizationScore = point.monetizationScore || 0;
+    const urgency = point.urgency || 0;
+    const marketMaturity = point.marketMaturity || 0;
 
-    const pain = (point.score || 0) * 0.35 * feedbackIntensityWeight;
-    const urgency = (point.urgency || 0) * 0.25;
-    const monetization = (point.monetizationScore || 0) * 0.3;
-
-    let maturityBonus = 0;
-    if ((point.marketMaturity || 0) <= 3) maturityBonus = 10;
-    else if ((point.marketMaturity || 0) >= 8) maturityBonus = 8;
-    else maturityBonus = 4;
+    // Apply weights (0.40, 0.30, 0.20, 0.10 by default)
+    const weightedSum =
+      painIntensity * weights.w1 +
+      monetizationScore * weights.w2 +
+      urgency * weights.w3 +
+      marketMaturity * weights.w4;
 
     const sentimentMap: Record<string, number> = {
       desperate: 1.1,
@@ -58,13 +109,17 @@ export function toOpportunityScore(painPoints: DashboardPainPoint[]) {
     };
     const modifier = sentimentMap[point.sentiment || ""] || 1.0;
     const validation = toValidationScore(point);
+
+    const feedbackBalance =
+      (point.userUpvotes ?? 0) - (point.userDownvotes ?? 0);
     const feedbackBoost =
       feedbackBalance > 0 ? Math.min(feedbackBalance * 2, 10) : 0;
     const feedbackPenalty =
       feedbackBalance < 0 ? Math.max(feedbackBalance * 4, -20) : 0;
 
     const base =
-      ((pain + urgency + monetization) * 10 + maturityBonus + feedbackBoost + feedbackPenalty) * modifier;
+      (weightedSum * 10 + feedbackBoost + feedbackPenalty) * modifier;
+
     return base * 0.75 + validation * 0.25;
   });
 

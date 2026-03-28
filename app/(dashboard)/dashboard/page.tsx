@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
+import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
 import { and, desc, eq, gte, isNull } from "drizzle-orm";
 import {
   TrendingUp,
@@ -16,7 +16,12 @@ import {
 import Link from "next/link";
 import { z } from "zod";
 import { normalizeRunStatus } from "@/lib/run-status";
-import { getMarketBadge, toOpportunityScore } from "@/lib/dashboard-metrics";
+import {
+  getMarketBadge,
+  toOpportunityScore,
+  DEFAULT_WEIGHTS,
+  ScoringWeights,
+} from "@/lib/dashboard-metrics";
 import {
   buildLatestTrendInsights,
   formatTrendChangePercent,
@@ -72,6 +77,7 @@ const getCachedDashboardData = unstable_cache(
             commentCount: true,
             subreddit: true,
             subredditDisplayName: true,
+            scoreExplanation: true,
           },
           with: {
             painPointFeedback: {
@@ -163,6 +169,12 @@ export default async function DashboardPage({
   const selectedWindowLabel =
     selectedWindow === "30d" ? "the past 30 days" : "the last 24 hours";
 
+  const preferences = await db.query.userPreferences.findFirst({
+    where: eq(userPreferences.userId, session.user.id),
+    columns: { scoringWeights: true },
+  });
+  const scoringWeights = (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS;
+
   const reports = (
     await getCachedDashboardData(
       session.user.id,
@@ -191,7 +203,7 @@ export default async function DashboardPage({
     0,
   );
   const allPainPoints = reports.flatMap((report) => report.painPoints);
-  const marketScore = toOpportunityScore(allPainPoints);
+  const marketScore = toOpportunityScore(allPainPoints, scoringWeights);
   const reportsSaved = reports.length;
   const marketBadge = getMarketBadge(marketScore);
   const communityMapNodes = buildCommunityMapNodes(
@@ -423,7 +435,10 @@ export default async function DashboardPage({
                   </tr>
                 ) : (
                   reports.slice(0, 3).map((report) => {
-                    const reportScore = toOpportunityScore(report.painPoints);
+                    const reportScore = toOpportunityScore(
+                      report.painPoints,
+                      scoringWeights,
+                    );
                     const latestRunStatus = normalizeRunStatus(
                       report.scraperRuns?.[0]?.status,
                     );
@@ -455,6 +470,7 @@ export default async function DashboardPage({
                         }
                         score={reportScore}
                         status={statusLabel}
+                        explanation={report.painPoints[0]?.scoreExplanation}
                       />
                     );
                   })
@@ -614,6 +630,7 @@ function ReportRow({
   painPoint,
   score,
   status,
+  explanation,
 }: {
   id: string;
   keyword: string;
@@ -621,6 +638,7 @@ function ReportRow({
   painPoint: string;
   score: number;
   status: string;
+  explanation?: string | null;
 }) {
   return (
     <tr className="hover:bg-white/4 transition-colors cursor-pointer group">
@@ -636,9 +654,14 @@ function ReportRow({
       </td>
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-[14px] text-zinc-400 font-medium truncate max-w-[250px]">
+          <p className="text-[14px] text-zinc-400 font-medium truncate max-w-[250px] mb-1">
             {painPoint}
           </p>
+          {explanation && (
+            <p className="text-[11px] text-zinc-600 font-medium italic truncate max-w-[250px]">
+              {explanation}
+            </p>
+          )}
         </Link>
       </td>
       <td className="px-8 py-6 text-center">

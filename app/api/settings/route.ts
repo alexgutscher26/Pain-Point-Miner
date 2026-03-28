@@ -1,9 +1,19 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 import { requireApiContext } from "@/lib/api-auth";
 import { apiError, apiJson } from "@/lib/api-error";
 import { db } from "@/lib/db";
 import { user, userPreferences } from "@/lib/db/schema";
+import { DEFAULT_WEIGHTS, ScoringWeights } from "@/lib/dashboard-metrics";
+import { reScoreUserOpportunities } from "@/lib/re-score-job";
+
+const weightSchema = z.object({
+  w1: z.number().min(0).max(1),
+  w2: z.number().min(0).max(1),
+  w3: z.number().min(0).max(1),
+  w4: z.number().min(0).max(1),
+});
 
 const settingsSchema = z.object({
   fullName: z
@@ -24,6 +34,7 @@ const settingsSchema = z.object({
   defaultSubredditCount: z.number().int().min(1).max(25),
   minimumOpportunityScore: z.number().int().min(0).max(100),
   defaultLocale: z.string().trim().max(80, "Locale is too long"),
+  scoringWeights: weightSchema,
 });
 
 type SettingsPayload = z.infer<typeof settingsSchema>;
@@ -58,6 +69,7 @@ function toSettingsPayload(args: {
   email: string;
   emailNotifications: boolean;
   dashboardLayout: unknown;
+  scoringWeights: unknown;
 }): SettingsPayload {
   const parsedLayout = parseDashboardLayout(args.dashboardLayout);
   const persistedSettings = parsedLayout.settings ?? {};
@@ -75,6 +87,7 @@ function toSettingsPayload(args: {
     defaultSubredditCount: scanDefaults.defaultSubredditCount ?? 5,
     minimumOpportunityScore: scanDefaults.minimumOpportunityScore ?? 70,
     defaultLocale: scanDefaults.defaultLocale ?? "United States",
+    scoringWeights: (args.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
   };
 }
 
@@ -105,6 +118,7 @@ export async function GET(req: Request) {
       columns: {
         emailNotifications: true,
         dashboardLayout: true,
+        scoringWeights: true,
       },
     });
 
@@ -114,6 +128,7 @@ export async function GET(req: Request) {
         email: currentUser.email,
         emailNotifications: preferences?.emailNotifications ?? true,
         dashboardLayout: preferences?.dashboardLayout,
+        scoringWeights: preferences?.scoringWeights,
       }),
       200,
       correlationId,
@@ -198,6 +213,7 @@ export async function PATCH(req: Request) {
           .set({
             emailNotifications: payload.weeklyDigest,
             dashboardLayout: nextDashboardLayout,
+            scoringWeights: payload.scoringWeights,
           })
           .where(eq(userPreferences.id, existingPreferences.id));
       } else {
@@ -206,9 +222,17 @@ export async function PATCH(req: Request) {
           userId,
           emailNotifications: payload.weeklyDigest,
           dashboardLayout: nextDashboardLayout,
+          scoringWeights: payload.scoringWeights,
         });
       }
     });
+
+    // Handle background re-scoring (fire and forget)
+    void reScoreUserOpportunities(userId, payload.scoringWeights).catch((err) =>
+      console.error("[Settings API] Background re-score trigger failed:", err),
+    );
+
+    revalidateTag("dashboard");
 
     return apiJson(payload, 200, correlationId);
   } catch (error) {
