@@ -10,38 +10,39 @@ describe("fetchSubredditPosts", () => {
     // Mock the global fetch
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: {
-          children: [
-            {
-              data: {
-                id: "1",
-                title: "Test Post 1",
-                selftext: "Body 1",
-                author: "user1",
-                score: 20, // Setting higher score so it gets sorted first
-                subreddit: "test",
-                url: "https://reddit.com/1",
-                num_comments: 5,
-                created_utc: 1234567890,
+      json: () =>
+        Promise.resolve({
+          data: {
+            children: [
+              {
+                data: {
+                  id: "1",
+                  title: "Test Post 1",
+                  selftext: "Body 1",
+                  author: "user1",
+                  score: 20, // Setting higher score so it gets sorted first
+                  subreddit: "test",
+                  url: "https://reddit.com/1",
+                  num_comments: 5,
+                  created_utc: 1234567890,
+                },
               },
-            },
-            {
-              data: {
-                id: "2",
-                title: "Test Post 2",
-                selftext: "Body 2",
-                author: "user2",
-                score: 10,
-                subreddit: "test",
-                url: "https://reddit.com/2",
-                num_comments: 10,
-                created_utc: 1234567891,
+              {
+                data: {
+                  id: "2",
+                  title: "Test Post 2",
+                  selftext: "Body 2",
+                  author: "user2",
+                  score: 10,
+                  subreddit: "test",
+                  url: "https://reddit.com/2",
+                  num_comments: 10,
+                  created_utc: 1234567891,
+                },
               },
-            },
-          ],
-        },
-      }),
+            ],
+          },
+        }),
     });
 
     const posts = await fetchSubredditPosts("test", "keyword", 2);
@@ -64,11 +65,12 @@ describe("fetchSubredditPosts", () => {
     // Mock the global fetch
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: {
-          children: [],
-        },
-      }),
+      json: () =>
+        Promise.resolve({
+          data: {
+            children: [],
+          },
+        }),
     });
 
     const posts = await fetchSubredditPosts("test", "keyword", 2);
@@ -78,7 +80,7 @@ describe("fetchSubredditPosts", () => {
   it("handles multiple batches when limit > 100", async () => {
     // Mock the global fetch
     let callCount = 0;
-    global.fetch = vi.fn().mockImplementation(async () => {
+    global.fetch = vi.fn().mockImplementation(() => {
       callCount += 1;
       const start = (callCount - 1) * 100;
       const children = Array.from({ length: 100 }, (_, i) => ({
@@ -94,15 +96,16 @@ describe("fetchSubredditPosts", () => {
           created_utc: 1234567890,
         },
       }));
-      return {
+      return Promise.resolve({
         ok: true,
-        json: async () => ({
-          data: {
-            children: callCount < 2 ? children : children.slice(0, 50),
-            after: callCount < 2 ? "after_token" : null,
-          },
-        }),
-      };
+        json: () =>
+          Promise.resolve({
+            data: {
+              children: callCount < 2 ? children : children.slice(0, 50),
+              after: callCount < 2 ? "after_token" : null,
+            },
+          }),
+      });
     });
 
     const posts = await fetchSubredditPosts("test", "keyword", 150);

@@ -100,7 +100,7 @@ const freeTools = {
   },
 };
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return Object.keys(freeTools).map((slug) => ({
     slug,
   }));

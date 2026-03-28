@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { fetchComments } from "@/lib/reddit";
 
@@ -68,7 +69,7 @@ describe("fetchComments", () => {
     // Mock global fetch to return our mockData
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => mockCommentData,
+      json: () => Promise.resolve(mockCommentData),
     });
   });
 
@@ -108,7 +109,7 @@ describe("fetchComments", () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => emptyRepliesMockData,
+      json: () => Promise.resolve(emptyRepliesMockData),
     });
 
     const comments = await fetchComments("testsub", "testpost");
@@ -148,17 +149,19 @@ describe("fetchComments", () => {
       .mockImplementationOnce(() =>
         Promise.resolve({
           ok: true,
-          json: async () => ({
-            data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
-          }),
+          json: () =>
+            Promise.resolve({
+              data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+            }),
         }),
       )
       .mockImplementation(() =>
         Promise.resolve({
           ok: true,
-          json: async () => ({
-            data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
-          }),
+          json: () =>
+            Promise.resolve({
+              data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+            }),
         }),
       );
 

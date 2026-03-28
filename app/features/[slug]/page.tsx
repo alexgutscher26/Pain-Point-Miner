@@ -99,7 +99,7 @@ const features = {
   },
 };
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return Object.keys(features).map((slug) => ({
     slug,
   }));

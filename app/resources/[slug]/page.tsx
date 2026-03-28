@@ -118,7 +118,7 @@ const resources = {
   },
 };
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return Object.keys(resources).map((slug) => ({
     slug,
   }));
