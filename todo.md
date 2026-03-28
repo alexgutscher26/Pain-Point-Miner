@@ -116,13 +116,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [x] Expose pre-filter stats in SSE: "Skipped 12 low-quality posts"
   - [x] _Acceptance:_ A `basic` scan of r/startups skips deleted/removed posts and logs skip reason
 
-- [ ] **Subreddit Discovery Engine**
+- [x] **Subreddit Discovery Engine**
   - [x] Given a keyword (e.g., "SEO"), auto-suggest relevant subreddits via Reddit `/subreddits/search`
-  - [ ] Score suggestions by: subscriber count, activity level, relevance to keyword
-  - [ ] Return top 10 suggestions with subscriber count + description in `/api/search/suggest-subreddits`
-  - [ ] Show suggestions inline in the search form before the user starts a scan
-  - [ ] Cache suggestions for 24h per keyword to avoid redundant Reddit API calls
-  - [ ] _Acceptance:_ Typing "email marketing" into the search form suggests r/emailmarketing, r/Entrepreneur, r/SaaS within 500ms
+  - [x] Score suggestions by: subscriber count, activity level, relevance to keyword
+  - [x] Return top 10 suggestions with subscriber count + description in `/api/search/suggest-subreddits`
+  - [x] Show suggestions inline in the search form before the user starts a scan
+  - [x] Cache suggestions for 24h per keyword to avoid redundant Reddit API calls
+  - [x] _Acceptance:_ Typing "email marketing" into the search form suggests r/emailmarketing, r/Entrepreneur, r/SaaS within 500ms
 
 - [ ] **Mining Depth Presets**
   - [ ] Define 3 standard presets with cost estimates shown before scan

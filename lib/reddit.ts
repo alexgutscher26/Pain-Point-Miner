@@ -915,3 +915,51 @@ export const fetchComments = async (
     return [];
   }
 };
+
+export interface SubredditSuggestion {
+  name: string;
+  subscribers: number;
+  description: string;
+  activeUsers?: number;
+}
+
+/**
+ * Searches for relevant subreddits by name or topic using Reddit's search API.
+ * 
+ * @param query - The search query.
+ * @param limit - Maximum number of results to return.
+ * @returns An array of subreddit suggestions with metadata.
+ */
+export async function searchSubreddits(
+  query: string,
+  limit = 10,
+): Promise<SubredditSuggestion[]> {
+  try {
+    const params = new URLSearchParams({
+      q: query,
+      limit: String(limit),
+      sort: "relevance",
+    });
+
+    const url = `https://www.reddit.com/subreddits/search.json?${params.toString()}`;
+    const response = await fetchRedditResponse(url);
+    const data = await response.json();
+    const children = data.data?.children ?? [];
+
+    return children
+      .map((child: any) => {
+        const item = child.data;
+        return {
+          name: item.display_name,
+          subscribers: item.subscribers || 0,
+          description: item.public_description || item.title || "",
+          activeUsers: item.active_user_count || 0,
+        };
+      })
+      .filter((sub: SubredditSuggestion) => sub.name && !sub.name.startsWith("u/"))
+      .slice(0, limit);
+  } catch (error) {
+    console.error("Error searching subreddits:", error);
+    return [];
+  }
+}

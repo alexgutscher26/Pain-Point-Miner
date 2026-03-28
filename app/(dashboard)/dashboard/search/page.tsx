@@ -39,6 +39,13 @@ type SearchDraft = {
   savedAt: string;
 };
 
+type SubredditSuggestion = {
+  name: string;
+  subscribers: number;
+  description: string;
+  activeUsers?: number;
+};
+
 type MiningDepth = SearchDraft["miningDepth"];
 type BillingEntitlementsResponse = {
   plan: "starter" | "growth" | "pro";
@@ -117,7 +124,9 @@ export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [subreddits, setSubreddits] = useState("");
   const [customPatterns, setCustomPatterns] = useState("");
-  const [suggestedSubreddits, setSuggestedSubreddits] = useState<string[]>([]);
+  const [suggestedSubreddits, setSuggestedSubreddits] = useState<
+    SubredditSuggestion[]
+  >([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
@@ -528,19 +537,39 @@ export default function SearchPage() {
               </div>
 
               {suggestedSubreddits.length > 0 && (
-                <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <p className="w-full font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
-                    AI Recommended Communities
+                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <p className="font-mono text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                    AI & Reddit Discovery Results
                   </p>
-                  {suggestedSubreddits.map((sub, i) => (
-                    <button
-                      key={i}
-                      onClick={() => addSubreddit(sub)}
-                      className="px-3 py-1.5 border border-[#ff4500]/40 bg-[#ff4500]/8 font-mono text-[11px] font-bold text-[#ff4500] hover:bg-[#ff4500]/15 transition-colors"
-                    >
-                      + r/{sub}
-                    </button>
-                  ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {suggestedSubreddits.map((sub, i) => (
+                      <button
+                        key={i}
+                        onClick={() => addSubreddit(sub.name)}
+                        className="group/item relative flex flex-col p-4 border border-[#ff4500]/30 bg-[#ff4500]/5 hover:bg-[#ff4500]/10 hover:border-[#ff4500]/60 transition-all text-left shadow-[2px_2px_0px_0px_rgba(255,69,0,0.1)]"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-mono text-sm font-black text-white group-hover/item:text-[#ff8a57] transition-colors">
+                            r/{sub.name}
+                          </span>
+                          <span className="font-mono text-[10px] text-[#ff8a57] font-bold">
+                            {Intl.NumberFormat("en-US", {
+                              notation: "compact",
+                              maximumFractionDigits: 1,
+                            }).format(sub.subscribers)}{" "}
+                            subs
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 font-medium line-clamp-2 leading-relaxed h-8">
+                          {sub.description || "No description provided."}
+                        </p>
+                        <div className="mt-2 flex items-center gap-1 font-mono text-[9px] font-black text-[#ff4500] uppercase opacity-0 group-hover/item:opacity-100 transition-opacity">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          Add to Scan
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
