@@ -14,7 +14,7 @@ import os
 import tempfile
 
 def run_lighthouse(url: str) -> dict:
-    """Run Lighthouse audit on URL."""
+    """Run Lighthouse audit on the specified URL and return the results."""
     try:
         # Use NamedTemporaryFile to get a unique path, but close it immediately
         # so that the lighthouse CLI can write to it without file locking issues.
