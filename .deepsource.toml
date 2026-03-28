@@ -22,7 +22,7 @@ enabled = true
 
   [analyzers.meta]
   plugins = ["react"]
-  environment = ["browser", "node"]
+  environment = ["browser", "nodejs", "vitest"]
 
 [[analyzers]]
 name = "secrets"
