@@ -12,7 +12,7 @@ export function Steps() {
           <br /> in 3 simple steps
         </h3>
         <p className="text-[18px] text-zinc-400 font-medium">
-          Enter a niche, and we'll do the deep research to extract the real
+          Enter a niche, and we&apos;ll do the deep research to extract the real
           problems your potential users are actively trying to solve.
         </p>
       </div>
@@ -26,7 +26,7 @@ export function Steps() {
 
           <div className="w-full h-40 bg-black rounded-xl border border-white/[0.03] mb-8 flex items-center justify-center overflow-hidden shadow-inner group-hover:scale-[1.02] transition-transform duration-500">
             {/* Search text box mockup */}
-            <div className="bg-[#1a1a1a] border border-white/[0.05] px-5 py-3 rounded-full flex items-center gap-2 shadow-lg w-[80%]">
+            <div className="bg-[#1a1a1a] border border-white/5 px-5 py-3 rounded-full flex items-center gap-2 shadow-lg w-[80%]">
               <span className="text-[#ff4500] font-bold text-[15px]">#</span>
               <span className="text-[15px] text-white border-r-2 border-[#ff4500] pr-1.5 animate-pulse font-medium tracking-wide">
                 SaaS marketing
@@ -37,7 +37,7 @@ export function Steps() {
             1. Define your niche
           </h3>
           <p className="text-[15px] text-zinc-400 leading-relaxed font-medium">
-            Enter a keyword like 'SEO tools' or 'property management' to target
+            Enter a keyword like &quot;SEO tools&quot; or &quot;property management&quot; to target
             the exact subreddits relevant to your SaaS.
           </p>
         </div>
