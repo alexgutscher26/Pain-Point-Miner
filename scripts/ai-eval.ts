@@ -12,7 +12,7 @@ import crypto from "crypto";
  * ideal results using a "Judge" model.
  */
 
-const CURRENT_MODEL = "anthropic/claude-3.5-sonnet";
+const CURRENT_MODEL = "google/gemini-2.0-flash-001";
 const BENCHMARK_MODELS = [
   "google/gemini-2.0-flash-001",
   "openai/gpt-4o"

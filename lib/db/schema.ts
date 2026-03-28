@@ -227,7 +227,7 @@ export const userPreferences = pgTable(
     id: text().primaryKey().notNull(),
     userId: text().notNull(),
     theme: text().default("system").notNull(),
-    defaultAiModel: text().default("anthropic/claude-3.5-sonnet").notNull(),
+    defaultAiModel: text().default("google/gemini-2.0-flash-001").notNull(),
     emailNotifications: boolean().default(true).notNull(),
     timezone: text(),
     dashboardLayout: jsonb(),

@@ -6,11 +6,11 @@ import {
 
 export const AI_MODELS = {
   GEMINI_FLASH: "google/gemini-2.0-flash-001",
-  CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
+  // CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
   GPT4O: "openai/gpt-4o",
 } as const;
 
-export const DEFAULT_AI_MODEL = AI_MODELS.CLAUDE_SONNET;
+export const DEFAULT_AI_MODEL = AI_MODELS.GEMINI_FLASH;
 
 export interface PainPointData {
   title: string;
