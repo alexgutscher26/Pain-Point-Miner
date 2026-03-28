@@ -9,6 +9,7 @@ import { UserJotWidget } from "@/components/userjot-widget";
 import { auth } from "@/lib/auth";
 
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -47,6 +48,7 @@ export default async function RootLayout({
       >
         <UserJotWidget user={session?.user ?? null} />
         <Toaster />
+        <Analytics />
         {children}
       </body>
     </html>
