@@ -882,6 +882,14 @@ export const fetchComments = async (
   const maxDepth = options?.maxDepth ?? 100;
   const maxComments = options?.maxComments ?? 200;
 
+  // Validate subreddit to prevent malformed URLs and restrict path injection.
+  if (
+    !subreddit ||
+    !/^[A-Za-z0-9_]{3,21}$/.test(subreddit)
+  ) {
+    throw new Error(`Invalid subreddit name: ${String(subreddit)}`);
+  }
+
   try {
     const url = `https://www.reddit.com/r/${subreddit}/comments/${postId}.json`;
     const response = await fetchRedditResponse(url);
