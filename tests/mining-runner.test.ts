@@ -71,7 +71,7 @@ describe("executeMiningRun", () => {
           subreddits: ["test"],
           customPatterns: [],
           miningDepth: "basic",
-          timeWindow: "1w",
+          timeWindow: "7d",
           userId: "test-user",
           workspaceId: "test-workspace",
         })
@@ -108,7 +108,7 @@ describe("executeMiningRun", () => {
         subreddits: ["success-sub", "fail-sub"],
         customPatterns: [],
         miningDepth: "basic",
-        timeWindow: "1w",
+        timeWindow: "7d",
         userId: "test-user",
         workspaceId: "test-workspace",
       });
@@ -155,7 +155,7 @@ describe("executeMiningRun", () => {
         subreddits: ["test-sub"],
         customPatterns: ["pattern1"],
         miningDepth: "basic",
-        timeWindow: "1w",
+        timeWindow: "7d",
         userId: "test-user",
         workspaceId: "test-workspace",
       });
@@ -205,7 +205,7 @@ describe("executeMiningRun", () => {
         subreddits: ["test-sub"],
         customPatterns: ["pattern1"],
         miningDepth: "basic",
-        timeWindow: "1w",
+        timeWindow: "7d",
         userId: "test-user",
         workspaceId: "test-workspace",
       });

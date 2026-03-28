@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { clusterPainPoint } from "@/lib/clustering";
 
@@ -13,13 +14,13 @@ const mockUpdate = vi.fn(() => ({ set: mockSet }));
 
 vi.mock("@/lib/db", () => ({
   db: {
-    execute: (...args: any[]) => mockExecute(...args),
-    insert: (...args: any[]) => mockInsert(...args),
-    update: (...args: any[]) => mockUpdate(...args),
+    execute: (...args: any[]) => (mockExecute as any)(...args),
+    insert: (...args: any[]) => (mockInsert as any)(...args),
+    update: (...args: any[]) => (mockUpdate as any)(...args),
     query: {
       painPoint: {
-        findFirst: (...args: any[]) => mockFindFirst(...args),
-        findMany: (...args: any[]) => mockFindMany(...args),
+        findFirst: (...args: any[]) => (mockFindFirst as any)(...args),
+        findMany: (...args: any[]) => (mockFindMany as any)(...args),
       },
     },
   },

@@ -392,6 +392,7 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 - [x] **Per-User Rate Limiting** — sliding window counter in `lib/rate-limit.ts` · `429 Retry-After` header
 - [x] **Route Auth Enforcement** — `lib/api-auth.ts` guards all protected API routes
 - [x] **Workspace Scoping** — partial `workspaceScope()` enforcement in query layer
+- [x] **Secure Tempfile Handling** — fixed potential resource leakage/locking in `lighthouse_audit.py`
 
 ### 🔥 High Priority (Planned)
 

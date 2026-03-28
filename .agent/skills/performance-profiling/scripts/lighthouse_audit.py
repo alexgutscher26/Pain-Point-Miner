@@ -16,8 +16,11 @@ import tempfile
 def run_lighthouse(url: str) -> dict:
     """Run Lighthouse audit on URL."""
     try:
-        with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as f:
-            output_path = f.name
+        # Use NamedTemporaryFile to get a unique path, but close it immediately
+        # so that the lighthouse CLI can write to it without file locking issues.
+        f = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
+        output_path = f.name
+        f.close()
         
         result = subprocess.run(
             [
