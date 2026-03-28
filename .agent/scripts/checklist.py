@@ -130,13 +130,13 @@ def print_summary(results: List[dict]):
     
     This function calculates and displays the total number of checks, along with
     counts of passed, failed, and skipped checks. It iterates through the provided
-    results to determine the status of each check and prints a detailed summary. If
-    any checks have failed, an error message is printed; otherwise, a success
+    results to determine the status of each check and prints a detailed summary.
+    If any checks have failed, an error message is printed; otherwise, a success
     message is displayed.
     
     Args:
-        results (List[dict]): A list of dictionaries containing the results of checks, where each dictionary
-            has keys "passed", "skipped", and "name".
+        results (List[dict]): A list of dictionaries containing the results of checks,
+            where each dictionary has keys "passed", "skipped", and "name".
     
     Returns:
         bool: Returns False if any checks failed, otherwise returns True.
