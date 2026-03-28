@@ -780,7 +780,7 @@ export default function ReportDetailPage() {
                 <div className="flex flex-wrap gap-1.5">
                   <span>Patterns:</span>
                   {reportData.customPatterns.map((p, i) => (
-                    <span key={i} className="font-black text-emerald-300">
+                    <span key={p} className="font-black text-emerald-300">
                       "{p}"
                       {i < (reportData.customPatterns?.length ?? 0) - 1
                         ? ","
@@ -1435,9 +1435,9 @@ export default function ReportDetailPage() {
                       </div>
                       <div className="space-y-2">
                         {formatPainDescription(opp.problemStatement).map(
-                          (paragraph, paragraphIdx) => (
+                          (paragraph, pIdx) => (
                             <p
-                              key={`opp-${idx}-problem-${paragraphIdx}`}
+                              key={`opp-${idx}-p-stmt-${pIdx}`}
                               className="text-xs leading-relaxed font-medium text-zinc-400"
                             >
                               {paragraph}
@@ -1450,9 +1450,9 @@ export default function ReportDetailPage() {
                       </p>
                       <div className="space-y-2">
                         {formatPainDescription(opp.valueProposition).map(
-                          (paragraph, paragraphIdx) => (
+                          (paragraph, pIdx) => (
                             <p
-                              key={`opp-${idx}-value-${paragraphIdx}`}
+                              key={`opp-${idx}-v-prop-${pIdx}`}
                               className="text-xs leading-relaxed font-medium text-zinc-300"
                             >
                               {paragraph}
@@ -1462,9 +1462,9 @@ export default function ReportDetailPage() {
                       </div>
                       <div className="space-y-2">
                         {formatPainDescription(opp.launchAngle).map(
-                          (paragraph, paragraphIdx) => (
+                          (paragraph, pIdx) => (
                             <p
-                              key={`opp-${idx}-launch-${paragraphIdx}`}
+                              key={`opp-${idx}-l-angle-${pIdx}`}
                               className="text-[11px] leading-relaxed font-bold text-zinc-500"
                             >
                               {paragraph}

@@ -48,8 +48,8 @@ export function FAQ() {
         </div>
 
         <div className="w-full max-w-2xl rounded-2xl border border-white/5 bg-[#0a0a0a] p-2 shadow-xl md:p-6">
-          {faqs.map((faq, i) => (
-            <FAQItem key={i} question={faq.q} answer={faq.a} />
+          {faqs.map((faq) => (
+            <FAQItem key={faq.q} question={faq.q} answer={faq.a} />
           ))}
         </div>
       </section>

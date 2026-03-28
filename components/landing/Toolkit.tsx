@@ -29,7 +29,7 @@ export function Toolkit() {
       <div className="mb-32 grid w-full max-w-[1200px] grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
         {/* Left Column (Feature list) - taking up 5 columns */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 lg:col-span-5">
-          {[
+          {([
             {
               icon: <Target className="h-5 w-5 text-indigo-400" />,
               title: "Keyword Targeting",
@@ -60,8 +60,8 @@ export function Toolkit() {
               title: "Trend Analytics",
               desc: "Track complaint frequencies",
             },
-          ].map((feature, i) => (
-            <div key={i} className="flex flex-col items-start gap-4">
+          ] as const).map((feature) => (
+            <div key={feature.title} className="flex flex-col items-start gap-4">
               <div className="rounded-lg border border-white/[0.05] bg-[#0f0f0f] p-2.5 shadow-inner">
                 {feature.icon}
               </div>
@@ -184,7 +184,7 @@ export function Toolkit() {
           <div className="absolute right-8 bottom-8 left-8 flex h-24 items-end gap-[3px] transition-transform duration-500 group-hover:-translate-y-2">
             {[3, 5, 4, 7, 5, 8, 4, 9, 7].map((h, i) => (
               <div
-                key={i}
+                key={`bar-${i}`}
                 className="flex-1 rounded-t-[2px] bg-red-500 opacity-20"
                 style={{ height: `${h * 10}%` }}
               ></div>

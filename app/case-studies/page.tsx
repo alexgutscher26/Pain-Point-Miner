@@ -63,9 +63,9 @@ export default function CaseStudiesPage() {
           </header>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {caseStudies.map((cs, i) => (
+            {caseStudies.map((cs) => (
               <div
-                key={i}
+                key={cs.slug}
                 className="group relative flex flex-col items-start overflow-hidden rounded-[32px] border border-white/5 bg-[#0f0f0f] p-10 text-left shadow-2xl backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/2"
               >
                 <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[#ff4500]/10 opacity-50 blur-[80px] transition-opacity" />

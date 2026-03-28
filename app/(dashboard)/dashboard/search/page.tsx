@@ -549,9 +549,9 @@ export default function SearchPage() {
                     AI & Reddit Discovery Results
                   </p>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {suggestedSubreddits.map((sub, i) => (
+                    {suggestedSubreddits.map((sub) => (
                       <button
-                        key={i}
+                        key={sub.name}
                         onClick={() => addSubreddit(sub.name)}
                         className="group/item relative flex flex-col border border-[#ff4500]/30 bg-[#ff4500]/5 p-4 text-left shadow-[2px_2px_0px_0px_rgba(255,69,0,0.1)] transition-all hover:border-[#ff4500]/60 hover:bg-[#ff4500]/10"
                       >
@@ -584,9 +584,9 @@ export default function SearchPage() {
                 <p className="mb-1 w-full font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
                   Common Core Communities ({defaultLocale})
                 </p>
-                {visibleCommunities.map((sub, i) => (
+                {visibleCommunities.map((sub) => (
                   <button
-                    key={i}
+                    key={sub}
                     onClick={() => addSubreddit(sub)}
                     className="border border-white/15 bg-white/2 px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
                   >

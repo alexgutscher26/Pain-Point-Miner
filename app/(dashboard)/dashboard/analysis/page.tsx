@@ -193,9 +193,9 @@ export default function AnalysisPage() {
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Rate Limit Protocol Alerts
               </div>
-              {throttleWarnings.map((warning, idx) => (
+              {throttleWarnings.map((warning) => (
                 <div
-                  key={idx}
+                  key={warning}
                   className="flex gap-2 border-l-2 border-amber-500/30 pl-3"
                 >
                   <span className="tabular-nums opacity-40">
@@ -237,9 +237,9 @@ export default function AnalysisPage() {
           <div className="relative space-y-0">
             <div className="absolute top-6 bottom-6 left-[19px] w-px bg-white/10"></div>
 
-            {steps.map((step, idx) => (
+            {steps.map((step) => (
               <AnalysisStep
-                key={idx}
+                key={step.title}
                 icon={step.icon}
                 title={step.title}
                 description={step.description}
@@ -280,9 +280,9 @@ export default function AnalysisPage() {
                 Active Custom Intelligence Signals
               </p>
               <div className="flex flex-wrap gap-2">
-                {customPatterns.map((pattern, idx) => (
+                {customPatterns.map((pattern) => (
                   <div
-                    key={idx}
+                    key={pattern}
                     className="border border-amber-500/20 bg-amber-500/10 px-3 py-1 font-mono text-xs font-bold text-amber-400"
                   >
                     {pattern}

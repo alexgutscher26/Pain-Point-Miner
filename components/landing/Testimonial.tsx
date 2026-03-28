@@ -86,9 +86,9 @@ export function Testimonial() {
 
             {/* Dots */}
             <div className="flex justify-center gap-2">
-              {testimonials.map((_, i) => (
+              {testimonials.map((t, i) => (
                 <div
-                  key={i}
+                  key={t.author}
                   className={`h-1 rounded-full transition-all duration-500 ${i === currentIndex ? "w-8 bg-[#ff4500]" : "w-3 bg-white/10"}`}
                 />
               ))}
