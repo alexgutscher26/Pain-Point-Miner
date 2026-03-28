@@ -24,6 +24,7 @@ type StreamEvent = {
   status: RunStatus;
   subreddits: string[];
   timeWindow: string;
+  throttleWarnings: string[];
 };
 
 function phaseToProgress(phase: RunStatus): number {
@@ -149,6 +150,7 @@ export async function GET(req: Request) {
             status: phase,
             subreddits,
             timeWindow,
+            throttleWarnings: (latestRun?.throttleWarnings as string[]) ?? [],
           };
 
           send(event);

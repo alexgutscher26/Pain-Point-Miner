@@ -321,6 +321,9 @@ export const scraperRun = pgTable(
     newPainPoints: integer().default(0).notNull(),
     fromComments: integer().default(0).notNull(),
     error: text(),
+    throttleWarnings: text()
+      .array()
+      .default(sql`'{}'::text[]`),
   },
   (table) => [
     foreignKey({
@@ -648,9 +651,11 @@ export const aiEvalLog = pgTable("ai_eval_log", {
 
 export const redditRateLimitLog = pgTable("reddit_rate_limit_log", {
   id: text().primaryKey().notNull(),
+  subreddit: text(),
   userAgent: text().notNull(),
   url: text().notNull(),
   statusCode: integer().notNull(),
+  retryAfter: integer(),
   error: text(),
   createdAt: timestamp({ precision: 3, mode: "date" })
     .default(sql`CURRENT_TIMESTAMP`)

@@ -82,14 +82,14 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### 🔥 High Priority (Planned)
 
-- [ ] **Reddit Rate Limit Monitoring**
-  - [ ] Create `reddit_rate_limit_log` table: `id`, `subreddit`, `statusCode`, `retryAfter`, `createdAt`
-  - [ ] Log every 429/403 event received from Reddit OAuth or PullPush
-  - [ ] Auto-backoff: 3+ consecutive 429s from the same subreddit → mark it as `throttled`, skip for 15 min
-  - [ ] Store throttle state in Redis or in-memory `Map` with TTL
-  - [ ] Surface SSE warnings: _"⚠️ r/startups is rate-limited, skipping for 15 min"_
-  - [ ] Show per-subreddit throttle status in the scan progress UI
-  - [ ] _Acceptance:_ A subreddit that returns 3 consecutive 429s is automatically skipped and an SSE warning fires within 500ms
+- [x] **Reddit Rate Limit Monitoring**
+  - [x] Create `reddit_rate_limit_log` table: `id`, `subreddit`, `statusCode`, `retryAfter`, `createdAt`
+  - [x] Log every 429/403 event received from Reddit OAuth or PullPush
+  - [x] Auto-backoff: 3+ consecutive 429s from the same subreddit → mark it as `throttled`, skip for 15 min
+  - [x] Store throttle state in Redis or in-memory `Map` with TTL
+  - [x] Surface SSE warnings: _"⚠️ r/startups is rate-limited, skipping for 15 min"_
+  - [x] Show per-subreddit throttle status in the scan progress UI
+  - [x] _Acceptance:_ A subreddit that returns 3 consecutive 429s is automatically skipped and an SSE warning fires within 500ms
 
 - [x] **Multi-Sort Strategy**
   - [x] Add `hot`, `new`, `top` sort modes alongside current `relevance`

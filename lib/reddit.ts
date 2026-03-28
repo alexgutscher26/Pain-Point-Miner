@@ -61,6 +61,73 @@ function getRandomUA() {
   return UA_POOL[Math.floor(Math.random() * UA_POOL.length)] ?? "Threddiq/1.0";
 }
 
+/** In-memory map of throttled subreddits (subreddit -> timestamp when throttle expires). */
+const throttledUntilMap = new Map<string, number>();
+
+/** Track consecutive 429s per subreddit. */
+const consecutive429CountMap = new Map<string, number>();
+
+const THROTTLE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
+/** Extracts subreddit name from a Reddit URL. */
+function getSubredditFromUrl(url: string): string | null {
+  const match = url.match(/\/r\/([^/?]+)/);
+  return match ? match[1] : null;
+}
+
+/** Checks if a subreddit is currently throttled. */
+export function isSubredditThrottled(subreddit: string): boolean {
+  const until = throttledUntilMap.get(subreddit);
+  if (!until) return false;
+  if (Date.now() > until) {
+    throttledUntilMap.delete(subreddit);
+    consecutive429CountMap.set(subreddit, 0);
+    return false;
+  }
+  return true;
+}
+
+/** Logs a rate limit or block event to the database and updates throttle state. */
+async function logRateLimitEvent(
+  url: string,
+  statusCode: number,
+  headers?: Headers,
+  errorText?: string,
+) {
+  const subreddit = getSubredditFromUrl(url);
+  const uaUsed = currentUA;
+
+  let retryAfter: number | undefined;
+  if (headers?.has("retry-after")) {
+    retryAfter = parseInt(headers.get("retry-after") || "0", 10);
+  }
+
+  try {
+    await db.insert(redditRateLimitLog).values({
+      id: crypto.randomUUID(),
+      subreddit,
+      userAgent: uaUsed,
+      url,
+      statusCode,
+      retryAfter,
+      error: errorText,
+    });
+  } catch (dbErr) {
+    console.error("Failed to log rate limit to DB:", dbErr);
+  }
+
+  if (subreddit && (statusCode === 429 || statusCode === 403)) {
+    const count = (consecutive429CountMap.get(subreddit) || 0) + 1;
+    consecutive429CountMap.set(subreddit, count);
+
+    if (count >= 3 && !throttledUntilMap.has(subreddit)) {
+      throttledUntilMap.set(subreddit, Date.now() + THROTTLE_DURATION_MS);
+    }
+  } else if (subreddit && statusCode >= 200 && statusCode < 300) {
+    consecutive429CountMap.set(subreddit, 0);
+  }
+}
+
 /** The currently active User-Agent string for the current execution instance. */
 let currentUA = getRandomUA();
 
@@ -191,28 +258,32 @@ async function fetchWithRetry(
     const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
     try {
+      const subreddit = getSubredditFromUrl(url);
+      if (subreddit && isSubredditThrottled(subreddit)) {
+        throw new Error(`Subreddit r/${subreddit} is currently rate-limited.`);
+      }
+
       const response = await fetch(url, {
         ...init,
         signal: controller.signal,
       });
 
-      if (response.ok) return response;
+      if (response.ok) {
+        if (subreddit) consecutive429CountMap.set(subreddit, 0);
+        return response;
+      }
+
+      const isRateLimited = response.status === 429 || response.status === 403;
+      if (isRateLimited) {
+        await logRateLimitEvent(
+          url,
+          response.status,
+          response.headers,
+          response.statusText,
+        );
+      }
 
       if (response.status === 403) {
-        // Log the block before rotating
-        const uaUsed = (init.headers as Record<string, string>)?.["User-Agent"] || currentUA;
-        try {
-          await db.insert(redditRateLimitLog).values({
-            id: crypto.randomUUID(),
-            userAgent: uaUsed,
-            url,
-            statusCode: 403,
-            error: `Forbidden/Blocked: ${response.statusText}`,
-          });
-        } catch (dbErr) {
-          console.error("Failed to log 403 error to DB:", dbErr);
-        }
-
         // Rotate UA and update the headers for the next attempt
         const nextUA = rotateUA();
         if (init.headers instanceof Headers) {

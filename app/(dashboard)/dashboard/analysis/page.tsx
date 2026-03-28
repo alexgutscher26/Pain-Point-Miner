@@ -10,6 +10,7 @@ import {
   Search,
   BrainCircuit,
   BarChart4,
+  AlertTriangle,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
@@ -29,6 +30,7 @@ export default function AnalysisPage() {
     postsFetched,
     subreddits,
     timeWindow,
+    throttleWarnings,
     isDone,
     hasFailed,
     hasHydrated,
@@ -183,6 +185,22 @@ export default function AnalysisPage() {
         <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-[#ff4500]/20 to-transparent"></div>
 
         <div className="p-10 space-y-10">
+          {/* Rate Limit Warnings */}
+          {throttleWarnings.length > 0 && (
+            <div className="mb-8 space-y-2.5 bg-amber-500/5 border border-amber-500/20 p-5 font-mono text-[11px] text-amber-400 uppercase tracking-widest leading-relaxed">
+              <div className="flex items-center gap-2 mb-2 font-black text-amber-500">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Rate Limit Protocol Alerts
+              </div>
+              {throttleWarnings.map((warning, idx) => (
+                <div key={idx} className="flex gap-2 border-l-2 border-amber-500/30 pl-3">
+                  <span className="opacity-40 tabular-nums">[{new Date().toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' })}]</span>
+                  <span className="font-bold">{warning}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Overall Progress */}
           <div className="space-y-4">
             <div className="flex justify-between items-end">

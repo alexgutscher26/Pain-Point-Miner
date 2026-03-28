@@ -16,6 +16,7 @@ import {
   fetchSubredditPostsMultiSort,
   rankRedditPosts,
   resolveProblemPatterns,
+  isSubredditThrottled,
   type RedditPost,
 } from "@/lib/reddit";
 import { clusterPainPoint } from "@/lib/clustering";
@@ -136,7 +137,21 @@ export async function executeMiningRun({
     });
 
     let allPosts: RedditPost[] = [];
-    const targetSubreddits = subreddits.slice(0, Math.max(1, subLimit));
+    const throttleWarnings: string[] = [];
+
+    const throttledSubredditsList = subreddits.filter(isSubredditThrottled);
+    const nonThrottledSubreddits = subreddits.filter(
+      (s) => !isSubredditThrottled(s),
+    );
+
+    for (const sub of throttledSubredditsList) {
+      throttleWarnings.push(`⚠️ r/${sub} is rate-limited, skipping for 15 min`);
+    }
+
+    const targetSubreddits = nonThrottledSubreddits.slice(
+      0,
+      Math.max(1, subLimit),
+    );
 
     // Fetch posts concurrently across all subreddits.
     // Each subreddit call internally fans out across all sort modes for the
@@ -150,11 +165,21 @@ export async function executeMiningRun({
       ),
     );
 
-    for (const result of subredditFetchResults) {
+    for (let i = 0; i < subredditFetchResults.length; i++) {
+      const result = subredditFetchResults[i]!;
+      const sub = targetSubreddits[i]!;
       if (result.status === "fulfilled") {
         allPosts.push(...result.value);
       } else {
-        console.error("Subreddit fetch failed:", result.reason);
+        const errorMsg = getErrorMessage(result.reason);
+        if (
+          errorMsg.toLowerCase().includes("rate-limited") ||
+          errorMsg.includes("429") ||
+          errorMsg.includes("403")
+        ) {
+          throttleWarnings.push(`⚠️ r/${sub} returned rate-limit, skipping...`);
+        }
+        console.error(`Subreddit fetch failed for r/${sub}:`, result.reason);
       }
     }
 
@@ -175,6 +200,7 @@ export async function executeMiningRun({
         status: "extracting",
         postsFetched: fetchedPosts.length,
         postsMatched: allPosts.length,
+        throttleWarnings,
       })
       .where(eq(scraperRun.id, runId));
 

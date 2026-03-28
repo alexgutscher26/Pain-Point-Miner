@@ -22,6 +22,7 @@ export type MiningStreamState = {
   status: MiningPhase;
   subreddits: string[];
   timeWindow: string;
+  throttleWarnings: string[];
 };
 
 const INITIAL_STATE: MiningStreamState = {
@@ -34,6 +35,7 @@ const INITIAL_STATE: MiningStreamState = {
   status: "running",
   subreddits: [],
   timeWindow: "Last 90d",
+  throttleWarnings: [],
 };
 
 /**
@@ -84,6 +86,7 @@ export function useMiningStream(scraperId: string | null) {
             status: phase,
             subreddits: data.scraper?.subreddits ?? [],
             timeWindow: data.timeWindowLabel ?? "Last 90d",
+            throttleWarnings: data.latestRun?.throttleWarnings ?? [],
           });
         } catch {
           // ignore polling errors

@@ -12,8 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, Settings, User, ChevronDown, ExternalLink } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Menu, LogOut, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
@@ -147,6 +154,9 @@ export function Header() {
                      </div>
                      ThreddIQ
                   </SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Navigate through ThreddIQ features and pricing.
+                  </SheetDescription>
                 </SheetHeader>
                 <nav className="flex flex-col gap-8">
                   {navLinks.map((link) => (

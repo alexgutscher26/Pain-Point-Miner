@@ -4,7 +4,13 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
 import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-links";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 export function DashboardMobileNav({
   userName,
@@ -28,6 +34,10 @@ export function DashboardMobileNav({
         side="left"
         className="w-[88%] max-w-xs border-white/10 bg-[#0d0d0d] p-0 text-zinc-100"
       >
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Access your dashboard, reports, and settings.
+        </SheetDescription>
         <div className="flex h-full flex-col">
           <div className="border-b border-white/10 px-5 py-5">
             <Link href="/dashboard" className="flex items-center gap-3">
