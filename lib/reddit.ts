@@ -931,7 +931,8 @@ export const fetchComments = async (
         return await fetchFromPullPushComments(postId);
       } catch (fallbackError) {
         console.error(
-          `Error fetching comments from fallback source for post ${postId}:`,
+          "Error fetching comments from fallback source for post:",
+          postId,
           fallbackError,
         );
         return [];
