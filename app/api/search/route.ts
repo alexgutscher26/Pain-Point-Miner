@@ -406,110 +406,103 @@ export async function POST(req: Request) {
       // 1. Create a Scraping Job record
       const scraperId = crypto.randomUUID();
 
-      try {
-        const latestMatchingScraper = await db.query.scraper.findFirst({
-          where: and(
-            eq(scraper.userId, userId),
-            workspaceScope(scraper.workspaceId, workspaceId),
-          ),
-          orderBy: [desc(scraper.createdAt)],
-          with: {
-            scraperRuns: {
-              orderBy: [desc(scraperRun.startedAt)],
-              limit: 1,
-            },
+      const latestMatchingScraper = await db.query.scraper.findFirst({
+        where: and(
+          eq(scraper.userId, userId),
+          workspaceScope(scraper.workspaceId, workspaceId),
+        ),
+        orderBy: [desc(scraper.createdAt)],
+        with: {
+          scraperRuns: {
+            orderBy: [desc(scraperRun.startedAt)],
+            limit: 1,
           },
-        });
+        },
+      });
 
-        if (latestMatchingScraper) {
-          const isWithinDuplicateWindow =
-            Date.now() - new Date(latestMatchingScraper.createdAt).getTime() <=
-            DUPLICATE_SUBMISSION_WINDOW_MS;
-          const isSameKeyword = latestMatchingScraper.keywords?.[0] === keyword;
-          const isSameDepth = latestMatchingScraper.miningDepth === miningDepth;
-          const isSameSubreddits = arraysEqual(
-            latestMatchingScraper.subreddits,
-            targetSubreddits,
-          );
-          const isSamePatterns = arraysEqual(
-            latestMatchingScraper.customPatterns,
-            patterns,
-          );
-          const isSameTimeWindow =
-            normalizeTimeWindow(latestMatchingScraper.timeWindow) ===
-            timeWindow;
+      if (latestMatchingScraper) {
+        const isWithinDuplicateWindow =
+          Date.now() - new Date(latestMatchingScraper.createdAt).getTime() <=
+          DUPLICATE_SUBMISSION_WINDOW_MS;
+        const isSameKeyword = latestMatchingScraper.keywords?.[0] === keyword;
+        const isSameDepth = latestMatchingScraper.miningDepth === miningDepth;
+        const isSameSubreddits = arraysEqual(
+          latestMatchingScraper.subreddits,
+          targetSubreddits,
+        );
+        const isSamePatterns = arraysEqual(
+          latestMatchingScraper.customPatterns,
+          patterns,
+        );
+        const isSameTimeWindow =
+          normalizeTimeWindow(latestMatchingScraper.timeWindow) === timeWindow;
 
-          if (
-            isWithinDuplicateWindow &&
-            isSameKeyword &&
-            isSameDepth &&
-            isSameSubreddits &&
-            isSamePatterns &&
-            isSameTimeWindow
-          ) {
-            const latestRun = latestMatchingScraper.scraperRuns?.[0];
-            return {
-              success: true as const,
-              duplicate: true,
-              scraperId: latestMatchingScraper.id,
-              runId: latestRun?.id ?? null,
-              count: latestRun?.newPainPoints ?? 0,
-              status: normalizeRunStatus(latestRun?.status),
-            };
-          }
+        if (
+          isWithinDuplicateWindow &&
+          isSameKeyword &&
+          isSameDepth &&
+          isSameSubreddits &&
+          isSamePatterns &&
+          isSameTimeWindow
+        ) {
+          const latestRun = latestMatchingScraper.scraperRuns?.[0];
+          return {
+            success: true as const,
+            duplicate: true,
+            scraperId: latestMatchingScraper.id,
+            runId: latestRun?.id ?? null,
+            count: latestRun?.newPainPoints ?? 0,
+            status: normalizeRunStatus(latestRun?.status),
+          };
         }
-
-        // We'll create the scraper and first run metadata
-        await db.insert(scraper).values({
-          id: scraperId,
-          keywords: [keyword],
-          subreddits: targetSubreddits,
-          customPatterns: patterns,
-          miningDepth,
-          timeWindow,
-          userId,
-          workspaceId,
-          updatedAt: new Date(),
-          cost: calculateMiningCost(miningDepth),
-        });
-
-
-
-        void executeMiningRun({
-          scraperId,
-          keyword,
-          subreddits: targetSubreddits,
-          customPatterns: patterns,
-          miningDepth,
-          timeWindow,
-          userId,
-          workspaceId,
-          maxPostsPerSubreddit:
-            miningDepth === "advanced"
-              ? 400
-              : miningDepth === "deep"
-                ? 250
-                : 120, // Keep these high for actual results
-          processingLimit:
-            miningDepth === "advanced" ? 50 : miningDepth === "deep" ? 25 : 6,
-        }).catch((error) => {
-          console.error(
-            `Async mining run failed for scraper ${scraperId}:`,
-            error,
-          );
-        });
-
-        return {
-          success: true as const,
-          duplicate: false,
-          scraperId,
-          runId: null,
-          count: 0,
-          status: "running" as const,
-        };
-      } catch (error) {
-        throw error;
       }
+
+      // We'll create the scraper and first run metadata
+      await db.insert(scraper).values({
+        id: scraperId,
+        keywords: [keyword],
+        subreddits: targetSubreddits,
+        customPatterns: patterns,
+        miningDepth,
+        timeWindow,
+        userId,
+        workspaceId,
+        updatedAt: new Date(),
+        cost: calculateMiningCost(miningDepth),
+      });
+
+      void executeMiningRun({
+        scraperId,
+        keyword,
+        subreddits: targetSubreddits,
+        customPatterns: patterns,
+        miningDepth,
+        timeWindow,
+        userId,
+        workspaceId,
+        maxPostsPerSubreddit:
+          miningDepth === "advanced"
+            ? 400
+            : miningDepth === "deep"
+              ? 250
+              : 120, // Keep these high for actual results
+        processingLimit:
+          miningDepth === "advanced" ? 50 : miningDepth === "deep" ? 25 : 6,
+      }).catch((error) => {
+        console.error(
+          `Async mining run failed for scraper ${scraperId}:`,
+          error,
+        );
+      });
+
+      return {
+        success: true as const,
+        duplicate: false,
+        scraperId,
+        runId: null,
+        count: 0,
+        status: "running" as const,
+      };
     };
 
     const result = idempotencyKey
