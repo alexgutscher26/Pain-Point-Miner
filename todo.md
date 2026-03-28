@@ -497,6 +497,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Support hybrid search (keyword + semantic) natively via Pinecone's vector engine
   - [ ] _Acceptance:_ Latency for top-K similar pain point queries remains < 50ms even with 1M+ embeddings
 
+- [ ] **LLM Observability via Helicone.ai**
+  - [ ] Set up Helicone proxy gateway for all OpenRouter calls in `lib/ai.ts` and `lib/embeddings.ts`
+  - [ ] Add custom request properties for breakdown by `userId`, `scanId`, and `depth`
+  - [ ] Enable Helicone caching for redundant extraction calls to reduce unnecessary API spend
+  - [ ] _Acceptance:_ Real-time cost and latency tracking per scan is visible in the Helicone dashboard
+
 ---
 
 ## 💰 PHASE 5 — Revenue & Growth
