@@ -59,9 +59,26 @@ export async function POST(req: Request) {
     const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST";
     console.log(`[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`);
 
+    // Validate the stored customer ID against the current Stripe environment.
+    // It may be a stale Test-mode ID when running in Live mode (or vice versa).
+    let validCustomerId: string | undefined = session.user.stripeCustomerId || undefined;
+    if (validCustomerId) {
+      try {
+        const existing = await stripe.customers.retrieve(validCustomerId);
+        if ((existing as any).deleted) validCustomerId = undefined;
+      } catch (err: any) {
+        if (err.code === "resource_missing") {
+          console.warn(`[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`);
+          validCustomerId = undefined;
+        } else {
+          throw err;
+        }
+      }
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer: session.user.stripeCustomerId || undefined,
-      customer_email: session.user.stripeCustomerId ? undefined : session.user.email,
+      customer: validCustomerId,
+      customer_email: validCustomerId ? undefined : session.user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
       success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true`,
