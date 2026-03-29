@@ -31,52 +31,54 @@ export async function POST(req: Request) {
     let amount = 0;
 
     if (tier === "founder") {
-      priceId = process.env.STRIPE_PRICE_LTD_FOUNDER!;
+      priceId = process.env.STRIPE_PRICE_LTD_FOUNDER ?? "";
       amount = 149;
     } else if (tier === "professional") {
       if (currentUser?.ltdTier === "founder") {
-        // PRO-RATED UPGRADE
-        priceId = process.env.STRIPE_PRICE_LTD_UPGRADE!; // User must provide this $150 price
+        priceId = process.env.STRIPE_PRICE_LTD_UPGRADE ?? "";
         amount = 150;
       } else {
-        priceId = process.env.STRIPE_PRICE_LTD_PROFESSIONAL!;
+        priceId = process.env.STRIPE_PRICE_LTD_PROFESSIONAL ?? "";
         amount = 299;
       }
     }
 
     if (!priceId) {
+      const missing = tier === "founder"
+        ? "STRIPE_PRICE_LTD_FOUNDER"
+        : currentUser?.ltdTier === "founder"
+        ? "STRIPE_PRICE_LTD_UPGRADE"
+        : "STRIPE_PRICE_LTD_PROFESSIONAL";
+      console.error(`[LTD Checkout] Missing env var: ${missing}`);
       return NextResponse.json(
-        { message: `Stripe Price ID for ${tier} not configured.` },
+        { message: `Server misconfiguration: ${missing} is not set in .env.local` },
         { status: 500 }
       );
     }
 
+    const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST";
+    console.log(`[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`);
+
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: session.user.stripeCustomerId || undefined,
       customer_email: session.user.stripeCustomerId ? undefined : session.user.email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
       success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true`,
       cancel_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?canceled=true`,
       metadata: {
         userId: session.user.id,
         ltdTier: tier,
-        amountPaid: amount,
+        amountPaid: String(amount),
         type: "ltd_purchase",
       },
     });
 
     return NextResponse.json({ url: checkoutSession.url });
-  } catch (error) {
-    console.error("LTD Checkout Error:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    // Surface the real Stripe/server error message
+    const message = error?.message ?? "Internal server error";
+    console.error("[LTD Checkout Error]", message);
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
