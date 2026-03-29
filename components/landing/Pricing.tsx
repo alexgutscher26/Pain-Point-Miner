@@ -414,12 +414,16 @@ export function Pricing() {
         </div>
 
         {/* Rollover explanation */}
-        <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
+        <div className="mt-6 flex flex-col items-center gap-4 rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
+          <div className="flex items-center gap-3">
+            <span className="text-[14px] font-bold text-white">Upcoming: One-time Scan Refills</span>
+            <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-500">Coming Soon</span>
+          </div>
           <p className="text-[13px] font-medium text-zinc-400">
             <span className="font-bold text-white">How credits work:</span>{" "}
             Your monthly base resets every month on your signup anniversary — unused base credits{" "}
             <span className="font-bold text-amber-400">do not roll over</span>. But{" "}
-            <span className="font-bold text-white">purchased top-up credits</span> are permanent
+            <span className="font-bold text-white">purchased top-up credits</span> (coming soon) are permanent
             and roll over forever, used only after your monthly base is exhausted.
           </p>
         </div>

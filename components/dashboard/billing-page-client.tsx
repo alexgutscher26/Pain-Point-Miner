@@ -562,8 +562,11 @@ export function BillingPageClient({
             return (
               <div
                 key={pack.id}
-                className="group relative flex flex-col rounded-xl border border-white/5 bg-[#141414] p-6 transition-all hover:border-amber-400/20"
+                className="group relative flex flex-col rounded-xl border border-white/5 bg-[#141414] p-6 transition-all"
               >
+                <div className="absolute top-2 right-2 rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-500">
+                  Coming Soon
+                </div>
                 <h3 className="mb-1 text-[16px] font-bold text-white">{pack.name}</h3>
                 <div className="mb-4 flex items-baseline gap-1">
                   <span className="text-[24px] font-extrabold text-white">
@@ -586,11 +589,10 @@ export function BillingPageClient({
                 </div>
 
                 <button
-                  onClick={() => startTopupCheckout(pack.id)}
-                  disabled={loadingPackage === pack.id}
-                  className="mt-auto flex h-10 w-full items-center justify-center rounded-lg bg-white/5 text-[14px] font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
+                  disabled
+                  className="mt-auto flex h-10 w-full cursor-not-allowed items-center justify-center rounded-lg bg-white/5 text-[14px] font-bold text-zinc-500 transition-all"
                 >
-                  {loadingPackage === pack.id ? "Redirecting..." : "Buy Now"}
+                  Coming Soon
                 </button>
               </div>
             );
