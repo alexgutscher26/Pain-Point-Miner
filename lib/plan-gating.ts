@@ -1,13 +1,13 @@
 import { and, eq, gte, sql } from "drizzle-orm";
 import { startOfMonth } from "date-fns";
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
+import { scraper, scraperRun, userPreferences, purchasedCredits } from "@/lib/db/schema";
 import { MINING_PRESETS, type MiningDepth } from "./mining-presets";
 
 export { MINING_PRESETS };
 export type { MiningDepth };
 
-export type BillingPlan = "starter" | "growth" | "pro";
+export type BillingPlan = "starter" | "growth" | "pro" | "founder" | "professional";
 
 export type PlanEntitlements = {
   monthlyScans: number | null;
@@ -47,6 +47,24 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     hasSaasOpportunities: true,
     hasCustomPatterns: true,
   },
+  founder: {
+    monthlyScans: 30,
+    maxSubredditsPerSearch: 10,
+    allowedMiningDepths: ["basic", "deep"],
+    canSaveReports: true,
+    hasTrendDetection: false,
+    hasSaasOpportunities: false,
+    hasCustomPatterns: false,
+  },
+  professional: {
+    monthlyScans: 100,
+    maxSubredditsPerSearch: null,
+    allowedMiningDepths: ["basic", "deep", "advanced"],
+    canSaveReports: true,
+    hasTrendDetection: true,
+    hasSaasOpportunities: true,
+    hasCustomPatterns: true,
+  },
 };
 
 export function calculateMiningCost(depth: MiningDepth): number {
@@ -62,6 +80,8 @@ const PLAN_ORDER: Record<BillingPlan, number> = {
   starter: 1,
   growth: 2,
   pro: 3,
+  founder: 4,
+  professional: 5,
 };
 
 type SubscriptionLike = {
@@ -122,6 +142,7 @@ export function resolvePlanForIdentity(input: {
   userId: string;
   email?: string | null;
   subscriptions?: SubscriptionLike[];
+  ltdTier?: string | null;
 }) {
   const defaultPlan = normalizeBillingPlan(process.env.DEFAULT_BILLING_PLAN);
   const overrides = parsePlanOverrides(process.env.BILLING_PLAN_OVERRIDES_JSON);
@@ -130,6 +151,10 @@ export function resolvePlanForIdentity(input: {
     ? overrides[input.userId.trim().toLowerCase()]
     : undefined;
   if (byUserId) return byUserId;
+
+  // Prioritize LTD Tiers if user has one
+  if (input.ltdTier === "founder") return "founder";
+  if (input.ltdTier === "professional") return "professional";
 
   const email = input.email?.trim().toLowerCase();
   const byEmail = email ? overrides[email] : undefined;
@@ -163,8 +188,40 @@ export function resolvePlanForIdentity(input: {
   );
 }
 
+export async function getAnniversaryDate(userId: string) {
+  const result = await db
+    .select({ anniversaryDate: userPreferences.anniversaryDate })
+    .from(userPreferences)
+    .where(eq(userPreferences.userId, userId));
+  return result[0]?.anniversaryDate ?? null;
+}
+
+export async function getPurchasedCreditsBalance(userId: string) {
+  const result = await db
+    .select({ amount: purchasedCredits.amount })
+    .from(purchasedCredits)
+    .where(eq(purchasedCredits.userId, userId));
+  return result[0]?.amount ?? 0;
+}
+
 export async function getMonthlyScanUsage(userId: string, now = new Date()) {
-  const fromDate = startOfMonth(now);
+  let fromDate = startOfMonth(now);
+
+  const anniversary = await getAnniversaryDate(userId);
+  if (anniversary) {
+    const day = anniversary.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const currentAnniversary = new Date(year, month, day);
+    
+    // If today is before this month's anniversary, the period started last month
+    if (now < currentAnniversary) {
+      fromDate = new Date(year, month - 1, day);
+    } else {
+      fromDate = currentAnniversary;
+    }
+  }
+
   const result = await db
     .select({ total: sql<number>`COALESCE(SUM(${scraperRun.cost}), 0)` })
     .from(scraperRun)
@@ -173,6 +230,23 @@ export async function getMonthlyScanUsage(userId: string, now = new Date()) {
       and(eq(scraper.userId, userId), gte(scraperRun.startedAt, fromDate)),
     );
   return Number(result[0]?.total ?? 0);
+}
+
+export async function getCreditSummary(userId: string, plan: BillingPlan) {
+  const used = await getMonthlyScanUsage(userId);
+  const purchased = await getPurchasedCreditsBalance(userId);
+  const limit = PLAN_ENTITLEMENTS[plan].monthlyScans;
+
+  const baseRemaining = limit === null ? null : Math.max(limit - used, 0);
+  const totalRemaining = baseRemaining === null ? null : baseRemaining + purchased;
+
+  return {
+    monthlyUsed: used,
+    monthlyLimit: limit,
+    monthlyRemaining: baseRemaining,
+    purchasedRemaining: purchased,
+    totalRemaining,
+  };
 }
 
 export function getMonthlyUsageSummary(

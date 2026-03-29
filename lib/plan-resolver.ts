@@ -75,11 +75,20 @@ export async function resolvePlanContext(input: {
   email?: string | null;
   requestHeaders: HeadersInit;
 }): Promise<ResolvedPlanContext> {
+  const currentUser = await db.query.user.findFirst({
+    where: eq(user.id, input.userId),
+    columns: {
+      createdAt: true,
+      ltdTier: true,
+    },
+  });
+
   const subscriptions = await loadSubscriptions(input.requestHeaders);
   const resolvedPlan = resolvePlanForIdentity({
     userId: input.userId,
     email: input.email,
     subscriptions,
+    ltdTier: currentUser?.ltdTier,
   });
   const hasActiveSubscription = subscriptions.some((subscription) =>
     ["active", "trialing", "past_due"].includes(
@@ -93,31 +102,18 @@ export async function resolvePlanContext(input: {
   const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED !== "false";
   const requirePaidAfterTrial =
     process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
+  
   const baseResolutionInput = {
     resolvedPlan,
     hasActiveSubscription,
     localTrialDays,
     localTrialEnabled,
     requirePaidAfterTrial,
+    userCreatedAt: currentUser?.createdAt ?? null,
+    ltdTier: currentUser?.ltdTier,
   };
 
-  try {
-    const currentUser = await db.query.user.findFirst({
-      where: eq(user.id, input.userId),
-      columns: {
-        createdAt: true,
-      },
-    });
-    return resolvePlanAccessState({
-      ...baseResolutionInput,
-      userCreatedAt: currentUser?.createdAt ?? null,
-    });
-  } catch {
-    return resolvePlanAccessState({
-      ...baseResolutionInput,
-      userCreatedAt: null,
-    });
-  }
+  return resolvePlanAccessState(baseResolutionInput);
 }
 
 export function resolvePlanAccessState({
@@ -128,15 +124,17 @@ export function resolvePlanAccessState({
   localTrialEnabled = true,
   localTrialDays = 3,
   requirePaidAfterTrial = true,
-}: PlanContextResolutionInput): ResolvedPlanContext {
+  ltdTier = "none",
+}: PlanContextResolutionInput & { ltdTier?: string | null }): ResolvedPlanContext {
   const defaultContext: ResolvedPlanContext = {
     plan: resolvedPlan,
     hasActiveSubscription,
     trialActive: false,
     planPurchaseRequired:
       requirePaidAfterTrial &&
-      resolvedPlan === "starter" &&
-      !hasActiveSubscription,
+      (resolvedPlan === "starter" || (resolvedPlan as string) === "none") &&
+      !hasActiveSubscription &&
+      (!ltdTier || ltdTier === "none"),
     trialEndsAt: null,
     trialDaysRemaining: null,
   };

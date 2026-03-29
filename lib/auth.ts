@@ -58,6 +58,9 @@ export const auth = betterAuth({
       anonymizeRedditUsernames: { type: "boolean" },
       deletedAt: { type: "date" },
       role: { type: "string" },
+      ltdTier: { type: "string" },
+      ltdPricePaid: { type: "number" },
+      stripeCustomerId: { type: "string" },
     },
   },
   emailAndPassword: {

@@ -13,6 +13,7 @@ import {
   subscription,
   user,
   userPreferences,
+  purchasedCredits,
   workspace,
   workspaceMember,
 } from "./schema";
@@ -194,6 +195,16 @@ export const painPointFeedbackRelations = relations(
     }),
     user: one(user, {
       fields: [painPointFeedback.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
+export const purchasedCreditsRelations = relations(
+  purchasedCredits,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [purchasedCredits.userId],
       references: [user.id],
     }),
   }),

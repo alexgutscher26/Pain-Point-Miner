@@ -21,6 +21,8 @@ export const scraperStatus = pgEnum("ScraperStatus", [
   "error",
 ]);
 
+export const ltdTier = pgEnum("LtdTier", ["none", "founder", "professional"]);
+
 export const verification = pgTable("verification", {
   id: text().primaryKey().notNull(),
   identifier: text().notNull(),
@@ -46,6 +48,8 @@ export const user = pgTable(
     anonymizeRedditUsernames: boolean().default(false).notNull(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
     role: text().default("user").notNull(),
+    ltdTier: ltdTier().default("none").notNull(),
+    ltdPricePaid: doublePrecision().default(0),
   },
   (table) => [
     uniqueIndex("user_email_key").using(
@@ -230,6 +234,7 @@ export const userPreferences = pgTable(
     defaultAiModel: text().default("google/gemini-2.0-flash-001").notNull(),
     emailNotifications: boolean().default(true).notNull(),
     timezone: text(),
+    anniversaryDate: timestamp({ precision: 3, mode: "date" }),
     dashboardLayout: jsonb(),
     scoringWeights: jsonb().$type<{
       w1: number; // painIntensity
@@ -729,5 +734,28 @@ export const painPointFeedback = pgTable(
       table.painPointId,
       table.userId,
     ),
+  ],
+);
+
+export const purchasedCredits = pgTable(
+  "purchased_credits",
+  {
+    id: text().primaryKey().notNull(),
+    userId: text().notNull(),
+    amount: integer().default(0).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "purchased_credits_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    uniqueIndex("purchased_credits_userId_key").on(table.userId),
   ],
 );

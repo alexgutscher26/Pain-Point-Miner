@@ -19,10 +19,13 @@ type BillingPageClientProps = {
   trialDaysRemaining: number | null;
   entitlements: PlanEntitlements;
   usage: {
-    monthlyScansUsed: number;
-    monthlyScansLimit: number | null;
-    monthlyScansRemaining: number | null;
+    monthlyUsed: number;
+    monthlyLimit: number | null;
+    monthlyRemaining: number | null;
+    purchasedRemaining: number;
+    totalRemaining: number | null;
   };
+  ltdTier?: string | null;
 };
 
 type BillingActionState = {
@@ -34,6 +37,7 @@ export function BillingPageClient({
   stripeConfigured,
   availablePlans,
   plan,
+  ltdTier,
   planPurchaseRequired,
   trialActive,
   trialEndsAt,
@@ -93,6 +97,44 @@ export function BillingPageClient({
       });
     } finally {
       setOpeningPortal(false);
+    }
+  }
+
+  async function startLtdCheckout(targetTier: "founder" | "professional") {
+    if (!stripeConfigured) {
+      return;
+    }
+
+    setStartingCheckoutPlan(targetTier as any);
+    setActionState(null);
+
+    try {
+      const res = await fetch("/api/billing/create-ltd-checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tier: targetTier }),
+      });
+
+      const data = (await res.json()) as { url?: string; message?: string };
+
+      if (!res.ok) {
+        throw new Error(data?.message ?? "Unable to start LTD checkout.");
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      throw new Error("Checkout URL was not returned.");
+    } catch (error) {
+      console.error("Error starting LTD checkout:", error);
+      setActionState({
+        type: "error",
+        message: error instanceof Error ? error.message : "Unable to start LTD checkout.",
+      });
+    } finally {
+      setStartingCheckoutPlan(null);
     }
   }
 
@@ -273,6 +315,86 @@ export function BillingPageClient({
         </div>
       ) : null}
 
+      {/* LTD SECTION */}
+      <div className="relative overflow-hidden border-2 border-amber-400/30 bg-linear-to-br from-[#111] to-[#16130a] p-8 shadow-[5px_5px_0px_0px_rgba(251,191,36,0.1)]">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <CreditCard className="h-24 w-24 rotate-12" />
+        </div>
+        <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center">
+          <div className="flex-1">
+            <p className="mb-2 font-mono text-[11px] font-black tracking-[0.3em] text-amber-400 uppercase">
+              Early Believer Offer
+            </p>
+            <h3 className="mb-4 text-3xl font-black tracking-tight text-white uppercase">
+              Lifetime Deals
+            </h3>
+            <p className="max-w-xl text-sm leading-relaxed text-zinc-400">
+              One-time payment for lifetime access. Support early development and
+              avoid recurring fees forever. Includes monthly recurring base
+              credits plus heavily discounted top-up rates.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {/* FOUNDER LTD */}
+            <div className="flex flex-col border border-white/5 bg-black/40 p-5">
+              <span className="mb-1 font-mono text-[10px] text-amber-500 uppercase">
+                Tier 1
+              </span>
+              <span className="mb-3 text-lg font-bold text-white">
+                Founder LTD
+              </span>
+              <span className="mb-4 text-3xl font-black text-white">$149</span>
+              <ul className="mb-6 space-y-2 text-xs text-zinc-400">
+                <li>✓ 30 scans / month</li>
+                <li>✓ Subreddit heatmaps</li>
+                <li>✓ Basic + Deep extraction</li>
+                <li>✓ 20% credit top-up discount</li>
+              </ul>
+              <button
+                type="button"
+                onClick={() => startLtdCheckout("founder")}
+                disabled={ltdTier === "founder" || ltdTier === "professional"}
+                className="inline-flex justify-center border-2 border-amber-400 px-4 py-2 font-mono text-xs font-bold text-amber-400 uppercase transition-all hover:bg-amber-400 hover:text-black disabled:opacity-30"
+              >
+                {(ltdTier === "founder" || ltdTier === "professional")
+                  ? "Owned"
+                  : "Buy Founder LTD"}
+              </button>
+            </div>
+            {/* PRO FOUNDER LTD */}
+            <div className="flex flex-col border border-amber-400 bg-amber-400/5 p-5">
+              <span className="mb-1 font-mono text-[10px] text-amber-500 uppercase">
+                Tier 2
+              </span>
+              <span className="mb-3 text-lg font-bold text-white">
+                Professional LTD
+              </span>
+              <span className="mb-4 text-3xl font-black text-white">
+                {ltdTier === "founder" ? "$150" : "$299"}
+              </span>
+              <ul className="mb-6 space-y-2 text-xs text-zinc-400">
+                <li>✓ 100 scans / month</li>
+                <li>✓ Advanced AI depth</li>
+                <li>✓ Trend Velocity engine</li>
+                <li>✓ 40% credit top-up discount</li>
+              </ul>
+              <button
+                type="button"
+                onClick={() => startLtdCheckout("professional")}
+                disabled={ltdTier === "professional"}
+                className="inline-flex justify-center bg-amber-400 px-4 py-2 font-mono text-xs font-bold text-black uppercase transition-all hover:bg-amber-500 disabled:opacity-30"
+              >
+                {ltdTier === "professional"
+                  ? "Active"
+                  : ltdTier === "founder"
+                    ? "Upgrade to Pro"
+                    : "Buy Professional LTD"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="border-2 border-white/15 bg-[#111] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)] lg:col-span-2">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-white">
@@ -307,30 +429,55 @@ export function BillingPageClient({
           <h3 className="text-lg font-black text-white">Current Access</h3>
           <p className="text-2xl font-black text-[#ff4500] uppercase">
             {planPurchaseRequired ? "Read Only" : plan}
+            {ltdTier && ltdTier !== "none" && (
+              <span className="ml-2 inline-block rounded-full bg-linear-to-r from-amber-400 to-amber-600 px-2 py-0.5 text-[10px] text-black">
+                {ltdTier === "founder" ? "FOUNDER ✨" : "PRO FOUNDER 💎"}
+              </span>
+            )}
           </p>
           <div className="space-y-2 font-mono text-sm text-zinc-400">
-            <p>
+            <p className="border-b border-white/5 pb-1">
               Status:{" "}
-              <span className="font-bold text-white">
-                {planPurchaseRequired
-                  ? "Plan inactive"
-                  : trialActive
-                    ? "Free trial"
-                    : "Active plan"}
+              <span className="font-bold text-white uppercase">
+                {ltdTier && ltdTier !== "none"
+                  ? "Lifetime access"
+                  : planPurchaseRequired
+                    ? "Plan inactive"
+                    : trialActive
+                      ? "Free trial"
+                      : "Active plan"}
               </span>
             </p>
-            <p>
-              Scans this month:{" "}
-              <span className="font-bold text-white">
-                {planPurchaseRequired
-                  ? "Read only"
-                  : `${usage.monthlyScansUsed}${
-                      usage.monthlyScansLimit === null
-                        ? ""
-                        : ` / ${usage.monthlyScansLimit}`
-                    }`}
-              </span>
-            </p>
+            <div className="pt-2">
+              <p className="mb-1 text-[10px] tracking-widest text-[#ff4500] uppercase">
+                Credit Meter
+              </p>
+              <div className="space-y-1">
+                <p className="flex justify-between">
+                  <span>Monthly Base:</span>
+                  <span className="font-bold text-white">
+                    {usage.monthlyUsed} / {usage.monthlyLimit ?? "∞"}
+                  </span>
+                </p>
+                <div className="h-1 w-full bg-white/5">
+                  <div
+                    className="h-full bg-white"
+                    style={{
+                      width: `${Math.min(
+                        (usage.monthlyUsed / (usage.monthlyLimit ?? 100)) * 100,
+                        100,
+                      )}%`,
+                    }}
+                  />
+                </div>
+                <p className="flex justify-between pt-1">
+                  <span>Permanent (Rollover):</span>
+                  <span className="font-bold text-amber-400">
+                    {usage.purchasedRemaining}
+                  </span>
+                </p>
+              </div>
+            </div>
             <p>
               Max subreddits/search:{" "}
               <span className="font-bold text-white">

@@ -5,7 +5,7 @@ import { BillingPageClient } from "@/components/dashboard/billing-page-client";
 import {
   type BillingPlan,
   getMonthlyScanUsage,
-  getMonthlyUsageSummary,
+  getCreditSummary,
   getPlanEntitlements,
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
@@ -65,24 +65,22 @@ export default async function BillingPage() {
     email: session.user.email,
     requestHeaders,
   });
-  const plan = planContext.plan;
-  const entitlements = getPlanEntitlements(plan);
-  const usage = getMonthlyUsageSummary(
-    plan,
-    await getMonthlyScanUsage(session.user.id),
-  );
+  const currentPlan = planContext.plan;
+  const entitlements = getPlanEntitlements(currentPlan);
+  const creditSummary = await getCreditSummary(session.user.id, currentPlan);
 
   return (
     <BillingPageClient
       stripeConfigured={stripeConfigured}
       availablePlans={availablePlans}
-      plan={plan}
+      plan={currentPlan}
+      ltdTier={session.user.ltdTier}
       planPurchaseRequired={planContext.planPurchaseRequired}
       trialActive={planContext.trialActive}
       trialEndsAt={planContext.trialEndsAt?.toISOString() ?? null}
       trialDaysRemaining={planContext.trialDaysRemaining}
       entitlements={entitlements}
-      usage={usage}
+      usage={creditSummary}
     />
   );
 }
