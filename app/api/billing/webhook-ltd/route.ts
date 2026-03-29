@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { db } from "@/lib/db";
-import { user, userPreferences } from "@/lib/db/schema";
+import { user, userPreferences, purchasedCredits } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -26,38 +26,56 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { userId, ltdTier, amountPaid, type } = session.metadata || {};
+    const type = session.metadata?.type as string;
+    const userId = session.metadata?.userId as string;
 
-    if (type === "ltd_purchase" && userId && ltdTier) {
-      // 1. Update User LTD Tier
+    if (!userId) return NextResponse.json({ received: true });
+
+    if (type === "ltd_purchase") {
+      const tier = session.metadata?.ltdTier as "founder" | "professional";
+      const amountPaid = parseFloat(session.metadata?.amountPaid || "0");
+
+      console.log(`[Webhook-LTD] Processing tier upgrade for ${userId} to ${tier}`);
+
       await db
         .update(user)
         .set({
-          ltdTier: ltdTier as "founder" | "professional",
-          ltdPricePaid: Number(amountPaid),
+          ltdTier: tier,
+          ltdPricePaid: amountPaid,
+          stripeCustomerId: session.customer as string,
         })
         .where(eq(user.id, userId));
+    } else if (type === "credit_topup") {
+      const credits = parseInt(session.metadata?.credits || "0");
+      console.log(`[Webhook-LTD] Processing credit top-up for ${userId}: +${credits}`);
 
-      // 2. Set Anniversary Date if not already set
-      const existingPrefs = await db.query.userPreferences.findFirst({
-        where: eq(userPreferences.userId, userId),
-      });
+      await db
+        .insert(purchasedCredits)
+        .values({
+          id: crypto.randomUUID(),
+          userId,
+          amount: credits,
+          updatedAt: new Date(),
+        });
+    }
 
-      if (!existingPrefs?.anniversaryDate) {
-        await db
-          .insert(userPreferences)
-          .values({
-            id: crypto.randomUUID(),
-            userId,
-            anniversaryDate: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: userPreferences.userId,
-            set: { anniversaryDate: new Date() },
-          });
-      }
+    // Shared Anniversary Logic
+    const existingPrefs = await db.query.userPreferences.findFirst({
+      where: eq(userPreferences.userId, userId),
+    });
 
-      console.log(`LTD ${ltdTier} activated for user ${userId}`);
+    if (!existingPrefs?.anniversaryDate) {
+      await db
+        .insert(userPreferences)
+        .values({
+          id: crypto.randomUUID(),
+          userId,
+          anniversaryDate: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: userPreferences.userId,
+          set: { anniversaryDate: new Date() },
+        });
     }
   }
 

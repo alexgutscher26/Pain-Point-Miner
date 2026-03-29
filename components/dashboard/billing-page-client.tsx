@@ -48,10 +48,13 @@ export function BillingPageClient({
   const [openingPortal, setOpeningPortal] = useState(false);
   const [startingCheckoutPlan, setStartingCheckoutPlan] =
     useState<BillingPlan | null>(null);
+  const [loadingPackage, setLoadingPackage] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">(
     "monthly",
   );
   const [actionState, setActionState] = useState<BillingActionState>(null);
+
+  const displayLtdTier = ltdTier || "none";
 
   async function openBillingPortal() {
     if (!stripeConfigured) {
@@ -135,6 +138,29 @@ export function BillingPageClient({
       });
     } finally {
       setStartingCheckoutPlan(null);
+    }
+  }
+
+  async function startTopupCheckout(packId: string) {
+    if (!stripeConfigured) return;
+    setLoadingPackage(packId);
+    try {
+      const res = await fetch("/api/billing/create-credit-checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ pack: packId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message ?? "Unable to start checkout.");
+      if (data?.url) window.location.href = data.url;
+    } catch (error) {
+      console.error("Top-up Error:", error);
+      setActionState({
+        type: "error",
+        message: error instanceof Error ? error.message : "Unable to purchase credits.",
+      });
+    } finally {
+      setLoadingPackage(null);
     }
   }
 
@@ -506,6 +532,71 @@ export function BillingPageClient({
           </div>
         </div>
       </div>
+      {/* ── CREDIT TOP-UPS ── */}
+      <section className="mt-12 w-full">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-[20px] font-extrabold text-[#f4f4f5]">
+              Buy More Scans
+            </h2>
+            <p className="text-[14px] font-medium text-zinc-400">
+              Permanent rollover credits. Never expire.
+            </p>
+          </div>
+          {displayLtdTier !== "none" && (
+            <div className="rounded-full bg-amber-400/10 px-4 py-1.5 text-[12px] font-bold text-amber-400">
+              {displayLtdTier === "professional" ? "Professional (40% OFF)" : "Founder (20% OFF)"}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { id: "starter", name: "Starter Pack", scans: 50, price: 19 },
+            { id: "pro", name: "Pro Pack", scans: 250, price: 79 },
+            { id: "elite", name: "Elite Pack", scans: 1000, price: 249 },
+          ].map((pack) => {
+            const discount = displayLtdTier === "professional" ? 0.4 : displayLtdTier === "founder" ? 0.2 : 0;
+            const finalPrice = Math.round(pack.price * (1 - discount));
+
+            return (
+              <div
+                key={pack.id}
+                className="group relative flex flex-col rounded-xl border border-white/5 bg-[#141414] p-6 transition-all hover:border-amber-400/20"
+              >
+                <h3 className="mb-1 text-[16px] font-bold text-white">{pack.name}</h3>
+                <div className="mb-4 flex items-baseline gap-1">
+                  <span className="text-[24px] font-extrabold text-white">
+                    {pack.scans}
+                  </span>
+                  <span className="text-[12px] font-medium text-zinc-500">
+                    scans
+                  </span>
+                </div>
+
+                <div className="mb-6 flex items-baseline gap-1.5">
+                  <span className="text-[28px] font-black text-white">
+                    ${finalPrice}
+                  </span>
+                  {discount > 0 && (
+                    <span className="text-[14px] font-medium text-zinc-500 line-through">
+                      ${pack.price}
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => startTopupCheckout(pack.id)}
+                  disabled={loadingPackage === pack.id}
+                  className="mt-auto flex h-10 w-full items-center justify-center rounded-lg bg-white/5 text-[14px] font-bold text-white transition-all hover:bg-white/10 disabled:opacity-50"
+                >
+                  {loadingPackage === pack.id ? "Redirecting..." : "Buy Now"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

@@ -746,7 +746,9 @@ export const purchasedCredits = pgTable(
     createdAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => [
     foreignKey({
@@ -756,6 +758,6 @@ export const purchasedCredits = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-    uniqueIndex("purchased_credits_userId_key").on(table.userId),
+    index("purchased_credits_userId_idx").on(table.userId),
   ],
 );
