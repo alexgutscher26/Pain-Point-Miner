@@ -82,6 +82,28 @@ function formatSentiment(sentiment: string | null) {
   if (!sentiment) return "Unknown sentiment";
   return sentiment.charAt(0).toUpperCase() + sentiment.slice(1);
 }
+function formatDifficulty(difficulty: string | null) {
+  const map: Record<string, { label: string; color: string }> = {
+    weekend_project: {
+      label: "Weekend Project",
+      color: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
+    },
+    side_project: {
+      label: "Side Project",
+      color: "border-amber-500/20 bg-amber-500/10 text-amber-500",
+    },
+    startup_mvp: {
+      label: "Startup MVP",
+      color: "border-orange-500/20 bg-orange-500/10 text-orange-500",
+    },
+    vc_scale_moat: {
+      label: "VC-Scale Moat",
+      color:
+        "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]",
+    },
+  };
+  return map[difficulty || "weekend_project"] || map.weekend_project;
+}
 
 function CommunityPainPointCard({
   painPoint,
@@ -101,6 +123,15 @@ function CommunityPainPointCard({
             <span>{formatUrgency(painPoint.urgency)}</span>
             <span className="h-1 w-1 bg-zinc-700" />
             <span>{formatSentiment(painPoint.sentiment)}</span>
+            <span className="h-1 w-1 bg-zinc-700" />
+            {(() => {
+              const { label, color } = formatDifficulty(painPoint.difficulty);
+              return (
+                <span className={`rounded-lg border px-1.5 py-0.5 ${color}`}>
+                  {label}
+                </span>
+              );
+            })()}
             <span className="h-1 w-1 bg-zinc-700" />
             <span>{Math.max(0, painPoint.mentionCount ?? 0)} mentions</span>
           </div>

@@ -73,6 +73,7 @@ interface PainPoint {
   } | null;
   switchingCosts?: string;
   triedSolutions?: string[];
+  difficulty: "weekend_project" | "side_project" | "startup_mvp" | "vc_scale_moat";
 }
 
 interface ReportData {
@@ -294,6 +295,28 @@ function formatStageValue(maturity?: number) {
   }
 
   return "Scaling";
+}
+function formatDifficulty(difficulty: PainPoint["difficulty"]) {
+  const map: Record<PainPoint["difficulty"], { label: string; color: string }> = {
+    weekend_project: {
+      label: "Weekend Project",
+      color: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
+    },
+    side_project: {
+      label: "Side Project",
+      color: "border-amber-500/20 bg-amber-500/10 text-amber-500",
+    },
+    startup_mvp: {
+      label: "Startup MVP",
+      color: "border-orange-500/20 bg-orange-500/10 text-orange-500",
+    },
+    vc_scale_moat: {
+      label: "VC-Scale Moat",
+      color:
+        "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]",
+    },
+  };
+  return map[difficulty] || map.weekend_project;
 }
 
 function normalizeKeyword(input: string) {
@@ -932,6 +955,16 @@ export default function ReportDetailPage() {
                       >
                         {pain.urgency}
                       </span>
+                      {(() => {
+                        const { label, color } = formatDifficulty(pain.difficulty);
+                        return (
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${color}`}
+                          >
+                            {label}
+                          </span>
+                        );
+                      })()}
                       {pain.hasWillingnessToPay && (
                         <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black tracking-widest text-emerald-300 uppercase">
                           💰 Willingness to Pay

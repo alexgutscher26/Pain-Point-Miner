@@ -523,6 +523,7 @@ export async function processSinglePost({
       postUrl: post.url,
       author: anonymize ? "[Anonymized]" : post.author,
       sentiment: point.sentiment,
+      difficulty: point.difficulty,
       commentCount: comments.length,
       mentionCount: 1,
       workspaceId,

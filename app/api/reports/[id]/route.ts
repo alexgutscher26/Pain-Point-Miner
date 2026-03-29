@@ -155,6 +155,7 @@ interface DBPainPoint {
   budget?: BudgetSignal[] | string | null;
   switchingCosts?: string;
   triedSolutions?: string[];
+  difficulty?: string;
   painPointCluster?: {
     id: string;
     estimatedTamUsdAnnual: number | null;
@@ -502,6 +503,7 @@ export async function GET(
             : null,
           switchingCosts: pp.switchingCosts,
           triedSolutions: pp.triedSolutions || [],
+          difficulty: pp.difficulty || "weekend_project",
           communityVoices:
             (pp.painPointComments ?? [])
               .map((comment) => cleanQuote(comment.body))

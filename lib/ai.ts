@@ -23,6 +23,11 @@ export interface PainPointData {
   switchingCosts?: string;
   triedSolutions: string[];
   sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
+  difficulty:
+    | "weekend_project"
+    | "side_project"
+    | "startup_mvp"
+    | "vc_scale_moat";
   url: string;
   author: string;
   subreddit: string;
@@ -117,6 +122,11 @@ Scoring rubric:
   4-6 = some solutions likely exist, but problem still feels open
   7-8 = established category with visible dissatisfaction
   9-10 = crowded market with many known alternatives
+- difficulty:
+  weekend_project = 1–2 days, no integrations, simple CRUD; e.g., a browser extension
+  side_project = 1–2 weeks, 1–2 third-party integrations; e.g., a simple SaaS dashboard
+  startup_mvp = 1–3 months, auth + billing + complex domain logic; e.g., an analytics platform
+  vc_scale_moat = 6+ months, network effects, regulatory complexity (HIPAA, SOC2), data moat required
 
 Field rules:
 - title: 4-10 words, specific, no hype
@@ -152,7 +162,8 @@ Return only valid JSON matching:
       ],
       "switchingCosts": "",
       "triedSolutions": [],
-      "sentiment": "frustrated"
+      "sentiment": "frustrated",
+      "difficulty": "side_project"
     }
   ]
 }`;
@@ -245,6 +256,11 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       switchingCosts?: string;
       triedSolutions?: string[];
       sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
+      difficulty:
+        | "weekend_project"
+        | "side_project"
+        | "startup_mvp"
+        | "vc_scale_moat";
     }
 
     const rawPainPoints: RawPainPoint[] = Array.isArray(parsed)

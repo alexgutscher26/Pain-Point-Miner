@@ -12,6 +12,7 @@ export type CommunityPainPointRow = {
   commentCount: number | null;
   subreddit: string;
   label: string;
+  difficulty: string | null;
 };
 
 export type SubredditCommunityNode = {
@@ -35,6 +36,7 @@ type CommunityMapSourceRow = {
   commentCount: number | null;
   subreddit: string | null;
   subredditDisplayName?: string | null;
+  difficulty?: string | null;
 };
 
 function roundToNearestInt(value: number) {
@@ -70,6 +72,7 @@ function toCommunityPainPointRow(
     commentCount: row.commentCount ?? 0,
     subreddit: normalizedSubreddit,
     label: `r/${normalizedSubreddit}`,
+    difficulty: row.difficulty ?? "weekend_project",
   };
 }
 

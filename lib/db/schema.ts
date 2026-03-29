@@ -22,6 +22,12 @@ export const scraperStatus = pgEnum("ScraperStatus", [
 ]);
 
 export const ltdTier = pgEnum("LtdTier", ["none", "founder", "professional"]);
+export const painPointDifficulty = pgEnum("PainPointDifficulty", [
+  "weekend_project",
+  "side_project",
+  "startup_mvp",
+  "vc_scale_moat",
+]);
 
 export const verification = pgTable("verification", {
   id: text().primaryKey().notNull(),
@@ -538,6 +544,7 @@ export const painPoint = pgTable(
     clusterId: text(),
     clusterSimilarity: doublePrecision(),
     scoreExplanation: text(),
+    difficulty: painPointDifficulty().default("weekend_project"),
   },
   (table) => [
     index("pain_point_userId_clusterId_createdAt_idx").using(
