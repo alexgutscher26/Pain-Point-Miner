@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Magnet, RotateCw } from "lucide-react";
+import { ArrowRight, Check, Magnet, RotateCw, Zap } from "lucide-react";
 
 export function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
@@ -414,19 +414,17 @@ export function Pricing() {
         </div>
 
         {/* Rollover explanation */}
-        <div className="mt-6 flex flex-col items-center gap-4 rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
-          <div className="flex items-center gap-3">
-            <span className="text-[14px] font-bold text-white">Upcoming: One-time Scan Refills</span>
-            <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-500">Coming Soon</span>
+          <div className="mt-12 flex w-full max-w-2xl items-center gap-4 rounded-xl border border-white/5 bg-[#141414] p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-400/10 text-amber-400">
+              <Zap className="h-5 w-5 fill-current" />
+            </div>
+            <div className="flex flex-1 flex-col">
+              <span className="text-[14px] font-bold text-white">Buy More, Save More</span>
+              <p className="text-[13px] font-medium text-zinc-400">
+                Need more than your monthly allowance? Purchase permanent rollover scans with your exclusive 20/40% LTD discount.
+              </p>
+            </div>
           </div>
-          <p className="text-[13px] font-medium text-zinc-400">
-            <span className="font-bold text-white">How credits work:</span>{" "}
-            Your monthly base resets every month on your signup anniversary — unused base credits{" "}
-            <span className="font-bold text-amber-400">do not roll over</span>. But{" "}
-            <span className="font-bold text-white">purchased top-up credits</span> (coming soon) are permanent
-            and roll over forever, used only after your monthly base is exhausted.
-          </p>
-        </div>
       </div>
 
       <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
