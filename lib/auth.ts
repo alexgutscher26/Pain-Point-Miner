@@ -171,7 +171,19 @@ export const auth = betterAuth({
         ]
       : []),
   ],
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          const { syncUserToLoops } = await import("./loops/service");
+          await syncUserToLoops(user.email, user.name || undefined);
+        },
+      },
+    },
+  },
   hooks: {
+
     before: createAuthMiddleware(async (ctx) => {
       // Satisfy async contract for BetterAuth types
       await Promise.resolve();

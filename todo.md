@@ -198,16 +198,16 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] "Generate Build Plan" button in report detail page for lower-scoring opportunities (on demand)
   - [ ] _Acceptance:_ Top-scoring opportunity has a complete build plan within 30s of report finalization
 
-- [ ] **Build Difficulty Estimation**
-  - [ ] AI classifies each opportunity into 4 tiers based on complexity signals
-  - [ ] `Weekend Project` — 1–2 days, no integrations, simple CRUD; e.g., a browser extension
-  - [ ] `Side Project` — 1–2 weeks, 1–2 third-party integrations; e.g., a simple SaaS dashboard
-  - [ ] `Startup MVP` — 1–3 months, auth + billing + complex domain logic; e.g., an analytics platform
-  - [ ] `VC-Scale Moat` — 6+ months, network effects, regulatory complexity, data moat required
-  - [ ] Store in `opportunity.difficulty` (enum field)
-  - [ ] AI factors: number of integrations in `triedSolutions`, regulatory keywords ("HIPAA", "SOC2"), network effect signals, data moat requirements
-  - [ ] Show difficulty badge with color coding: green / yellow / orange / red
-  - [ ] _Acceptance:_ "I need a HIPAA-compliant patient management app" scores as `Startup MVP` or higher
+- [x] **Build Difficulty Estimation**
+  - [x] AI classifies each opportunity into 4 tiers based on complexity signals
+  - [x] `Weekend Project` — 1–2 days, no integrations, simple CRUD; e.g., a browser extension
+  - [x] `Side Project` — 1–2 weeks, 1–2 third-party integrations; e.g., a simple SaaS dashboard
+  - [x] `Startup MVP` — 1–3 months, auth + billing + complex domain logic; e.g., an analytics platform
+  - [x] `VC-Scale Moat` — 6+ months, network effects, regulatory complexity, data moat required
+  - [x] Store in `opportunity.difficulty` (enum field)
+  - [x] AI factors: number of integrations in `triedSolutions`, regulatory keywords ("HIPAA", "SOC2"), network effect signals, data moat requirements
+  - [x] Show difficulty badge with color coding: green / yellow / orange / red
+  - [x] _Acceptance:_ "I need a HIPAA-compliant patient management app" scores as `Startup MVP` or higher
 
 - [ ] **Competitor Intel Engine**
   - [ ] Collect all `triedSolutions` strings across pain points in a cluster

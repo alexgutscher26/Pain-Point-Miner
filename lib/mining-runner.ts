@@ -375,9 +375,21 @@ export async function executeMiningRun({
         commentsFetched,
         newPainPoints,
       })
+
       .where(eq(scraperRun.id, runId));
 
+    if (userRecord?.email) {
+      const { sendLoopsEvent } = await import("./loops/service");
+      await sendLoopsEvent(userRecord.email, "report_ready", {
+        keyword,
+        runId,
+        newPainPoints,
+        subreddits: targetSubreddits.join(", "),
+      });
+    }
+
     await db
+
       .insert(keywordStat)
       .values({
         id: crypto.randomUUID(),
