@@ -270,7 +270,162 @@ export function Pricing() {
         </div>
       </div>
 
-      <div className="relative mx-0 mt-6 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
+      {/* ── LIFETIME DEAL SECTION ── */}
+      <div className="mt-16 w-full max-w-[1100px]">
+        <div className="mb-8 text-center">
+          <span className="mb-3 inline-block rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1 text-[11px] font-black tracking-[0.25em] text-amber-400 uppercase">
+            ⚡ Limited Early-Believer Offer
+          </span>
+          <h3 className="mb-3 text-[32px] font-extrabold tracking-tight text-white md:text-[40px]">
+            Lifetime Access
+          </h3>
+          <p className="mx-auto max-w-lg text-[15px] font-medium text-zinc-400">
+            One payment. No subscriptions. Monthly credits that reset forever on
+            your anniversary — plus permanent rollover top-ups at founder rates.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* FOUNDER LTD */}
+          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/20 bg-[#141414] shadow-2xl transition-all hover:border-amber-400/40">
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-400/5 to-transparent" />
+            <div className="relative z-10 p-8 pb-4">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
+                  Tier 1 — Founder
+                </span>
+              </div>
+              <div className="mb-1 flex items-baseline gap-2">
+                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+                  $149
+                </span>
+                <span className="text-[14px] font-semibold text-zinc-400">
+                  one-time
+                </span>
+              </div>
+              <p className="mb-6 text-[13px] font-medium text-zinc-500">
+                Perfect for solopreneurs who want to lock in early.
+              </p>
+            </div>
+
+            <div className="relative z-10 flex-1 px-8 pb-4">
+              <SectionHeader
+                icon={<Magnet className="h-3.5 w-3.5" />}
+                label="MONTHLY CREDITS"
+              />
+              <ul className="mb-8 space-y-4">
+                <FeatureItem label="30 Reddit scans / month — forever" />
+                <FeatureItem label="Credits reset on your anniversary date" />
+                <FeatureItem label="20% discount on extra credit top-ups" />
+              </ul>
+              <SectionHeader
+                icon={<RotateCw className="h-3.5 w-3.5" />}
+                label="FEATURES"
+              />
+              <ul className="space-y-4">
+                <FeatureItem label="Basic + Deep pain-point extraction" />
+                <FeatureItem label="Subreddit heatmaps" />
+                <FeatureItem label="Early access to new scrapers" />
+                <FeatureItem label="Founder badge on your account ✨" />
+                <FeatureItem label="Upgrade to Pro for just $150 later" />
+              </ul>
+            </div>
+
+            <div className="relative z-10 mt-auto w-full border-t border-amber-400/10 bg-amber-400/[0.03] p-8 pt-6">
+              <Link
+                href="/sign-up?plan=founder-ltd"
+                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-amber-400/60 bg-transparent text-[14px] font-extrabold text-amber-400 transition-all hover:bg-amber-400/10"
+              >
+                Get Founder Access
+              </Link>
+              <p className="text-center text-[11px] font-bold text-zinc-500">
+                One-time · No recurring fees · Unlock on signup
+              </p>
+            </div>
+          </div>
+
+          {/* PROFESSIONAL LTD */}
+          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/60 bg-[#141414] shadow-[0_0_60px_rgba(251,191,36,0.08)]">
+            <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-amber-400/30 bg-linear-to-r from-amber-500 to-amber-400 px-4 py-1.5 text-[10px] font-black tracking-widest text-black uppercase shadow-lg">
+              <span>💎</span> Best Value
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-400/8 to-transparent" />
+
+            <div className="relative z-10 p-8 pb-4">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="rounded-full border border-amber-400/60 bg-amber-400/15 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
+                  Tier 2 — Professional
+                </span>
+              </div>
+              <div className="mb-1 flex items-baseline gap-2">
+                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+                  $299
+                </span>
+                <span className="text-[14px] font-semibold text-zinc-400">
+                  one-time
+                </span>
+              </div>
+              <p className="mb-1 text-[12px] font-semibold text-amber-400">
+                Already a Founder? Upgrade for just $150.
+              </p>
+              <p className="mb-6 text-[13px] font-medium text-zinc-500">
+                For serious builders who want the full arsenal.
+              </p>
+            </div>
+
+            <div className="relative z-10 flex-1 px-8 pb-4">
+              <SectionHeader
+                icon={<Magnet className="h-3.5 w-3.5" />}
+                label="MONTHLY CREDITS"
+                spotlight
+              />
+              <ul className="mb-8 space-y-4">
+                <FeatureItem label="100 Reddit scans / month — forever" spotlight />
+                <FeatureItem label="Credits reset on your anniversary date" spotlight />
+                <FeatureItem label="40% discount on extra credit top-ups" spotlight />
+              </ul>
+              <SectionHeader
+                icon={<RotateCw className="h-3.5 w-3.5" />}
+                label="FEATURES"
+                spotlight
+              />
+              <ul className="space-y-4">
+                <FeatureItem label="Everything in Founder" spotlight />
+                <FeatureItem label="Advanced AI mining depth" spotlight />
+                <FeatureItem label="Trend Velocity engine" spotlight />
+                <FeatureItem label="Phase 7 & 8 scrapers (early access)" spotlight />
+                <FeatureItem label="Pro Founder badge 💎" spotlight />
+                <FeatureItem label="Priority support & feature requests" spotlight />
+              </ul>
+            </div>
+
+            <div className="relative z-10 mt-auto w-full border-t border-amber-400/20 bg-amber-400/[0.05] p-8 pt-6">
+              <Link
+                href="/sign-up?plan=professional-ltd"
+                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-400 text-[14px] font-extrabold text-black shadow-lg shadow-amber-400/20 transition-all hover:bg-amber-300"
+              >
+                Get Professional Access <ArrowRight className="h-4 w-4" />
+              </Link>
+              <p className="text-center text-[11px] font-bold text-zinc-500">
+                One-time · No recurring fees · Unlock on signup
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Rollover explanation */}
+        <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
+          <p className="text-[13px] font-medium text-zinc-400">
+            <span className="font-bold text-white">How credits work:</span>{" "}
+            Your monthly base resets every month on your signup anniversary — unused base credits{" "}
+            <span className="font-bold text-amber-400">do not roll over</span>. But{" "}
+            <span className="font-bold text-white">purchased top-up credits</span> are permanent
+            and roll over forever, used only after your monthly base is exhausted.
+          </p>
+        </div>
+      </div>
+
+      <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
         <h4 className="mb-2 text-[18px] font-extrabold tracking-tight text-white">
           Start your 3-day free trial. No credit card required.
