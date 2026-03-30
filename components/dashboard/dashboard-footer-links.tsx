@@ -26,6 +26,19 @@ export function DashboardFooterLinks() {
         />
         Help & Support
       </Link>
+
+      {/* Command Palette Trigger Hint */}
+      <div className="mt-1 flex w-full items-center justify-between px-3 py-2 font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[16px]">terminal</span>
+          <span>Commands</span>
+        </div>
+        <div className="flex items-center gap-1 border border-white/10 bg-white/5 px-1.5 py-0.5 text-zinc-400">
+          <span className="text-[9px]">⌘</span>
+          <span>K</span>
+        </div>
+      </div>
+      
       <SignOutButton />
     </div>
   );

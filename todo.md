@@ -308,13 +308,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Animate in on mount using Recharts animation props
   - [ ] _Acceptance:_ Radar chart renders in < 200ms and all 5 axes show correct values from opportunity record
 
-- [ ] **Command Palette (Cmd+K)**
-  - [ ] Build with `cmdk` library (already in deps)
-  - [ ] Commands: `/scan <keyword>`, `/report <id>`, `/settings`, `/billing`, `/search`
-  - [ ] Recent 5 searches and recent 5 reports as auto-populated suggestions
-  - [ ] Keyboard shortcut indicator (e.g., `⌘K`) visible in the sidebar footer
-  - [ ] Fuzzy search across reports by title and keyword
-  - [ ] _Acceptance:_ Pressing Cmd+K opens the palette in < 100ms; typing "SEO" shows matching reports
+- [x] **Command Palette (Cmd+K)**
+  - [x] Build with `cmdk` library (already in deps)
+  - [x] Commands: `/scan <keyword>`, `/report <id>`, `/settings`, `/billing`, `/search`
+  - [x] Recent 5 searches and recent 5 reports as auto-populated suggestions
+  - [x] Keyboard shortcut indicator (e.g., `⌘K`) visible in the sidebar footer
+  - [x] Fuzzy search across reports by title and keyword
+  - [x] _Acceptance:_ Pressing Cmd+K opens the palette in < 100ms; typing "SEO" shows matching reports
 
 - [ ] **Pain Point Cluster Visualization (Force Graph)**
   - [ ] Force-directed graph using `d3-force` or `react-force-graph-2d`

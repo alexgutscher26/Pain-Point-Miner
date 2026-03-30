@@ -10,6 +10,7 @@ import { resolveCurrentPlan } from "@/lib/plan-resolver";
 import { Plus, Crown, LayoutDashboard } from "lucide-react";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
 import { SystemBanner } from "@/components/dashboard/system-banner";
+import { CommandPalette } from "@/components/dashboard/command-palette";
 
 export const metadata: Metadata = {
   title: {
@@ -60,6 +61,9 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-[#0a0a0a] font-sans text-zinc-100 antialiased selection:bg-[#ff4500]/30">
+      {/* Command Palette */}
+      <CommandPalette />
+
       {/* Sidebar */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start border-r-2 border-white/15 bg-[#0d0d0d] lg:flex lg:flex-col">
         <div className="p-6">
