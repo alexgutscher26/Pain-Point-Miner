@@ -59,6 +59,18 @@ export async function POST(req: Request) {
         });
     }
 
+    // 2. Fetch user email for Loops if not in session
+    const customerEmail = session.customer_details?.email;
+    if (customerEmail) {
+      const { sendLoopsEvent } = await import("@/lib/loops/service");
+      await sendLoopsEvent(customerEmail, "payment_received", {
+        type: type || "purchase",
+        amount: parseFloat(session.metadata?.amountPaid || "0") || (session.amount_total ? session.amount_total / 100 : 0),
+        credits: parseInt(session.metadata?.credits || "0"),
+        ltdTier: session.metadata?.ltdTier || "",
+      });
+    }
+
     // Shared Anniversary Logic
     const existingPrefs = await db.query.userPreferences.findFirst({
       where: eq(userPreferences.userId, userId),

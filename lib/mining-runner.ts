@@ -379,6 +379,7 @@ export async function executeMiningRun({
       .where(eq(scraperRun.id, runId));
 
     if (userRecord?.email) {
+      console.log(`[Mining] Triggering Loops report_ready for ${userRecord.email}...`);
       const { sendLoopsEvent } = await import("./loops/service");
       await sendLoopsEvent(userRecord.email, "report_ready", {
         keyword,
@@ -386,6 +387,8 @@ export async function executeMiningRun({
         newPainPoints,
         subreddits: targetSubreddits.join(", "),
       });
+    } else {
+      console.warn("[Mining] Skipping Loops: No user email found.");
     }
 
     await db
@@ -462,6 +465,15 @@ export async function executeMiningRun({
         lastError: errorMessage,
       })
       .where(eq(scraper.id, scraperId));
+      
+    // Trigger Loops scan_failed notification if we have an email
+    const userOnErr = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+    });
+    if (userOnErr?.email) {
+      const { sendScanFailedNotification } = await import("@/lib/loops/service");
+      await sendScanFailedNotification(userOnErr.email, keyword, errorMessage);
+    }
 
     throw error;
   }

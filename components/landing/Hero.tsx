@@ -147,39 +147,22 @@ export function Hero() {
             </div>
           </form>
 
-          {/* <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-90 mx-auto">
-            <div className="flex items-center justify-center gap-3">
-              <div className="flex -space-x-3">
-                {[
-                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=100&auto=format&fit=crop",
-                ].map((img, i) => (
-                  <div
-                    key={i}
-                    className="w-9 h-9 rounded-full border-2 border-black relative overflow-hidden"
-                    style={{ zIndex: 10 - i }}
-                  >
-                    <Image
-                      src={img}
-                      fill
-                      className="object-cover"
-                      alt="User avatar"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="text-[14px] font-medium text-zinc-400 tracking-wide mt-0.5">
-                Loved by{" "}
-                <span className="font-bold text-white tracking-normal">
-                  616+
-                </span>{" "}
-                founders & marketers
-              </div>
-            </div>
-          </div> */}
+          <div className="mx-auto flex flex-col items-center justify-center">
+            <a
+              href="https://www.producthunt.com/products/threddiq?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-threddiq"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <img
+                alt="ThreddIQ - Find profitable SaaS ideas from real Reddit pain points | Product Hunt"
+                width="250"
+                height="54"
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1108630&theme=dark&t=1774833351369"
+                className="h-[54px] w-[250px] opacity-90 hover:opacity-100"
+              />
+            </a>
+          </div>
         </div>
       </div>
 

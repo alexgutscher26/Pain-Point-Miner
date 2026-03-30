@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { sql } from "drizzle-orm";
+import { sql, gt } from "drizzle-orm";
 import { db } from "./db";
 import { redditRateLimitLog } from "./db/schema";
 
@@ -142,7 +142,7 @@ export async function getGlobal429Rate(): Promise<number> {
         statusCode: redditRateLimitLog.statusCode,
       })
       .from(redditRateLimitLog)
-      .where(sql`${redditRateLimitLog.createdAt} > ${fiveMinutesAgo}`)
+      .where(gt(redditRateLimitLog.createdAt, fiveMinutesAgo))
       .limit(100);
 
     if (recentLogs.length === 0) return 0;

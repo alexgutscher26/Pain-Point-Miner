@@ -22,11 +22,11 @@ const stripePriceStarterYearly = process.env.STRIPE_PRICE_STARTER_YEARLY;
 const stripePriceGrowthYearly = process.env.STRIPE_PRICE_GROWTH_YEARLY;
 const stripePriceProYearly = process.env.STRIPE_PRICE_PRO_YEARLY;
 const stripePluginEnabled =
-  process.env.STRIPE_PLUGIN_ENABLED === "true" &&
+  process.env.STRIPE_PLUGIN_ENABLED?.trim() === "true" &&
   Boolean(stripeSecretKey) &&
   Boolean(stripeWebhookSecret);
 const stripeSubscriptionEnabled =
-  process.env.STRIPE_SUBSCRIPTION_ENABLED === "true" &&
+  process.env.STRIPE_SUBSCRIPTION_ENABLED?.trim() === "true" &&
   Boolean(stripePriceGrowthMonthly) &&
   Boolean(stripePriceProMonthly);
 const usernamePluginEnabled = process.env.USERNAME_PLUGIN_ENABLED === "true";
@@ -172,17 +172,17 @@ export const auth = betterAuth({
       : []),
   ],
 
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
-          const { syncUserToLoops } = await import("./loops/service");
-          await syncUserToLoops(user.email, user.name || undefined);
-        },
-      },
-    },
-  },
   hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      // Sync user to Loops after successful email signup
+      if (ctx.path === "/sign-up/email" && ctx.context.returned) {
+        const body = ctx.body as { email?: string; name?: string };
+        if (body.email) {
+          const { syncUserToLoops } = await import("./loops/service");
+          await syncUserToLoops(body.email, body.name);
+        }
+      }
+    }),
 
     before: createAuthMiddleware(async (ctx) => {
       // Satisfy async contract for BetterAuth types
