@@ -32,6 +32,7 @@ import { resolvePlanContext } from "@/lib/plan-resolver";
 import { buildCommunityMapNodes } from "@/lib/community-map";
 import { unstable_cache } from "next/cache";
 import dynamicLoader from "next/dynamic";
+import { EmptyState } from "@/components/dashboard/empty-state";
 
 const LazyCommunityMapPanel = dynamicLoader(
   () =>
@@ -391,94 +392,96 @@ export default async function DashboardPage({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Recent Reports Table */}
         <div className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-white/10 px-8 py-6">
-            <div className="flex items-center gap-3">
-              <div className="h-2 w-2 bg-[#ff4500]"></div>
-              <h4 className="text-lg font-black tracking-tight text-white">
-                Recent Investigations
-              </h4>
-            </div>
-            <Link
-              className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase transition-colors hover:text-[#ff4500]"
-              href="/dashboard/reports"
-            >
-              View All
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
-              <thead>
-                <tr className="bg-white/2 text-zinc-500">
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
-                    Investigation
-                  </th>
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
-                    Key Insight
-                  </th>
-                  <th className="px-8 py-4 text-center font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
-                    Score
-                  </th>
-                  <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {reports.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-8 py-10 text-center font-mono text-sm font-medium text-zinc-500"
-                    >
-                      No investigations yet. Run your first analysis to populate
-                      this table.
-                    </td>
-                  </tr>
-                ) : (
-                  reports.slice(0, 3).map((report) => {
-                    const reportScore = toOpportunityScore(
-                      report.painPoints,
-                      scoringWeights,
-                    );
-                    const latestRunStatus = normalizeRunStatus(
-                      report.scraperRuns?.[0]?.status,
-                    );
-                    const statusLabel =
-                      latestRunStatus === "completed"
-                        ? "Ready"
-                        : latestRunStatus === "failed" ||
-                            latestRunStatus === "canceled"
-                          ? "Failed"
-                          : "Live";
+          {reports.length === 0 ? (
+            <EmptyState
+              title="Start Your First Investigation"
+              description="Uncover high-intent pain points and signal profitable SaaS opportunities in minutes by mining Reddit's richest conversations."
+              actionLabel="Launch New Investigation"
+              actionHref="/dashboard/search"
+              icon="dashboard"
+              variant="hero"
+              className="border-none bg-transparent shadow-none"
+            />
+          ) : (
+            <>
+              <div className="flex items-center justify-between border-b border-white/10 px-8 py-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 bg-[#ff4500]"></div>
+                  <h4 className="text-lg font-black tracking-tight text-white">
+                    Recent Investigations
+                  </h4>
+                </div>
+                <Link
+                  className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase transition-colors hover:text-[#ff4500]"
+                  href="/dashboard/reports"
+                >
+                  View All
+                </Link>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
+                  <thead>
+                    <tr className="bg-white/2 text-zinc-500">
+                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                        Investigation
+                      </th>
+                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                        Key Insight
+                      </th>
+                      <th className="px-8 py-4 text-center font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                        Score
+                      </th>
+                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {reports.slice(0, 3).map((report) => {
+                      const reportScore = toOpportunityScore(
+                        report.painPoints,
+                        scoringWeights,
+                      );
+                      const latestRunStatus = normalizeRunStatus(
+                        report.scraperRuns?.[0]?.status,
+                      );
+                      const statusLabel =
+                        latestRunStatus === "completed"
+                          ? "Ready"
+                          : latestRunStatus === "failed" ||
+                              latestRunStatus === "canceled"
+                            ? "Failed"
+                            : "Live";
 
-                    return (
-                      <ReportRow
-                        key={report.id}
-                        id={report.id}
-                        keyword={
-                          report.keywords?.[0] || "Unknown Investigation"
-                        }
-                        date={new Date(report.createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                          },
-                        )}
-                        painPoint={
-                          report.painPoints[0]?.title ||
-                          "No pain points extracted yet"
-                        }
-                        score={reportScore}
-                        status={statusLabel}
-                        explanation={report.painPoints[0]?.scoreExplanation}
-                      />
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                      return (
+                        <ReportRow
+                          key={report.id}
+                          id={report.id}
+                          keyword={
+                            report.keywords?.[0] || "Unknown Investigation"
+                          }
+                          date={new Date(report.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                          painPoint={
+                            report.painPoints[0]?.title ||
+                            "No pain points extracted yet"
+                          }
+                          score={reportScore}
+                          status={statusLabel}
+                          explanation={report.painPoints[0]?.scoreExplanation}
+                        />
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Insight Panel */}

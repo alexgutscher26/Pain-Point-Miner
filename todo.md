@@ -269,13 +269,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### 🔥 High Priority (Planned)
 
-- [ ] **Empty States with CTAs**
-  - [ ] Dashboard (no reports) → large "Start your first investigation" hero with animated illustration
-  - [ ] Reports page (no saved reports) → illustration + "Run a scan" CTA button
-  - [ ] Analysis page (invalid or missing scraper ID) → graceful redirect to search page
-  - [ ] Pain points tab (empty cluster) → "No pain points found. Try adjusting your keywords."
-  - [ ] Use consistent illustration style across all empty states (monochrome with accent color)
-  - [ ] _Acceptance:_ Every page has a designed empty state instead of a blank white area
+- [x] **Empty States with CTAs**
+  - [x] Dashboard (no reports) → large "Start your first investigation" hero with animated illustration
+  - [x] Reports page (no saved reports) → illustration + "Run a scan" CTA button
+  - [x] Analysis page (invalid or missing scraper ID) → graceful redirect to search page
+  - [x] Pain points tab (empty cluster) → "No pain points found. Try adjusting your keywords."
+  - [x] Use consistent illustration style across all empty states (monochrome with accent color)
+  - [x] _Acceptance:_ Every page has a designed empty state instead of a blank white area
 
 - [ ] **Dark/Light Theme Toggle**
   - [ ] Use `next-themes` with `ThemeProvider` wrapping the root layout

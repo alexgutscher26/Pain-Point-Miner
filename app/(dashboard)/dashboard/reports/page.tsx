@@ -24,6 +24,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/dashboard/empty-state";
 
 interface Report {
   id: string;
@@ -357,26 +358,15 @@ export default function ReportsPage() {
           {isInitialLoading ? (
             <ReportsTableSkeleton />
           ) : reports.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-6 py-20 text-center">
-              <div className="flex h-16 w-16 items-center justify-center border border-white/20 bg-zinc-900">
-                <Database className="h-8 w-8 text-zinc-700" />
-              </div>
-              <div className="space-y-2">
-                <p className="text-xl font-black tracking-tight text-white">
-                  No investigations found.
-                </p>
-                <p className="mx-auto max-w-[300px] text-sm font-medium text-zinc-500">
-                  Start your first mining session to see high-value SaaS
-                  opportunities here.
-                </p>
-              </div>
-              <Link
-                href="/dashboard/search"
-                className="border border-[#ff4500]/45 px-6 py-2.5 font-mono text-[12px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:bg-[#ff4500]/10"
-              >
-                Start Mining
-              </Link>
-            </div>
+            <EmptyState
+              title="No Investigations Found"
+              description="You haven't run any mining sessions yet. Start a scan to uncover SaaS opportunities from Reddit."
+              actionLabel="Run a scan"
+              actionHref="/dashboard/search"
+              icon="reports"
+              variant="card"
+              className="border-none py-24"
+            />
           ) : (
             <table className="w-full table-fixed border-collapse text-left">
               <thead>

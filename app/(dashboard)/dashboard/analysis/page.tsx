@@ -37,6 +37,13 @@ export default function AnalysisPage() {
     hasHydrated,
   } = useMiningStream(scraperId);
 
+  // New: Graceful redirect if ID is missing or invalid
+  useEffect(() => {
+    if (!scraperId) {
+      router.push("/dashboard/search");
+    }
+  }, [scraperId, router]);
+
   // New: Toast management for mining operations
   useEffect(() => {
     if (!scraperId || !hasHydrated) return;

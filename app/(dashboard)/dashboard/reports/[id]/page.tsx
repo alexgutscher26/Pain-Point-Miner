@@ -33,6 +33,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
+import { EmptyState } from "@/components/dashboard/empty-state";
 
 interface CompetitorIntel {
   name: string;
@@ -1347,11 +1348,13 @@ export default function ReportDetailPage() {
           </div>
 
           {totalPainPoints === 0 && (
-            <div className="border border-white/20 bg-zinc-900/40 p-6 text-center">
-              <p className="font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
-                No frustrations match the selected filters
-              </p>
-            </div>
+            <EmptyState
+              title="No Insights Found"
+              description="No pain points match your current filters. Try adjusting your keywords or criteria."
+              icon="search"
+              variant="inline"
+              className="py-12"
+            />
           )}
 
           {totalPainPoints > PAIN_POINTS_PER_PAGE && (
