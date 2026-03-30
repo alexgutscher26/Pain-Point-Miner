@@ -176,6 +176,20 @@ export function Hero() {
                 className="h-[54px] opacity-90 hover:opacity-100"
               />
             </a>
+            <a
+              href="https://open-launch.com/projects/threddiq"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <img
+                src="https://open-launch.com/api/badge/f8c55855-5ed3-44e6-b583-b09d4bedef8e/featured-dark.svg"
+                alt="Featured on Open-Launch"
+                width="200"
+                height="54"
+                className="h-[54px] opacity-90 hover:opacity-100"
+              />
+            </a>
           </div>
         </div>
       </div>
