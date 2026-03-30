@@ -175,6 +175,7 @@ export const auth = betterAuth({
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       // Sync user to Loops after successful email signup
+      console.log(`[Auth-Hook] after: path=${ctx.path}`);
       if (ctx.path === "/sign-up/email" && ctx.context.returned) {
         const body = ctx.body as { email?: string; name?: string };
         if (body.email) {

@@ -21,10 +21,12 @@ export async function syncUserToLoops(
     });
 
     if (!response.success) {
-      console.error("Failed to sync user to Loops:", response);
+      console.error("[Loops] Failed to sync user to Loops:", response);
+    } else {
+      console.log(`[Loops] Successfully synced user to Loops audience: ${email}`);
     }
   } catch (error) {
-    console.error("Error syncing user to Loops:", error);
+    console.error("[Loops] Error syncing user to Loops:", error);
   }
 }
 
