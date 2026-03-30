@@ -126,19 +126,17 @@ export function resolvePlanAccessState({
   requirePaidAfterTrial = true,
   ltdTier = "none",
 }: PlanContextResolutionInput & { ltdTier?: string | null }): ResolvedPlanContext {
-  const defaultContext: ResolvedPlanContext = {
+  // 1. Initial State from existing plan/subscription
+  const context: ResolvedPlanContext = {
     plan: resolvedPlan,
     hasActiveSubscription,
     trialActive: false,
-    planPurchaseRequired:
-      requirePaidAfterTrial &&
-      (resolvedPlan === "starter" || (resolvedPlan as string) === "none") &&
-      !hasActiveSubscription &&
-      (!ltdTier || ltdTier === "none"),
     trialEndsAt: null,
     trialDaysRemaining: null,
+    planPurchaseRequired: !hasActiveSubscription && requirePaidAfterTrial,
   };
 
+  // 2. Early Exit if trial logic should not run
   if (
     !localTrialEnabled ||
     hasActiveSubscription ||
@@ -146,32 +144,46 @@ export function resolvePlanAccessState({
     localTrialDays <= 0 ||
     !userCreatedAt
   ) {
-    return defaultContext;
+    return context;
   }
 
+  // 3. Calculate Trial Boundaries (Signup date + Trial duration)
   const trialEndsAt = new Date(userCreatedAt);
   trialEndsAt.setDate(trialEndsAt.getDate() + localTrialDays);
+  
+  // Normalize to end-of-day for the expiration date to be user-friendly (generous end)
+  trialEndsAt.setHours(23, 59, 59, 999);
+  
   const trialEndsAtMs = trialEndsAt.getTime();
   const nowMs = now.getTime();
-  const trialDaysRemaining = Math.max(
+  const isCurrentlyInTrial = trialEndsAtMs > nowMs;
+
+  // 4. Update Context with Trial Details
+  context.trialEndsAt = trialEndsAt;
+  context.trialActive = isCurrentlyInTrial;
+  
+  // Calculate days remaining based on calendar midnights for a more natural countdown
+  const endMidnight = new Date(trialEndsAt);
+  endMidnight.setHours(0, 0, 0, 0);
+  const nowMidnight = new Date(now);
+  nowMidnight.setHours(0, 0, 0, 0);
+  
+  context.trialDaysRemaining = Math.max(
     0,
-    Math.ceil((trialEndsAtMs - nowMs) / (1000 * 60 * 60 * 24)),
+    Math.round((endMidnight.getTime() - nowMidnight.getTime()) / (1000 * 60 * 60 * 24)),
   );
 
-  if (trialEndsAtMs > nowMs) {
-    return {
-      plan: "pro",
-      hasActiveSubscription,
-      trialActive: true,
-      planPurchaseRequired: false,
-      trialEndsAt,
-      trialDaysRemaining,
-    };
+  // 5. Business Logic Overrides
+  if (isCurrentlyInTrial) {
+    context.planPurchaseRequired = false;
+    // Upgrade "starter" to "pro" during trial if not already on a higher plan
+    if (context.plan === "starter" || context.plan === "founder") {
+      context.plan = "pro";
+    }
+  } else {
+    // Trial expired. If no active subscription, lock access if required.
+    context.planPurchaseRequired = !hasActiveSubscription && requirePaidAfterTrial;
   }
 
-  return {
-    ...defaultContext,
-    trialEndsAt,
-    trialDaysRemaining: 0,
-  };
+  return context;
 }
