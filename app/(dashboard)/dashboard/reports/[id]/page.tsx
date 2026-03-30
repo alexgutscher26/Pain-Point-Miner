@@ -21,6 +21,7 @@ import {
   Sparkles,
   ExternalLink,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { SpotlightCard } from "@/components/dashboard/spotlight-card";
 
 interface CompetitorIntel {
   name: string;
@@ -1547,19 +1549,23 @@ export default function ReportDetailPage() {
                 </h4>
                 <div className="space-y-4">
                   {reportData.saasOpportunities.slice(0, 3).map((opp) => (
-                    <div
+                    <SpotlightCard
                       key={opp.title}
-                      className="space-y-3 border border-white/20 bg-white/2 p-5"
+                      active={opp.score > 70}
+                      className="group/opp border border-white/20 bg-white/2 p-5 transition-all duration-300 hover:border-amber-500/30"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-sm leading-tight font-black text-white">
                           {opp.title}
                         </p>
-                        <span className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
+                        <span className={cn(
+                          "text-[10px] font-black tracking-widest uppercase",
+                          opp.score > 70 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-[#ff4500]"
+                        )}>
                           {opp.score}/100
                         </span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-3">
                         {formatPainDescription(opp.problemStatement).map(
                           (paragraph) => (
                             <p
@@ -1571,10 +1577,10 @@ export default function ReportDetailPage() {
                           ),
                         )}
                       </div>
-                      <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                      <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase mt-3">
                         ICP: {opp.targetCustomer}
                       </p>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-2">
                         {formatPainDescription(opp.valueProposition).map(
                           (paragraph) => (
                             <p
@@ -1586,19 +1592,19 @@ export default function ReportDetailPage() {
                           ),
                         )}
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-2">
                         {formatPainDescription(opp.launchAngle).map(
                           (paragraph) => (
                             <p
                               key={paragraph.slice(0, 100)}
-                              className="text-[11px] leading-relaxed font-bold text-zinc-500"
+                              className="text-[11px] leading-relaxed font-bold text-zinc-500 underline decoration-zinc-800 underline-offset-4"
                             >
                               {paragraph}
                             </p>
                           ),
                         )}
                       </div>
-                    </div>
+                    </SpotlightCard>
                   ))}
                 </div>
               </div>

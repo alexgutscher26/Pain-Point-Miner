@@ -332,12 +332,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Export comparison as PDF or generate a shareable `/compare/<slug>` link
   - [ ] _Acceptance:_ Comparing 2 reports correctly identifies overlapping pain points via embedding similarity
 
-- [ ] **Spotlight Hover Effect**
-  - [ ] CSS `radial-gradient` that follows mouse `clientX/Y` position within the card boundary
-  - [ ] Only activate on opportunity cards with `opportunityScore > 70`
-  - [ ] Subtle gold-tinted glow, opacity capped at 15% — not distracting
-  - [ ] Remove effect on touch devices (no hover)
-  - [ ] _Acceptance:_ Moving mouse across a high-score card produces a smooth gradient follow effect
+- [x] **Spotlight Hover Effect**
+  - [x] CSS `radial-gradient` that follows mouse `clientX/Y` position within the card boundary
+  - [x] Only activate on opportunity cards with `opportunityScore > 70`
+  - [x] Subtle gold-tinted glow, opacity capped at 15% — not distracting
+  - [x] Remove effect on touch devices (no hover)
+  - [x] _Acceptance:_ Moving mouse across a high-score card produces a smooth gradient follow effect
 
 - [ ] **Glassmorphism Overlays**
   - [ ] `backdrop-filter: blur(20px) saturate(180%)` on report detail right panel
