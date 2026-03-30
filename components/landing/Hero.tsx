@@ -190,6 +190,20 @@ export function Hero() {
                 className="h-[54px] opacity-90 hover:opacity-100"
               />
             </a>
+            <a
+              href="https://findly.tools/threddiq?utm_source=threddiq"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <img
+                src="https://findly.tools/badges/findly-tools-badge-dark.svg"
+                alt="Featured on Findly.tools"
+                width="175"
+                height="54"
+                className="h-[54px] opacity-90 hover:opacity-100"
+              />
+            </a>
           </div>
         </div>
       </div>
