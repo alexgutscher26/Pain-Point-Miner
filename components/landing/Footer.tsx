@@ -25,6 +25,19 @@ export function Footer() {
           <p className="mb-6 text-[14px] leading-relaxed font-medium text-zinc-400">
             Find perfect opportunities on Reddit with AI-powered monitoring
           </p>
+          <a
+            href="https://startupfa.st"
+            target="_blank"
+            title="Powered by Startup Fast"
+          >
+            <img
+              src="https://startupfa.st/images/badges/powered-by-light.svg"
+              alt="Powered by Startup Fast"
+              width="150"
+              height="44"
+              className="opacity-80 transition-opacity hover:opacity-100"
+            />
+          </a>
           {/* 
           <div className="flex items-center p-1 border border-zinc-800 rounded-lg bg-[#141414]">
             <button
