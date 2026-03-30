@@ -13,6 +13,7 @@ export type ResolvedPlanContext = {
   plan: BillingPlan;
   hasActiveSubscription: boolean;
   trialActive: boolean;
+  trialEndsAt: Date | null;
   planPurchaseRequired: boolean;
   trialDaysRemaining: number | null;
   ltdTier: string | null;
