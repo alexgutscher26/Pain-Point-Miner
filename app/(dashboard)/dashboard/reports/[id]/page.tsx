@@ -19,6 +19,7 @@ import {
   ArrowRightLeft,
   Wrench,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -84,6 +85,7 @@ interface PainPoint {
   switchingCosts?: string;
   triedSolutions?: string[];
   difficulty: "weekend_project" | "side_project" | "startup_mvp" | "vc_scale_moat";
+  postUrl: string | null;
 }
 
 interface ReportData {
@@ -974,6 +976,17 @@ export default function ReportDetailPage() {
                       <h4 className="text-2xl font-black tracking-tight text-white transition-colors group-hover:text-[#ff4500]">
                         {pain.title}
                       </h4>
+                      {pain.postUrl && (
+                        <a
+                          href={pain.postUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-black tracking-widest text-zinc-400 uppercase transition-all hover:border-[#ff4500]/30 hover:bg-[#ff4500]/10 hover:text-[#ff4500]"
+                        >
+                          View Source
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
                       <span
                         className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${
                           pain.urgency === "High Urgency"

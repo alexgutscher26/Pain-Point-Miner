@@ -144,6 +144,7 @@ interface DBPainPoint {
   id: string;
   title: string;
   body: string;
+  postUrl: string | null;
   score: number;
   urgency: number;
   monetizationScore: number;
@@ -518,6 +519,7 @@ export async function GET(
                   .slice(0, 3)
               : [pp.body],
           language: pp.triedSolutions || [],
+          postUrl: pp.postUrl,
           angles: [
             "Solution for " + pp.title,
             "Cost-effective alternative to existing tools",
