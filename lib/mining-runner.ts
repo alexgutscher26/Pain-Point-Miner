@@ -229,10 +229,9 @@ export async function executeMiningRun({
       const body = (post.selftext || "").toLowerCase();
       if (body === "[removed]" || body === "[deleted]") return false;
 
-      // 2. Score threshold for basic depth
-      if (miningDepth === "basic" && post.score < 2 && post.num_comments < 3) {
-        return false;
-      }
+      // 2. Score threshold dropped (originally required score >=2 or comments >=3)
+      // We now prioritize matching quality over raw popularity to find emerging pain points.
+
 
       // 3. Skip link posts unless no self-posts exist
       if (post.is_self === false && hasSelfPosts) {

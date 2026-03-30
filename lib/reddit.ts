@@ -245,11 +245,23 @@ const STOP_WORDS = new Set([
 export const DEFAULT_PROBLEM_PATTERNS = [
   "struggling",
   "frustrating",
+  "annoying",
+  "horrible",
   "hate",
+  "waste of time",
+  "sucks",
   "pain",
   "wish there was",
+  "is there a tool",
   "why is it so hard",
   "anyone else deal with",
+  "manual",
+  "spreadsheet",
+  "workflow",
+  "nightmare",
+  "expensive",
+  "alternative to",
+  "how do i",
 ] as const;
 
 export type ProblemPatternMatchStats = {
