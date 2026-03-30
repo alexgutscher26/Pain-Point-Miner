@@ -74,7 +74,7 @@ export default async function BillingPage() {
       stripeConfigured={stripeConfigured}
       availablePlans={availablePlans}
       plan={currentPlan}
-      ltdTier={session.user.ltdTier}
+      ltdTier={planContext.ltdTier}
       planPurchaseRequired={planContext.planPurchaseRequired}
       trialActive={planContext.trialActive}
       trialEndsAt={planContext.trialEndsAt?.toISOString() ?? null}

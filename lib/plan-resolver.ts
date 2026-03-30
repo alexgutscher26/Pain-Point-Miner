@@ -14,8 +14,8 @@ export type ResolvedPlanContext = {
   hasActiveSubscription: boolean;
   trialActive: boolean;
   planPurchaseRequired: boolean;
-  trialEndsAt: Date | null;
   trialDaysRemaining: number | null;
+  ltdTier: string | null;
 };
 
 type PlanContextResolutionInput = {
@@ -110,7 +110,7 @@ export async function resolvePlanContext(input: {
     localTrialEnabled,
     requirePaidAfterTrial,
     userCreatedAt: currentUser?.createdAt ?? null,
-    ltdTier: currentUser?.ltdTier,
+    ltdTier: currentUser?.ltdTier ?? "none",
   };
 
   return resolvePlanAccessState(baseResolutionInput);
@@ -133,7 +133,8 @@ export function resolvePlanAccessState({
     trialActive: false,
     trialEndsAt: null,
     trialDaysRemaining: null,
-    planPurchaseRequired: !hasActiveSubscription && requirePaidAfterTrial,
+    planPurchaseRequired: !hasActiveSubscription && requirePaidAfterTrial && (ltdTier === "none" || !ltdTier),
+    ltdTier: ltdTier ?? "none",
   };
 
   // 2. Early Exit if trial logic should not run
@@ -177,12 +178,14 @@ export function resolvePlanAccessState({
   if (isCurrentlyInTrial) {
     context.planPurchaseRequired = false;
     // Upgrade "starter" to "pro" during trial if not already on a higher plan
-    if (context.plan === "starter" || context.plan === "founder") {
+    // But don't override if they have already purchased an LTD tier (founder/professional)
+    if ((context.plan === "starter") && (ltdTier === "none" || !ltdTier)) {
       context.plan = "pro";
     }
   } else {
     // Trial expired. If no active subscription, lock access if required.
-    context.planPurchaseRequired = !hasActiveSubscription && requirePaidAfterTrial;
+    // However, if they have an LTD, we allow it to bypass the lockdown.
+    context.planPurchaseRequired = !hasActiveSubscription && requirePaidAfterTrial && (ltdTier === "none" || !ltdTier);
   }
 
   return context;
