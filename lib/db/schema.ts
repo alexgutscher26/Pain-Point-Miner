@@ -250,6 +250,7 @@ export const userPreferences = pgTable(
     emailNotifications: boolean().default(true).notNull(),
     timezone: text(),
     anniversaryDate: timestamp({ precision: 3, mode: "date" }),
+    onboardingComplete: boolean().default(false).notNull(),
     dashboardLayout: jsonb(),
     scoringWeights: jsonb().$type<{
       w1: number; // painIntensity

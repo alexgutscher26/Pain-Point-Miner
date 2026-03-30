@@ -11,6 +11,9 @@ import { Plus, Crown, LayoutDashboard } from "lucide-react";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
 import { SystemBanner } from "@/components/dashboard/system-banner";
 import { CommandPalette } from "@/components/dashboard/command-palette";
+import { db } from "@/lib/db";
+import { userPreferences } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export const metadata: Metadata = {
   title: {
@@ -42,6 +45,14 @@ export default async function DashboardLayout({
 
   if (!session) {
     redirect("/sign-in");
+  }
+
+  const prefs = await db.query.userPreferences.findFirst({
+    where: eq(userPreferences.userId, session.user.id),
+  });
+
+  if (!prefs?.onboardingComplete) {
+    redirect("/onboarding/step-1");
   }
   const plan = await resolveCurrentPlan({
     userId: session.user.id,

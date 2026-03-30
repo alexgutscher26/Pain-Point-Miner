@@ -358,13 +358,13 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Disable shortcuts when user is typing in an input or textarea
   - [ ] _Acceptance:_ All shortcuts work globally; pressing `?` shows the shortcut reference modal
 
-- [ ] **Onboarding Flow for New Users**
-  - [ ] First-login redirect to a guided 3-step onboarding: Choose niche → Select subreddits → Run first scan
-  - [ ] Progress bar indicator at top of onboarding pages
-  - [ ] Skip option available at every step
-  - [ ] After first scan completes: "You found X pain points!" celebration screen with confetti
-  - [ ] Persist completion state in `user_preferences.onboardingComplete`
-  - [ ] _Acceptance:_ New user can complete onboarding and run first scan in under 2 minutes
+- [x] **Onboarding Flow for New Users**
+  - [x] First-login redirect to a guided 3-step onboarding: Choose niche → Select subreddits → Run first scan
+  - [x] Progress bar indicator at top of onboarding pages
+  - [x] Skip option available at every step
+  - [x] After first scan completes: "You found X pain points!" celebration screen with confetti
+  - [x] Persist completion state in `user_preferences.onboardingComplete`
+  - [x] _Acceptance:_ New user can complete onboarding and run first scan in under 2 minutes
 
 - [ ] **Accessibility Audit**
   - [ ] All interactive elements have `aria-label` or `aria-labelledby`
@@ -413,11 +413,11 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Key rotation: generate new secret, invalidate old one atomically
   - [ ] _Acceptance:_ Creating a key shows it once; subsequent API calls use the hash for validation
 
-- [ ] **Dependency Audit**
-  - [ ] Run `npm audit --audit-level=critical` in CI on every PR
-  - [ ] Block merges if critical vulnerabilities are found
-  - [ ] Monthly manual review of `npm audit` output for high-severity issues
-  - [ ] Maintain a `SECURITY.md` with known exemptions and reasoning
+- [x] **Dependency Audit**
+  - [x] Run `npm audit --audit-level=critical` in CI on every PR
+  - [x] Block merges if critical vulnerabilities are found
+  - [x] Monthly manual review of `npm audit` output for high-severity issues
+  - [x] Maintain a `SECURITY.md` with known exemptions and reasoning
 
 ### ⬜ Planned
 

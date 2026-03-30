@@ -93,7 +93,7 @@ const subredditTokenSchema = z
       .replace(/[^\w]/g, "")
       .toLowerCase(),
   )
-  .pipe(z.string().regex(/^[a-z0-9_]{2,21}$/, "Invalid subreddit name"));
+  .pipe(z.string().regex(/^[a-z0-9_]{2,24}$/, "Invalid subreddit name"));
 
 const customPatternItemSchema = z
   .string()
@@ -307,7 +307,12 @@ export async function POST(req: Request) {
 
     const rawSubreddits = subreddits
       .split(",")
-      .map((sub) => sub.trim())
+      .map((sub) => {
+        const clean = sub.trim().toLowerCase();
+        // Known bad mapping from previous bug
+        if (clean === "artificialintelligence") return "artificial";
+        return clean;
+      })
       .filter(Boolean);
 
     const depthLimit = MAX_SUBREDDITS_BY_DEPTH[miningDepth];
