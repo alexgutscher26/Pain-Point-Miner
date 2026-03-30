@@ -175,6 +175,15 @@ export function Footer() {
             >
               Reddit Tools
             </Link>
+            <a
+              href="https://aitooltrek.com"
+              title="AI Tool Trek"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
+            >
+              AI Tool Trek
+            </a>
           </div>
         </div>
       </div>
