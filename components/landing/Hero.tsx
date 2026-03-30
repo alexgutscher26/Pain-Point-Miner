@@ -147,7 +147,7 @@ export function Hero() {
             </div>
           </form>
 
-          <div className="mx-auto flex flex-col items-center justify-center">
+          <div className="mx-auto flex flex-col items-center justify-center gap-6 sm:flex-row">
             <a
               href="https://www.producthunt.com/products/threddiq?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-threddiq"
               target="_blank"
@@ -160,6 +160,20 @@ export function Hero() {
                 height="54"
                 src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1108630&theme=dark&t=1774833351369"
                 className="h-[54px] w-[250px] opacity-90 hover:opacity-100"
+              />
+            </a>
+            <a
+              href="https://startupdirectory.net"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <img
+                src="https://startupdirectory.net/badge/featured-dark.svg"
+                alt="Featured"
+                width="200"
+                height="54"
+                className="h-[54px] opacity-90 hover:opacity-100"
               />
             </a>
           </div>
