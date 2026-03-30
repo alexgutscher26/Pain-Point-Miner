@@ -15,6 +15,15 @@ import {
 import { sql } from "drizzle-orm";
 import type { BudgetSignal } from "@/lib/budget-signals";
 
+export type CompetitorIntel = {
+  name: string;
+  url: string | null;
+  description: string | null;
+  mentionCount: number;
+  category: string | null;
+  iconUrl: string | null;
+};
+
 export const scraperStatus = pgEnum("ScraperStatus", [
   "running",
   "paused",
@@ -464,6 +473,7 @@ export const painPointCluster = pgTable(
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
     estimatedTamUsdAnnual: integer(),
+    competitorIntel: jsonb().$type<CompetitorIntel[]>(),
     budgetSignalCount: integer().default(0).notNull(),
     lastMatchedAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -768,3 +778,20 @@ export const purchasedCredits = pgTable(
     index("purchased_credits_userId_idx").on(table.userId),
   ],
 );
+
+export const tool = pgTable("tool", {
+  id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  slug: text().unique().notNull(),
+  url: text(),
+  description: text(),
+  category: text(),
+  iconUrl: text(),
+  lastCrawledAt: timestamp({ precision: 3, mode: "date" }),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});

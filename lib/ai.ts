@@ -280,3 +280,64 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     return [];
   }
 };
+
+/**
+ * Uses AI to resolve metadata (description, official URL, category) for a tool by name.
+ */
+export async function resolveCompetitorMetadata(name: string) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    return { description: null, url: null, category: null };
+  }
+
+  const systemPrompt = `You are a market intelligence expert. 
+Given a tool or company name, provide:
+1. A concise (1-2 sentence) description of what they do.
+2. Their official website URL (absolute URL).
+3. A broad category for the tool (e.g., CRM, Analytics, Project Management, E-commerce, etc.).
+
+Return ONLY valid JSON:
+{
+  "description": "string",
+  "url": "string or null",
+  "category": "string or null"
+}`;
+
+  try {
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "ThreddIQ - Competitor Intel Engine",
+        },
+        body: JSON.stringify({
+          model: DEFAULT_AI_MODEL,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `Tool name: "${name}"` },
+          ],
+          response_format: { type: "json_object" },
+        }),
+      },
+    );
+
+    if (!response.ok) return { description: null, url: null, category: null };
+
+    const data = await response.json();
+    const rawContent = extractMessageContent(data?.choices?.[0]?.message?.content);
+    const parsed = JSON.parse(rawContent);
+
+    return {
+      description: parsed.description || null,
+      url: parsed.url || null,
+      category: parsed.category || null,
+    };
+  } catch (err) {
+    console.error(`AI metadata resolution failed for ${name}:`, err);
+    return { description: null, url: null, category: null };
+  }
+}

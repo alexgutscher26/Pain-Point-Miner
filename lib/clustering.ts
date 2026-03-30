@@ -6,6 +6,7 @@ import {
   aggregateBudgetSignals,
   normalizeBudgetSignals,
 } from "@/lib/budget-signals";
+import { aggregateCompetitorIntel } from "@/lib/competitor-intel";
 
 const CLUSTER_SIMILARITY_THRESHOLD = 0.82;
 const EMBEDDING_PROVIDER = "openrouter";
@@ -153,12 +154,13 @@ async function createNewCluster(
   return { clusterId, isNew: true };
 }
 
-async function refreshClusterRollups(clusterId: string) {
+export async function refreshClusterRollups(clusterId: string) {
   const clusterPoints = await db.query.painPoint.findMany({
     where: eq(painPoint.clusterId, clusterId),
     columns: {
       id: true,
       budget: true,
+      triedSolutions: true,
     },
   });
 
@@ -168,12 +170,18 @@ async function refreshClusterRollups(clusterId: string) {
   const { budgetSignalCount, estimatedTamUsdAnnual } =
     aggregateBudgetSignals(budgetSignals);
 
+  const triedSolutions = clusterPoints
+    .map((point) => point.triedSolutions)
+    .filter((s): s is string[] => s !== null);
+  const competitorIntel = await aggregateCompetitorIntel(triedSolutions);
+
   await db
     .update(painPointCluster)
     .set({
       sourceCount: clusterPoints.length,
       budgetSignalCount,
       estimatedTamUsdAnnual,
+      competitorIntel,
       lastMatchedAt: new Date(),
       updatedAt: new Date(),
     })

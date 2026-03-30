@@ -160,6 +160,7 @@ interface DBPainPoint {
     id: string;
     estimatedTamUsdAnnual: number | null;
     budgetSignalCount: number;
+    competitorIntel?: any;
   } | null;
   painPointComments?: Array<{
     body: string;
@@ -234,6 +235,7 @@ export async function GET(
                 id: true,
                 estimatedTamUsdAnnual: true,
                 budgetSignalCount: true,
+                competitorIntel: true,
               },
             },
             painPointComments: {
@@ -499,6 +501,7 @@ export async function GET(
                 estimatedTamUsdAnnual:
                   pp.painPointCluster.estimatedTamUsdAnnual ?? null,
                 budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
+                competitorIntel: pp.painPointCluster.competitorIntel ?? [],
               }
             : null,
           switchingCosts: pp.switchingCosts,

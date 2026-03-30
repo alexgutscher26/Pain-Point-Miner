@@ -209,14 +209,14 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [x] Show difficulty badge with color coding: green / yellow / orange / red
   - [x] _Acceptance:_ "I need a HIPAA-compliant patient management app" scores as `Startup MVP` or higher
 
-- [ ] **Competitor Intel Engine**
-  - [ ] Collect all `triedSolutions` strings across pain points in a cluster
-  - [ ] Normalize: lowercase → title-case lookup → fuzzy dedup ("HubSpot", "hubspot", "HubSpot CRM" → "HubSpot")
-  - [ ] For each unique tool: fire a `HEAD` or `GET` request to attempt to resolve homepage title + description
-  - [ ] Populate `opportunity.competitorIntel`: `[{ name, url, description, mentionCount, category }]`
-  - [ ] "Competitive Landscape" card on report detail page: ranked by `mentionCount`, with external links
-  - [ ] Cache resolved tool data in a `tool` table to avoid re-fetching on every report
-  - [ ] _Acceptance:_ A cluster with 5 posts mentioning "Airtable" surfaces Airtable in the Competitive Landscape card with correct description
+- [x] **Competitor Intel Engine**
+  - [x] Collect all `triedSolutions` strings across pain points in a cluster
+  - [x] Normalize: lowercase → title-case lookup → fuzzy dedup ("HubSpot", "hubspot", "HubSpot CRM" → "HubSpot")
+  - [x] For each unique tool: fire a `HEAD` or `GET` request to attempt to resolve homepage title + description
+  - [x] Populate `opportunity.competitorIntel`: `[{ name, url, description, mentionCount, category }]`
+  - [x] "Competitive Landscape" card on report detail page: ranked by `mentionCount`, with external links
+  - [x] Cache resolved tool data in a `tool` table to avoid re-fetching on every report
+  - [x] _Acceptance:_ A cluster with 5 posts mentioning "Airtable" surfaces Airtable in the Competitive Landscape card with correct description
 
 - [ ] **Cross-Subreddit Correlation**
   - [ ] After clustering, compare pain points across different subreddit sources using embedding similarity

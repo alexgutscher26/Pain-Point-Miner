@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -32,6 +32,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
+
+interface CompetitorIntel {
+  name: string;
+  url: string | null;
+  description: string | null;
+  mentionCount: number;
+  category: string | null;
+  iconUrl: string | null;
+}
 
 interface PainPoint {
   id: string;
@@ -70,6 +79,7 @@ interface PainPoint {
     id: string;
     estimatedTamUsdAnnual: number | null;
     budgetSignalCount: number;
+    competitorIntel?: CompetitorIntel[];
   } | null;
   switchingCosts?: string;
   triedSolutions?: string[];
@@ -365,6 +375,24 @@ export default function ReportDetailPage() {
     "Operations",
     "Customer Success",
   ];
+
+  const allCompetitors = useMemo(() => {
+    if (!reportData) return [];
+    const map = new Map<string, CompetitorIntel>();
+    reportData.topPainPoints.forEach((pp) => {
+      pp.cluster?.competitorIntel?.forEach((intel) => {
+        const existing = map.get(intel.name);
+        if (existing) {
+          existing.mentionCount += intel.mentionCount;
+        } else {
+          map.set(intel.name, { ...intel });
+        }
+      });
+    });
+    return Array.from(map.values()).sort(
+      (a, b) => b.mentionCount - a.mentionCount,
+    );
+  }, [reportData]);
 
   useEffect(() => {
     async function fetchReportDetail() {
@@ -1407,6 +1435,60 @@ export default function ReportDetailPage() {
                 </button>
               </div>
             </div>
+
+            {/* Competitive Landscape */}
+            {allCompetitors.length > 0 && (
+              <div className="border-t border-white/5 pt-8">
+                <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <Wrench className="h-4 w-4 text-[#ff4500]" />
+                  Competitive Landscape
+                </h4>
+                <div className="space-y-4">
+                  {allCompetitors.slice(0, 10).map((tool) => (
+                    <div
+                      key={tool.name}
+                      className="group relative overflow-hidden border border-white/10 bg-white/2 p-4 transition-all hover:border-[#ff4500]/30 hover:bg-white/5"
+                    >
+                      <div className="relative z-10 flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center gap-2">
+                            <span className="text-sm font-black text-white">
+                              {tool.name}
+                            </span>
+                            <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-black text-[#ff4500] uppercase">
+                              {tool.mentionCount} mentions
+                            </span>
+                          </div>
+                          {tool.description ? (
+                            <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-zinc-500">
+                              {tool.description}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] font-bold text-zinc-700 italic">
+                              Analyzing tool specs...
+                            </p>
+                          )}
+                        </div>
+                        {tool.url && (
+                          <a
+                            href={
+                              tool.url.startsWith("http")
+                                ? tool.url
+                                : `https://${tool.url}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-zinc-800 p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
+                          >
+                            <TrendingUp className="h-3 w-3" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Validation Signals */}
             <div className="border-t border-white/5 pt-8">
