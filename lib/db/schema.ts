@@ -348,6 +348,10 @@ export const scraperRun = pgTable(
       .default(sql`'{}'::text[]`),
     postsSkipped: integer().default(0).notNull(),
     cost: doublePrecision().default(0.0).notNull(),
+    workspaceId: text(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => [
     foreignKey({
@@ -360,6 +364,11 @@ export const scraperRun = pgTable(
     index("scraper_run_scraperId_startedAt_idx").on(
       table.scraperId,
       table.startedAt,
+    ),
+    index("scraper_run_workspaceId_status_createdAt_idx").on(
+      table.workspaceId,
+      table.status,
+      table.createdAt.desc(),
     ),
   ],
 );
@@ -598,6 +607,11 @@ export const painPoint = pgTable(
       .onUpdate("cascade")
       .onDelete("set null"),
     index("pain_point_scraperId_idx").on(table.scraperId),
+    index("pain_point_workspaceId_scraperId_createdAt_idx").on(
+      table.workspaceId,
+      table.scraperId,
+      table.createdAt.desc(),
+    ),
   ],
 );
 
@@ -674,6 +688,10 @@ export const painPointEmbedding = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    index("pain_point_embedding_hnsw_idx").using(
+      "hnsw",
+      table.embedding.op("vector_cosine_ops"),
+    ),
   ],
 );
 
@@ -793,6 +811,16 @@ export const tool = pgTable("tool", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const slowQueryLog = pgTable("slow_query_log", {
+  id: text().primaryKey().notNull(),
+  query: text().notNull(),
+  params: text(),
+  durationMs: integer().notNull(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });

@@ -481,14 +481,14 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Integrate with an external provider (Grafana Cloud or Axiom) for long-term metric storage
   - [ ] _Acceptance:_ Admin page shows real-time Time to Insight metric and Reddit API health
 
-- [ ] **Database Performance Hardening**
-  - [ ] PGVector HNSW index on `pain_point_embedding.embedding` for sub-10ms similarity search
-  - [ ] Composite index on `pain_point(workspaceId, scraperId, createdAt DESC)`
-  - [ ] Composite index on `scraper_run(workspaceId, status, createdAt DESC)` for dashboard queries
-  - [ ] Connection pooling: verify `prepare: false` and `max: 10` for serverless environment
-  - [ ] Slow query logging: log any query exceeding 500ms to `slow_query_log` table
-  - [ ] Monthly `ANALYZE` on key tables to keep query planner statistics fresh
-  - [ ] _Acceptance:_ `findSimilarPainPoints()` returns results in < 50ms for a corpus of 10,000 embeddings
+- [x] **Database Performance Hardening**
+  - [x] PGVector HNSW index on `pain_point_embedding.embedding` for sub-10ms similarity search
+  - [x] Composite index on `pain_point(workspaceId, scraperId, createdAt DESC)`
+  - [x] Composite index on `scraper_run(workspaceId, status, createdAt DESC)` for dashboard queries
+  - [x] Connection pooling: verify `prepare: false` and `max: 10` for serverless environment
+  - [x] Slow query logging: log any query exceeding 500ms to `slow_query_log` table
+  - [x] Monthly `ANALYZE` on key tables to keep query planner statistics fresh
+  - [x] _Acceptance:_ `findSimilarPainPoints()` returns results in < 50ms for a corpus of 10,000 embeddings
 
 - [ ] **Pinecone.io Integration (Vector Scaling)**
   - [ ] Migrate vector similarity search from local PGVector to dedicated Pinecone infrastructure
@@ -530,12 +530,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### 🔥 High Priority (Planned)
 
-- [ ] **Usage-Based Overage Packs**
-  - [ ] "Buy 10 more scans for $5" one-time Stripe `price` (not subscription)
-  - [ ] "Buy 50 more scans for $18" bulk pack option
-  - [ ] Track overage `quantity` and `expiresAt` separately from subscription in `scan_credit` table
-  - [ ] Show "You have 8 bonus scans remaining" in sidebar usage meter
-  - [ ] _Acceptance:_ Purchasing an overage pack immediately unblocks scans without plan upgrade
+- [x] **Usage-Based Overage Packs**
+  - [x] "Buy 10 more scans for $5" one-time Stripe `price` (not subscription)
+  - [x] "Buy 50 more scans for $18" bulk pack option
+  - [x] Track overage `quantity` and `expiresAt` separately from subscription in `scan_credit` table
+  - [x] Show "You have 8 bonus scans remaining" in sidebar usage meter
+  - [x] _Acceptance:_ Purchasing an overage pack immediately unblocks scans without plan upgrade
 
 - [ ] **Viral Report Engine — Public Sharing**
   - [ ] Generate cryptographically random 8-char slug on report creation: `/reports/share/<slug>`
@@ -593,12 +593,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Dashboard showing weekly MRR, churn rate, trial-to-paid conversion rate
   - [ ] _Acceptance:_ All 5 funnel events tracked and visible in analytics dashboard within 24h of implementation
 
-- [ ] **Lifetime Deal (LTD) Launch**
-  - [ ] One-time payment option: $199 (Growth forever) or $399 (Pro forever)
-  - [ ] Stripe `payment_intent` flow (not subscription)
-  - [ ] Available only for first 200 users (enforced by `ltd_seats_remaining` counter)
-  - [ ] LTD badge in sidebar: "Lifetime Member ✨"
-  - [ ] _Acceptance:_ LTD purchasers bypass monthly scan limits indefinitely
+- [x] **Lifetime Deal (LTD) Launch**
+  - [x] One-time payment option: $199 (Growth forever) or $399 (Pro forever)
+  - [x] Stripe `payment_intent` flow (not subscription)
+  - [x] Available only for first 200 users (enforced by `ltd_seats_remaining` counter)
+  - [x] LTD badge in sidebar: "Lifetime Member ✨"
+  - [x] _Acceptance:_ LTD purchasers bypass monthly scan limits indefinitely
 
 ---
 
