@@ -1,0 +1,18 @@
+{
+  "postId": "p2",
+  "subreddit": "freelance",
+  "title": "Chasing down invoices is taking 10 hours a week",
+  "selftext": "Every month I have to manually email my clients 4 times just to get paid. The software I use doesn't let me text them, which is the only way they respond. Is there a simple texting invoice reminder tool?",
+  "comments": [
+    { "body": "I totally agree, texting is the only way now." },
+    { "body": "I built a crappy twilio script for this but an app would be nice." }
+  ],
+  "expected": [
+    {
+      "painPoint": "Following up on invoices via email is ineffective and wastes 10 hours a week.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": false
+    }
+  ]
+}

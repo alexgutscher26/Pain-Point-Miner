@@ -644,14 +644,14 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Screenshot on failure (stored as GitHub Actions artifacts)
   - [ ] _Acceptance:_ All 7 flows pass on 3 consecutive CI runs without flake
 
-- [ ] **AI Evaluation Framework**
-  - [ ] Create `tests/golden-dataset/` folder with 50 handpicked Reddit posts + expected extraction output
-  - [ ] JSON schema: `{ postId, subreddit, selftext, expected: { painPoint, sentiment, painIntensity, hasBudgetSignal } }`
-  - [ ] Eval script: run `extractPainPoints()` against all 50 posts, compare to expected
-  - [ ] Metrics: precision, recall, F1, average `painIntensity` delta
-  - [ ] Alert CI if overall F1 drops below 0.70 on the golden dataset
-  - [ ] Run eval monthly and log results to `ai_eval_log` table: `date`, `model`, `f1`, `precision`, `recall`
-  - [ ] _Acceptance:_ Running `bun run eval:ai` on the golden dataset prints a score report in < 2 minutes
+- [x] **AI Evaluation Framework**
+  - [x] Create `tests/golden-dataset/` folder with 50 handpicked Reddit posts + expected extraction output
+  - [x] JSON schema: `{ postId, subreddit, selftext, expected: { painPoint, sentiment, painIntensity, hasBudgetSignal } }`
+  - [x] Eval script: run `extractPainPoints()` against all 50 posts, compare to expected
+  - [x] Metrics: precision, recall, F1, average `painIntensity` delta
+  - [x] Alert CI if overall F1 drops below 0.70 on the golden dataset
+  - [x] Run eval monthly and log results to `ai_eval_log` table: `date`, `model`, `f1`, `precision`, `recall`
+  - [x] _Acceptance:_ Running `bun run eval:ai` on the golden dataset prints a score report in < 2 minutes
 
 ### ⬜ Planned
 

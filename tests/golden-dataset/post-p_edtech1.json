@@ -1,0 +1,19 @@
+{
+  "postId": "p_edtech1",
+  "subreddit": "edtech",
+  "title": "LMS Integration with Existing Student Information System (SIS) - absolute nightmare!",
+  "selftext": "Our university is migrating to a new Learning Management System (LMS) from Blackboard to Canvas. The IT department promised seamless integration with our existing SIS (Banner), but the integration is a disaster. Grades aren't syncing correctly, student enrollments are messed up, and faculty are spending hours troubleshooting errors. We're receiving angry emails from students and professors every day. I need to fix the broken LMS/SIS sync IMMEDIATELY. Has anyone managed data-mapping between Canvas and Banner effectively? We are willing to pay experts.",
+  "comments": [
+    {
+      "body": "We have had success working with Ellucian, if that's helpful."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Failed LMS (Canvas) and SIS (Banner) integration leading to grade syncing issues, enrollment errors, and faculty frustration.",
+      "sentiment": "angry",
+      "painIntensity": 10,
+      "hasBudgetSignal": true
+    }
+  ]
+}

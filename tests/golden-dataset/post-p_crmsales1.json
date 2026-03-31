@@ -1,0 +1,19 @@
+{
+  "postId": "p_crmsales1",
+  "subreddit": "sales",
+  "title": "Lack of Territory Management Automation in Salesforce - Driving Me Crazy!",
+  "selftext": "Our sales team is growing rapidly and our territory assignments in Salesforce are a complete mess. We're currently using a combination of spreadsheet mapping and manual data entry to assign accounts to reps. It's incredibly inefficient and prone to human error. Ideally, I'd like a tool that can automate territory alignment based on factors like industry, company size, and geography, and then automatically update rep assignments in Salesforce. Considering buying a Salesforce appexchange solution, but worried about integration costs.",
+  "comments": [
+    {
+      "body": "There are a few AppExchange apps. Check out 'Territory Management' app exchange. I'd recommend getting a demo before purchasing."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient and error-prone manual process for territory management and account assignment in Salesforce, leading to inaccuracies and lost sales opportunities.",
+      "sentiment": "angry",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

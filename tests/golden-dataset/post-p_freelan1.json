@@ -1,0 +1,19 @@
+{
+  "postId": "p_freelan1",
+  "subreddit": "freelance",
+  "title": "Self-employed accountants, what's the *least* painful way to track billable hours and expenses WITHOUT Quickbooks?",
+  "selftext": "I'm a freelance accountant and bookkeeper. I need to meticulously track my time and all the various expenses I incur on behalf of clients. I abhor Quickbooks – it's overkill for my needs and I find it incredibly clunky. I've tried Toggl Track, but it doesn't handle expenses well. I'm looking for something that integrates time tracking with expense management and ideally generates professional-looking invoices. Simplicity is key. Willing to pay for a decent solution, but I'm not diving into a full-blown accounting suite.",
+  "comments": [
+    {
+      "body": "Check out FreshBooks. It's more tailored to freelancers than QuickBooks, with good time tracking and invoicing."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficulty tracking billable hours and expenses efficiently without using QuickBooks or other complex accounting software as a freelance accountant.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

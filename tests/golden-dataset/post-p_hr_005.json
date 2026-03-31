@@ -1,0 +1,19 @@
+{
+  "postId": "p_hr_005",
+  "subreddit": "HR",
+  "title": "Performance Management Software - Continuous Feedback Struggles",
+  "selftext": "We've rolled out a continuous feedback performance management system (using Lattice). In theory, great. In practice, nobody uses it. Managers don't give feedback, employees don't ask for it. It's just another tool cluttering our workflow. Any tips on how to drive adoption or should we just cut our losses and go back to annual reviews?",
+  "comments": [
+    {
+      "body": "Leadership needs to champion the change. If they aren't actively using it, nobody else will be either."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Low adoption and engagement with a continuous feedback performance management system, rendering it ineffective.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "postId": "p_agency_rpt",
+  "subreddit": "agency",
+  "title": "Client reporting for digital marketing agencies - beyond Google Analytics?",
+  "selftext": "My agency manages digital marketing for small to medium businesses. We're spending way too much time manually compiling reports from Google Analytics, Google Ads, Facebook Ads, etc., then dropping it all into a Powerpoint. I need a tool that automates this process, pulls data from multiple sources, and creates visually appealing, client-friendly reports. We'd also value whitelabel branding. Needs to be affordable as we need licenses for multiple users across multiple clients. What affordable SaaS can actually reduce reporting time, not just look pretty?",
+  "comments": [
+    {
+      "body": "Checked out AgencyAnalytics? Supposed to be built for this. Bit more expensive, perhaps."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Time consuming manual report generation for multiple clients using data from various marketing platforms",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

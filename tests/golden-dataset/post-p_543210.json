@@ -1,0 +1,19 @@
+{
+  "postId": "p_543210",
+  "subreddit": "Salesforce",
+  "title": "Territory Management in Salesforce: a real headache",
+  "selftext": "Our sales team is growing fast, and our current territory management in Salesforce is a complete mess. We're assigning leads manually with no real logic, causing conflicts and missed opportunities. I've tried to use Salesforce's built-in territory management but I find it clunky and difficult to customize to our business needs. We need a more intelligent/automated solution. Anyone successfully implemented sophisticated territory management within Salesforce to support complex sales hierarchies and automated lead routing?",
+  "comments": [
+    {
+      "body": "Consider using a dedicated territory management app from the AppExchange. Several offer advanced features and integrations with Salesforce."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient manual lead assignment and complex territory structures in Salesforce lead to conflicts, missed opportunities, and reduced sales productivity.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

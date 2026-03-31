@@ -1,0 +1,19 @@
+{
+  "postId": "p_hris1",
+  "subreddit": "HR",
+  "title": "HRIS for remote teams - beyond just payroll?",
+  "selftext": "Our company is fully remote and growing quickly (now 75 employees). We're using Gusto for payroll, but we need more comprehensive HR features to manage performance reviews, employee engagement, and benefits administration. We're finding it difficult to foster a strong company culture with everyone working remotely. Any recommendations for HRIS solutions that are specifically designed for remote teams and offer features beyond basic HR functions? Preferably something that integrates with Slack and other communication tools.",
+  "comments": [
+    {
+      "body": "BambooHR is a good option and integrates with Slack. But also give remote-first HRIS platforms like Deel and Oyster a look, these are designed for global teams, if that's your situation."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inadequate HRIS (Gusto) for managing performance reviews, employee engagement, and benefits in a fully remote and growing company.",
+      "sentiment": "neutral",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

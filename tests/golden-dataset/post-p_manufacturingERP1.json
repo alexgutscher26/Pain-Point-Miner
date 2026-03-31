@@ -1,0 +1,19 @@
+{
+  "postId": "p_manufacturingERP1",
+  "subreddit": "manufacturing",
+  "title": "Inventory Tracking Woes with NetSuite - Cycle Counts are killing us!",
+  "selftext": "We're a small manufacturing company using NetSuite for ERP. Our biggest ongoing issue is maintaining accurate inventory levels. We're constantly having to do manual cycle counts to correct discrepancies, which is incredibly time-consuming. We've explored using barcoding and mobile scanning, but the implementation costs and complexity seem daunting. Is there a more streamlined, affordable solution for improving inventory accuracy within NetSuite? Perhaps an add-on?",
+  "comments": [
+    {
+      "body": "Have you optimized your bin management? Could be a setup issue"
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inaccurate inventory levels in NetSuite, leading to frequent and time-consuming manual cycle counts in a manufacturing company.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": false
+    }
+  ]
+}

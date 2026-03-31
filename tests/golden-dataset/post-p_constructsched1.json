@@ -1,0 +1,19 @@
+{
+  "postId": "p_constructsched1",
+  "subreddit": "Construction",
+  "title": "Overwhelmed with Primavera P6 Updates - Cloud Based Alternatives?",
+  "selftext": "Our small-to-medium GC firm relies heavily on Primavera P6 for scheduling our projects. The problem is the weekly updates are a nightmare. We have multiple supers in the field, constantly emailing spreadsheets with progress and delays. Getting that data accurately into P6 is a manual, error-prone process. We're looking for something more real-time and cloud-based that can integrate easily with field reports and ideally provide a dashboard view for executives. Mobile app is a must. Not ready to abandon scheduling software completely, but looking for a simpler, more collaborative solution. Considering Procore but open to suggestions. Budget is a consideration, of course.",
+  "comments": [
+    {
+      "body": "Check out Bridgit Bench for resource allocation as well, can integrate with schedule easily"
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficult and error-prone manual entry of field progress updates into Primavera P6 for construction scheduling, causing delays and inaccuracies.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

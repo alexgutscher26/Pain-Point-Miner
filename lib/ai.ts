@@ -188,7 +188,7 @@ Top comments:
 ${topComments || "(no comments)"}
 
 ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
-- Extract up to 3 distinct pain points.
+- Extract ONLY the single most critical, root pain point (1 maximum).
 - Prioritize pains with urgency, repeatability, and business value.
 - Ignore generic complaints unless they reveal a concrete unmet need.
 - Prefer the root cause over symptoms.

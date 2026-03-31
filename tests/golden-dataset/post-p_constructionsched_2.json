@@ -1,0 +1,22 @@
+{
+  "postId": "p_constructionsched_2",
+  "subreddit": "Construction",
+  "title": "Scheduling conflicts with subcontractors and material deliveries—any solutions?",
+  "selftext": "Running a mid-sized GC firm and our project timelines keep getting wrecked by subcontractor scheduling conflicts and delayed material deliveries. We're using a spreadsheet-based system for scheduling, and it's just not cutting it.  Multiple subcontractors showing up at the same time for a small area, materials arriving weeks late because the order wasn't synced with the schedule, the works.  We've looked at Procore and similar heavy hitters, but those are way too expensive and complex for our needs.  Is there anything in between -- something more robust than spreadsheets but less bloated than enterprise-level solutions -- that focuses specifically on scheduling and resource management? Willing to pay something reasonable to solve this.",
+  "comments": [
+    {
+      "body": "Check out Buildertrend. Might be a good fit. They have decent scheduling and CRM functionality without the Procore price tag."
+    },
+    {
+      "body": "Look into cloud-based scheduling software like Asana or Monday.com, they integrate well with other PM tools and have visual timelines."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient construction scheduling leading to subcontractor conflicts and material delays due to inadequate software.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

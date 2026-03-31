@@ -1,0 +1,19 @@
+{
+  "postId": "p_construction_002",
+  "subreddit": "Construction",
+  "title": "Scheduling Software that integrates with subcontractors?",
+  "selftext": "I'm a PM for a residential construction company. We're using Procore, but their scheduling module is clunky when it comes to communicating schedules to subcontractors. We end up emailing spreadsheets and making tons of phone calls. Looking for a solution that allows subcontractors to see their schedules in real-time and update their progress. Needs to be mobile friendly. Any recommendations?",
+  "comments": [
+    {
+      "body": "Check out Buildertrend, it's pretty good for sub management. Not perfect, but better than spreadsheets."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of real-time schedule communication and collaboration with subcontractors, leading to inefficient project management.",
+      "sentiment": "curious",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "postId": "p_876954",
+  "subreddit": "Sales",
+  "title": "SaaS Sales CRM Integration Hell: Data Silos!",
+  "selftext": "Our sales team uses Salesforce, but our marketing and customer success teams use different platforms (HubSpot and Zendesk, respectively). The lack of integration creates massive data silos, making it impossible to get a complete view of the customer journey. We're missing opportunities, providing inconsistent customer experiences, and wasting valuable time on manual data entry. What middleware/integration tools are others using to connect these platforms and create a single source of truth for customer data? Cost effective solutions are a plus!",
+  "comments": [
+    {
+      "body": "Consider a dedicated integration platform as a service (iPaaS) solution like Workato or Celigo. They're built for connecting enterprise applications."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Data silos resulting from disparate CRM, marketing, and customer success platforms hinder cross-functional collaboration and limit the ability to track the complete customer journey.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "postId": "p_legaltech_8",
+  "subreddit": "legaltech",
+  "title": "Contract lifecycle management solutions for small law firms?",
+  "selftext": "Our small law firm is drowning in contracts. Drafting, reviewing, redlining, signing, storing... it's all a manual, time-consuming mess. We're looking into contract lifecycle management (CLM) solutions but the price point for enterprise CLMs (think Ironclad, Agiloft) is completely out of reach. Are there any CLM platforms specifically designed for small law firms or solo practitioners? Needs to be affordable and relatively easy to implement. If it can integrate with Clio Manage, even better! Just looking for something to make us more efficient.",
+  "comments": [
+    {
+      "body": "Consider PandaDoc. It is contract management system with some automation."
+    },
+    {
+      "body": "Check out LawToolBox."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Drowning in contracts at a small law firm and seeking an affordable CLM solution with easy implementation.",
+      "sentiment": "curious",
+      "painIntensity": 5,
+      "hasBudgetSignal": true
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "postId": "p_entso1",
+  "subreddit": "devops",
+  "title": "Enterprise SSO and BYOD - absolute chaos!",
+  "selftext": "We're a 500-person company rapidly moving to a BYOD model. Our current SSO (Azure AD) is struggling to handle the diverse range of devices and applications. We're seeing constant login problems, especially with cloud-based apps. The security team is also concerned about vulnerabilities with personal devices accessing sensitive company data. Management is pushing for a zero-trust architecture. I'm looking for robust SSO solutions that integrate well with Azure AD but offer better device management and multi-factor authentication options. Budget is flexible if it truly solves the headache.",
+  "comments": [
+    {
+      "body": "Look into Okta or Ping Identity. They're pricier but offer better control and security features for BYOD. Make sure they integrate seamlessly with your existing Azure AD setup."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inadequate enterprise SSO (Azure AD) for BYOD environment leading to login problems, security vulnerabilities, and difficulty implementing zero-trust architecture.",
+      "sentiment": "desperate",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

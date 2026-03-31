@@ -1,0 +1,22 @@
+{
+  "postId": "p_enterpriseSSO_3",
+  "subreddit": "devops",
+  "title": "SSO provider lock-in is killing us",
+  "selftext": "We initially went with [SSO provider name] because it was cheap and easy, but now we're hitting all sorts of limitations. Their API is garbage, integration with our custom apps is a nightmare, and their customer support is non-existent. We desperately need to migrate to something more robust (thinking Okta or Azure AD), but the cost of migration is terrifying. Anyone been through a similar migration and have any advice on minimizing disruption and data loss? We have hundreds of internal applications relying on [SSO provider name] right now. We really messed up, guys...",
+  "comments": [
+    {
+      "body": "Yeah, proprietary SSO APIs are a trap. Start with a phased migration, focusing on less critical apps first."
+    },
+    {
+      "body": "Write detailed migration scripts and test them thoroughly in a staging environment. Consider using a SAML proxy to abstract away the specific SSO provider."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Vendor/SSO lock-in causing limitations, poor API, and difficult custom app integration prompting costly and complex migration.",
+      "sentiment": "desperate",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

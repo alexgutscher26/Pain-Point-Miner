@@ -1,0 +1,19 @@
+{
+  "postId": "p_321654",
+  "subreddit": "devops",
+  "title": "Centralized Authentication for Microservices is a Mess",
+  "selftext": "We've migrated to a microservices architecture, and while we love the increased agility, managing authentication is a nightmare. Each service currently handles its own authentication, leading to duplicated code, inconsistent policies, and security vulnerabilities. Has anyone successfully implemented a centralized authentication solution that works well with microservices? We're considering using something like Keycloak or Auth0, but are concerned about vendor lock-in. What are the pros and cons of different approaches, especially in terms of security, scalability, and ease of integration?",
+  "comments": [
+    {
+      "body": "Look into using service meshes like Istio with a shared identity provider. That can provide a layer of security and authentication across your microservices."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Decentralized authentication in a microservices architecture results in duplicated code, inconsistent security policies, and increased vulnerability risks.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

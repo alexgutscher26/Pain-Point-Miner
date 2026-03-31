@@ -1,0 +1,19 @@
+{
+  "postId": "p_enterprise_sso_003",
+  "subreddit": "devops",
+  "title": "SSO nightmare - Vendor lock-in and rising costs",
+  "selftext": "We're a growing company and have been using Okta for SSO. While it's been reliable, the costs are skyrocketing and we're feeling increasingly locked in. We're exploring alternatives that offer more flexibility and better pricing. Open to open-source solutions as well. Scalability is critical. Any suggestions?",
+  "comments": [
+    {
+      "body": "Have you looked at Keycloak? It's open source and pretty powerful."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "High costs and vendor lock-in with current SSO solution (Okta). Seeking more flexible and cost-effective alternatives.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

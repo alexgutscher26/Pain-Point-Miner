@@ -1,0 +1,19 @@
+{
+  "postId": "p_marketingdata1",
+  "subreddit": "marketing",
+  "title": "Attribution modeling across diverse channels - a nightmare",
+  "selftext": "Okay, so like everyone else, we are just drowning in marketing data: Google Ads, FB ads, LinkedIn ads, plus email campaigns and content marketing. Our in-house data team is struggling to build a unified attribution model showing how each channel contributes to conversions. We've implemented Google Analytics 360, but even that doesn't give us the granular insights we need. Looking for suggestions! Would consider cloud based solutions too.",
+  "comments": [
+    {
+      "body": "Have you looked at Rockerbox? They specialize in B2B attribution and have integrations for lots of platforms"
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficulty creating a unified attribution model across diverse marketing channels (Google Ads, FB Ads, LinkedIn Ads, email, content) due to data silos and limitations of existing tools like Google Analytics 360.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "postId": "p_legaltech1",
+  "subreddit": "legaltech",
+  "title": "Contract Lifecycle Management for Lawyers - Feature Parity Please!",
+  "selftext": "Our small law firm finally made the jump to Cloud for our Case Management Software (Clio), but our on-premise Contract Lifecycle Management (CLM) system doesn't have an easy way to integrate with it. I would kill for the ability to have automated updates and track amendments in real time. Is there a contract drafting and management tool with version control and integration from different sources besides Microsoft Word? I'd subscribe today for that!",
+  "comments": [
+    {
+      "body": "Checkout Ironclad. Integrates with a lot of stuff and is solid."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of seamless integration between Cloud-based Case Management Software (Clio) and a legacy on-premise Contract Lifecycle Management (CLM) system, hindering automated updates and real-time tracking of amendments.",
+      "sentiment": "desperate",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

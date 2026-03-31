@@ -1,0 +1,19 @@
+{
+  "postId": "p_456123",
+  "subreddit": "recruiting",
+  "title": "Applicant Tracking Systems (ATS) for High-Volume, Specialized Roles",
+  "selftext": "We are struggling to find an ATS that efficiently handles the high volume of applications we receive for specialized engineering roles (e.g., machine learning engineers, data scientists). None seem to properly parse resumes with complex formatting or accurately capture the nuanced skills we need. We're spending hours manually reviewing resumes that should be automatically filtered out. Does anyone have recommendations for ATS solutions that excel at parsing complex technical resumes and provide advanced skills-based matching, specifically for technical talent?",
+  "comments": [
+    {
+      "body": "Have you looked into solutions that use AI-powered skills extraction? They can often handle more complex resumes."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inadequate resume parsing and skills-based matching in current ATS solutions lead to wasted time on manual review of irrelevant applications for specialized roles.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

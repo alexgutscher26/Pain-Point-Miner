@@ -1,0 +1,19 @@
+{
+  "postId": "p_HRanalytics1",
+  "subreddit": "HR",
+  "title": "Predictive Turnover Analysis - What Are You Using?",
+  "selftext": "Our HR department is trying to get ahead of employee turnover. Right now, we're just reacting to resignations. I'd like to implement a predictive analytics solution that can identify employees at high risk of leaving based on factors like performance reviews, tenure, compensation, and engagement scores. We use Workday, but their built-in analytics are pretty basic. Has anyone successfully implemented a more advanced predictive turnover solution with Workday? Price is a major concern for us, so looking for cost-effective options.",
+  "comments": [
+    {
+      "body": "Consider building something with Python on top of your HR data. Off the shelf might be too expensive if you are ok getting hands on"
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of proactive insight into employee turnover risks due to limited predictive analytics capabilities in Workday, leading to reactive HR management.",
+      "sentiment": "curious",
+      "painIntensity": 5,
+      "hasBudgetSignal": false
+    }
+  ]
+}

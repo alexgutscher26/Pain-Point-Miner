@@ -1,0 +1,19 @@
+{
+  "postId": "p_123789",
+  "subreddit": "Salesforce",
+  "title": "Automated CPQ Quote Approval Workflow: So Frustrated!",
+  "selftext": "Our Salesforce CPQ implementation promised seamless quote-to-cash, but the approval workflow is a disaster. Quotes often need to be escalated several times for minor discounts. We're facing major deal delays because sales reps are waiting days for approvals. We've tried modifying the standard approval processes, but it's complex and inflexible. We are also struggling to integrate approval limits based on both deal size and product type. Has anyone found a robust solution for automating complex CPQ quote approvals with granular control and integrated discounting matrices?",
+  "comments": [
+    {
+      "body": "Have you checked out Conga Approvals? It might give you more customization options than the out-of-the-box Salesforce approval process."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Slow and complex quote approval workflows in Salesforce CPQ are causing deal delays and hindering sales efficiency.",
+      "sentiment": "frustrated",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

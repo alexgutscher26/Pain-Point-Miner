@@ -1,0 +1,19 @@
+{
+  "postId": "p_martech1",
+  "subreddit": "marketing",
+  "title": "Marketing Automation - Overwhelmed with Options!",
+  "selftext": "My team is finally ready to invest in marketing automation software. We're a B2B SaaS company focusing on lead generation and nurture. I've been researching all the options (HubSpot, Marketo, Pardot, ActiveCampaign) and I'm completely overwhelmed. Each platform seems to have its own pros and cons, and the pricing is all over the place. We need something robust enough to handle lead scoring, email marketing, and landing page creation, but not so complex that it requires a dedicated admin. Has anyone successfully navigated this decision process and can offer some practical advice?",
+  "comments": [
+    {
+      "body": "Start with identifying your core needs and non-negotiables. Then create a matrix comparing features and pricing. Don't get swayed by fancy demos; focus on what will truly impact your ROI."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficulty selecting the appropriate marketing automation software due to the variety of options, complex features, and varying pricing models.",
+      "sentiment": "curious",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

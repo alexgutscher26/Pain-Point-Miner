@@ -1,0 +1,22 @@
+{
+  "postId": "p_salescrm_6",
+  "subreddit": "Sales",
+  "title": "CRM reporting on multi-touch attribution drives me nuts",
+  "selftext": "We're using Salesforce, and trying to get accurate multi-touch attribution reports is like pulling teeth. The out-of-the-box reporting is useless, and even custom reports are clunky and inaccurate. I want to know which marketing channels are truly driving pipeline and revenue, but all I get are incomplete or misleading data. Has anyone found a good workaround or a third-party tool that actually solves this problem? Will pay for a good solution at this point.",
+  "comments": [
+    {
+      "body": "Look into attribution tools like CaliberMind or Bizible (now part of Adobe). They integrate with Salesforce and provide much more sophisticated attribution models."
+    },
+    {
+      "body": "HubSpot has decent attribution reporting capabilities, if you're willing to migrate to a different platform."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inaccurate or clunky multi-touch attribution reporting available in Salesforce.",
+      "sentiment": "angry",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

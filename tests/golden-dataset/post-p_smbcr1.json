@@ -1,0 +1,19 @@
+{
+  "postId": "p_smbcr1",
+  "subreddit": "Sales",
+  "title": "CRM Recommendations for a small but growing CRO agency?",
+  "selftext": "Our CRO agency is growing fast, now at 8 people. We're currently using a spreadsheet to track leads and client communication, but it's becoming unmanageable. We need a CRM that can handle lead management, pipeline tracking, and basic reporting. We're not interested in all the bells and whistles of Salesforce – something simpler and more focused on sales would be ideal. Cost is a major factor; looking for something affordable for a small team. Any recommendations?",
+  "comments": [
+    {
+      "body": "HubSpot CRM is free and pretty good for small teams. It might be enough for your needs."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of a suitable CRM to manage lead generation, pipeline tracking, and client communication within a small CRO agency.",
+      "sentiment": "neutral",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

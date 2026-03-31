@@ -1,0 +1,19 @@
+{
+  "postId": "p_medbill1",
+  "subreddit": "medicalbilling",
+  "title": "Denied claims piling up - integration nightmare!",
+  "selftext": "We're a small medical billing company specializing in physical therapy clinics. We switched to Medisoft a year ago, primarily for its claims scrubbing features. However, the promised seamless integration with our existing EHR (TheraOffice) is a joke. We're manually entering data and constantly getting denials due to mismatched CPT codes and patient demographics. The Medisoft support is blaming TheraOffice and vice versa. We're spending hours each week fixing errors. Anyone else have this problem and found a workaround, or should we just cut our losses and switch to a different billing software?",
+  "comments": [
+    {
+      "body": "Dealing with the same issue! Medisoft support is awful. Have you considered Claim.MD? They seem to play nicer with other systems."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Poor integration between medical billing software (Medisoft) and existing EHR (TheraOffice) leading to manual data entry and claim denials.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

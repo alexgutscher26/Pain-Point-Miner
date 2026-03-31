@@ -1,0 +1,19 @@
+{
+  "postId": "p_medbilling1",
+  "subreddit": "medicalbilling",
+  "title": "Struggling to Automate Denials Workflow in Epic - Any Tips?",
+  "selftext": "We're a medium-sized medical billing company specializing in oncology. We use Epic primarily. Our biggest bottleneck currently is manual denials management - specifically, identifying root causes for denials related to prior authorization discrepancies and timely filing limits. It's a black hole, manually pulling EOB data, comparing with authorizations, and checking dates. I've looked into Epic's AI features but they are not robust enough. Anyone have experience integrating third-party AI tools with Epic for automated denials analysis and appeal generation? Willing to spend on a custom solution if needed.",
+  "comments": [
+    {
+      "body": "Have you checked out ClaimMedic? They have a pretty good module for denials around auth and coding."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient manual process for identifying root causes of medical billing denials in Epic, particularly related to prior authorization and timely filing.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

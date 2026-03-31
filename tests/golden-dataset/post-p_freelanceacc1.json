@@ -1,0 +1,19 @@
+{
+  "postId": "p_freelanceacc1",
+  "subreddit": "freelance",
+  "title": "Need a better invoicing solution for complex project billing",
+  "selftext": "As a freelance web developer, my projects often involve milestone payments, hourly rates, and fixed-price components, all within the same project. Current tools like Quickbooks Self-Employed struggle to accurately represent these complex billing scenarios. I'm constantly manually adjusting invoices and creating separate documents. I'd love a solution that allows for flexible invoicing structures, seamless time tracking integration, and even automatic invoice generation based on project milestones. Anything out there that isn't complete overkill for a solo freelancer?",
+  "comments": [
+    {
+      "body": "Have you tried FreshBooks? It's pretty streamlined and handles different rates okay."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficulty creating and managing complex invoices with milestone payments, hourly rates, and fixed-price components as a freelancer.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": false
+    }
+  ]
+}

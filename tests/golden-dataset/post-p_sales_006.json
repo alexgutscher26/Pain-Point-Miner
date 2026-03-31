@@ -1,0 +1,19 @@
+{
+  "postId": "p_sales_006",
+  "subreddit": "Sales",
+  "title": "Salesforce Automation for Complex Product Configuration?",
+  "selftext": "We sell highly configurable industrial equipment. Our reps are spending way too much time manually configuring quotes in Salesforce. We need a CPQ (Configure, Price, Quote) system that integrates seamlessly with Salesforce and can handle complex product rules. Current setup is slowing us down. Willing to invest in the right solution.",
+  "comments": [
+    {
+      "body": "Have you looked at Salesforce CPQ? It's the native solution, but can be pricey."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient manual quote generation and product configuration in Salesforce, hindering sales productivity.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

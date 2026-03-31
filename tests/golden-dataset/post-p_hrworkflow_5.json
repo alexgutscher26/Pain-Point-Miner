@@ -1,0 +1,22 @@
+{
+  "postId": "p_hrworkflow_5",
+  "subreddit": "HR",
+  "title": "Applicant tracking system integrations with background check vendors",
+  "selftext": "Currently using [ATS name] to manage our recruiting process, but the integration with our background check vendor ([background check vendor name]) is a disaster. Manual data entry is required for every single candidate, which is eating up so much time. Are there any ATS platforms that have smoother integrations with major background check services, allowing for automated data transfer and status updates? Getting tired of switching between systems constantly. Seems unbelievably inefficient.",
+  "comments": [
+    {
+      "body": "We use Workday and Sterling and the integration is pretty seamless. Expensive, though."
+    },
+    {
+      "body": "BambooHR might be a good option to look at. Heard their integrations are generally pretty solid."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Poor integrations between applicant tracking system and background check vendor needing manual data entry and constant switching between systems.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

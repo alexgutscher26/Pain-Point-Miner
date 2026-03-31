@@ -1,0 +1,19 @@
+{
+  "postId": "p_freelance_004",
+  "subreddit": "freelance",
+  "title": "Accounting Software for Agencies with Recurring Revenue?",
+  "selftext": "I run a small digital marketing agency with lots of recurring monthly retainers. Xero is ok, but it's not ideal for managing recurring revenue and forecasting. I need something that integrates with Stripe and can easily track customer lifetime value. Anyone found a good solution?",
+  "comments": [
+    {
+      "body": "Check out ProfitWell, but it's more analytics focused. Might be worth integrating into Xero."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of robust recurring revenue management and forecasting capabilities in current accounting software (Xero).",
+      "sentiment": "curious",
+      "painIntensity": 5,
+      "hasBudgetSignal": true
+    }
+  ]
+}

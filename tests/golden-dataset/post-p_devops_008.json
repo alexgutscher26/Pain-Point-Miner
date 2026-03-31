@@ -1,0 +1,19 @@
+{
+  "postId": "p_devops_008",
+  "subreddit": "devops",
+  "title": "Infrastructure as Code - Terraform State Management Hell",
+  "selftext": "We're using Terraform to manage our AWS infrastructure, but state management is a nightmare. State locking is inconsistent and we've had multiple instances of state corruption. Looking for a robust and scalable solution for Terraform state storage and collaboration. Thinking about Atlantis or Terraform Cloud, but exploring all options.",
+  "comments": [
+    {
+      "body": "Atlantis is great if you're already using GitOps. Terraform Cloud also makes it pretty easy."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inconsistent Terraform state locking and state corruption issues, hindering Infrastructure as Code (IaC) management.",
+      "sentiment": "angry",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

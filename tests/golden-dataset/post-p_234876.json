@@ -1,0 +1,19 @@
+{
+  "postId": "p_234876",
+  "subreddit": "recruiting",
+  "title": "Video Interview Platforms Lacking for Technical Assessments",
+  "selftext": "We're a small startup and have been using generic video interview platforms (Zoom, Google Meet) for initial screenings. We now need a system that includes live coding assessment capability. The current solutions on the market either lack the features we need (proper IDE integration, real-time compilation) or are prohibitively expensive. Has anyone found a budget-friendly video interview platform that supports robust live coding challenges and technical skills assessment?",
+  "comments": [
+    {
+      "body": "Take a look at CoderPad or HackerRank's interview tool. They offer free trials, so you can see if they meet your needs."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of affordable video interviewing platforms with real-time code compilation and integrated IDE support hinders effective technical skills assessments for small startups.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

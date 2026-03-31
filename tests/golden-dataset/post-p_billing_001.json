@@ -1,0 +1,19 @@
+{
+  "postId": "p_billing_001",
+  "subreddit": "medicalbilling",
+  "title": "Insurance claim automation nightmare - modifier hell!",
+  "selftext": "We're a medium sized independent practice (10 physicians) specializing in cardiology. We use a well-known practice management software for billing, but its modifier automation is AWFUL. We constantly get denials because modifier combinations aren't validating properly against payer rules. We're spending hours manually reviewing claims before submission. Anyone else have this problem or find a fix? Thinking of building a custom script to pre-validate claims, but that sounds like a huge undertaking.",
+  "comments": [
+    {
+      "body": "Yep, been there. Our old system did that. Switched to [Competitor Software] and it's much better. Expensive, but worth it."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inefficient modifier validation causing claim denials and manual review overhead.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

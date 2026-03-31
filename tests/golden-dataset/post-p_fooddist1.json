@@ -1,0 +1,19 @@
+{
+  "postId": "p_fooddist1",
+  "subreddit": "supplychain",
+  "title": "Food Distribution - Visibility Nightmare",
+  "selftext": "I work for a small food distributor. We're struggling with tracking inventory and order fulfillment in real-time. Our current ERP (Sage 100) feels outdated and doesn't give us the visibility we need. We have constant stockouts, delayed deliveries, and frustrated customers. We need a solution that can integrate with our warehouse management system and provide real-time updates on inventory levels, order status, and delivery routes. Compliance with food safety regulations is also crucial. Thinking about upgrading to NetSuite, but the price tag is scary. Are there more affordable alternatives?",
+  "comments": [
+    {
+      "body": "Check out Fishbowl Inventory - it's designed for manufacturing and distribution and integrates nicely with Quickbooks (or Sage even). Might be a good middle ground before jumping to NetSuite."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of real-time visibility in inventory and order fulfillment leading to stockouts, delivery delays, and compliance issues in a food distribution business.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

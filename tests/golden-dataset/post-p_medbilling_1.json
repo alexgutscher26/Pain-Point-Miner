@@ -1,0 +1,22 @@
+{
+  "postId": "p_medbilling_1",
+  "subreddit": "medicalbilling",
+  "title": "ICD-10 nightmares with modifier sequencing in emergency medicine",
+  "selftext": "Anyone else completely losing it trying to get modifier sequencing correct for E/M services in the ER? We're using [billing software name], and its modifier rules are just plain wrong for several common emergency scenarios. Denials are through the roof. Example: a laceration repair with conscious sedation AND a foreign body removal... the system flags the E/M as needing modifier 25 appended, but if we do, it's immediately denied because of bundling rules we *should* be able to override with the correct sequence. We're burning so much staff time on appeals. Considering switching platforms, but the data migration process is horrifying. Any tips or suggestions, or should I just brace myself for years of this?",
+  "comments": [
+    {
+      "body": "We had similar issues with [another billing software name]. Try appealing with detailed documentation of the encounter and highlighting medical necessity."
+    },
+    {
+      "body": "Yeah, [billing software name] is notorious for sucking at modifier logic. Ask your rep to escalate to their coding experts, but honestly, switching might be less painful in the long run. Data migration IS a pain, agreed."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inaccurate modifier sequencing in medical billing software leading to claim denials and increased staff time spent on appeals.",
+      "sentiment": "angry",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

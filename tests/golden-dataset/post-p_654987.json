@@ -1,0 +1,19 @@
+{
+  "postId": "p_654987",
+  "subreddit": "agency",
+  "title": "Client Reporting Automation: Losing Too Much Time on Spreadsheets",
+  "selftext": "As a digital marketing agency, we're spending way too much time manually compiling client reports from various platforms (Google Ads, Facebook Ads, Google Analytics, etc.). The process is tedious, error-prone, and doesn't scale. We need a solution that can automatically aggregate data from multiple sources, generate visually appealing reports, and schedule delivery to clients. We're open to exploring different options, from dedicated reporting platforms to custom API integrations. Anyone have insights into the best tools for automating client reporting in an agency setting? Prefer something with white-label options.",
+  "comments": [
+    {
+      "body": "Check out Databox or Klipfolio. Both are popular options for agency-level reporting."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Manual client reporting processes are time-consuming, error-prone, and limit scalability for digital marketing agencies.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

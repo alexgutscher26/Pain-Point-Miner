@@ -1,0 +1,19 @@
+{
+  "postId": "p_agency_007",
+  "subreddit": "agency",
+  "title": "Project Management for Distributed Teams - Seeking Alternatives to Asana",
+  "selftext": "Our creative agency has fully embraced remote work, but our project management process is suffering. We're using Asana, but finding it too basic for our needs. We need better resource planning, time tracking, and budget management. Integrated reporting is a must. Not afraid to spend some $$$.",
+  "comments": [
+    {
+      "body": "Take a look at ClickUp. Very customizable and they're constantly adding new features."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Limited resource planning, time tracking, and budget management capabilities in current project management software (Asana), impacting remote team productivity.",
+      "sentiment": "curious",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

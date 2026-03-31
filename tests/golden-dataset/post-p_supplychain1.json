@@ -1,0 +1,19 @@
+{
+  "postId": "p_supplychain1",
+  "subreddit": "supplychain",
+  "title": "Real-time Visibility in our Supply Chain",
+  "selftext": "As e-commerce grows for us, our team wants to implement visibility into our supply chain. Looking at various data sources. We use an ELK stack to manage our log data, but aggregating metrics is pretty rough. We are also trying to understand the impact of delays on end-customer satisfaction. Has anyone solved this problem?",
+  "comments": [
+    {
+      "body": "Have you tried leveraging existing data providers that ship this kind of data. They usually have APIs to help"
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of real-time visibility into end-to-end supply chain, hindering the ability to track shipments, predict delays, and understand the impact on customer satisfaction.",
+      "sentiment": "curious",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

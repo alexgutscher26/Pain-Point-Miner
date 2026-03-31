@@ -1,0 +1,19 @@
+{
+  "postId": "p_112233",
+  "subreddit": "agency",
+  "title": "Project Management Software That Integrates Well With Finance Systems?",
+  "selftext": "My design agency is looking for a project management system that seamlessly integrates with our accounting software (QuickBooks). Currently, we're manually transferring project hours and expenses, causing constant errors and delays in invoicing. It's slowing down our payments and affecting profitability. Has anyone discovered a project management solution that has a solid integration with QuickBooks or a similar accounting system? Time-tracking is a *must*!!! Any recommendations much appreciated!",
+  "comments": [
+    {
+      "body": "Check out ClickUp and see if their QuickBooks integration meets your criteria. It is worth exploring before committing to anything more expensive."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of integration between project management and accounting software leads to manual data entry, errors, billing delays, and reduced agency profitability.",
+      "sentiment": "desperate",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "postId": "p_sales_010",
+  "subreddit": "Sales",
+  "title": "CRM for a niche SaaS business with complex pricing tiers!",
+  "selftext": "We're running into the limits of HubSpot Sales. We're SaaS, and our product has very bespoke pricing tiers based on usage. Tracking this complicated logic inside HubSpot is quickly becoming a mess. We really need something heavily customizeable and flexible - even to the point of potentially developing our own integration if needed. Any suggestions?",
+  "comments": [
+    {
+      "body": "Maybe consider something open source with a strong API? Could be a heavy lift initially but longer term benefits."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inability of current CRM (HubSpot) to handle complex pricing tiers and usage-based pricing specific to a niche SaaS business.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

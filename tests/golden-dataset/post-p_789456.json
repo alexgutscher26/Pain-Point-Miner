@@ -1,0 +1,19 @@
+{
+  "postId": "p_789456",
+  "subreddit": "devops",
+  "title": "Struggling with Multi-Region Deployment Strategies for Our SaaS App - Help!",
+  "selftext": "We're a SaaS company targeting US and EU markets, serving large enterprise clients. We're using Terraform for infrastructure as code, but our multi-region deployments in AWS are a nightmare. We're constantly battling inconsistent state, different IAM roles interfering, and slow replication times for our database (PostgreSQL on RDS). Our DR strategy feels weak and testing failover is a manual process. Is anyone successfully managing complex multi-region deployments with Terraform at scale, especially with compliance requirements like GDPR? Happy to hear real-world examples and tooling recommendations. Considered Spinnaker or ArgoCD but not sure if the added complexity is worth it.",
+  "comments": [
+    {
+      "body": "Have you looked into using a configuration management database (CMDB) alongside your IaC? It can help track state across regions and ensure consistency."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inconsistent infrastructure state and slow database replication during multi-region deployments lead to operational inefficiencies and weak disaster recovery.",
+      "sentiment": "frustrated",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}

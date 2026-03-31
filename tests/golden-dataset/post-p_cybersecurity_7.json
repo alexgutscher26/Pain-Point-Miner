@@ -1,0 +1,22 @@
+{
+  "postId": "p_cybersecurity_7",
+  "subreddit": "cybersecurity",
+  "title": "SIEM tool limitations for cloud environments",
+  "selftext": "We're a small security team managing a growing cloud infrastructure (AWS + Azure). Our current SIEM (Splunk On-Premise) is struggling to keep up with the volume of logs and the complexities of cloud-native security events. It's getting increasingly difficult to detect real threats amidst the noise. Looking for alternative SIEM solutions that are better suited for cloud environments—considering cloud-based SIEMs like Sumo Logic or Azure Sentinel. Anyone have experience with these platforms and recommendations on ease of use, cost, and effectiveness?",
+  "comments": [
+    {
+      "body": "Azure Sentinel is great if you're already heavily invested in the Microsoft ecosystem. Sumo Logic is more platform-agnostic."
+    },
+    {
+      "body": "Consider the total cost of ownership, including ingestion fees, retention policies, and staffing requirements. Cloud SIEMs can get expensive quickly."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Difficulty detecting threats in cloud environments due to limitations in on-premise SIEM tool.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

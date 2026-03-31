@@ -1,0 +1,19 @@
+{
+  "postId": "p_entSSO1",
+  "subreddit": "devops",
+  "title": "Okta/Azure AD SSO Integration with Legacy Internal Apps - Headaches!",
+  "selftext": "We're migrating our enterprise to Okta for SSO, but we have a bunch of legacy internal apps written in .NET Framework that weren't designed with modern authentication in mind. Retrofitting them to use OIDC/SAML is proving to be a major pain. I've tried using reverse proxies with authentication middleware, but it's flaky and difficult to manage. Has anyone successfully tackled this problem at scale? Open to exploring commercial solutions if they can simplify the integration process. I'm losing sleep over this.",
+  "comments": [
+    {
+      "body": "Look into using an Identity Aware Proxy service. Cloudflare Access or Google IAP could help."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Significant challenges integrating legacy .NET Framework applications with modern SSO (Okta/Azure AD), leading to complex and unreliable integration processes.",
+      "sentiment": "desperate",
+      "painIntensity": 9,
+      "hasBudgetSignal": true
+    }
+  ]
+}

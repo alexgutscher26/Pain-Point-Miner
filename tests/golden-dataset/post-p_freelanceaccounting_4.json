@@ -1,0 +1,22 @@
+{
+  "postId": "p_freelanceaccounting_4",
+  "subreddit": "freelance",
+  "title": "Accounting software that *actually* handles international VAT properly?",
+  "selftext": "I'm a freelance developer working with clients in the EU and UK, and my accounting software (Quickbooks Online) is just a complete mess when it comes to VAT. Figuring out reverse charge VAT, different VAT rates for different countries, and MOSS reporting is driving me insane. I'm constantly getting confused and worried about making a mistake that will get me audited. Is there *any* accounting software out there that's actually designed for freelancers dealing with international VAT? Happy to invest in something better—my peace of mind is worth a lot right now!",
+  "comments": [
+    {
+      "body": "Check out Xero. They have better VAT handling, especially with add-ons that specialize in international taxes."
+    },
+    {
+      "body": "Consider consulting with a tax professional who specializes in international freelancing. It's worth the investment to avoid mistakes."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Accounting software's inadequacy in handling international VAT causing confusion and audit concerns for a freelancer.",
+      "sentiment": "frustrated",
+      "painIntensity": 7,
+      "hasBudgetSignal": true
+    }
+  ]
+}

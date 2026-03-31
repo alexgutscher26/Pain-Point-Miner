@@ -1,0 +1,19 @@
+{
+  "postId": "p_987321",
+  "subreddit": "HR",
+  "title": "Compliance Training in a Remote-First World - What Tools Do You Use?",
+  "selftext": "Our company went fully remote last year, and we're really struggling to manage compliance training for our employees. We're using a basic LMS but it's clunky and doesn't integrate well with our other HR tools. Engagement is low, and tracking completion rates across different departments is a nightmare. What learning platforms or approaches are other remote-first companies using to deliver engaging and effective compliance training? Are there solutions that offer built-in reporting and automated reminders?",
+  "comments": [
+    {
+      "body": "We moved to Lessonly (now Litmos) and it's been a game changer. The content creation is easier and the reporting is much more robust."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Inadequate legacy LMS solutions are resulting in low employee engagement and poor tracking of compliance training in a remote-first environment.",
+      "sentiment": "frustrated",
+      "painIntensity": 6,
+      "hasBudgetSignal": true
+    }
+  ]
+}

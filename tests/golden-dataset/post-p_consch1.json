@@ -1,0 +1,19 @@
+{
+  "postId": "p_consch1",
+  "subreddit": "Construction",
+  "title": "Project Scheduling: Primavera P6 vs. Microsoft Project - still worth the hassle?",
+  "selftext": "Been using MS Project for years managing residential construction projects, but projects are getting bigger and more complex (multi-unit developments). Everyone keeps saying Primavera P6 is the industry standard for heavy civil and commercial, but the learning curve looks steep and the UI seems ancient. Is it REALLY worth the investment (time and training costs)? Does anyone have a genuinely unbiased breakdown of when P6 is truly necessary vs. when a more modern, intuitive tool like Asana or BuilderTrend could suffice? We're starting a $5M apartment complex project next quarter.",
+  "comments": [
+    {
+      "body": "P6 is a beast, but for $5M projects, you're probably fine sticking with Project or similar. But if you ever go into infrastructure P6 is the only real choice."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Evaluating project management software (Primavera P6 vs. MS Project) for increasing project complexity and determining if the added complexity and cost of P6 is justified.",
+      "sentiment": "curious",
+      "painIntensity": 5,
+      "hasBudgetSignal": true
+    }
+  ]
+}

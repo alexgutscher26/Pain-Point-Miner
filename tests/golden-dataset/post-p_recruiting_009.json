@@ -1,0 +1,19 @@
+{
+  "postId": "p_recruiting_009",
+  "subreddit": "recruiting",
+  "title": "ATS that integrates with LinkedIn Recruiter AND has video interviewing?",
+  "selftext": "We're a small but rapidly-growing tech company. We are struggling to keep up with hiring. Our current ATS (BambooHR) doesn't integrate well with LinkedIn Recruiter and we have to use a separate platform for video interviewing. It's a huge time suck. Is there an ATS that does it all or are we dreaming?",
+  "comments": [
+    {
+      "body": "Greenhouse offers good integrations, including LinkedIn Recruiter. Check them out."
+    }
+  ],
+  "expected": [
+    {
+      "painPoint": "Lack of seamless integration between ATS, LinkedIn Recruiter, and video interviewing platform, leading to inefficient recruiting workflows.",
+      "sentiment": "desperate",
+      "painIntensity": 8,
+      "hasBudgetSignal": true
+    }
+  ]
+}
