@@ -1,5 +1,7 @@
 # RPP — Reddit Pain-Point Miner
 
+[![codecov](https://codecov.io/gh/alexgutscher26/Pain-Point-Miner/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/alexgutscher26/Pain-Point-Miner)
+
 An AI-powered market research engine that mines Reddit conversations to uncover validated SaaS opportunities. It finds posts discussing real problems, extracts semantic pain points with AI, clusters them into market opportunities, and scores them by monetization potential.
 
 ## What It Does

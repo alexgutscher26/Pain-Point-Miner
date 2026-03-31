@@ -7,6 +7,14 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     clearMocks: true,
     restoreMocks: true,
+    coverage: {
+      provider: "v8",
+      include: ["lib/**/*.ts"],
+      thresholds: {
+        lines: 80,
+      },
+      reporter: ["text", "json", "html", "lcov"],
+    },
   },
   resolve: {
     alias: {

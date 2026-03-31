@@ -672,12 +672,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] `dry-run` uses 0 credits and doesn't create a `scraperRun` record
   - [ ] _Acceptance:_ A dry run completes in < 10s and shows post/comment count without any AI calls
 
-- [ ] **Coverage Gates in CI**
-  - [ ] Run `vitest --coverage` in GitHub Actions on every PR
-  - [ ] Fail PR if coverage for `lib/` drops below 80% line coverage
-  - [ ] Fail PR if any test in `tests/` fails
-  - [ ] Upload coverage report to Codecov
-  - [ ] Coverage badge in `README.md`
+- [x] **Coverage Gates in CI**
+  - [x] Run `vitest --coverage` in GitHub Actions on every PR
+  - [x] Fail PR if coverage for `lib/` drops below 80% line coverage
+  - [x] Fail PR if any test in `tests/` fails
+  - [x] Upload coverage report to Codecov
+  - [x] Coverage badge in `README.md`
 
 - [ ] **Error Boundary Coverage**
   - [ ] Verify `app/error.tsx` catches all async server component errors
