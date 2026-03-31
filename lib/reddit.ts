@@ -1014,3 +1014,36 @@ export async function searchSubreddits(
     return [];
   }
 }
+
+/**
+ * Fetches metadata for multiple subreddits.
+ *
+ * @param subreddits - Array of subreddit names to query.
+ * @returns An array of metadata about each subreddit.
+ */
+export async function getSubredditMetadataBulk(
+  subreddits: string[],
+): Promise<SubredditSuggestion[]> {
+  const results: SubredditSuggestion[] = [];
+
+  for (const sub of subreddits) {
+    try {
+      const url = `https://www.reddit.com/r/${sub}/about.json`;
+      const response = await fetchRedditResponse(url);
+      const data = (await response.json()) as any;
+      
+      if (data?.data) {
+        results.push({
+          name: data.data.display_name ?? sub,
+          subscribers: data.data.subscribers ?? 0,
+          description: data.data.public_description ?? "",
+          activeUsers: data.data.active_user_count ?? 0,
+        });
+      }
+    } catch (err) {
+      console.error(`Failed to fetch metadata for r/${sub}:`, err);
+    }
+  }
+
+  return results;
+}

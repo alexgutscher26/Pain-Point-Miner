@@ -731,12 +731,12 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Use as lookup table for `competitorIntel` across all reports — no re-fetching the same URL
   - [ ] _Acceptance:_ "Airtable" resolved to its full tool record within 1s on first mention
 
-- [ ] **Subreddit Metadata Cache**
-  - [ ] Schema: `subreddit_cache` — `name`, `subscriberCount`, `description`, `activeUsers`, `category`, `cachedAt`
-  - [ ] Populate on-demand when a subreddit is first used; refresh if `cachedAt` > 7 days old
-  - [ ] Use for subreddit suggestion scoring in the Discovery Engine
-  - [ ] Show subscriber count badge on subreddit chips in search form and report UI
-  - [ ] _Acceptance:_ Subscriber count for r/SaaS shown in the UI without an extra API call after first use
+- [x] **Subreddit Metadata Cache**
+  - [x] Schema: `subreddit_cache` — `name`, `subscriberCount`, `description`, `activeUsers`, `category`, `cachedAt`
+  - [x] Populate on-demand when a subreddit is first used; refresh if `cachedAt` > 7 days old
+  - [x] Use for subreddit suggestion scoring in the Discovery Engine
+  - [x] Show subscriber count badge on subreddit chips in search form and report UI
+  - [x] _Acceptance:_ Subscriber count for r/SaaS shown in the UI without an extra API call after first use
 
 - [ ] **Historical Trend Database**
   - [ ] Schema: `trend_snapshot` — `keyword`, `subreddit`, `mentionCount`, `week` (ISO week string), `createdAt`

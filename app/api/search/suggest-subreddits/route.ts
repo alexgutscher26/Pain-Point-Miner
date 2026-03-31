@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { db } from "@/lib/db";
-import { discoveryCache } from "@/lib/db/schema";
+import { discoveryCache, subredditCache } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { searchSubreddits, type SubredditSuggestion } from "@/lib/reddit";
 
@@ -119,6 +119,31 @@ export async function POST(req: Request) {
           cachedAt: new Date(),
         },
       });
+
+    const recordValues = scoredSuggestions.map((s) => ({
+      name: s.name.toLowerCase(),
+      subscriberCount: s.subscribers,
+      description: s.description,
+      activeUsers: s.activeUsers || 0,
+      category: null,
+      cachedAt: new Date(),
+    }));
+
+    if (recordValues.length > 0) {
+      Promise.all(recordValues.map(record =>
+        db.insert(subredditCache)
+          .values(record)
+          .onConflictDoUpdate({
+            target: subredditCache.name,
+            set: {
+              subscriberCount: record.subscriberCount,
+              description: record.description,
+              activeUsers: record.activeUsers,
+              cachedAt: record.cachedAt,
+            }
+          })
+      )).catch(err => console.error("Failed to populate subredditCache", err));
+    }
 
     return apiJson(
       {

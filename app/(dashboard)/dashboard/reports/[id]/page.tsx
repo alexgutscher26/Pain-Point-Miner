@@ -359,6 +359,9 @@ export default function ReportDetailPage() {
   const [activeTabsByPain, setActiveTabsByPain] = useState<
     Record<string, CardTab>
   >({});
+  const [subredditMetadata, setSubredditMetadata] = useState<
+    Record<string, number>
+  >({});
   const [intensityFilterDraft, setIntensityFilterDraft] =
     useState<IntensityFilter>("all");
   const [sentimentFilterDraft, setSentimentFilterDraft] =
@@ -420,6 +423,34 @@ export default function ReportDetailPage() {
     }
     if (id) fetchReportDetail();
   }, [id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMetadata() {
+      if (!reportData) return;
+      const allSubs = new Set<string>();
+      reportData.topPainPoints.forEach(p => {
+        p.subreddits.forEach(s => allSubs.add(s));
+      });
+      if (allSubs.size === 0) return;
+
+      try {
+        const query = Array.from(allSubs).join(",");
+        const res = await fetch(`/api/subreddits/metadata?names=${query}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data.subreddits) {
+          const map: Record<string, number> = {};
+          for (const sub of data.subreddits) {
+            map[sub.name.toLowerCase()] = sub.subscriberCount;
+          }
+          setSubredditMetadata(map);
+        }
+      } catch {}
+    }
+    void loadMetadata();
+    return () => { cancelled = true; };
+  }, [reportData]);
 
   async function handleSaveToggle(
     nextSaved: boolean,
@@ -1038,15 +1069,26 @@ export default function ReportDetailPage() {
                           Validation {pain.validationScore}/100
                         </div>
                       )}
-                      {pain.subreddits.map((sub) => (
-                        <div
-                          key={sub}
-                          className="flex items-center gap-1.5 text-zinc-500"
-                        >
-                          <Users className="h-3.5 w-3.5" />
-                          r/{sub}
-                        </div>
-                      ))}
+                      {pain.subreddits.map((sub) => {
+                        const subs = subredditMetadata[sub.toLowerCase()];
+                        const formattedSubs = subs
+                          ? Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(subs)
+                          : null;
+                        return (
+                          <div
+                            key={sub}
+                            className="flex items-center gap-1.5 text-zinc-500 rounded bg-white/5 px-2 py-0.5"
+                          >
+                            <Users className="h-3.5 w-3.5" />
+                            <span>r/{sub}</span>
+                            {formattedSubs && (
+                              <span className="text-[9px] text-zinc-600 font-bold ml-0.5">
+                                {formattedSubs}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                       <div
                         className={`flex items-center gap-1.5 ${pain.sentiment === "frustrated" ? "text-rose-500" : "text-zinc-500"}`}
                       >

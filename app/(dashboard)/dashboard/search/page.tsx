@@ -142,6 +142,9 @@ export default function SearchPage() {
   const [billing, setBilling] = useState<BillingEntitlementsResponse | null>(
     null,
   );
+  const [subredditMetadata, setSubredditMetadata] = useState<
+    Record<string, number>
+  >({});
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
     "Your free trial has ended. Purchase a plan to continue.",
@@ -274,6 +277,30 @@ export default function SearchPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMetadata() {
+      if (visibleCommunities.length === 0) return;
+      try {
+        const query = visibleCommunities.join(",");
+        const res = await fetch(`/api/subreddits/metadata?names=${query}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data.subreddits) {
+          const map: Record<string, number> = {};
+          for (const sub of data.subreddits) {
+            map[sub.name.toLowerCase()] = sub.subscriberCount;
+          }
+          setSubredditMetadata(map);
+        }
+      } catch {}
+    }
+    void loadMetadata();
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleCommunities]);
 
   const handleSuggestSubreddits = async () => {
     if (trialEnded) {
@@ -584,15 +611,26 @@ export default function SearchPage() {
                 <p className="mb-1 w-full font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
                   Common Core Communities ({defaultLocale})
                 </p>
-                {visibleCommunities.map((sub) => (
-                  <button
-                    key={sub}
-                    onClick={() => addSubreddit(sub)}
-                    className="border border-white/15 bg-white/2 px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
-                  >
-                    + r/{sub}
-                  </button>
-                ))}
+                {visibleCommunities.map((sub) => {
+                  const subs = subredditMetadata[sub.toLowerCase()];
+                  const formattedSubs = subs
+                    ? Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(subs)
+                    : null;
+                  return (
+                    <button
+                      key={sub}
+                      onClick={() => addSubreddit(sub)}
+                      className="border border-white/15 bg-white/2 px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white flex items-center gap-1.5"
+                    >
+                      <span>+ r/{sub}</span>
+                      {formattedSubs && (
+                        <span className="rounded bg-white/10 px-1 py-0.5 text-[9px] text-zinc-500 group-hover:bg-[#ff4500]/20 group-hover:text-[#ff4500]">
+                          {formattedSubs}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">

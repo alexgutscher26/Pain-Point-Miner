@@ -824,3 +824,15 @@ export const slowQueryLog = pgTable("slow_query_log", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+export const subredditCache = pgTable("subreddit_cache", {
+  name: text().primaryKey().notNull(),
+  subscriberCount: integer(),
+  description: text(),
+  activeUsers: integer(),
+  category: text(),
+  cachedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
