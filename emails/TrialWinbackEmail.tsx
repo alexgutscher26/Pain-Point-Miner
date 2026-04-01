@@ -24,7 +24,7 @@ interface TrialWinbackEmailProps {
 export const TrialWinbackEmail = ({
   firstName,
   upgradeUrl,
-  discountCode = "WINBACK20",
+  discountCode = "FOUNDER20",
 }: TrialWinbackEmailProps) => {
   return (
     <Html lang="en">
@@ -191,7 +191,7 @@ export const TrialWinbackEmail = ({
 TrialWinbackEmail.PreviewProps = {
   firstName: "Founder",
   upgradeUrl: "https://threddiq.com/dashboard/billing",
-  discountCode: "WINBACK20",
+  discountCode: "FOUNDER20",
 } satisfies TrialWinbackEmailProps;
 
 export default TrialWinbackEmail;
