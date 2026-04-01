@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { OnboardingProgressBar } from "@/components/onboarding/progress-bar";
+import { LogoIcon } from "@/components/Logo";
+
 
 export default async function OnboardingLayout({
   children,
@@ -28,11 +30,10 @@ export default async function OnboardingLayout({
 
       <header className="relative z-10 border-b border-white/10 bg-[#0d0d0d]/80 backdrop-blur-md px-6 py-4">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
+
           <div className="flex items-center gap-3">
-            <div className="border border-[#ff8a57] bg-[#ff4500] p-1.5 text-white">
-              <span className="material-symbols-outlined block text-xl font-bold">
-                query_stats
-              </span>
+            <div className="flex size-9 items-center justify-center border border-[#ff8a57] bg-[#ff4500] p-1.5 text-white">
+              <LogoIcon className="h-5 w-5" />
             </div>
             <h1 className="text-lg font-black tracking-tight">ThreddIQ</h1>
           </div>

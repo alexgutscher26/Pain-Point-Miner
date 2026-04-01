@@ -745,9 +745,51 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Enable velocity detection (Phase 2): compare current week vs prior week per snapshot
   - [ ] _Acceptance:_ A keyword with 8 weeks of data shows a correct 6-point sparkline on the dashboard
 
+- [ ] **External API Connectors**
+  - [ ] **TrustPilot / G2 Scraper** — Extract "Cons" and "Pain Points" from reviews of specific competitors.
+  - [ ] **YouTube Comment Scraper** — Fetch comments from tutorials or "how-to" videos in a niche.
+  - [ ] **Discord Community Ingestion** — Monitor specific partner Discord channels for help requests (requires bot invite).
+  - [ ] _Acceptance:_ Pain points from YouTube comments appear in a unified "Multi-Source" report.
+
 ---
 
-## 📧 PHASE 8 — Communication & Reporting
+## 🧩 PHASE 8 — Extensions, Integrations & Ecosystem
+
+> **Goal:** Move RPP beyond the browser tab. Integrate into the user's existing workflow (Reddit, Slack, Zapier) and provide a seamless mobile experience.
+
+### ⬜ Planned
+
+- [ ] **RPP Browser Extension (Chrome/Firefox/Edge)**
+  - [ ] **Native Integration** — Inject "Mine Niche" button into Reddit search results and subreddit headers.
+  - [ ] **Signal Overlay** — Highlight "Desperate" or "Budget" comments directly on Reddit with an RPP icon.
+  - [ ] **Quick Capture** — Right-click any text on the web → "Add to RPP Inbox" as a manual pain point.
+  - [ ] **Popup Dashboard** — View latest 3 reports and status of active scans without leaving the current tab.
+  - [ ] _Acceptance:_ Users can initiate a scan of r/SaaS directly from the Reddit UI using the extension.
+
+- [ ] **Zapier & Make.com (Platform Apps)**
+  - [ ] **Public App Listing** — Official RPP connector on Zapier App Directory.
+  - [ ] **Triggers** — `New Opportunity Found`, `Scan Finalized`, `Credit Limit Reached`.
+  - [ ] **Actions** — `Trigger Investigation`, `Search Existing Reports`, `Create Opportunity Note`.
+  - [ ] _Acceptance:_ A Zapier workflow successfully sends a Slack dm whenever a score > 8.5 is found.
+
+- [ ] **Slack & Discord Connectors**
+  - [ ] **Channel Alerts** — Configure an RPP bot to post summaries to `#market-intel` or `#product-ideas`.
+  - [ ] **Slash Commands** — `/rpp stats <niche>` to get a quick summary of the last 30 days of data.
+  - [ ] **Interactive Cards** — "Vote" or "Bookmark" pain points directly from chat.
+  - [ ] _Acceptance:_ Slack bot posts a rich-text block with radar chart preview for new top opportunities.
+
+- [ ] **Mobile App (React Native / PWA)**
+  - [ ] **Push Notifications** — Immediate notification for "Exploding" trends or "High Score" opportunities.
+  - [ ] **Simplified Scan** — Mobile-first UI for starting quick keyword investigations.
+  - [ ] **FaceID/TouchID** — Secure, instant access to the market dashboard.
+  - [ ] _Acceptance:_ Users receive a push notification when a scheduled report is ready.
+
+- [ ] **N8N Node Implementation**
+  - [ ] High-performance self-hosted integration for power users/developers.
+
+---
+
+## 📧 PHASE 9 — Communication & Reporting
 
 > **Goal:** Keep users engaged, informed, and converting through high-quality automated email communication and scheduled intelligence reports.
 
@@ -806,7 +848,7 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ---
 
-## 🔒 PHASE 9 — Security Hardening
+## 🔒 PHASE 10 — Security Hardening
 
 > **Goal:** Production-hardened security posture. No critical vulnerabilities shipped. All secrets managed correctly. All user data protected by default.
 
@@ -841,7 +883,7 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ---
 
-## 📅 PHASE 10 — Maintenance & Periodic Audits
+## 📅 PHASE 11 — Maintenance & Periodic Audits
 
 > **Goal:** A platform that stays fast, clean, and reliable months after launch through proactive maintenance cadences.
 
@@ -951,8 +993,9 @@ All emails use React Email components, tested locally with `email.dev` preview s
 | Phase 5 — Revenue & Growth   | 🔄 In Progress | ~55%       | Overage packs, viral sharing    |
 | Phase 6 — Testing & QA       | 🔄 In Progress | ~65%       | E2E Playwright suite            |
 | Phase 7 — Platform Expansion | ⬜ Planned     | 0%         | Depends on P1 stable            |
-| Phase 8 — Communication      | ⬜ Planned     | 0%         | Depends on email provider setup |
-| Phase 9 — Security           | 🔄 In Progress | ~70%       | API key hashing                 |
-| Phase 10 — Maintenance       | ⬜ Planned     | 0%         | Depends on Inngest              |
+| Phase 8 — Ecosystem & Exts   | ⬜ Planned     | 0%         | Requires Public API (P4)        |
+| Phase 9 — Communication      | ⬜ Planned     | 0%         | Depends on email provider setup |
+| Phase 10 — Security          | 🔄 In Progress | ~70%       | API key hashing                 |
+| Phase 11 — Maintenance       | ⬜ Planned     | 0%         | Depends on Inngest              |
 
-**Total open tasks (rough estimate):** ~180 items across all phases
+**Total open tasks (rough estimate):** ~210 items across all phases

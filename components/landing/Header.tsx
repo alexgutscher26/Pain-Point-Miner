@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { LogoIcon } from "@/components/Logo";
+
 import { useSession, signOut } from "@/lib/auth-client";
 import {
   DropdownMenu,
@@ -45,13 +47,8 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="group flex items-center gap-2">
-            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33]">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 fill-current text-white"
-              >
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-              </svg>
+            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded bg-linear-to-tr from-[#ff4500] to-[#ff6b33] shadow-[0_4px_12px_rgba(255,69,0,0.3)]">
+              <LogoIcon className="h-4 w-4 text-white" />
             </div>
             <span className="text-base font-bold tracking-tight text-white sm:text-lg">
               ThreddIQ
