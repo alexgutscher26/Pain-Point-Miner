@@ -95,11 +95,27 @@ const resources = {
   "tool-comparisons": {
     title: "Reddit Tool Comparisons",
     description:
-      "Honest comparisons between ThreddIQ and other Reddit monitoring or marketing tools.",
+      "Is ThreddIQ right for you? We compare our AI-driven discovery engine against manual searching, keyword scrapers, and traditional enterprise social listening tools.",
     content: [
       {
-        heading: "ThreddIQ vs Manual Search",
-        text: "Why manual searching is losing you hours of valuable time every single week.",
+        heading: "1. ThreddIQ vs. Manual Searching",
+        text: "The 'Context Gap' is the biggest hurdle for founders. While you could spend 10 hours a week reading through subreddits, you'll still miss 90% of the relevant data. ThreddIQ performs deep semantic analysis on thousands of posts in seconds, categorizing frustrations that would take weeks of manual reading to uncover.",
+      },
+      {
+        heading: "2. ThreddIQ vs. Keyword Alerts (Google Alerts, F5bot)",
+        text: "Keyword alerts are digital noise. If you track 'SaaS', you'll get 10,000 notifications about new product launches but 0 about users failing with existing tools. ThreddIQ filters for *Emotional Intent*—spotting the difference between a casual mention and a high-intensity pain point that signals a buying decision.",
+      },
+      {
+        heading: "3. ThreddIQ vs. Generic Scrapers",
+        text: "Generic scrapers deliver raw text; we deliver structured insights. Instead of a CSV of 500 posts, ThreddIQ provides 'Problem Clusters' and 'Opportunity Scores', allowing you to prioritize your roadmap based on real-world demand density rather than just mention frequency.",
+      },
+      {
+        heading: "4. ThreddIQ vs. Enterprise Social Listening",
+        text: "Most enterprise tools are designed for brand managers tracking PR crises. ThreddIQ is built from the ground up for *Solo Founders and Product Managers*. We don't care about 'Sentiment about a Logo'—we care about 'Frustration about a Workflow'.",
+      },
+      {
+        heading: "The Bottom Line",
+        text: "If you need to know *when* someone mentions your brand, use a free alert tool. If you need to know *what* product people are begging you to build next, you need ThreddIQ.",
       },
     ],
     icon: <Layout className="h-10 w-10 text-zinc-400" />,
@@ -107,11 +123,27 @@ const resources = {
   "reddit-tools": {
     title: "Essential Reddit Tools",
     description:
-      "A list of the best browser extensions, analytics platforms, and automation tools for Reddit professionals.",
+      "The Reddit ecosystem is vast. To compete as a founder or marketer, you need a stack that helps you cut through the noise, track growth, and identify opportunities in real-time.",
     content: [
       {
-        heading: "Analytics Tools",
-        text: "Tools that help you track subreddit growth and post performance.",
+        heading: "1. Reddit Enhancement Suite (RES)",
+        text: "The definitive browser extension for every Reddit professional. RES adds a massive layer of functionality to the desktop experience, including account switching, user tagging, and infinitely scrollable dashboards. It's the first tool you should install to manage multiple niche-focused accounts without friction.",
+      },
+      {
+        heading: "2. Subreddit Stats & Analytics",
+        text: "Tools like SubredditStats or RedditGraphs allow you to visualize community velocity. Before entering a new market, use these to check if a subreddit's growth is accelerating or stagnating. Look for 'spikes' in activity—these often correlate with emerging pain points or trending industry shifts.",
+      },
+      {
+        heading: "3. Later for Reddit",
+        text: "Timing is everything on Reddit. This tool helps you find the 'Goldilocks' windows—the specific hours when your target audience is most active and likely to engage. Schedule posts based on historical performance data to ensure your insights don't get buried in the 'New' queue.",
+      },
+      {
+        heading: "4. ThreddIQ (AI Pain Point Mining)",
+        text: "Generic analytics show you *when* people post; ThreddIQ shows you *why* they're frustrated. By moving beyond surface-level keyword matching, our AI identifies high-intent 'Buy Signals' and emotional triggers that signal a desperate need for a solution. It's the difference between seeing a trend and finding a customer.",
+      },
+      {
+        heading: "5. Browser Extensions for Verification",
+        text: "Reddit Pro Tools and similar extensions are essential for 'vibe checking' a community. They allow you to quickly identify serial posters, community elders, or potential bad actors, ensuring your outreach remains authentic and high-quality.",
       },
     ],
     icon: <ListChecks className="h-10 w-10 text-blue-400" />,
