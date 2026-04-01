@@ -1,4 +1,4 @@
-# RPP (Reddit Pain Point Miner)
+# RPP (Reddit ThreddIQ)
 
 > RPP is a Next.js application that discovers Reddit pain points, extracts structured opportunities with AI, and surfaces them in a dashboard with scheduled scanning support.
 

@@ -10,7 +10,7 @@ export function FAQ() {
       a: "ThreddIQ is an AI-powered insights engine that mines Reddit to uncover real customer frustrations. We help founders and product teams find validated SaaS opportunities by identifying 'pain points' that people are actively complaining about and willing to pay to solve.",
     },
     {
-      q: "How does the 'Pain Point Miner' work?",
+      q: "How does the 'ThreddIQ' work?",
       a: "Our algorithm scans thousands of threads across targeted subreddits. It uses natural language processing to filter for 'desperate' sentiment markers—like requests for workarounds, complaints about existing tools, and explicit 'I would pay for...' statements.",
     },
     {

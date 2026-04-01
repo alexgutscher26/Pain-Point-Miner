@@ -175,12 +175,15 @@ export const auth = betterAuth({
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       // Sync user to Loops after successful email signup
-      console.log(`[Auth-Hook] after: path=${ctx.path}`);
       if (ctx.path === "/sign-up/email" && ctx.context.returned) {
         const body = ctx.body as { email?: string; name?: string };
         if (body.email) {
-          const { syncUserToLoops } = await import("./loops/service");
+          const { syncUserToLoops, sendWelcomeEmailProgrammatically } = await import("./loops/service");
           await syncUserToLoops(body.email, body.name);
+
+          const firstName = body.name ? body.name.split(" ")[0] : "there";
+          const scanUrl = process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/search` : "https://threddiq.com/dashboard/search";
+          await sendWelcomeEmailProgrammatically(body.email, firstName, scanUrl);
         }
       }
     }),
@@ -237,7 +240,11 @@ export const auth = betterAuth({
       };
     }),
   },
-  trustedOrigins: [process.env.BETTER_AUTH_URL ?? "http://localhost:3000"],
+  trustedOrigins: [
+    process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;

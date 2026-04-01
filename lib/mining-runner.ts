@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pMap from "p-map";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   keywordStat,
@@ -378,14 +378,37 @@ export async function executeMiningRun({
       .where(eq(scraperRun.id, runId));
 
     if (userRecord?.email) {
-      console.log(`[Mining] Triggering Loops report_ready for ${userRecord.email}...`);
-      const { sendLoopsEvent } = await import("./loops/service");
-      await sendLoopsEvent(userRecord.email, "report_ready", {
-        keyword,
-        runId,
-        newPainPoints,
-        subreddits: targetSubreddits.join(", "),
-      });
+      console.log(`[Mining] Generating and sending report_ready email for ${userRecord.email}...`);
+      try {
+        const { sendReportReadyEmailProgrammatically } = await import("./loops/service");
+        
+        // Fetch top 3 pain points for this report to include in email
+        const topPts = await db.query.painPoint.findMany({
+          where: eq(painPoint.scraperId, scraperId),
+          orderBy: [desc(painPoint.score)],
+          limit: 3,
+        });
+
+        const topPainPoints = topPts.map((pt) => ({
+          title: pt.title,
+          excerpt: pt.body,
+          score: Number(pt.score || 0),
+        }));
+
+        const reportUrl = process.env.NEXT_PUBLIC_APP_URL 
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/reports/${scraperId}` 
+          : `https://painpointminer.com/dashboard/reports/${scraperId}`;
+
+        await sendReportReadyEmailProgrammatically(
+          userRecord.email,
+          keyword,
+          newPainPoints,
+          reportUrl,
+          topPainPoints
+        );
+      } catch (e) {
+        console.error("[Mining] Failed to send report ready email:", e);
+      }
     } else {
       console.warn("[Mining] Skipping Loops: No user email found.");
     }

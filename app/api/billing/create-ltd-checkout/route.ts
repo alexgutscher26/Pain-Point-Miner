@@ -81,6 +81,7 @@ export async function POST(req: Request) {
       customer_email: validCustomerId ? undefined : session.user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
+      allow_promotion_codes: true,
       success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true`,
       cancel_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?canceled=true`,
       metadata: {

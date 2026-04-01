@@ -13,7 +13,7 @@ export function AuthInput({
   ...props
 }: AuthInputProps) {
   return (
-    <div>
+    <div suppressHydrationWarning>
       <div className="mb-1.5 flex justify-between">
         <label
           className="mb-1.5 block text-xs font-extrabold tracking-wider text-zinc-400 uppercase"

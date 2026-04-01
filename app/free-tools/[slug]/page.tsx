@@ -19,7 +19,7 @@ import { notFound } from "next/navigation";
 
 const freeTools = {
   "pain-point-miner": {
-    title: "Free Reddit Pain Point Miner",
+    title: "Free Reddit ThreddIQ",
     tagline: "Instantly extract root frustrations from any subreddit.",
     description:
       "Our AI-powered engine scans the top 100 threads in any subreddit to find the 'Desperation Index'. This tool helps you validate SaaS ideas before writing a single line of code.",

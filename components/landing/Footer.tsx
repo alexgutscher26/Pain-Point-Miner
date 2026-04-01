@@ -120,7 +120,7 @@ export function Footer() {
               href="/free-tools/pain-point-miner"
               className="flex items-center gap-2 text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
-              Pain Point Miner{" "}
+              ThreddIQ{" "}
               <span className="rounded bg-[#ff4500]/20 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#ff4500] uppercase">
                 Free
               </span>

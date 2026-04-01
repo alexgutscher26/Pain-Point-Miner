@@ -753,31 +753,31 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### Email Templates (React Email)
 
-All emails use React Email components, tested locally with `email.dev` preview server, sent via Resend.
+All emails use React Email components, tested locally with `email.dev` preview server, sent via loops.
 
-- [ ] **Welcome Email**
-  - [ ] Rich HTML layout: hero banner, 3 "how it works" steps, "Run your first scan →" CTA
-  - [ ] Dynamic: personalize with user's first name
-  - [ ] Plain-text fallback for email clients without HTML support
-  - [ ] _Acceptance:_ Email renders correctly in Gmail, Apple Mail, and Outlook preview
+- [x] **Welcome Email**
+  - [x] Rich HTML layout: hero banner, 3 "how it works" steps, "Run your first scan →" CTA
+  - [x] Dynamic: personalize with user's first name
+  - [x] Plain-text fallback for email clients without HTML support
+  - [x] _Acceptance:_ Email renders correctly in Gmail, Apple Mail, and Outlook preview
 
-- [ ] **Report Ready Email**
-  - [ ] Subject: "Your investigation is complete — X pain points found"
-  - [ ] Body: top 3 pain points by score (title + excerpt), total count, "View Full Report →" CTA
-  - [ ] Show the top opportunity's score as a visual bar
-  - [ ] _Acceptance:_ Email fires within 60s of `scraperRun.status = completed`
+- [x] **Report Ready Email**
+  - [x] Subject: "Your investigation is complete — X pain points found"
+  - [x] Body: top 3 pain points by score (title + excerpt), total count, "View Full Report →" CTA
+  - [x] Show the top opportunity's score as a visual bar
+  - [x] _Acceptance:_ Email fires within 60s of `scraperRun.status = completed`
 
-- [ ] **Weekly Digest Email**
-  - [ ] Top 3 opportunities that week: title, score, niche
-  - [ ] Top trending keyword in user's saved niches
-  - [ ] Usage summary: "X scans remaining this month"
-  - [ ] _Acceptance:_ Sends every Monday 8am UTC; unsubscribe link works
+- [x] **Weekly Digest Email**
+  - [x] Top 3 opportunities that week: title, score, niche
+  - [x] Top trending keyword in user's saved niches
+  - [x] Usage summary: "X scans remaining this month"
+  - [x] _Acceptance:_ Sends every Monday 8am UTC; unsubscribe link works
 
-- [ ] **Trial Expiry Warning Email**
-  - [ ] Day 2 of trial: "1 day left — here's what you'll keep access to" + feature comparison table
-  - [ ] Day 3 (expiry): "Your trial has ended — upgrade to keep your reports" + upgrade CTA
-  - [ ] Day 5 (win-back): "We saved your reports — pick up where you left off" + discount offer
-  - [ ] _Acceptance:_ All 3 emails fire at correct intervals without duplicating
+- [x] **Trial Expiry Warning Email**
+  - [x] Day 2 of trial: "1 day left — here's what you'll keep access to" + feature comparison table
+  - [x] Day 3 (expiry): "Your trial has ended — upgrade to keep your reports" + upgrade CTA
+  - [x] Day 5 (win-back): "We saved your reports — pick up where you left off" + discount offer
+  - [x] _Acceptance:_ All 3 emails fire at correct intervals without duplicating
 
 - [ ] **Password Reset Email** — branded reset link, 15-min expiry, warning if not requested
 - [ ] **Workspace Invitation Email** — "You've been invited to `<workspace>`" with accept button and 48h expiry
