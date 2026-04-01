@@ -194,7 +194,9 @@ export default async function ResourcePage({
               Home
             </Link>
             <span>/</span>
-            <span className="text-zinc-300">Resources</span>
+            <Link href="/resources" className="transition-colors hover:text-white">
+              Resources
+            </Link>
           </div>
 
           <div className="mb-20">
