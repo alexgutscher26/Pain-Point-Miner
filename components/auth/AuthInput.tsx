@@ -24,7 +24,7 @@ export function AuthInput({
         {forgotPassword && (
           <Link
             className="text-xs font-semibold text-[#ff4500] hover:underline"
-            href="/"
+            href="/forgot-password"
           >
             Forgot password?
           </Link>

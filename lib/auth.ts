@@ -65,6 +65,12 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    async sendResetPassword(data, request) {
+      const { sendResetPasswordEmailProgrammatically } = await import(
+        "./loops/service"
+      );
+      await sendResetPasswordEmailProgrammatically(data.user.email, data.url);
+    },
   },
   rateLimit: {
     enabled: true,

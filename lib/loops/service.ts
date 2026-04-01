@@ -291,4 +291,36 @@ export async function sendTrialWinbackEmailProgrammatically(
     console.error("[Loops] Error sending trial winback email:", error);
   }
 }
+/**
+ * Sends a Reset Password email programmatically with built HTML
+ */
+export async function sendResetPasswordEmailProgrammatically(
+  email: string,
+  resetLink: string,
+) {
+  if (!process.env.LOOPS_API_KEY) return;
 
+  try {
+    const { render } = await import("@react-email/components");
+    const { ResetPasswordEmail } = await import("../../emails/ResetPasswordEmail");
+    
+    const htmlBody = await render(ResetPasswordEmail({ userEmail: email, resetLink }));
+
+    // Use the Reset Password Transactional ID
+    const response = await loops.sendTransactionalEmail({
+      transactionalId: process.env.LOOPS_RESET_PASSWORD_TRANSACTIONAL_ID || "cm2xxxx", 
+      email,
+      dataVariables: {
+        html: htmlBody,
+      },
+    });
+
+    if (!response.success) {
+      console.error("[Loops] Failed to send reset password email:", response);
+    } else {
+      console.log(`[Loops] Successfully sent reset password email to ${email}`);
+    }
+  } catch (error) {
+    console.error("[Loops] Error sending reset password email:", error);
+  }
+}
