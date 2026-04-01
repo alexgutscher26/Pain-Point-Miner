@@ -779,7 +779,7 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [x] Day 5 (win-back): "We saved your reports — pick up where you left off" + discount offer
   - [x] _Acceptance:_ All 3 emails fire at correct intervals without duplicating
 
-- [ ] **Password Reset Email** — branded reset link, 15-min expiry, warning if not requested
+- [x] **Password Reset Email** — branded reset link, 15-min expiry, warning if not requested
 - [ ] **Workspace Invitation Email** — "You've been invited to `<workspace>`" with accept button and 48h expiry
 - [ ] **Alert Notification Email** — "High-score opportunity detected: `<title>`" with score bar and "View →" CTA
 

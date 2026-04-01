@@ -42,12 +42,6 @@ export function AuthHero({
 
       <div className="relative z-10 mt-auto flex gap-8 text-sm text-zinc-600">
         <span>© 2026 ThreddIQ</span>
-        <Link className="transition-colors hover:text-white" href="/">
-          Privacy
-        </Link>
-        <Link className="transition-colors hover:text-white" href="/">
-          Terms
-        </Link>
       </div>
     </div>
   );

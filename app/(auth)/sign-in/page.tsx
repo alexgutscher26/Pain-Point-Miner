@@ -63,46 +63,52 @@ export default function SignInPage() {
       />
 
       {/* Right Side: Sign-In Form */}
-      <div className="flex w-full items-center justify-center bg-black p-8 sm:p-12 lg:w-1/2 lg:p-24">
+      <div className="flex w-full items-center justify-center bg-black p-8 sm:p-12 lg:w-1/2 lg:p-24 overflow-y-auto">
         <div className="flex w-full max-w-[400px] flex-col">
           <AuthFormHeader
             title="Welcome back"
             subtitle="Sign in to continue mining insights."
           />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <AuthInput
-              label="Email Address"
-              id="email"
-              placeholder="name@company.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div className="space-y-4">
+              <AuthInput
+                label="Email Address"
+                id="email"
+                placeholder="name@company.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
 
-            <AuthInput
-              label="Password"
-              id="password"
-              placeholder="••••••••"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              forgotPassword
-            />
+              <AuthInput
+                label="Password"
+                id="password"
+                placeholder="••••••••"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                forgotPassword
+              />
+            </div>
 
             {error && (
-              <p className="text-sm font-medium text-red-400">{error}</p>
-            )}
+              <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-3 text-[13px] font-medium text-red-400 ring-1 ring-red-500/20">
+                <span className="mt-0.5 select-none text-red-500">⚠</span>
+                {error}
+              </div>
+            ) }
 
             <button
-              className="group mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#ff4500] py-3 font-extrabold text-white shadow-[0_4px_20px_rgba(255,69,0,0.3)] transition-all hover:bg-[#e03d00] disabled:cursor-not-allowed disabled:opacity-60"
+              className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-[#ff4500] py-3.5 font-extrabold text-white shadow-[0_4px_25px_rgba(255,69,0,0.3)] transition-all hover:bg-[#e03d00] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               type="submit"
               disabled={loading}
             >
+              <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
               {loading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -117,7 +123,7 @@ export default function SignInPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-zinc-500">
+          <p className="mt-10 text-center text-[13px] font-medium text-zinc-500">
             Don&apos;t have an account?{" "}
             <Link
               className="font-bold text-[#ff4500] hover:underline"

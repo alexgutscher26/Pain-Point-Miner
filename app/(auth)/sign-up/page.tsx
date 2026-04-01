@@ -136,14 +136,14 @@ export default function SignUpPage() {
             <p className="pt-1 text-xs leading-relaxed text-zinc-600">
               By creating an account you agree to our{" "}
               <Link
-                href="#"
+                href="/terms"
                 className="font-semibold text-[#ff4500] hover:underline"
               >
                 Terms of Service
               </Link>{" "}
               and{" "}
               <Link
-                href="#"
+                href="/privacy"
                 className="font-semibold text-[#ff4500] hover:underline"
               >
                 Privacy Policy
