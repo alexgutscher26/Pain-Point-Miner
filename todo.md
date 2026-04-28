@@ -889,11 +889,11 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ### Database Maintenance
 
-- [ ] **Monthly Log Truncation**
-  - [ ] Archive `scraper_run` records older than 60 days to a `scraper_run_archive` table (same schema)
-  - [ ] Or hard-delete if archive isn't needed — keep aggregate stats in a `scraper_run_summary` table
-  - [ ] Inngest monthly cron scheduled for midnight, first Sunday of each month
-  - [ ] _Acceptance:_ `scraper_run` table stays under 100k rows after 6 months of production use
+- [x] **Monthly Log Truncation**
+  - [x] Archive `scraper_run` records older than 60 days to a `scraper_run_summary` table (same schema)
+  - [x] Or hard-delete if archive isn't needed — keep aggregate stats in a `scraper_run_summary` table
+  - [x] Inngest monthly cron scheduled for midnight, first Sunday of each month
+  - [x] _Acceptance:_ `scraper_run` table stays under 100k rows after 6 months of production use
 
 - [x] **Weekly PGVector REINDEX**
   - [x] Inngest weekly cron: `REINDEX INDEX CONCURRENTLY pain_point_embedding_hnsw_idx`

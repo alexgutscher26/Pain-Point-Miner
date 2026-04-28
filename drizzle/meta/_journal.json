@@ -57,6 +57,13 @@
       "when": 1777335033362,
       "tag": "0007_broken_leech",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1777335582836,
+      "tag": "0008_careless_norman_osborn",
+      "breakpoints": true
     }
   ]
 }
