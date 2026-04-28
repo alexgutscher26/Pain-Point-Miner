@@ -895,11 +895,11 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [ ] Inngest monthly cron scheduled for midnight, first Sunday of each month
   - [ ] _Acceptance:_ `scraper_run` table stays under 100k rows after 6 months of production use
 
-- [ ] **Weekly PGVector REINDEX**
-  - [ ] Inngest weekly cron: `REINDEX INDEX CONCURRENTLY pain_point_embedding_hnsw_idx`
-  - [ ] Log index size before/after to `db_maintenance_log` table
-  - [ ] Alert if index size grows >20% week-over-week
-  - [ ] _Acceptance:_ Similarity search latency stays under 50ms after index rebuild
+- [x] **Weekly PGVector REINDEX**
+  - [x] Inngest weekly cron: `REINDEX INDEX CONCURRENTLY pain_point_embedding_hnsw_idx`
+  - [x] Log index size before/after to `db_maintenance_log` table
+  - [x] Alert if index size grows >20% week-over-week
+  - [x] _Acceptance:_ Similarity search latency stays under 50ms after index rebuild
 
 - [x] **Dead Data Cleanup**
   - [x] Pain points with no parent `scraperId` (orphaned by hard-delete bugs)

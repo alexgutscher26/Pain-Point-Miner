@@ -836,3 +836,18 @@ export const subredditCache = pgTable("subreddit_cache", {
     .notNull(),
 });
 
+export const dbMaintenanceLog = pgTable("db_maintenance_log", {
+  id: text().primaryKey().notNull(),
+  taskName: text().notNull(),
+  indexName: text(),
+  sizeBeforeBytes: doublePrecision(),
+  sizeAfterBytes: doublePrecision(),
+  durationMs: integer(),
+  latencyBeforeMs: doublePrecision(),
+  latencyAfterMs: doublePrecision(),
+  alertTriggered: boolean().default(false).notNull(),
+  error: text(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
