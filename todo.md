@@ -901,18 +901,12 @@ All emails use React Email components, tested locally with `email.dev` preview s
   - [ ] Alert if index size grows >20% week-over-week
   - [ ] _Acceptance:_ Similarity search latency stays under 50ms after index rebuild
 
-- [ ] **Dead Data Cleanup**
-  - [ ] Pain points with no parent `scraperId` (orphaned by hard-delete bugs)
-  - [ ] Embeddings in `pain_point_embedding` with no corresponding `pain_point` row
-  - [ ] Empty clusters where `sourceCount = 0`
-  - [ ] Run as weekly Inngest function, log deleted row counts
-  - [ ] _Acceptance:_ Zero orphaned records found after cleanup function runs
-
-- [ ] **Monthly Backup Verification**
-  - [ ] Restore latest database backup to an isolated Neon branch
-  - [ ] Run smoke test queries: count pain points, verify latest scraper run exists
-  - [ ] Document restore time in ops log
-  - [ ] _Acceptance:_ Backup restore completes in < 15 minutes with no data loss
+- [x] **Dead Data Cleanup**
+  - [x] Pain points with no parent `scraperId` (orphaned by hard-delete bugs)
+  - [x] Embeddings in `pain_point_embedding` with no corresponding `pain_point` row
+  - [x] Empty clusters where `sourceCount = 0`
+  - [x] Run as weekly Inngest function, log deleted row counts
+  - [x] _Acceptance:_ Zero orphaned records found after cleanup function runs
 
 ### Content & Quality
 
