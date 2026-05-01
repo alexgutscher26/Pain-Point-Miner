@@ -523,7 +523,7 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 - [x] **Plan Enforcement** — `maxSubredditsPerSearch`, `allowedMiningDepths`, locked UI with "Upgrade" badge
 - [x] **Sidebar Usage Meter** — "7/10 scans used this month" with visual progress bar
 - [x] **Soft Block at 100%** — clear upgrade CTA modal, not a hard error response
-- [x] **Free Trial Flow** — 3-day Pro trial on signup · countdown banner · Day 2/3/5 win-back emails
+- [x] **Free Trial Flow** — 2-day trial with card on signup · countdown banner · Day 2/3/5 win-back emails
 - [x] **Annual Billing Toggle** — 20% discount · "Save $48/year" callout on pricing page
 - [x] **Social Proof** — ⭐ "Most Popular" badge on Growth plan card
 - [x] **Landing Page Basics** — A/B headline test · live scan counter · testimonial carousel · interactive demo

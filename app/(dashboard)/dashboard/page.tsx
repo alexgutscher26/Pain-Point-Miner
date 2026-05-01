@@ -273,18 +273,17 @@ export default async function DashboardPage({
         <div className="flex items-center justify-between gap-4 border border-amber-400/35 bg-amber-500/8 px-5 py-4">
           <div>
             <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
-              Read-Only After Trial
+              Action Required
             </p>
             <p className="text-sm font-semibold text-amber-100">
-              You can still review past results and explore the app. New scans
-              and AI actions require a paid plan.
+              Start your 2-day trial with a credit card to unlock new scans and AI suggestions.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
             className="shrink-0 border border-[#ff8a57] bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase"
           >
-            Purchase Plan
+            Start Free Trial
           </Link>
         </div>
       ) : null}
@@ -295,8 +294,7 @@ export default async function DashboardPage({
               Trial Ending Soon
             </p>
             <p className="text-sm font-semibold text-amber-100">
-              Your free trial ends in 1 day. Purchase a paid plan to continue
-              using all features.
+              Your free trial ends in 1 day. Purchase a paid plan to continue using all features.
             </p>
           </div>
           <Link

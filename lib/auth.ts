@@ -140,6 +140,7 @@ export const auth = betterAuth({
               ? {
                   subscription: {
                     enabled: true as const,
+                    trial_period_days: 2,
                     plans: [
                       ...(stripePriceStarterMonthly
                         ? [

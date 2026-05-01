@@ -97,12 +97,16 @@ export async function resolvePlanContext(input: {
     ),
   );
   const localTrialDays = Number.parseInt(
-    process.env.LOCAL_TRIAL_DAYS ?? "3",
+    process.env.LOCAL_TRIAL_DAYS ?? "2",
     10,
   );
-  const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED !== "false";
+  const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED === "true";
   const requirePaidAfterTrial =
     process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
+  
+  const isStripeTrialing = subscriptions.some(
+    (s) => s.status?.toLowerCase() === "trialing",
+  );
   
   const baseResolutionInput = {
     resolvedPlan,
@@ -110,6 +114,7 @@ export async function resolvePlanContext(input: {
     localTrialDays,
     localTrialEnabled,
     requirePaidAfterTrial,
+    isStripeTrialing,
     userCreatedAt: currentUser?.createdAt ?? null,
     ltdTier: currentUser?.ltdTier ?? "none",
   };
@@ -122,16 +127,17 @@ export function resolvePlanAccessState({
   hasActiveSubscription,
   userCreatedAt = null,
   now = new Date(),
-  localTrialEnabled = true,
-  localTrialDays = 3,
+  localTrialEnabled = false,
+  localTrialDays = 2,
   requirePaidAfterTrial = true,
   ltdTier = "none",
-}: PlanContextResolutionInput & { ltdTier?: string | null }): ResolvedPlanContext {
+  isStripeTrialing = false,
+}: PlanContextResolutionInput & { ltdTier?: string | null; isStripeTrialing?: boolean }): ResolvedPlanContext {
   // 1. Initial State from existing plan/subscription
   const context: ResolvedPlanContext = {
     plan: resolvedPlan,
     hasActiveSubscription,
-    trialActive: false,
+    trialActive: isStripeTrialing,
     trialEndsAt: null,
     trialDaysRemaining: null,
     planPurchaseRequired: !hasActiveSubscription && requirePaidAfterTrial && (ltdTier === "none" || !ltdTier),

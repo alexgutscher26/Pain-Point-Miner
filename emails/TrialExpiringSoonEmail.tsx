@@ -94,7 +94,7 @@ export const TrialExpiringSoonEmail = ({
             {/* Body */}
             <Section className="px-[40px] pt-[32px] pb-[0px]">
               <Text className="m-0 text-[15px] text-[#374151] leading-[26px]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-                We hope you've enjoyed uncovering hidden opportunities with ThreddIQ. Your 3-day full access trial wraps up in exactly 24 hours — after that, your reports will be archived and scans limited.
+                We hope you've enjoyed uncovering hidden opportunities with ThreddIQ. Your 2-day full access trial wraps up in exactly 24 hours — after that, your reports will be archived and scans limited.
               </Text>
             </Section>
 

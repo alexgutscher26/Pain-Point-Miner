@@ -81,7 +81,7 @@ export default function SignUpPage() {
         <div className="flex w-full max-w-[400px] flex-col">
           <AuthFormHeader
             title="Create your account"
-            subtitle="Start your 3-day free trial. No credit card required."
+            subtitle="Start your 2-day free trial. Credit card required."
           />
 
           <form onSubmit={handleSubmit} className="space-y-4">
