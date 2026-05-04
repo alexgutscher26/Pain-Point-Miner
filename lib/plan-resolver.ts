@@ -14,6 +14,10 @@ export type ResolvedPlanContext = {
   plan: BillingPlan;
   ltdTier: string | null;
   planPurchaseRequired: boolean;
+  hasActiveSubscription: boolean;
+  trialActive: boolean;
+  trialEndsAt: Date | null;
+  trialDaysRemaining: number | null;
 };
 
 type PlanContextResolutionInput = {
@@ -108,31 +112,16 @@ export function resolvePlanAccessState({
   plan,
   ltdTier,
 }: PlanContextResolutionInput): ResolvedPlanContext {
-  // 1. LTD always wins
-  if (ltdTier && ltdTier !== "none") {
-    return {
-      userId,
-      plan,
-      ltdTier,
-      planPurchaseRequired: false,
-    };
-  }
+  const isPaidOrLTD = (ltdTier && ltdTier !== "none") || plan !== "starter";
 
-  // 2. Paid Subscription wins
-  if (plan !== "starter") {
-    return {
-      userId,
-      plan,
-      ltdTier: ltdTier || null,
-      planPurchaseRequired: false,
-    };
-  }
-
-  // 3. Otherwise, the user is on Starter and must purchase a plan
   return {
     userId,
-    plan: "starter",
+    plan,
     ltdTier: ltdTier || null,
-    planPurchaseRequired: true,
+    planPurchaseRequired: !isPaidOrLTD,
+    hasActiveSubscription: isPaidOrLTD,
+    trialActive: false, // Trials are disabled
+    trialEndsAt: null,
+    trialDaysRemaining: null,
   };
 }

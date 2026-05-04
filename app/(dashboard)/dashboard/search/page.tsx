@@ -147,7 +147,7 @@ export default function SearchPage() {
   >({});
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
-    "Start your 2-day trial with a credit card to unlock new scans and AI analysis.",
+    "A paid plan is required to unlock new scans and AI analysis.",
   );
   const requestInFlightRef = useRef(false);
   const planSubredditCap = billing?.entitlements.maxSubredditsPerSearch ?? 10;
@@ -305,7 +305,7 @@ export default function SearchPage() {
   const handleSuggestSubreddits = async () => {
     if (trialEnded) {
       setPlanDialogMessage(
-        "Your free trial has ended. Purchase a plan to continue.",
+        "A paid plan is required to continue. Please upgrade your account.",
       );
       setPlanDialogOpen(true);
       return;
@@ -408,7 +408,7 @@ export default function SearchPage() {
         ) {
           setPlanDialogMessage(
             errorPayload?.message ??
-              "Your free trial has ended. Purchase a plan to continue.",
+              "A paid plan is required to continue. Please upgrade your account.",
           );
           setPlanDialogOpen(true);
           return;
@@ -497,7 +497,7 @@ export default function SearchPage() {
                 Action Required
               </p>
               <p className="text-sm font-semibold text-amber-100">
-                Start your 2-day trial with a credit card to unlock new scans and AI suggestions.
+                Upgrade to a paid plan to unlock new scans and AI suggestions.
               </p>
             </div>
           ) : null}
@@ -889,7 +889,7 @@ export default function SearchPage() {
                   <div className="flex flex-col items-center gap-2 sm:items-end">
                     <p className="font-serif text-[13px] text-amber-300 italic">
                       {trialEnded
-                        ? "Start your 2-day trial with a card to unlock new investigations."
+                        ? "Upgrade your plan to unlock new investigations."
                         : "Scan limit reached — upgrade to Growth or Pro to continue."}
                     </p>
                     <Link
