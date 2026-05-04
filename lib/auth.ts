@@ -42,6 +42,7 @@ import * as schema from "./db/schema";
 import * as relations from "./db/relations";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   secret:
     process.env.BETTER_AUTH_SECRET ||
     "fallback_secret_for_local_development_or_testing",
@@ -140,7 +141,6 @@ export const auth = betterAuth({
               ? {
                   subscription: {
                     enabled: true as const,
-                    trial_period_days: 2,
                     plans: [
                       ...(stripePriceStarterMonthly
                         ? [

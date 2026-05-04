@@ -54,7 +54,7 @@ export default function SignUpPage() {
   return (
     <div className="flex min-h-screen w-full bg-black font-sans text-white antialiased">
       <AuthHero
-        badge="START FOR FREE"
+        badge="GET STARTED"
         title={
           <>
             Stop guessing. Build what{" "}
@@ -81,7 +81,7 @@ export default function SignUpPage() {
         <div className="flex w-full max-w-[400px] flex-col">
           <AuthFormHeader
             title="Create your account"
-            subtitle="Start your 2-day free trial. Credit card required."
+            subtitle="Secure checkout with Stripe. Instant access."
           />
 
           <form onSubmit={handleSubmit} className="space-y-4">

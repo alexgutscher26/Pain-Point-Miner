@@ -200,7 +200,7 @@ export function GoldMine() {
               Start mining insights
             </button>
             <p className="text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
-              🔥 2-Day Trial With Card
+              🔥 Instant Setup With Stripe
             </p>
           </div>
         </div>

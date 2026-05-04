@@ -14,9 +14,6 @@ type BillingPageClientProps = {
   availablePlans: BillingPurchaseOption[];
   plan: BillingPlan;
   planPurchaseRequired: boolean;
-  trialActive: boolean;
-  trialEndsAt: string | null;
-  trialDaysRemaining: number | null;
   entitlements: PlanEntitlements;
   usage: {
     monthlyUsed: number;
@@ -39,9 +36,6 @@ export function BillingPageClient({
   plan,
   ltdTier,
   planPurchaseRequired,
-  trialActive,
-  trialEndsAt,
-  trialDaysRemaining,
   entitlements,
   usage,
 }: BillingPageClientProps) {
@@ -248,25 +242,6 @@ export function BillingPageClient({
         </div>
       ) : null}
 
-      {trialActive && trialDaysRemaining !== null ? (
-        <div className="border-2 border-amber-400/60 bg-amber-500/10 px-5 py-4">
-          <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
-            Trial Active
-          </p>
-          <p className="text-sm font-semibold text-amber-100">
-            {trialDaysRemaining <= 1
-              ? "Your free trial ends in 1 day."
-              : `Your free trial ends in ${trialDaysRemaining} days.`}{" "}
-            Purchase a plan to keep using premium features.
-          </p>
-          {trialEndsAt ? (
-            <p className="mt-2 font-mono text-[11px] text-amber-200/80">
-              Ends {new Date(trialEndsAt).toLocaleDateString("en-US")}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-
       {availablePlans.length > 0 ? (
         <div className="border-2 border-white/15 bg-[#111] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]">
           <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -297,8 +272,7 @@ export function BillingPageClient({
             </div>
           </div>
           <p className="mb-6 text-sm leading-relaxed text-zinc-400">
-            Choose a paid plan to restore access after trial expiry or upgrade
-            your current account.{" "}
+            Choose a paid plan to unlock full access or upgrade your current account.{" "}
             {billingInterval === "yearly"
               ? "Yearly checkout is selected."
               : "Monthly checkout is selected."}
@@ -306,7 +280,7 @@ export function BillingPageClient({
           <div className="flex flex-wrap gap-3">
             {availablePlans.map(({ plan: targetPlan, yearlyAvailable }) => {
               const isCurrentPlan =
-                !planPurchaseRequired && targetPlan === plan && !trialActive;
+                !planPurchaseRequired && targetPlan === plan;
               const isLoading = startingCheckoutPlan === targetPlan;
               const yearlyDisabled =
                 billingInterval === "yearly" && !yearlyAvailable;
@@ -469,9 +443,7 @@ export function BillingPageClient({
                   ? "Lifetime access"
                   : planPurchaseRequired
                     ? "Plan inactive"
-                    : trialActive
-                      ? "Free trial"
-                      : "Active plan"}
+                    : "Active plan"}
               </span>
             </p>
             <div className="pt-2">

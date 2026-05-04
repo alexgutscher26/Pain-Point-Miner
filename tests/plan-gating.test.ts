@@ -20,7 +20,7 @@ describe("plan-gating", () => {
       userId: "user-1",
       subscriptions: [
         { plan: "starter", status: "active" },
-        { plan: "pro", status: "trialing" },
+        { plan: "pro", status: "active" },
       ],
     });
     expect(resolved).toBe("pro");
@@ -34,12 +34,13 @@ describe("plan-gating", () => {
     expect(resolved).toBe("starter");
   });
 
-  it("grants pro entitlements for trialing subscriptions", () => {
+  it("does not grant pro entitlements for trialing subscriptions (hard paywall)", () => {
     const resolved = resolvePlanForIdentity({
       userId: "user-1",
-      subscriptions: [{ plan: "starter", status: "trialing" }],
+      subscriptions: [{ plan: "pro", status: "trialing" }],
     });
-    expect(resolved).toBe("pro");
+    // In a hard paywall, "trialing" is not in ACTIVE_SUBSCRIPTION_STATUSES
+    expect(resolved).toBe("starter");
   });
 
   it("exposes expected entitlements by plan", () => {
