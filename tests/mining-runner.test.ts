@@ -13,6 +13,9 @@ vi.mock("@/lib/db", () => ({
     update: vi.fn(),
   },
 }));
+vi.mock("drizzle-orm/postgres-js", () => ({
+  drizzle: vi.fn(),
+}));
 
 vi.mock("@/lib/ai", () => ({
   extractPainPoints: vi.fn(),
@@ -24,6 +27,8 @@ vi.mock("@/lib/reddit", () => ({
   fetchSubredditPostsMultiSort: vi.fn(),
   rankRedditPosts: vi.fn(),
   resolveProblemPatterns: vi.fn(),
+  isSubredditThrottled: vi.fn().mockReturnValue(false),
+  getGlobal429Rate: vi.fn().mockResolvedValue(0),
 }));
 
 vi.mock("@/lib/clustering", () => ({

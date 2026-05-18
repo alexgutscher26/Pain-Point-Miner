@@ -6,18 +6,18 @@ describe("generateEmbedding", () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
-    vi.stubEnv("OPENROUTER_API_KEY", "test-api-key");
+    process.env.OPENROUTER_API_KEY = "test-api-key";
     global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
+    delete process.env.OPENROUTER_API_KEY;
     global.fetch = originalFetch;
     vi.restoreAllMocks();
   });
 
   it("throws an error if OPENROUTER_API_KEY is not configured", async () => {
-    vi.stubEnv("OPENROUTER_API_KEY", "");
+    delete process.env.OPENROUTER_API_KEY;
     await expect(generateEmbedding("test text")).rejects.toThrow(
       "OPENROUTER_API_KEY is not configured.",
     );

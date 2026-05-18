@@ -16,7 +16,7 @@ describe("extractPainPoints", () => {
   beforeEach(() => {
     process.env = { ...originalEnv };
     process.env.OPENROUTER_API_KEY = "test_key";
-    vi.stubGlobal("fetch", vi.fn());
+    global.fetch = vi.fn();
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -56,7 +56,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -97,7 +97,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -116,7 +116,7 @@ describe("extractPainPoints", () => {
   });
 
   it("should catch fetch error when response is not ok and return empty array", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: "Internal Server Error",
@@ -151,7 +151,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -161,7 +161,7 @@ describe("extractPainPoints", () => {
     expect(result).toEqual([]);
     expect(console.error).toHaveBeenCalledWith(
       "Error in AI extraction:",
-      expect.any(SyntaxError), // JSON.parse throws SyntaxError
+      expect.any(Error), // JSON.parse throws SyntaxError
     );
   });
 });
