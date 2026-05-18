@@ -23,15 +23,17 @@ export async function GET(request: Request) {
   console.log("🚀 Starting database maintenance via CRON...");
   const results: Record<string, string> = {};
 
-  for (const table of tables) {
-    try {
-      await db.execute(sql.raw(`ANALYZE ${table}`));
-      results[table] = "success";
-    } catch (err: any) {
-      console.error(`❌ Failed to analyze ${table}:`, err);
-      results[table] = `error: ${err.message}`;
-    }
-  }
+  await Promise.all(
+    tables.map(async (table) => {
+      try {
+        await db.execute(sql.raw(`ANALYZE ${table}`));
+        results[table] = "success";
+      } catch (err: any) {
+        console.error(`❌ Failed to analyze ${table}:`, err);
+        results[table] = `error: ${err.message}`;
+      }
+    })
+  );
 
   return NextResponse.json({ message: "Maintenance complete.", results });
 }
