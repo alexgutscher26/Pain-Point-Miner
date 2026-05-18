@@ -24,6 +24,7 @@ vi.mock("@/lib/reddit", () => ({
   fetchSubredditPostsMultiSort: vi.fn(),
   rankRedditPosts: vi.fn(),
   resolveProblemPatterns: vi.fn(),
+  isSubredditThrottled: vi.fn().mockReturnValue(false),
 }));
 
 vi.mock("@/lib/clustering", () => ({
