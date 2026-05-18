@@ -34,6 +34,7 @@ jobs:
           BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: dummy_sk_test_123
+          LOOPS_API_KEY: dummy_loops_key
 
       - name: Start Application Server
         run: |
@@ -45,6 +46,7 @@ jobs:
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: dummy_sk_test_123
+          LOOPS_API_KEY: dummy_loops_key
 
       - name: Start Application Server
         run: bun run start &
@@ -54,6 +56,7 @@ jobs:
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: dummy_sk_test_123
+          LOOPS_API_KEY: dummy_loops_key
 
       - name: Lighthouse Check
         uses: treosh/lighthouse-ci-action@v12
@@ -63,6 +66,7 @@ jobs:
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: dummy_sk_test_123
+          LOOPS_API_KEY: dummy_loops_key
         with:
           urls: |
             http://localhost:3000/dashboard
