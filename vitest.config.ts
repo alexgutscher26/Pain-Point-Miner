@@ -7,6 +7,7 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     clearMocks: true,
     restoreMocks: true,
+    setupFiles: ["vitest.setup.ts"],
     coverage: {
       provider: "v8",
       include: ["lib/**/*.ts"],
