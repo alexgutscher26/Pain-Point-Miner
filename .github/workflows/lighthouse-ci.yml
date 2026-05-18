@@ -33,6 +33,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: dummy_sk_test_123
 
       - name: Start Application Server
         run: |
@@ -43,6 +44,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: dummy_sk_test_123
 
       - name: Start Application Server
         run: bun run start &
@@ -51,6 +53,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: dummy_sk_test_123
 
       - name: Lighthouse Check
         uses: treosh/lighthouse-ci-action@v12
@@ -59,6 +62,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: dummy_sk_test_123
         with:
           urls: |
             http://localhost:3000/dashboard
