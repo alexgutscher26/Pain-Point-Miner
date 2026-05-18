@@ -145,7 +145,7 @@ describe("extractPainPoints", () => {
       choices: [
         {
           message: {
-            content: "This is not valid JSON",
+            content: "{ This is not valid JSON }",
           },
         },
       ],
