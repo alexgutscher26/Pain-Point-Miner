@@ -5,7 +5,8 @@ import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripeSecret = process.env.STRIPE_SECRET_KEY || "sk_test_123";
+const stripe = new Stripe(stripeSecret, {
   apiVersion: "2025-01-27.acacia" as any,
 });
 
@@ -65,9 +66,9 @@ export async function POST(req: Request) {
     if (validCustomerId) {
       try {
         const existing = await stripe.customers.retrieve(validCustomerId);
-        if ((existing as any).deleted) validCustomerId = undefined;
-      } catch (err: any) {
-        if (err.code === "resource_missing") {
+        if ("deleted" in existing && existing.deleted) validCustomerId = undefined;
+      } catch (err: unknown) {
+        if (err instanceof Stripe.errors.StripeError && err.code === "resource_missing") {
           console.warn(`[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`);
           validCustomerId = undefined;
         } else {
