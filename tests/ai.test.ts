@@ -16,7 +16,7 @@ describe("extractPainPoints", () => {
   beforeEach(() => {
     process.env = { ...originalEnv };
     process.env.OPENROUTER_API_KEY = "test_key";
-    vi.stubGlobal("fetch", vi.fn());
+    global.fetch = vi.fn() as any;
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -56,7 +56,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -97,7 +97,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -116,7 +116,7 @@ describe("extractPainPoints", () => {
   });
 
   it("should catch fetch error when response is not ok and return empty array", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: "Internal Server Error",
@@ -151,7 +151,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
