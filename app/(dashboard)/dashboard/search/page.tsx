@@ -147,7 +147,7 @@ export default function SearchPage() {
   >({});
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
-    "Your free trial has ended. Purchase a plan to continue.",
+    "A paid plan is required to unlock new scans and AI analysis.",
   );
   const requestInFlightRef = useRef(false);
   const planSubredditCap = billing?.entitlements.maxSubredditsPerSearch ?? 10;
@@ -305,7 +305,7 @@ export default function SearchPage() {
   const handleSuggestSubreddits = async () => {
     if (trialEnded) {
       setPlanDialogMessage(
-        "Your free trial has ended. Purchase a plan to continue.",
+        "A paid plan is required to continue. Please upgrade your account.",
       );
       setPlanDialogOpen(true);
       return;
@@ -408,7 +408,7 @@ export default function SearchPage() {
         ) {
           setPlanDialogMessage(
             errorPayload?.message ??
-              "Your free trial has ended. Purchase a plan to continue.",
+              "A paid plan is required to continue. Please upgrade your account.",
           );
           setPlanDialogOpen(true);
           return;
@@ -494,11 +494,10 @@ export default function SearchPage() {
           {trialEnded ? (
             <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4">
               <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
-                Read-Only After Trial
+                Action Required
               </p>
               <p className="text-sm font-semibold text-amber-100">
-                You can still explore the app and review past results. New scans
-                and AI suggestions require a paid plan.
+                Upgrade to a paid plan to unlock new scans and AI suggestions.
               </p>
             </div>
           ) : null}
@@ -890,7 +889,7 @@ export default function SearchPage() {
                   <div className="flex flex-col items-center gap-2 sm:items-end">
                     <p className="font-serif text-[13px] text-amber-300 italic">
                       {trialEnded
-                        ? "Free trial ended — upgrade to start a new investigation."
+                        ? "Upgrade your plan to unlock new investigations."
                         : "Scan limit reached — upgrade to Growth or Pro to continue."}
                     </p>
                     <Link

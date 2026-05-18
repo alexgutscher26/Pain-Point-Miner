@@ -836,3 +836,49 @@ export const subredditCache = pgTable("subreddit_cache", {
     .notNull(),
 });
 
+export const dbMaintenanceLog = pgTable("db_maintenance_log", {
+  id: text().primaryKey().notNull(),
+  taskName: text().notNull(),
+  indexName: text(),
+  sizeBeforeBytes: doublePrecision(),
+  sizeAfterBytes: doublePrecision(),
+  durationMs: integer(),
+  latencyBeforeMs: doublePrecision(),
+  latencyAfterMs: doublePrecision(),
+  alertTriggered: boolean().default(false).notNull(),
+  error: text(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+export const scraperRunSummary = pgTable(
+  "scraper_run_summary",
+  {
+    id: text().primaryKey().notNull(),
+    scraperId: text().notNull(),
+    workspaceId: text(),
+    month: text().notNull(), // ISO month format "YYYY-MM"
+    runsCount: integer().default(0).notNull(),
+    totalPostsFetched: integer().default(0).notNull(),
+    totalPostsMatched: integer().default(0).notNull(),
+    totalCommentsFetched: integer().default(0).notNull(),
+    totalNewPainPoints: integer().default(0).notNull(),
+    totalCost: doublePrecision().default(0.0).notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("scraper_run_summary_scraperId_month_key").on(
+      table.scraperId,
+      table.month,
+    ),
+    foreignKey({
+      columns: [table.scraperId],
+      foreignColumns: [scraper.id],
+      name: "scraper_run_summary_scraperId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);

@@ -66,16 +66,6 @@ export async function sendLoopsEvent(
 }
 
 /**
- * Sends a notification when a user's trial is about to end.
- */
-export async function sendTrialEndingNotification(
-  email: string,
-  daysRemaining: number,
-) {
-  await sendLoopsEvent(email, "trial_ending", { daysRemaining });
-}
-
-/**
  * Sends a notification when a mining run fails.
  */
 export async function sendScanFailedNotification(
@@ -223,77 +213,8 @@ export async function sendWeeklyDigestEmailProgrammatically(
 }
 
 /**
- * Sends a Trial Expiring Soon email (Day 2)
- */
-export async function sendTrialExpiringSoonEmailProgrammatically(
-  email: string,
-  firstName: string,
-  upgradeUrl: string,
-) {
-  if (!process.env.LOOPS_API_KEY) return;
-  try {
-    const { render } = await import("@react-email/components");
-    const { TrialExpiringSoonEmail } = await import("../../emails/TrialExpiringSoonEmail");
-    const htmlBody = await render(TrialExpiringSoonEmail({ firstName, upgradeUrl }));
-    await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_TRIAL_EXPIRING_ID || "cm2xxxx",
-      email,
-      dataVariables: { html: htmlBody },
-    });
-  } catch (error) {
-    console.error("[Loops] Error sending trial expiring soon email:", error);
-  }
-}
-
-/**
- * Sends a Trial Ended email (Day 3)
- */
-export async function sendTrialEndedEmailProgrammatically(
-  email: string,
-  firstName: string,
-  upgradeUrl: string,
-) {
-  if (!process.env.LOOPS_API_KEY) return;
-  try {
-    const { render } = await import("@react-email/components");
-    const { TrialEndedEmail } = await import("../../emails/TrialEndedEmail");
-    const htmlBody = await render(TrialEndedEmail({ firstName, upgradeUrl }));
-    await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_TRIAL_ENDED_ID || "cm2xxxy",
-      email,
-      dataVariables: { html: htmlBody },
-    });
-  } catch (error) {
-    console.error("[Loops] Error sending trial ended email:", error);
-  }
-}
-
-/**
- * Sends a Trial Win-back email (Day 5)
- */
-export async function sendTrialWinbackEmailProgrammatically(
-  email: string,
-  firstName: string,
-  upgradeUrl: string,
-  discountCode?: string,
-) {
-  if (!process.env.LOOPS_API_KEY) return;
-  try {
-    const { render } = await import("@react-email/components");
-    const { TrialWinbackEmail } = await import("../../emails/TrialWinbackEmail");
-    const htmlBody = await render(TrialWinbackEmail({ firstName, upgradeUrl, discountCode }));
-    await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_TRIAL_WINBACK_ID || "cm2xxxz",
-      email,
-      dataVariables: { html: htmlBody },
-    });
-  } catch (error) {
-    console.error("[Loops] Error sending trial winback email:", error);
-  }
-}
-/**
- * Sends a Reset Password email programmatically with built HTML
- */
+  * Sends a Reset Password email programmatically with built HTML
+  */
 export async function sendResetPasswordEmailProgrammatically(
   email: string,
   resetLink: string,

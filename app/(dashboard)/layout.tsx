@@ -14,6 +14,8 @@ import { CommandPalette } from "@/components/dashboard/command-palette";
 import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { LogoIcon } from "@/components/Logo";
+
 
 export const metadata: Metadata = {
   title: {
@@ -78,11 +80,10 @@ export default async function DashboardLayout({
       {/* Sidebar */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start border-r-2 border-white/15 bg-[#0d0d0d] lg:flex lg:flex-col">
         <div className="p-6">
+
           <div className="mb-8 flex items-center gap-3">
-            <div className="border border-[#ff8a57] bg-[#ff4500] p-2 text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]">
-              <span className="material-symbols-outlined block text-2xl font-bold">
-                query_stats
-              </span>
+            <div className="flex size-10 items-center justify-center border border-[#ff8a57] bg-[#ff4500] p-2 text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]">
+              <LogoIcon className="h-6 w-6" />
             </div>
             <div>
               <h1 className="text-[17px] leading-tight font-black tracking-tight">

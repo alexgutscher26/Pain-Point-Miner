@@ -147,6 +147,12 @@ export function Footer() {
           <div className="flex flex-col gap-5">
             <p className="mb-2 text-[15px] font-bold text-white">Resources</p>
             <Link
+              href="/blog/why-saas-founders-cant-stop-bleeding-users"
+              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-white underline decoration-[#ff4500]/30 underline-offset-4"
+            >
+              Why SaaS Bleed Users
+            </Link>
+            <Link
               href="/resources/best-subreddits-by-industry"
               className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
             >

@@ -16,26 +16,80 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const features = {
+interface Feature {
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: React.ReactNode;
+  benefits: string[];
+  details: string;
+  gradient: string;
+  howItWorks?: { title: string; desc: string }[];
+  useCases?: { title: string; desc: string }[];
+  preview?: {
+    type: string;
+    target: string;
+    intensity: string;
+    insight: string;
+    score: number;
+  };
+}
+
+const features: Record<string, Feature> = {
   "pain-point-mining": {
     title: "AI Pain Point Mining",
-    subtitle: "Identify root frustrations automatically",
+    subtitle: "Stop guessing. Find the real problems your customers are already venting about.",
     description:
-      "Our AI engine scans thousands of Reddit conversations to extract the underlying problems, recurring complaints, and unmet needs of your target audience.",
+      "Our AI engine doesn't just scrape Reddit; it understands it. We scan thousands of horizontal and vertical communities to extract the underlying frustrations, manual workarounds, and unmet needs that represent your next big opportunity.",
     icon: <Bot className="h-12 w-12 text-[#ff4500]" />,
     benefits: [
-      "Semantic clustering of similar complaints",
-      "Automatic root cause identification",
-      "Sentiment-weighted problem priority",
-      "Direct quote extraction for user research",
+      "Semantic clustering of 1,000+ individual rants",
+      "Automatic root cause identification (not just symptoms)",
+      "Sentiment-weighted priority based on frustration",
+      "Direct quote extraction for customer research",
     ],
     details:
-      "ThreddIQ doesn't just look for keywords. It understands context. Using deep semantic search, we group thousands of posts into structured problem clusters, showing you exactly what keeps your potential customers awake at night.",
+      "Most founders build products based on shallow keyword research. ThreddIQ identifies the 'Frustration Threshold'—the exact point where a user's annoyance becomes a willingness to pay. We group thousands of raw Reddit posts into structured 'Pain Pillars', showing you not just what people are saying, but the emotional intensity behind every complaint.",
+    howItWorks: [
+      {
+        title: "Community Targeting",
+        desc: "We monitor 100k+ subreddits to find where your potential audience lives and breathes.",
+      },
+      {
+        title: "Contextual Extraction",
+        desc: "Our AI filters out the noise, memes, and filler to find pure 'I wish there was a tool for...' moments.",
+      },
+      {
+        title: "Opportunity Scoring",
+        desc: "Every pain point is ranked by volume, upvote velocity, and emotional desperation.",
+      },
+    ],
+    useCases: [
+      {
+        title: "SaaS Builders",
+        desc: "Find low-competition technical problems in niche subreddits before they become mainstream trends.",
+      },
+      {
+        title: "Product Managers",
+        desc: "Validate your roadmap against real-world complaints. Stop building features based on loud minorities.",
+      },
+      {
+        title: "Growth Marketers",
+        desc: "Extract the exact language and 'hooks' your customers use to describe their frustrations for your ad copy.",
+      },
+    ],
+    preview: {
+      type: "Pain Point Analysis",
+      target: "r/SaaS",
+      intensity: "Critical (9.4/10)",
+      insight: "Users are reporting 2+ hours wasted daily on manual spreadsheet reconciliation between Stripe and QuickBooks.",
+      score: 88,
+    },
     gradient: "from-orange-500/20 to-transparent",
   },
   "idea-validation": {
     title: "SaaS Idea Validation",
-    subtitle: "Validate with real-world demand",
+    subtitle: "Validate with real-world demand signals",
     description:
       "Stop guessing if your idea will work. Use upvotes, comment volume, and discussion frequency to measure hard validation signals from real communities.",
     icon: <Shield className="h-12 w-12 text-[#ff4500]" />,
@@ -182,17 +236,105 @@ export default async function FeaturePage({
 
           <div className="group relative flex aspect-square items-center justify-center overflow-hidden rounded-[32px] border-2 border-white/3 bg-[#0f0f0f] p-8 shadow-2xl">
             <div className="absolute inset-0 bg-[#ff4500]/5 opacity-0 transition-opacity group-hover:opacity-100" />
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/40 p-12 text-center backdrop-blur-sm">
-              <Sparkles className="mb-6 h-16 w-16 text-[#ff4500] opacity-80 transition-transform duration-500 group-hover:scale-110" />
-              <h4 className="mb-2 text-xl font-bold text-white">
-                Automated Discovery
-              </h4>
-              <p className="text-sm font-medium text-zinc-500">
-                Built with advanced NLP to find what generic scrapers miss.
-              </p>
-            </div>
+            
+            {feature.preview ? (
+              <div className="relative z-10 w-full space-y-4 rounded-2xl border border-white/5 bg-black/40 p-6 backdrop-blur-md">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <span className="text-xs font-black uppercase tracking-widest text-[#ff4500]">
+                    Live Analysis
+                  </span>
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Source:</span>
+                    <span className="font-bold text-white">{feature.preview.target}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Intensity:</span>
+                    <span className="font-bold text-red-400">{feature.preview.intensity}</span>
+                  </div>
+                  <div className="rounded-lg bg-white/5 p-4 text-xs italic leading-relaxed text-zinc-300">
+                    "{feature.preview.insight}"
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="h-1.5 flex-1 rounded-full bg-white/5">
+                      <div 
+                        className="h-full rounded-full bg-[#ff4500]" 
+                        style={{ width: `${feature.preview.score}%` }} 
+                      />
+                    </div>
+                    <span className="text-xs font-bold text-white">Score: {feature.preview.score}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative z-10 flex h-full w-full flex-col items-center justify-center rounded-2xl border border-white/5 bg-black/40 p-12 text-center backdrop-blur-sm">
+                <Sparkles className="mb-6 h-16 w-16 text-[#ff4500] opacity-80 transition-transform duration-500 group-hover:scale-110" />
+                <h4 className="mb-2 text-xl font-bold text-white">
+                  Automated Discovery
+                </h4>
+                <p className="text-sm font-medium text-zinc-500">
+                  Built with advanced NLP to find what generic scrapers miss.
+                </p>
+              </div>
+            )}
           </div>
         </section>
+
+        {/* How It Works Section */}
+        {feature.howItWorks && (
+          <section className="mb-32 w-full max-w-6xl">
+            <div className="mb-16 text-center">
+              <h2 className="text-3xl font-extrabold text-white md:text-4xl">
+                How It Works
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {feature.howItWorks.map((step, idx) => (
+                <div
+                  key={step.title}
+                  className="group relative rounded-[32px] border border-white/5 bg-white/2 p-8 transition-all hover:bg-white/5"
+                >
+                  <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#ff4500]/10 text-xl font-black text-[#ff4500]">
+                    {idx + 1}
+                  </div>
+                  <h3 className="mb-4 text-xl font-bold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-zinc-400">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Use Cases Section */}
+        {feature.useCases && (
+          <section className="mb-32 w-full max-w-6xl">
+            <div className="mb-16 text-center">
+              <h2 className="text-3xl font-extrabold text-white md:text-4xl">
+                Who Is It For?
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {feature.useCases.map((useCase) => (
+                <div
+                  key={useCase.title}
+                  className="rounded-[32px] border border-white/5 bg-linear-to-br from-white/5 to-transparent p-8"
+                >
+                  <h3 className="mb-4 text-lg font-bold text-white">
+                    {useCase.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-zinc-500">
+                    {useCase.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
 
         {/* Call to Action */}
         <section className="relative w-full max-w-4xl overflow-hidden rounded-[40px] border border-[#ff4500]/10 bg-linear-to-b from-[#1c0c0a] to-[#0f0504] p-12 text-center shadow-2xl md:p-16">

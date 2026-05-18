@@ -523,7 +523,7 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 - [x] **Plan Enforcement** — `maxSubredditsPerSearch`, `allowedMiningDepths`, locked UI with "Upgrade" badge
 - [x] **Sidebar Usage Meter** — "7/10 scans used this month" with visual progress bar
 - [x] **Soft Block at 100%** — clear upgrade CTA modal, not a hard error response
-- [x] **Free Trial Flow** — 3-day Pro trial on signup · countdown banner · Day 2/3/5 win-back emails
+- [x] **Free Trial Flow** — 2-day trial with card on signup · countdown banner · Day 2/3/5 win-back emails
 - [x] **Annual Billing Toggle** — 20% discount · "Save $48/year" callout on pricing page
 - [x] **Social Proof** — ⭐ "Most Popular" badge on Growth plan card
 - [x] **Landing Page Basics** — A/B headline test · live scan counter · testimonial carousel · interactive demo
@@ -745,9 +745,51 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
   - [ ] Enable velocity detection (Phase 2): compare current week vs prior week per snapshot
   - [ ] _Acceptance:_ A keyword with 8 weeks of data shows a correct 6-point sparkline on the dashboard
 
+- [ ] **External API Connectors**
+  - [ ] **TrustPilot / G2 Scraper** — Extract "Cons" and "Pain Points" from reviews of specific competitors.
+  - [ ] **YouTube Comment Scraper** — Fetch comments from tutorials or "how-to" videos in a niche.
+  - [ ] **Discord Community Ingestion** — Monitor specific partner Discord channels for help requests (requires bot invite).
+  - [ ] _Acceptance:_ Pain points from YouTube comments appear in a unified "Multi-Source" report.
+
 ---
 
-## 📧 PHASE 8 — Communication & Reporting
+## 🧩 PHASE 8 — Extensions, Integrations & Ecosystem
+
+> **Goal:** Move RPP beyond the browser tab. Integrate into the user's existing workflow (Reddit, Slack, Zapier) and provide a seamless mobile experience.
+
+### ⬜ Planned
+
+- [ ] **RPP Browser Extension (Chrome/Firefox/Edge)**
+  - [ ] **Native Integration** — Inject "Mine Niche" button into Reddit search results and subreddit headers.
+  - [ ] **Signal Overlay** — Highlight "Desperate" or "Budget" comments directly on Reddit with an RPP icon.
+  - [ ] **Quick Capture** — Right-click any text on the web → "Add to RPP Inbox" as a manual pain point.
+  - [ ] **Popup Dashboard** — View latest 3 reports and status of active scans without leaving the current tab.
+  - [ ] _Acceptance:_ Users can initiate a scan of r/SaaS directly from the Reddit UI using the extension.
+
+- [ ] **Zapier & Make.com (Platform Apps)**
+  - [ ] **Public App Listing** — Official RPP connector on Zapier App Directory.
+  - [ ] **Triggers** — `New Opportunity Found`, `Scan Finalized`, `Credit Limit Reached`.
+  - [ ] **Actions** — `Trigger Investigation`, `Search Existing Reports`, `Create Opportunity Note`.
+  - [ ] _Acceptance:_ A Zapier workflow successfully sends a Slack dm whenever a score > 8.5 is found.
+
+- [ ] **Slack & Discord Connectors**
+  - [ ] **Channel Alerts** — Configure an RPP bot to post summaries to `#market-intel` or `#product-ideas`.
+  - [ ] **Slash Commands** — `/rpp stats <niche>` to get a quick summary of the last 30 days of data.
+  - [ ] **Interactive Cards** — "Vote" or "Bookmark" pain points directly from chat.
+  - [ ] _Acceptance:_ Slack bot posts a rich-text block with radar chart preview for new top opportunities.
+
+- [ ] **Mobile App (React Native / PWA)**
+  - [ ] **Push Notifications** — Immediate notification for "Exploding" trends or "High Score" opportunities.
+  - [ ] **Simplified Scan** — Mobile-first UI for starting quick keyword investigations.
+  - [ ] **FaceID/TouchID** — Secure, instant access to the market dashboard.
+  - [ ] _Acceptance:_ Users receive a push notification when a scheduled report is ready.
+
+- [ ] **N8N Node Implementation**
+  - [ ] High-performance self-hosted integration for power users/developers.
+
+---
+
+## 📧 PHASE 9 — Communication & Reporting
 
 > **Goal:** Keep users engaged, informed, and converting through high-quality automated email communication and scheduled intelligence reports.
 
@@ -806,7 +848,7 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ---
 
-## 🔒 PHASE 9 — Security Hardening
+## 🔒 PHASE 10 — Security Hardening
 
 > **Goal:** Production-hardened security posture. No critical vulnerabilities shipped. All secrets managed correctly. All user data protected by default.
 
@@ -841,36 +883,30 @@ All emails use React Email components, tested locally with `email.dev` preview s
 
 ---
 
-## 📅 PHASE 10 — Maintenance & Periodic Audits
+## 📅 PHASE 11 — Maintenance & Periodic Audits
 
 > **Goal:** A platform that stays fast, clean, and reliable months after launch through proactive maintenance cadences.
 
 ### Database Maintenance
 
-- [ ] **Monthly Log Truncation**
-  - [ ] Archive `scraper_run` records older than 60 days to a `scraper_run_archive` table (same schema)
-  - [ ] Or hard-delete if archive isn't needed — keep aggregate stats in a `scraper_run_summary` table
-  - [ ] Inngest monthly cron scheduled for midnight, first Sunday of each month
-  - [ ] _Acceptance:_ `scraper_run` table stays under 100k rows after 6 months of production use
+- [x] **Monthly Log Truncation**
+  - [x] Archive `scraper_run` records older than 60 days to a `scraper_run_summary` table (same schema)
+  - [x] Or hard-delete if archive isn't needed — keep aggregate stats in a `scraper_run_summary` table
+  - [x] Inngest monthly cron scheduled for midnight, first Sunday of each month
+  - [x] _Acceptance:_ `scraper_run` table stays under 100k rows after 6 months of production use
 
-- [ ] **Weekly PGVector REINDEX**
-  - [ ] Inngest weekly cron: `REINDEX INDEX CONCURRENTLY pain_point_embedding_hnsw_idx`
-  - [ ] Log index size before/after to `db_maintenance_log` table
-  - [ ] Alert if index size grows >20% week-over-week
-  - [ ] _Acceptance:_ Similarity search latency stays under 50ms after index rebuild
+- [x] **Weekly PGVector REINDEX**
+  - [x] Inngest weekly cron: `REINDEX INDEX CONCURRENTLY pain_point_embedding_hnsw_idx`
+  - [x] Log index size before/after to `db_maintenance_log` table
+  - [x] Alert if index size grows >20% week-over-week
+  - [x] _Acceptance:_ Similarity search latency stays under 50ms after index rebuild
 
-- [ ] **Dead Data Cleanup**
-  - [ ] Pain points with no parent `scraperId` (orphaned by hard-delete bugs)
-  - [ ] Embeddings in `pain_point_embedding` with no corresponding `pain_point` row
-  - [ ] Empty clusters where `sourceCount = 0`
-  - [ ] Run as weekly Inngest function, log deleted row counts
-  - [ ] _Acceptance:_ Zero orphaned records found after cleanup function runs
-
-- [ ] **Monthly Backup Verification**
-  - [ ] Restore latest database backup to an isolated Neon branch
-  - [ ] Run smoke test queries: count pain points, verify latest scraper run exists
-  - [ ] Document restore time in ops log
-  - [ ] _Acceptance:_ Backup restore completes in < 15 minutes with no data loss
+- [x] **Dead Data Cleanup**
+  - [x] Pain points with no parent `scraperId` (orphaned by hard-delete bugs)
+  - [x] Embeddings in `pain_point_embedding` with no corresponding `pain_point` row
+  - [x] Empty clusters where `sourceCount = 0`
+  - [x] Run as weekly Inngest function, log deleted row counts
+  - [x] _Acceptance:_ Zero orphaned records found after cleanup function runs
 
 ### Content & Quality
 
@@ -951,8 +987,9 @@ All emails use React Email components, tested locally with `email.dev` preview s
 | Phase 5 — Revenue & Growth   | 🔄 In Progress | ~55%       | Overage packs, viral sharing    |
 | Phase 6 — Testing & QA       | 🔄 In Progress | ~65%       | E2E Playwright suite            |
 | Phase 7 — Platform Expansion | ⬜ Planned     | 0%         | Depends on P1 stable            |
-| Phase 8 — Communication      | ⬜ Planned     | 0%         | Depends on email provider setup |
-| Phase 9 — Security           | 🔄 In Progress | ~70%       | API key hashing                 |
-| Phase 10 — Maintenance       | ⬜ Planned     | 0%         | Depends on Inngest              |
+| Phase 8 — Ecosystem & Exts   | ⬜ Planned     | 0%         | Requires Public API (P4)        |
+| Phase 9 — Communication      | ⬜ Planned     | 0%         | Depends on email provider setup |
+| Phase 10 — Security          | 🔄 In Progress | ~70%       | API key hashing                 |
+| Phase 11 — Maintenance       | ⬜ Planned     | 0%         | Depends on Inngest              |
 
-**Total open tasks (rough estimate):** ~180 items across all phases
+**Total open tasks (rough estimate):** ~210 items across all phases

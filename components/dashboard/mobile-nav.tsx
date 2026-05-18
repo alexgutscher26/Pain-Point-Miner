@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { LogoIcon } from "@/components/Logo";
+
 import { SidebarLinks } from "@/components/dashboard/sidebar-links";
 import { DashboardFooterLinks } from "@/components/dashboard/dashboard-footer-links";
 import {
@@ -39,12 +41,11 @@ export function DashboardMobileNav({
           Access your dashboard, reports, and settings.
         </SheetDescription>
         <div className="flex h-full flex-col">
+
           <div className="border-b border-white/10 px-5 py-5">
             <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="border border-[#ff8a57] bg-[#ff4500] p-2 text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]">
-                <span className="material-symbols-outlined block text-xl font-bold">
-                  query_stats
-                </span>
+              <div className="flex size-9 items-center justify-center border border-[#ff8a57] bg-[#ff4500] p-2 text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]">
+                <LogoIcon className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-base leading-tight font-black tracking-tight">
