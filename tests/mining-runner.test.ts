@@ -25,6 +25,7 @@ vi.mock("@/lib/reddit", () => ({
   rankRedditPosts: vi.fn(),
   resolveProblemPatterns: vi.fn(),
   isSubredditThrottled: vi.fn(),
+  getGlobal429Rate: vi.fn(),
 }));
 
 vi.mock("@/lib/clustering", () => ({
