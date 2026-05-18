@@ -10,23 +10,20 @@ type SubscriptionRecord = {
 };
 
 export type ResolvedPlanContext = {
+  userId: string;
   plan: BillingPlan;
+  ltdTier: string | null;
+  planPurchaseRequired: boolean;
   hasActiveSubscription: boolean;
   trialActive: boolean;
   trialEndsAt: Date | null;
-  planPurchaseRequired: boolean;
   trialDaysRemaining: number | null;
-  ltdTier: string | null;
 };
 
 type PlanContextResolutionInput = {
-  resolvedPlan: BillingPlan;
-  hasActiveSubscription: boolean;
-  userCreatedAt?: Date | null;
-  now?: Date;
-  localTrialEnabled?: boolean;
-  localTrialDays?: number;
-  requirePaidAfterTrial?: boolean;
+  userId: string;
+  plan: BillingPlan;
+  ltdTier?: string | null;
 };
 
 async function loadSubscriptions(
@@ -91,103 +88,40 @@ export async function resolvePlanContext(input: {
     subscriptions,
     ltdTier: currentUser?.ltdTier,
   });
-  const hasActiveSubscription = subscriptions.some((subscription) =>
-    ["active", "trialing", "past_due"].includes(
-      (subscription.status ?? "").toLowerCase(),
-    ),
-  );
-  const localTrialDays = Number.parseInt(
-    process.env.LOCAL_TRIAL_DAYS ?? "3",
-    10,
-  );
-  const localTrialEnabled = process.env.LOCAL_TRIAL_ENABLED !== "false";
-  const requirePaidAfterTrial =
-    process.env.REQUIRE_PAID_PLAN_AFTER_TRIAL !== "false";
   
-  const baseResolutionInput = {
-    resolvedPlan,
-    hasActiveSubscription,
-    localTrialDays,
-    localTrialEnabled,
-    requirePaidAfterTrial,
-    userCreatedAt: currentUser?.createdAt ?? null,
+  return resolvePlanAccessState({
+    userId: input.userId,
+    plan: resolvedPlan,
     ltdTier: currentUser?.ltdTier ?? "none",
-  };
-
-  return resolvePlanAccessState(baseResolutionInput);
+  });
 }
 
+/**
+ * Checks if a subscription is considered "active" (meaning it grants pro features).
+ */
+export function isSubscriptionActive(status?: string | null): boolean {
+  if (!status) return false;
+  return ["active", "past_due"].includes(status.toLowerCase());
+}
+
+/**
+ * High-level business logic that decides the final access state for a user.
+ */
 export function resolvePlanAccessState({
-  resolvedPlan,
-  hasActiveSubscription,
-  userCreatedAt = null,
-  now = new Date(),
-  localTrialEnabled = true,
-  localTrialDays = 3,
-  requirePaidAfterTrial = true,
-  ltdTier = "none",
-}: PlanContextResolutionInput & { ltdTier?: string | null }): ResolvedPlanContext {
-  // 1. Initial State from existing plan/subscription
-  const context: ResolvedPlanContext = {
-    plan: resolvedPlan,
-    hasActiveSubscription,
-    trialActive: false,
+  userId,
+  plan,
+  ltdTier,
+}: PlanContextResolutionInput): ResolvedPlanContext {
+  const isPaidOrLTD = (ltdTier && ltdTier !== "none") || plan !== "starter";
+
+  return {
+    userId,
+    plan,
+    ltdTier: ltdTier || null,
+    planPurchaseRequired: !isPaidOrLTD,
+    hasActiveSubscription: isPaidOrLTD,
+    trialActive: false, // Trials are disabled
     trialEndsAt: null,
     trialDaysRemaining: null,
-    planPurchaseRequired: !hasActiveSubscription && requirePaidAfterTrial && (ltdTier === "none" || !ltdTier),
-    ltdTier: ltdTier ?? "none",
   };
-
-  // 2. Early Exit if trial logic should not run
-  if (
-    !localTrialEnabled ||
-    hasActiveSubscription ||
-    !Number.isFinite(localTrialDays) ||
-    localTrialDays <= 0 ||
-    !userCreatedAt
-  ) {
-    return context;
-  }
-
-  // 3. Calculate Trial Boundaries (Signup date + Trial duration)
-  const trialEndsAt = new Date(userCreatedAt);
-  trialEndsAt.setDate(trialEndsAt.getDate() + localTrialDays);
-  
-  // Normalize to end-of-day for the expiration date to be user-friendly (generous end)
-  trialEndsAt.setHours(23, 59, 59, 999);
-  
-  const trialEndsAtMs = trialEndsAt.getTime();
-  const nowMs = now.getTime();
-  const isCurrentlyInTrial = trialEndsAtMs > nowMs;
-
-  // 4. Update Context with Trial Details
-  context.trialEndsAt = trialEndsAt;
-  context.trialActive = isCurrentlyInTrial;
-  
-  // Calculate days remaining based on calendar midnights for a more natural countdown
-  const endMidnight = new Date(trialEndsAt);
-  endMidnight.setHours(0, 0, 0, 0);
-  const nowMidnight = new Date(now);
-  nowMidnight.setHours(0, 0, 0, 0);
-  
-  context.trialDaysRemaining = Math.max(
-    0,
-    Math.round((endMidnight.getTime() - nowMidnight.getTime()) / (1000 * 60 * 60 * 24)),
-  );
-
-  // 5. Business Logic Overrides
-  if (isCurrentlyInTrial) {
-    context.planPurchaseRequired = false;
-    // Upgrade "starter" to "pro" during trial if not already on a higher plan
-    // But don't override if they have already purchased an LTD tier (founder/professional)
-    if ((context.plan === "starter") && (ltdTier === "none" || !ltdTier)) {
-      context.plan = "pro";
-    }
-  } else {
-    // Trial expired. If no active subscription, lock access if required.
-    // However, if they have an LTD, we allow it to bypass the lockdown.
-    context.planPurchaseRequired = !hasActiveSubscription && requirePaidAfterTrial && (ltdTier === "none" || !ltdTier);
-  }
-
-  return context;
 }

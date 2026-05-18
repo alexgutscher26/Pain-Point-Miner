@@ -204,7 +204,7 @@ export async function GET(
       return apiError(
         403,
         "PLAN_REQUIRED",
-        "Your free trial has ended. Purchase a plan to continue.",
+        "Start your 2-day trial with a credit card to unlock full analysis reports.",
         {
           trialEnded: true,
         },

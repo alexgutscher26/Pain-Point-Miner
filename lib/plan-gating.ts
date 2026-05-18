@@ -73,7 +73,6 @@ export function calculateMiningCost(depth: MiningDepth): number {
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
   "active",
-  "trialing",
   "past_due",
 ]);
 const PLAN_ORDER: Record<BillingPlan, number> = {
@@ -159,15 +158,6 @@ export function resolvePlanForIdentity(input: {
   const email = input.email?.trim().toLowerCase();
   const byEmail = email ? overrides[email] : undefined;
   if (byEmail) return byEmail;
-
-  const hasTrialingSubscription =
-    input.subscriptions?.some(
-      (subscription) =>
-        (subscription.status ?? "").toLowerCase() === "trialing",
-    ) ?? false;
-  if (hasTrialingSubscription) {
-    return "pro";
-  }
 
   const activePlans =
     input.subscriptions
