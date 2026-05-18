@@ -161,7 +161,7 @@ describe("extractPainPoints", () => {
     expect(result).toEqual([]);
     expect(console.error).toHaveBeenCalledWith(
       "Error in AI extraction:",
-      expect.any(SyntaxError), // JSON.parse throws SyntaxError
+      expect.any(Error), // AI extraction can throw standard Error on missing JSON object
     );
   });
 });
