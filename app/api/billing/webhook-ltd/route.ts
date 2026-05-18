@@ -5,11 +5,11 @@ import { db } from "@/lib/db";
 import { user, userPreferences, purchasedCredits } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "dummy_key", {
   apiVersion: "2025-01-27.acacia" as any,
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "dummy_secret";
 
 export async function POST(req: Request) {
   const body = await req.text();
