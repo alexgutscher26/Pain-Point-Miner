@@ -34,6 +34,7 @@ jobs:
           BETTER_AUTH_SECRET: better_auth_super_secret_long_string_123!
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: test
+          LOOPS_API_KEY: test
 
       - name: Start Application Server
         run: |
@@ -61,6 +62,7 @@ jobs:
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
           STRIPE_SECRET_KEY: test
+          LOOPS_API_KEY: test
         with:
           urls: |
             http://localhost:3000/dashboard
