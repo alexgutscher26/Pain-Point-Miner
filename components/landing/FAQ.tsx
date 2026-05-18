@@ -27,7 +27,7 @@ export function FAQ() {
     },
     {
       q: "Do you offer a free trial?",
-      a: "Yes! We offer a 3-day full-access trial for our Pro plan so you can see the depth of our mining engine yourself. No credit card is required to start your discovery journey.",
+      a: "Yes! We offer a 2-day full-access trial for our plans so you can see the depth of our mining engine yourself. A credit card is required to start your trial, but you won't be charged until the trial ends.",
     },
   ];
 
@@ -70,10 +70,10 @@ export function FAQ() {
           </p>
 
           <button className="relative z-10 rounded-lg bg-[#ff4500] px-10 py-4 text-lg font-bold text-white shadow-[0_0_30px_rgba(255,69,0,0.4)] transition-transform hover:scale-105 hover:bg-[#e03d00]">
-            Start 3-day free trial
+            Start 2-day free trial
           </button>
           <p className="relative z-10 mt-4 text-xs font-bold tracking-widest text-red-300 uppercase">
-            No Credit Card Required
+            Credit Card Required
           </p>
         </div>
       </section>

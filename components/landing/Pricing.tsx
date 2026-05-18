@@ -430,7 +430,7 @@ export function Pricing() {
       <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
         <h4 className="mb-2 text-[18px] font-extrabold tracking-tight text-white">
-          Start your 3-day free trial. No credit card required.
+          Secure checkout with Stripe. Instant access.
         </h4>
       </div>
     </section>

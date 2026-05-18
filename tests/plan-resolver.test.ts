@@ -2,54 +2,50 @@ import { describe, expect, it } from "vitest";
 import { resolvePlanAccessState } from "@/lib/plan-resolver";
 
 describe("plan-resolver", () => {
-  it("keeps users on pro during an active local trial", () => {
+  it("requires a paid plan for starter users without LTD", () => {
     const result = resolvePlanAccessState({
-      resolvedPlan: "starter",
-      hasActiveSubscription: false,
-      userCreatedAt: new Date("2026-03-15T12:00:00.000Z"),
-      now: new Date("2026-03-17T12:00:00.000Z"),
-      localTrialEnabled: true,
-      localTrialDays: 3,
-      requirePaidAfterTrial: true,
-    });
-
-    expect(result.plan).toBe("pro");
-    expect(result.trialActive).toBe(true);
-    expect(result.planPurchaseRequired).toBe(false);
-    expect(result.trialDaysRemaining).toBe(1);
-  });
-
-  it("requires a paid plan after the local trial expires", () => {
-    const result = resolvePlanAccessState({
-      resolvedPlan: "starter",
-      hasActiveSubscription: false,
-      userCreatedAt: new Date("2026-03-10T12:00:00.000Z"),
-      now: new Date("2026-03-17T12:00:00.000Z"),
-      localTrialEnabled: true,
-      localTrialDays: 3,
-      requirePaidAfterTrial: true,
+      userId: "user_1",
+      plan: "starter",
+      ltdTier: "none",
     });
 
     expect(result.plan).toBe("starter");
-    expect(result.trialActive).toBe(false);
     expect(result.planPurchaseRequired).toBe(true);
-    expect(result.trialDaysRemaining).toBe(0);
-    expect(result.trialEndsAt?.toISOString()).toBe("2026-03-13T12:00:00.000Z");
+    expect(result.ltdTier).toBe("none");
   });
 
-  it("does not require purchase when an active subscription exists", () => {
+  it("grants access to growth plan users", () => {
     const result = resolvePlanAccessState({
-      resolvedPlan: "growth",
-      hasActiveSubscription: true,
-      userCreatedAt: new Date("2026-03-10T12:00:00.000Z"),
-      now: new Date("2026-03-17T12:00:00.000Z"),
-      localTrialEnabled: true,
-      localTrialDays: 3,
-      requirePaidAfterTrial: true,
+      userId: "user_1",
+      plan: "growth",
+      ltdTier: "none",
     });
 
     expect(result.plan).toBe("growth");
     expect(result.planPurchaseRequired).toBe(false);
-    expect(result.trialActive).toBe(false);
+  });
+
+  it("grants access to LTD founder users even on starter plan", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "starter",
+      ltdTier: "founder",
+    });
+
+    expect(result.plan).toBe("starter");
+    expect(result.planPurchaseRequired).toBe(false);
+    expect(result.ltdTier).toBe("founder");
+  });
+
+  it("grants access to LTD professional users even on starter plan", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "starter",
+      ltdTier: "professional",
+    });
+
+    expect(result.plan).toBe("starter");
+    expect(result.planPurchaseRequired).toBe(false);
+    expect(result.ltdTier).toBe("professional");
   });
 });

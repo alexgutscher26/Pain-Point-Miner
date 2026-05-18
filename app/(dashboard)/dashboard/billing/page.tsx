@@ -76,9 +76,6 @@ export default async function BillingPage() {
       plan={currentPlan}
       ltdTier={planContext.ltdTier}
       planPurchaseRequired={planContext.planPurchaseRequired}
-      trialActive={planContext.trialActive}
-      trialEndsAt={planContext.trialEndsAt?.toISOString() ?? null}
-      trialDaysRemaining={planContext.trialDaysRemaining}
       entitlements={entitlements}
       usage={creditSummary}
     />

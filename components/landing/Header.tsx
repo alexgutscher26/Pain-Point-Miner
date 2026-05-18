@@ -152,7 +152,7 @@ export function Header() {
                     asChild
                     className="hidden h-10 rounded-xl bg-[#ff4500] px-5 text-sm font-black text-white shadow-lg shadow-[#ff4500]/10 transition-all hover:bg-[#ff5a1a] md:flex"
                   >
-                    <Link href="/sign-up">Start Free Trial</Link>
+                    <Link href="/sign-up">Get Started</Link>
                   </Button>
                 </div>
               )}
@@ -221,7 +221,7 @@ export function Header() {
                             href="/sign-up"
                             onClick={() => setIsOpen(false)}
                           >
-                            Start Free Trial
+                            Get Started
                           </Link>
                         </Button>
                         <Link

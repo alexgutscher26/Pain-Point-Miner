@@ -264,7 +264,7 @@ export async function POST(req: Request) {
       return apiError(
         403,
         "PLAN_REQUIRED",
-        "Your free trial has ended. Purchase a plan to continue.",
+        "Start your 2-day trial with a credit card to unlock new scans.",
         {
           trialEnded: true,
         },
