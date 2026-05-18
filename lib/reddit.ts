@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { sql, gt } from "drizzle-orm";
+import { gt } from "drizzle-orm";
 import { db } from "./db";
 import { redditRateLimitLog } from "./db/schema";
 
@@ -912,10 +910,14 @@ export const fetchComments = async (
     const commentNodes = data[1].data.children;
     const collectedComments: RedditComment[] = [];
 
+
+    type ReplyStructure = {
+      data?: { children?: { kind?: string; data: RedditComment & { replies?: ReplyStructure } }[] };
+    };
+
     const extractReplies = (
-      replies: {
-        data?: { children?: any[] };
-      },
+      replies: ReplyStructure,
+
       currentDepth: number,
     ): void => {
       if (
@@ -933,7 +935,7 @@ export const fetchComments = async (
 
         const comment = child.data;
         collectedComments.push(comment);
-        extractReplies(comment.replies, currentDepth + 1);
+        extractReplies(comment.replies as ReplyStructure, currentDepth + 1);
       }
     };
 
@@ -943,7 +945,7 @@ export const fetchComments = async (
 
       const comment = child.data;
       collectedComments.push(comment);
-      extractReplies(comment.replies, 1); // Depth 1 for replies to top-level
+      extractReplies(comment.replies as ReplyStructure, 1); // Depth 1 for replies to top-level
     }
 
     return collectedComments;
@@ -996,7 +998,7 @@ export async function searchSubreddits(
     const children = data.data?.children ?? [];
 
     return children
-      .map((child: any) => {
+      .map((child: { data: { display_name: string, subscribers?: number, public_description?: string, title?: string, active_user_count?: number } }) => {
         const item = child.data;
         return {
           name: item.display_name,
@@ -1030,7 +1032,7 @@ export async function getSubredditMetadataBulk(
     try {
       const url = `https://www.reddit.com/r/${sub}/about.json`;
       const response = await fetchRedditResponse(url);
-      const data = (await response.json()) as any;
+      const data = (await response.json()) as { data?: { display_name?: string, subscribers?: number, public_description?: string, active_user_count?: number } };
       
       if (data?.data) {
         results.push({
