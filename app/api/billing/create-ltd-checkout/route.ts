@@ -6,7 +6,7 @@ import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia" as any,
+  apiVersion: "2025-01-27.acacia" as Stripe.LatestApiVersion,
 });
 
 export async function POST(req: Request) {
