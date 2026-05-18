@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -13,11 +12,12 @@ import {
   Activity,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import type { User } from "@/lib/auth";
 
 export function SidebarLinks() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const isAdmin = (session?.user as any)?.role === "admin";
+  const isAdmin = (session?.user as User | undefined)?.role === "admin";
 
   const links = [
     {
