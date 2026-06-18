@@ -11,7 +11,6 @@ import {
   ChevronRight,
   Loader2,
   Search,
-  Database,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -101,16 +100,16 @@ export default function ReportsPage() {
               Investigation Archives
             </p>
           </div>
-          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-white">
+          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-zinc-900">
             Reports History
           </h2>
-          <p className="text-sm font-medium text-zinc-400">
+          <p className="text-sm font-medium text-zinc-500">
             Manage and analyze your past Reddit mining sessions.
           </p>
         </div>
         <Link
           href="/dashboard/search"
-          className="group flex items-center justify-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-6 py-3 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-95"
+          className="group flex items-center justify-center gap-2 rounded-xl border border-[#ff8a57] bg-[#ff4500] px-6 py-3 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-all shadow-sm hover:shadow-md active:scale-95"
         >
           <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
           New Search
@@ -118,42 +117,42 @@ export default function ReportsPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-4 border-2 border-white/15 bg-[#0c0c0c] p-2">
+      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-3 shadow-sm">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2 border border-white/20 bg-[#111] px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-300 uppercase transition-colors outline-none hover:border-white/35 hover:text-white">
+            <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
               <Calendar className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#ff4500]" />
               {days === "all" ? "All Time" : `Last ${days} Days`}
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-white/10 bg-[#0c0c0c] text-zinc-400">
-            <DropdownMenuLabel className="text-zinc-500">
+          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+            <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Date Range
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-zinc-200/50" />
             <DropdownMenuRadioGroup value={days} onValueChange={setDays}>
               <DropdownMenuRadioItem
                 value="7"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Last 7 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="30"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Last 30 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="90"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Last 90 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="all"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 All Time
               </DropdownMenuRadioItem>
@@ -163,7 +162,7 @@ export default function ReportsPage() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2 border border-white/20 bg-[#111] px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-300 uppercase transition-colors outline-none hover:border-white/35 hover:text-white">
+            <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
               <Filter className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#ff4500]" />
               Status:{" "}
               {status === "all"
@@ -172,27 +171,27 @@ export default function ReportsPage() {
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-white/10 bg-[#0c0c0c] text-zinc-400">
-            <DropdownMenuLabel className="text-zinc-500">
+          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+            <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Scraper Status
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-zinc-200/50" />
             <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
               <DropdownMenuRadioItem
                 value="all"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 All Statuses
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="completed"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Completed
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="in-progress"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 In Progress
               </DropdownMenuRadioItem>
@@ -202,42 +201,42 @@ export default function ReportsPage() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2 border border-white/20 bg-[#111] px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-300 uppercase transition-colors outline-none hover:border-white/35 hover:text-white">
-              <Star className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#ff4500]" />
+            <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
+              <Star className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
               Min Score: {minScore}+
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-white/10 bg-[#0c0c0c] text-zinc-400">
-            <DropdownMenuLabel className="text-zinc-500">
+          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+            <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Minimum Opportunity Score
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-zinc-200/50" />
             <DropdownMenuRadioGroup
               value={minScore}
               onValueChange={setMinScore}
             >
               <DropdownMenuRadioItem
                 value="0"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Any Score
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="50"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 50+
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="70"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 70+
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="85"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 85+ (High Potential)
               </DropdownMenuRadioItem>
@@ -247,30 +246,30 @@ export default function ReportsPage() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2 border border-white/20 bg-[#111] px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-300 uppercase transition-colors outline-none hover:border-white/35 hover:text-white">
-              <Star className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#ff4500]" />
+            <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
+              <Star className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
               {savedOnly === "true" ? "Saved Only" : "All Reports"}
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-white/10 bg-[#0c0c0c] text-zinc-400">
-            <DropdownMenuLabel className="text-zinc-500">
+          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+            <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Saved Filter
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-zinc-200/50" />
             <DropdownMenuRadioGroup
               value={savedOnly}
               onValueChange={setSavedOnly}
             >
               <DropdownMenuRadioItem
                 value="false"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 All Reports
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="true"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Saved Only
               </DropdownMenuRadioItem>
@@ -280,60 +279,60 @@ export default function ReportsPage() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2 border border-white/20 bg-[#111] px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-300 uppercase transition-colors outline-none hover:border-white/35 hover:text-white">
-              <Filter className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#ff4500]" />
+            <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
+              <Filter className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
               Category: {category === "all" ? "All" : category}
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-white/10 bg-[#0c0c0c] text-zinc-400">
-            <DropdownMenuLabel className="text-zinc-500">
+          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+            <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Category
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuSeparator className="bg-zinc-200/50" />
             <DropdownMenuRadioGroup
               value={category}
               onValueChange={setCategory}
             >
               <DropdownMenuRadioItem
                 value="all"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 All Categories
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Uncategorized"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Uncategorized
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Product"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Product
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Marketing"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Marketing
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Growth"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Growth
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Operations"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Operations
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Customer Success"
-                className="focus:bg-[#ff4500]/10 focus:text-white"
+                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
               >
                 Customer Success
               </DropdownMenuRadioItem>
@@ -342,7 +341,7 @@ export default function ReportsPage() {
         </DropdownMenu>
 
         <div className="ml-auto hidden px-4 sm:block">
-          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-450 uppercase">
             {isInitialLoading
               ? "Counting records..."
               : isLoading
@@ -353,7 +352,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Reports Table Card */}
-      <div className="overflow-hidden border-2 border-white/15 bg-[#0c0c0c] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+      <div className="rounded-2xl overflow-hidden border border-zinc-200/50 bg-white/60 backdrop-blur-md shadow-sm">
         <div className="min-h-[300px] overflow-x-hidden">
           {isInitialLoading ? (
             <ReportsTableSkeleton />
@@ -365,72 +364,72 @@ export default function ReportsPage() {
               actionHref="/dashboard/search"
               icon="reports"
               variant="card"
-              className="border-none py-24"
+              className="border-none py-24 bg-transparent"
             />
           ) : (
             <table className="w-full table-fixed border-collapse text-left">
               <thead>
-                <tr className="border-b border-white/5 bg-white/2">
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                <tr className="border-b border-zinc-200/50 bg-white/30">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Keyword / Niche
                   </th>
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Created Date
                   </th>
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Pain Points
                   </th>
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Top Score
                   </th>
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Category
                   </th>
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Status
                   </th>
-                  <th className="px-8 py-5 text-right font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+                  <th className="px-8 py-5 text-right font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-zinc-200/50">
                 {reports.map((report) => (
                   <tr
                     key={report.id}
-                    className="group transition-colors hover:bg-white/2"
+                    className="group transition-all duration-200 hover:bg-white/45"
                   >
                     <td className="px-8 py-6">
                       <div className="flex min-w-0 items-center gap-4">
                         <div
-                          className={`flex h-10 w-10 items-center justify-center border border-white/20 bg-[#ff4500]/8 text-[#ff4500]`}
+                          className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200/50 bg-white/50 text-[#ff4500] shadow-sm"
                         >
                           <Search className="h-4 w-4" />
                         </div>
-                        <p className="min-w-0 text-[15px] font-black tracking-tight break-words text-white uppercase transition-colors group-hover:text-[#ff4500]">
+                        <p className="min-w-0 text-[15px] font-black tracking-tight break-words text-zinc-850 uppercase transition-all duration-200 group-hover:text-[#ff4500]">
                           {report.niche}
                         </p>
                       </div>
                     </td>
                     <td className="px-8 py-6">
-                      <p className="text-sm font-medium text-zinc-400">
+                      <p className="text-sm font-medium text-zinc-500">
                         {report.date}
                       </p>
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-black text-white">
+                        <p className="text-sm font-black text-zinc-800">
                           {report.painPoints}
                         </p>
-                        <div className="h-1.5 w-1.5 bg-zinc-700"></div>
+                        <div className="h-1.5 w-1.5 rounded-full bg-zinc-300"></div>
                       </div>
                     </td>
                     <td className="px-8 py-6">
                       <div
-                        className={`inline-flex items-center border px-2.5 py-1 font-mono text-[12px] font-black tracking-tighter ${
+                        className={`inline-flex items-center border px-2.5 py-1 font-mono text-[12px] font-black tracking-tighter rounded-full ${
                           report.score >= 90
-                            ? "border-emerald-400/45 bg-emerald-500/10 text-emerald-300"
-                            : "border-amber-400/45 bg-amber-500/10 text-amber-300"
+                            ? "border-emerald-250 bg-emerald-50 text-emerald-600"
+                            : "border-amber-250 bg-amber-50 text-amber-600"
                         }`}
                       >
                         {report.score}/100
@@ -438,11 +437,11 @@ export default function ReportsPage() {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2.5">
-                        <span className="font-mono text-[11px] font-black tracking-widest text-zinc-300 uppercase">
+                        <span className="font-mono text-[11px] font-black tracking-widest text-zinc-655 uppercase">
                           {report.category}
                         </span>
                         {report.saved && (
-                          <span className="inline-flex items-center border border-emerald-400/45 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-emerald-300 uppercase">
+                          <span className="inline-flex items-center border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-emerald-600 uppercase rounded-full">
                             Saved
                           </span>
                         )}
@@ -451,15 +450,15 @@ export default function ReportsPage() {
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2.5">
                         {report.status === "Completed" ? (
-                          <div className="flex items-center gap-2 text-emerald-500">
-                            <div className="h-2 w-2 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.65)]"></div>
+                          <div className="flex items-center gap-2 text-emerald-600">
+                            <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
                             <span className="font-mono text-[10px] font-black tracking-widest uppercase">
                               Analyzed
                             </span>
                           </div>
                         ) : report.status === "Failed" ? (
-                          <div className="flex items-center gap-2 text-rose-500">
-                            <div className="h-2 w-2 bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.65)]"></div>
+                          <div className="flex items-center gap-2 text-rose-600">
+                            <div className="h-2 w-2 rounded-full bg-rose-500"></div>
                             <span className="font-mono text-[10px] font-black tracking-widest uppercase">
                               Failed
                             </span>
@@ -478,7 +477,7 @@ export default function ReportsPage() {
                       <div className="flex items-center justify-end gap-3">
                         <Link
                           href={`/dashboard/reports/${report.id}`}
-                          className="group/btn border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:border-[#ff8a57] hover:bg-[#ff4500] active:scale-95"
+                          className="group/btn rounded-xl border border-zinc-200 bg-white hover:border-[#ff4500]/60 hover:bg-[#ff4500] px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-zinc-700 hover:text-white uppercase transition-all duration-300 active:scale-95 shadow-sm"
                         >
                           <span className="flex items-center gap-2">
                             View Report
@@ -495,8 +494,8 @@ export default function ReportsPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-white/10 bg-white/1 px-8 py-6">
-          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+        <div className="flex items-center justify-between border-t border-zinc-200/50 bg-white/20 px-8 py-6">
+          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-450 uppercase">
             Showing {reports.length} of {reports.length} reports
           </p>
           <div className="flex items-center gap-1.5">
@@ -517,7 +516,7 @@ function ReportsTableSkeleton() {
   return (
     <table className="w-full table-fixed border-collapse text-left">
       <thead>
-        <tr className="border-b border-white/5 bg-white/2">
+        <tr className="border-b border-zinc-200/50 bg-white/30">
           {[
             "Keyword / Niche",
             "Created Date",
@@ -529,53 +528,53 @@ function ReportsTableSkeleton() {
           ].map((label) => (
             <th
               key={label}
-              className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-500 uppercase"
+              className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase"
             >
               {label}
             </th>
           ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-white/5">
+      <tbody className="divide-y divide-zinc-200/50">
         {["sk1", "sk2", "sk3", "sk4", "sk5", "sk6"].map((skId) => (
           <tr key={skId} className="group">
             <td className="px-8 py-6">
               <div className="flex min-w-0 items-center gap-4">
-                <Skeleton className="skeleton-shimmer h-10 w-10 rounded-none border border-white/20 bg-[#ff4500]/8" />
+                <Skeleton className="skeleton-shimmer h-10 w-10 rounded-xl border border-zinc-200 bg-zinc-200/40" />
                 <div className="min-w-0 flex-1 space-y-2">
-                  <Skeleton className="skeleton-shimmer h-5 w-32 rounded-none bg-white/10" />
-                  <Skeleton className="skeleton-shimmer h-3 w-20 rounded-none bg-white/8" />
+                  <Skeleton className="skeleton-shimmer h-5 w-32 rounded-xl bg-zinc-200/60" />
+                  <Skeleton className="skeleton-shimmer h-3 w-20 rounded-xl bg-zinc-200/40" />
                 </div>
               </div>
             </td>
             <td className="px-8 py-6">
-              <Skeleton className="skeleton-shimmer h-4 w-24 rounded-none bg-white/8" />
+              <Skeleton className="skeleton-shimmer h-4 w-24 rounded-xl bg-zinc-200/40" />
             </td>
             <td className="px-8 py-6">
               <div className="flex items-center gap-2">
-                <Skeleton className="skeleton-shimmer h-5 w-8 rounded-none bg-white/10" />
-                <div className="h-1.5 w-1.5 bg-zinc-800"></div>
-                <Skeleton className="skeleton-shimmer h-3 w-12 rounded-none bg-white/8" />
+                <Skeleton className="skeleton-shimmer h-5 w-8 rounded-xl bg-zinc-200/60" />
+                <div className="h-1.5 w-1.5 bg-zinc-200"></div>
+                <Skeleton className="skeleton-shimmer h-3 w-12 rounded-xl bg-zinc-200/40" />
               </div>
             </td>
             <td className="px-8 py-6">
-              <Skeleton className="skeleton-shimmer h-8 w-20 rounded-none bg-amber-500/10" />
+              <Skeleton className="skeleton-shimmer h-8 w-20 rounded-full bg-zinc-200/40" />
             </td>
             <td className="px-8 py-6">
               <div className="flex items-center gap-2.5">
-                <Skeleton className="skeleton-shimmer h-4 w-24 rounded-none bg-white/8" />
-                <Skeleton className="skeleton-shimmer h-5 w-14 rounded-none bg-emerald-500/10" />
+                <Skeleton className="skeleton-shimmer h-4 w-24 rounded-xl bg-zinc-200/40" />
+                <Skeleton className="skeleton-shimmer h-5 w-14 rounded-full bg-zinc-200/40" />
               </div>
             </td>
             <td className="px-8 py-6">
               <div className="flex items-center gap-2.5">
-                <Skeleton className="h-2 w-2 animate-pulse rounded-full bg-[#ff4500]/60" />
-                <Skeleton className="skeleton-shimmer h-4 w-20 rounded-none bg-white/8" />
+                <Skeleton className="h-2 w-2 rounded-full bg-zinc-200/40" />
+                <Skeleton className="skeleton-shimmer h-4 w-20 rounded-xl bg-zinc-200/40" />
               </div>
             </td>
             <td className="px-8 py-6 text-right">
               <div className="flex items-center justify-end gap-3">
-                <Skeleton className="skeleton-shimmer h-10 w-28 rounded-none bg-white/8" />
+                <Skeleton className="skeleton-shimmer h-10 w-28 rounded-xl bg-zinc-200/40" />
               </div>
             </td>
           </tr>
@@ -599,12 +598,12 @@ function PaginationButton({
   return (
     <button
       disabled={disabled}
-      className={`flex h-9 w-9 items-center justify-center border font-mono text-[12px] font-black transition-colors ${
+      className={`flex h-9 w-9 items-center justify-center font-mono text-[12px] font-black transition-colors ${
         active
-          ? "border-[#ff8a57] bg-[#ff4500] text-white"
+          ? "rounded-xl border border-[#ff8a57] bg-[#ff4500] text-white shadow-sm"
           : disabled
-            ? "cursor-not-allowed border-white/10 text-zinc-800 opacity-50"
-            : "border-white/20 text-zinc-500 hover:border-white/35 hover:bg-white/5 hover:text-white"
+            ? "rounded-xl cursor-not-allowed border-zinc-200/40 text-zinc-350 opacity-40"
+            : "rounded-xl border border-zinc-200/60 bg-white text-zinc-500 hover:border-[#ff4500]/40 hover:bg-white hover:text-zinc-800 shadow-sm"
       }`}
     >
       {icon || label}

@@ -36,6 +36,49 @@ export default async function BillingPage() {
   const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET,
   );
+
+  let stripeCustomerId = session.user.stripeCustomerId;
+
+  if (stripeConfigured && !stripeCustomerId) {
+    try {
+      const Stripe = (await import("stripe")).default;
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      
+      // Look up existing customer by email to prevent duplicates in Stripe dashboard
+      const existing = await stripe.customers.list({
+        email: session.user.email,
+        limit: 1,
+      });
+
+      if (existing.data.length > 0) {
+        stripeCustomerId = existing.data[0].id;
+      } else {
+        const customer = await stripe.customers.create({
+          email: session.user.email,
+          name: session.user.name || undefined,
+          metadata: {
+            userId: session.user.id,
+          },
+        });
+        stripeCustomerId = customer.id;
+      }
+
+      // Save customer ID to database
+      const { db } = await import("@/lib/db");
+      const { user } = await import("@/lib/db/schema");
+      const { eq } = await import("drizzle-orm");
+      await db
+        .update(user)
+        .set({ stripeCustomerId })
+        .where(eq(user.id, session.user.id));
+
+      // Update the local session user object so subsequent handlers get it
+      session.user.stripeCustomerId = stripeCustomerId;
+    } catch (err) {
+      console.error("Failed to automatically create Stripe customer ID:", err);
+    }
+  }
+
   const availablePlans: BillingPurchaseOption[] = (
     [
       {

@@ -1027,6 +1027,9 @@ export async function getSubredditMetadataBulk(
   const results: SubredditSuggestion[] = [];
 
   for (const sub of subreddits) {
+    if (isSubredditThrottled(sub)) {
+      continue;
+    }
     try {
       const url = `https://www.reddit.com/r/${sub}/about.json`;
       const response = await fetchRedditResponse(url);
@@ -1041,7 +1044,8 @@ export async function getSubredditMetadataBulk(
         });
       }
     } catch (err) {
-      console.error(`Failed to fetch metadata for r/${sub}:`, err);
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`Failed to fetch metadata for r/${sub}: ${message}`);
     }
   }
 

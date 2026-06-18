@@ -35,32 +35,32 @@ export function Pricing() {
 
   return (
     <section
-      className="flex w-full flex-col items-center border-y-2 border-white/[0.03] bg-[#111] px-4 py-24 sm:px-6 sm:py-32"
+      className="flex w-full flex-col items-center border-y border-black/[0.04] px-4 py-24 sm:px-6 sm:py-32"
       id="pricing"
     >
       <div className="mb-12 max-w-2xl text-center">
         <h2 className="mb-4 text-[11px] font-extrabold tracking-widest text-[#ff4500] uppercase">
           PRICING
         </h2>
-        <h3 className="mb-6 text-[40px] leading-[1.1] font-extrabold tracking-[-0.02em] text-[#f4f4f5] md:text-[56px]">
+        <h3 className="mb-6 text-[40px] leading-[1.1] font-extrabold tracking-[-0.02em] text-zinc-900 md:text-[56px]">
           Pricing Plans
         </h3>
-        <p className="mb-10 text-[17px] font-medium text-zinc-400">
+        <p className="mb-10 text-[17px] font-medium text-zinc-500">
           Scale your market research as you grow from idea to product.
         </p>
 
-        <div className="mb-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/5 bg-[#1a1a1a] p-1.5 shadow-inner sm:rounded-full">
+        <div className="mb-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-black/5 bg-zinc-100 p-1.5 shadow-inner">
           <button
             type="button"
             onClick={() => setIsYearly(false)}
-            className={`rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${!isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
+            className={`rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${!isYearly ? "border border-[#ff4500]/20 bg-white text-[#ff4500]" : "border border-transparent text-zinc-500 hover:text-zinc-900"}`}
           >
             Monthly
           </button>
           <button
             type="button"
             onClick={() => setIsYearly(true)}
-            className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
+            className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${isYearly ? "border border-[#ff4500]/20 bg-white text-[#ff4500]" : "border border-transparent text-zinc-500 hover:text-zinc-900"}`}
           >
             Yearly{" "}
             <span className="text-[10px] font-black tracking-wider text-[#ff4500] uppercase">
@@ -72,19 +72,19 @@ export function Pricing() {
 
       <div className="mb-12 grid w-full max-w-[1100px] grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
         {/* Starter Plan */}
-        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-white/60 shadow-sm transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-md">
           <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">
+            <h3 className="mb-2 text-[19px] font-extrabold text-zinc-900">
               Starter
             </h3>
             <p className="mb-6 text-[13px] font-medium text-zinc-500">
               Perfect for founders exploring early ideas.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-zinc-900">
                 {starterPricing.displayPrice}
               </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
+              <span className="text-[14px] font-semibold text-zinc-500">
                 {starterPricing.suffix}
               </span>
             </div>
@@ -118,41 +118,41 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
+          <div className="relative z-10 mt-auto w-full border-t border-black/5 bg-zinc-50/50 p-8 pt-6">
             <Link
               href={`/sign-up?plan=starter&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white text-[14px] font-bold text-zinc-800 transition-all hover:bg-zinc-50 shadow-xs"
             >
               Get Started
             </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Best for:
             </p>
-            <p className="text-[13px] leading-tight font-medium text-zinc-300">
+            <p className="text-[13px] leading-tight font-medium text-zinc-600">
               Early-stage founders validating first ideas.
             </p>
           </div>
         </div>
 
         {/* Growth Plan - Featured */}
-        <div className="group relative z-20 flex flex-col overflow-hidden rounded-2xl border-2 border-[#ff4500]/40 bg-[#141414] shadow-[0_0_40px_rgba(255,69,0,0.1)] lg:scale-105">
-          <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-white/20 bg-linear-to-r from-[#ff4500] to-[#ff571a] px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg">
+        <div className="group relative z-20 flex flex-col overflow-hidden rounded-2xl border-2 border-[#ff4500]/40 bg-white shadow-[0_12px_40px_rgba(255,69,0,0.06)] lg:scale-105">
+          <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-[#ff4500]/20 bg-linear-to-r from-[#ff4500] to-[#ff6b33] px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-sm">
             <span className="text-[12px]">⭐</span> Most Popular
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#ff4500]/5 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#ff4500]/2 to-transparent"></div>
 
           <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">
+            <h3 className="mb-2 text-[19px] font-extrabold text-zinc-900">
               Growth
             </h3>
             <p className="mb-6 text-[13px] font-medium text-zinc-500">
               For builders actively researching markets.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-zinc-900">
                 {growthPricing.displayPrice}
               </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
+              <span className="text-[14px] font-semibold text-zinc-500">
                 {growthPricing.suffix}
               </span>
             </div>
@@ -190,34 +190,34 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-[#ff4500]/5 p-8 pt-6">
+          <div className="relative z-10 mt-auto w-full border-t border-black/5 bg-[#ff4500]/5 p-8 pt-6">
             <Link
               href={`/sign-up?plan=growth&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#ff4500] bg-[#ff4500] text-[14px] font-extrabold text-black shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a]"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#ff4500] text-[14px] font-bold text-white shadow-sm transition-all hover:bg-[#e03d00]"
             >
               Get Started <ArrowRight className="h-4 w-4" />
             </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-[#ff4500] uppercase">
+            <p className="mb-1 text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
               Best for:
             </p>
-            <p className="text-[13px] leading-tight font-semibold text-zinc-300">
+            <p className="text-[13px] leading-tight font-semibold text-zinc-700">
               Indie hackers and SaaS founders building products.
             </p>
           </div>
         </div>
 
         {/* Pro Plan */}
-        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
+        <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-white/60 shadow-sm transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-md">
           <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">Pro</h3>
+            <h3 className="mb-2 text-[19px] font-extrabold text-zinc-900">Pro</h3>
             <p className="mb-6 text-[13px] font-medium text-zinc-500">
               For teams doing serious market research.
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
+              <span className="text-[44px] leading-none font-extrabold tracking-tight text-zinc-900">
                 {proPricing.displayPrice}
               </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
+              <span className="text-[14px] font-semibold text-zinc-500">
                 {proPricing.suffix}
               </span>
             </div>
@@ -245,7 +245,7 @@ export function Pricing() {
             />
             <ul className="space-y-4">
               <FeatureItem label="Deep Reddit thread analysis" />
-              <FeatureItem label="AI-generated SaaS opportunities" />
+              <FeatureItem label="SaaS opportunities blueprint" />
               <FeatureItem label="Trend detection & tracking" />
               <FeatureItem label="Team workspace (coming soon)" />
               <FeatureItem label="API access (coming soon)" />
@@ -253,17 +253,17 @@ export function Pricing() {
             </ul>
           </div>
 
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
+          <div className="relative z-10 mt-auto w-full border-t border-black/5 bg-zinc-50/50 p-8 pt-6">
             <Link
               href={`/sign-up?plan=pro&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
+              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white text-[14px] font-bold text-zinc-800 transition-all hover:bg-zinc-50 shadow-xs"
             >
               Get Started
             </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Best for:
             </p>
-            <p className="text-[13px] leading-tight font-medium text-zinc-300">
+            <p className="text-[13px] leading-tight font-medium text-zinc-600">
               Startup teams, agencies, and product researchers.
             </p>
           </div>
@@ -273,13 +273,13 @@ export function Pricing() {
       {/* ── LIFETIME DEAL SECTION ── */}
       <div className="mt-16 w-full max-w-[1100px]">
         <div className="mb-8 text-center">
-          <span className="mb-3 inline-block rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1 text-[11px] font-black tracking-[0.25em] text-amber-400 uppercase">
+          <span className="mb-3 inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-[11px] font-extrabold tracking-[0.25em] text-amber-800 uppercase">
             ⚡ Limited Early-Believer Offer
           </span>
-          <h3 className="mb-3 text-[32px] font-extrabold tracking-tight text-white md:text-[40px]">
+          <h3 className="mb-3 text-[32px] font-extrabold tracking-tight text-zinc-900 md:text-[40px]">
             Lifetime Access
           </h3>
-          <p className="mx-auto max-w-lg text-[15px] font-medium text-zinc-400">
+          <p className="mx-auto max-w-lg text-[15px] font-medium text-zinc-500">
             One payment. No subscriptions. Monthly credits that reset forever on
             your anniversary — plus permanent rollover top-ups at founder rates.
           </p>
@@ -287,19 +287,19 @@ export function Pricing() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* FOUNDER LTD */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/20 bg-[#141414] shadow-2xl transition-all hover:border-amber-400/40">
+          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-200 bg-amber-50/20 shadow-sm transition-all hover:bg-amber-50/40 hover:border-amber-300">
             <div className="absolute inset-0 bg-gradient-to-b from-amber-400/5 to-transparent" />
             <div className="relative z-10 p-8 pb-4">
               <div className="mb-4 flex items-center gap-2">
-                <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
+                <span className="rounded-full border border-amber-300 bg-amber-100/50 px-3 py-0.5 text-[10px] font-extrabold tracking-widest text-amber-800 uppercase">
                   Tier 1 — Founder
                 </span>
               </div>
               <div className="mb-1 flex items-baseline gap-2">
-                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+                <span className="text-[48px] leading-none font-extrabold tracking-tight text-zinc-900">
                   $149
                 </span>
-                <span className="text-[14px] font-semibold text-zinc-400">
+                <span className="text-[14px] font-semibold text-zinc-500">
                   one-time
                 </span>
               </div>
@@ -331,10 +331,10 @@ export function Pricing() {
               </ul>
             </div>
 
-            <div className="relative z-10 mt-auto w-full border-t border-amber-400/10 bg-amber-400/[0.03] p-8 pt-6">
+            <div className="relative z-10 mt-auto w-full border-t border-amber-200 bg-amber-100/10 p-8 pt-6">
               <Link
                 href="/sign-up?plan=founder-ltd"
-                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-amber-400/60 bg-transparent text-[14px] font-extrabold text-amber-400 transition-all hover:bg-amber-400/10"
+                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-amber-400 bg-white text-[14px] font-bold text-amber-800 transition-all hover:bg-amber-50 shadow-xs"
               >
                 Get Founder Access
               </Link>
@@ -345,27 +345,27 @@ export function Pricing() {
           </div>
 
           {/* PROFESSIONAL LTD */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/60 bg-[#141414] shadow-[0_0_60px_rgba(251,191,36,0.08)]">
-            <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-amber-400/30 bg-linear-to-r from-amber-500 to-amber-400 px-4 py-1.5 text-[10px] font-black tracking-widest text-black uppercase shadow-lg">
+          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400 bg-amber-50/35 shadow-md">
+            <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-amber-400 bg-amber-400 px-4 py-1.5 text-[10px] font-black tracking-widest text-amber-950 uppercase shadow-sm">
               <span>💎</span> Best Value
             </div>
             <div className="absolute inset-0 bg-gradient-to-b from-amber-400/8 to-transparent" />
 
             <div className="relative z-10 p-8 pb-4">
               <div className="mb-4 flex items-center gap-2">
-                <span className="rounded-full border border-amber-400/60 bg-amber-400/15 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
+                <span className="rounded-full border border-amber-400 bg-amber-100 px-3 py-0.5 text-[10px] font-extrabold tracking-widest text-amber-800 uppercase">
                   Tier 2 — Professional
                 </span>
               </div>
               <div className="mb-1 flex items-baseline gap-2">
-                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+                <span className="text-[48px] leading-none font-extrabold tracking-tight text-zinc-900">
                   $299
                 </span>
-                <span className="text-[14px] font-semibold text-zinc-400">
+                <span className="text-[14px] font-semibold text-zinc-500">
                   one-time
                 </span>
               </div>
-              <p className="mb-1 text-[12px] font-semibold text-amber-400">
+              <p className="mb-1 text-[12px] font-semibold text-amber-700">
                 Already a Founder? Upgrade for just $150.
               </p>
               <p className="mb-6 text-[13px] font-medium text-zinc-500">
@@ -391,7 +391,7 @@ export function Pricing() {
               />
               <ul className="space-y-4">
                 <FeatureItem label="Everything in Founder" spotlight />
-                <FeatureItem label="Advanced AI mining depth" spotlight />
+                <FeatureItem label="Advanced mining depth" spotlight />
                 <FeatureItem label="Trend Velocity engine" spotlight />
                 <FeatureItem label="Phase 7 & 8 scrapers (early access)" spotlight />
                 <FeatureItem label="Pro Founder badge 💎" spotlight />
@@ -399,10 +399,10 @@ export function Pricing() {
               </ul>
             </div>
 
-            <div className="relative z-10 mt-auto w-full border-t border-amber-400/20 bg-amber-400/[0.05] p-8 pt-6">
+            <div className="relative z-10 mt-auto w-full border-t border-amber-300 bg-amber-400/10 p-8 pt-6">
               <Link
                 href="/sign-up?plan=professional-ltd"
-                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-400 text-[14px] font-extrabold text-black shadow-lg shadow-amber-400/20 transition-all hover:bg-amber-300"
+                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-amber-400 text-[14px] font-bold text-amber-950 transition-all hover:bg-amber-300 shadow-sm"
               >
                 Get Professional Access <ArrowRight className="h-4 w-4" />
               </Link>
@@ -414,22 +414,21 @@ export function Pricing() {
         </div>
 
         {/* Rollover explanation */}
-          <div className="mt-12 flex w-full max-w-2xl items-center gap-4 rounded-xl border border-white/5 bg-[#141414] p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-400/10 text-amber-400">
-              <Zap className="h-5 w-5 fill-current" />
-            </div>
-            <div className="flex flex-1 flex-col">
-              <span className="text-[14px] font-bold text-white">Buy More, Save More</span>
-              <p className="text-[13px] font-medium text-zinc-400">
-                Need more than your monthly allowance? Purchase permanent rollover scans with your exclusive 20/40% LTD discount.
-              </p>
-            </div>
+        <div className="mx-auto mt-12 flex w-full max-w-2xl items-center gap-4 rounded-xl border border-black/5 bg-white p-4 shadow-xs">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+            <Zap className="h-5 w-5 fill-current" />
           </div>
+          <div className="flex flex-1 flex-col">
+            <span className="text-[14px] font-bold text-zinc-900">Buy More, Save More</span>
+            <p className="text-[13px] font-medium text-zinc-500">
+              Need more than your monthly allowance? Purchase permanent rollover scans with your exclusive 20/40% LTD discount.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
-        <h4 className="mb-2 text-[18px] font-extrabold tracking-tight text-white">
+      <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-full border border-black/5 bg-white px-8 py-4 text-center shadow-sm sm:mx-4">
+        <h4 className="text-[14px] font-bold text-zinc-700">
           Secure checkout with Stripe. Instant access.
         </h4>
       </div>
@@ -457,7 +456,7 @@ function SectionHeader({
         {label}
       </h4>
       <div
-        className={`flex-1 border-t ${spotlight ? "border-[#ff4500]/20" : "border-white/5"}`}
+        className={`flex-1 border-t ${spotlight ? "border-[#ff4500]/20" : "border-zinc-200"}`}
       ></div>
     </div>
   );
@@ -478,7 +477,7 @@ function FeatureItem({
         <Check className="h-2.5 w-2.5" strokeWidth={4} />
       </div>
       <span
-        className={`flex-1 text-[13px] leading-snug font-extrabold ${spotlight ? "text-white" : "text-zinc-200"}`}
+        className={`flex-1 text-[13px] leading-snug font-medium ${spotlight ? "text-zinc-800" : "text-zinc-650"}`}
       >
         {label}
       </span>

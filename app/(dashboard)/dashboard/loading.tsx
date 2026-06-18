@@ -7,14 +7,14 @@ export default function DashboardLoading() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <div className="h-px w-8 bg-[#ff4500]/60"></div>
-            <Skeleton className="h-3 w-36 rounded-none bg-white/10" />
+            <Skeleton className="h-3 w-36 rounded-md bg-black/[0.06]" />
           </div>
-          <Skeleton className="h-10 w-64 rounded-none bg-white/10" />
-          <Skeleton className="h-4 w-72 rounded-none bg-white/8" />
+          <Skeleton className="h-10 w-64 rounded-lg bg-black/[0.08]" />
+          <Skeleton className="h-4 w-72 rounded-md bg-black/[0.05]" />
         </div>
-        <div className="hidden items-center gap-3 border border-white/15 bg-[#161616] p-1.5 lg:flex">
-          <Skeleton className="h-10 w-28 rounded-none bg-white/10" />
-          <Skeleton className="h-10 w-32 rounded-none bg-white/8" />
+        <div className="hidden items-center gap-1.5 border border-black/[0.06] bg-white/50 p-1 rounded-full lg:flex shadow-xs backdrop-blur-md">
+          <Skeleton className="h-10 w-28 rounded-full bg-black/[0.05]" />
+          <Skeleton className="h-10 w-32 rounded-full bg-black/[0.03]" />
         </div>
       </div>
 
@@ -25,84 +25,59 @@ export default function DashboardLoading() {
         <MetricCardSkeleton highlight showBadge />
       </div>
 
-      <section className="border-2 border-white/12 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+      <section className="glass-card p-6 rounded-3xl">
         <div className="space-y-5">
           <div className="space-y-3">
-            <Skeleton className="h-3 w-28 rounded-none bg-[#ff4500]/15" />
-            <Skeleton className="h-10 w-80 rounded-none bg-white/10" />
-            <Skeleton className="h-4 w-full max-w-2xl rounded-none bg-white/8" />
+            <Skeleton className="h-3 w-28 rounded-full bg-[#ff4500]/10" />
+            <Skeleton className="h-10 w-80 rounded-lg bg-black/[0.08]" />
+            <Skeleton className="h-4 w-full max-w-2xl rounded-md bg-black/[0.05]" />
           </div>
           <div className="grid gap-3 lg:grid-cols-[1.4fr,0.8fr]">
-            <Skeleton className="h-12 w-full rounded-none bg-white/8" />
+            <Skeleton className="h-12 w-full rounded-full bg-black/[0.05]" />
             <div className="grid grid-cols-3 gap-3">
-              <Skeleton className="h-12 w-full rounded-none bg-white/8" />
-              <Skeleton className="h-12 w-full rounded-none bg-white/8" />
-              <Skeleton className="h-12 w-full rounded-none bg-white/8" />
+              <Skeleton className="h-12 w-full rounded-full bg-black/[0.05]" />
+              <Skeleton className="h-12 w-full rounded-full bg-black/[0.05]" />
+              <Skeleton className="h-12 w-full rounded-full bg-black/[0.05]" />
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div className="space-y-3">
-            <Skeleton className="h-3 w-32 rounded-none bg-[#ff4500]/15" />
-            <Skeleton className="h-8 w-64 rounded-none bg-white/10" />
-          </div>
-          <Skeleton className="h-9 w-28 rounded-none bg-white/8" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {["sk-c1", "sk-c2", "sk-c3", "sk-c4", "sk-c5", "sk-c6"].map((key) => (
-            <div
-              key={key}
-              className="border border-white/10 bg-white/2 p-4"
-            >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <Skeleton className="h-4 w-24 rounded-none bg-white/10" />
-                <Skeleton className="h-6 w-12 rounded-none bg-[#ff4500]/15" />
-              </div>
-              <Skeleton className="mb-3 h-5 w-full rounded-none bg-white/8" />
-              <Skeleton className="h-3 w-2/3 rounded-none bg-white/8" />
-            </div>
-          ))}
         </div>
       </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <section className="overflow-hidden border-2 border-white/10 bg-[#111] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-white/10 px-8 py-6">
+        <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white/60 backdrop-blur-md shadow-xs lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-black/[0.06] px-8 py-6">
             <div className="flex items-center gap-3">
-              <div className="h-2 w-2 bg-[#ff4500]/60"></div>
-              <Skeleton className="h-6 w-48 rounded-none bg-white/10" />
+              <div className="h-2 w-2 rounded-full bg-[#ff4500]/60"></div>
+              <Skeleton className="h-6 w-48 rounded-lg bg-black/[0.08]" />
             </div>
-            <Skeleton className="h-4 w-16 rounded-none bg-white/8" />
+            <Skeleton className="h-4 w-16 rounded-md bg-black/[0.05]" />
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
               <thead>
-                <tr className="bg-white/2 text-zinc-500">
+                <tr className="bg-black/[0.01] text-zinc-400 border-b border-black/[0.04]">
                   {["h-sk1", "h-sk2", "h-sk3", "h-sk4"].map((key) => (
                     <th key={key} className="px-8 py-4">
-                      <Skeleton className="h-3 w-24 rounded-none bg-white/8" />
+                      <Skeleton className="h-3 w-24 rounded-md bg-black/[0.05]" />
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-black/[0.04]">
                 {["r-sk1", "r-sk2", "r-sk3"].map((key) => (
                   <tr key={key}>
                     <td className="px-8 py-6">
-                      <Skeleton className="mb-3 h-5 w-40 rounded-none bg-white/10" />
-                      <Skeleton className="h-3 w-16 rounded-none bg-white/8" />
+                      <Skeleton className="mb-3 h-5 w-40 rounded-lg bg-black/[0.08]" />
+                      <Skeleton className="h-3 w-16 rounded-md bg-black/[0.05]" />
                     </td>
                     <td className="px-8 py-6">
-                      <Skeleton className="h-4 w-full max-w-[240px] rounded-none bg-white/8" />
+                      <Skeleton className="h-4 w-full max-w-[240px] rounded-md bg-black/[0.05]" />
                     </td>
                     <td className="px-8 py-6 text-center">
-                      <Skeleton className="mx-auto h-10 w-14 rounded-none bg-white/8" />
+                      <Skeleton className="mx-auto h-10 w-14 rounded-lg bg-black/[0.05]" />
                     </td>
                     <td className="px-8 py-6">
-                      <Skeleton className="h-8 w-24 rounded-none bg-white/8" />
+                      <Skeleton className="h-8 w-24 rounded-full bg-black/[0.05]" />
                     </td>
                   </tr>
                 ))}
@@ -112,31 +87,31 @@ export default function DashboardLoading() {
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className="overflow-hidden border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <div className="glass-card relative overflow-hidden p-8 rounded-2xl shadow-xs">
             <div className="mb-8 flex items-center gap-3">
-              <Skeleton className="h-8 w-8 rounded-none bg-[#ff4500]/15" />
-              <Skeleton className="h-6 w-36 rounded-none bg-white/10" />
+              <Skeleton className="h-8 w-8 rounded-xl bg-[#ff4500]/10" />
+              <Skeleton className="h-6 w-36 rounded-lg bg-black/[0.08]" />
             </div>
             <div className="space-y-8">
               <div className="space-y-4">
-                <Skeleton className="h-3 w-28 rounded-none bg-white/8" />
-                <div className="border border-white/15 bg-white/3 p-4">
+                <Skeleton className="h-3 w-28 rounded-md bg-black/[0.05]" />
+                <div className="border border-black/[0.06] bg-white/40 p-4 rounded-xl">
                   <div className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-none bg-[#ff4500]/12" />
+                    <Skeleton className="h-12 w-12 rounded-xl bg-[#ff4500]/10" />
                     <div className="space-y-2">
-                      <Skeleton className="h-5 w-32 rounded-none bg-white/10" />
-                      <Skeleton className="h-3 w-40 rounded-none bg-white/8" />
+                      <Skeleton className="h-5 w-32 rounded-lg bg-black/[0.08]" />
+                      <Skeleton className="h-3 w-40 rounded-md bg-black/[0.05]" />
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="border-t border-white/10 pt-6">
-                <Skeleton className="mb-4 h-3 w-32 rounded-none bg-white/8" />
-                <div className="border-y border-r border-l-4 border-white/10 border-l-[#ff4500]/50 bg-zinc-900 p-5">
-                  <Skeleton className="mb-3 h-4 w-full rounded-none bg-white/10" />
-                  <Skeleton className="h-4 w-5/6 rounded-none bg-white/8" />
+              <div className="border-t border-black/[0.06] pt-6">
+                <Skeleton className="mb-4 h-3 w-32 rounded-md bg-black/[0.05]" />
+                <div className="border-y border-r border-l-4 border-l-[#ff4500] border-black/[0.06] bg-white/40 p-5 rounded-r-xl">
+                  <Skeleton className="mb-3 h-4 w-full rounded-md bg-black/[0.08]" />
+                  <Skeleton className="h-4 w-5/6 rounded-md bg-black/[0.05]" />
                 </div>
-                <Skeleton className="mt-4 h-3 w-36 rounded-none bg-white/8" />
+                <Skeleton className="mt-4 h-3 w-36 rounded-md bg-black/[0.05]" />
               </div>
             </div>
           </div>
@@ -157,32 +132,34 @@ function MetricCardSkeleton({
 }) {
   return (
     <div
-      className={`relative overflow-hidden border-2 bg-[#111] p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)] ${
-        highlight ? "border-[#ff4500]/40" : "border-white/12"
+      className={`p-5 rounded-2xl transition-all duration-300 ${
+        highlight
+          ? "border border-[#ff4500]/20 bg-white/80 shadow-xs relative overflow-hidden"
+          : "glass-card bg-white/50 relative overflow-hidden"
       }`}
     >
       <div className="mb-4 flex items-start justify-between">
-        <Skeleton className="h-10 w-10 rounded-none border border-white/15 bg-white/8" />
+        <Skeleton className="h-10 w-10 border border-black/[0.05] bg-black/[0.04] rounded-xl" />
         {showBadge ? (
-          <Skeleton className="h-5 w-14 rounded-none bg-[#ff4500]/15" />
+          <Skeleton className="h-5 w-14 rounded-full bg-[#ff4500]/10" />
         ) : (
           <div className="h-5 w-14" />
         )}
       </div>
-      <Skeleton className="mb-3 h-3 w-24 rounded-none bg-white/8" />
+      <Skeleton className="mb-3 h-3 w-24 rounded-md bg-black/[0.05]" />
       <div className="flex items-end gap-2">
         <Skeleton
-          className={`h-9 w-24 rounded-none ${highlight ? "bg-[#ff4500]/15" : "bg-white/10"}`}
+          className={`h-9 w-24 rounded-lg ${highlight ? "bg-[#ff4500]/10" : "bg-black/[0.08]"}`}
         />
-        <Skeleton className="h-4 w-12 rounded-none bg-white/8" />
+        <Skeleton className="h-4 w-12 rounded-md bg-black/[0.05]" />
       </div>
       {showProgress ? (
         <div className="mt-4 space-y-2">
-          <Skeleton className="h-2 w-full rounded-none bg-white/8" />
-          <Skeleton className="h-3 w-40 rounded-none bg-white/8" />
+          <Skeleton className="h-2 w-full rounded-full bg-black/[0.05]" />
+          <Skeleton className="h-3 w-40 rounded-md bg-black/[0.05]" />
         </div>
       ) : (
-        <Skeleton className="mt-3 h-3 w-28 rounded-none bg-white/8" />
+        <Skeleton className="mt-3 h-3 w-28 rounded-md bg-black/[0.05]" />
       )}
     </div>
   );

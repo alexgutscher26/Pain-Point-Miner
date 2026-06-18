@@ -9,6 +9,7 @@ import {
   Clock,
   RefreshCcw,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import {
   XAxis,
@@ -38,6 +39,36 @@ type HealthStats = {
   successRate: number;
 };
 
+function CustomTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-zinc-200/50 bg-white/80 p-3.5 shadow-lg backdrop-blur-md animate-in fade-in duration-200">
+        <p className="mb-2 font-mono text-[10px] font-bold text-zinc-400 uppercase">
+          {label}
+        </p>
+        <div className="space-y-1">
+          {payload.map((item: any) => (
+            <div key={item.name} className="flex items-center gap-4 justify-between">
+              <span className="flex items-center gap-1.5 font-sans text-xs font-semibold text-zinc-600">
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                {item.name}:
+              </span>
+              <span className="font-mono text-xs font-bold text-zinc-900">
+                {item.value}
+                {item.name === "Success Rate" ? "%" : ""}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function ScraperHealthDashboard() {
   const [stats, setStats] = useState<HealthStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,22 +95,22 @@ export function ScraperHealthDashboard() {
     return (
       <div className="grid animate-pulse grid-cols-1 gap-6 md:grid-cols-3">
         {[1, 2, 3].map((key) => (
-          <div key={key} className="h-32 border-2 border-white/10 bg-white/5" />
+          <div key={key} className="h-36 rounded-2xl glass-card border border-zinc-200/30" />
         ))}
-        <div className="h-80 border-2 border-white/10 bg-white/5 md:col-span-2" />
-        <div className="h-80 border-2 border-white/10 bg-white/5" />
+        <div className="h-96 rounded-2xl glass-card border border-zinc-200/30 md:col-span-2" />
+        <div className="h-96 rounded-2xl glass-card border border-zinc-200/30" />
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="border-2 border-white/10 bg-[#111] p-12 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-        <Activity className="mx-auto mb-4 h-12 w-12 text-zinc-700" />
-        <h3 className="mb-2 text-xl font-black tracking-tight text-white uppercase">
+      <div className="glass-card p-12 rounded-2xl text-center border border-zinc-200/50">
+        <Activity className="mx-auto mb-4 h-12 w-12 text-zinc-300" />
+        <h3 className="mb-2 text-xl font-extrabold tracking-tight text-zinc-900 uppercase">
           No Health Data Available
         </h3>
-        <p className="mx-auto max-w-sm font-mono text-xs tracking-widest text-zinc-500 uppercase">
+        <p className="mx-auto max-w-sm font-mono text-xs tracking-widest text-zinc-400 uppercase">
           Initiate your first investigation to begin tracking operational
           metrics.
         </p>
@@ -91,18 +122,18 @@ export function ScraperHealthDashboard() {
     <div className="space-y-8 pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="mb-2 text-2xl leading-none font-black tracking-tight text-white">
+          <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900">
             Scraper Health & Reliability
           </h3>
-          <p className="text-sm font-medium text-zinc-400">
+          <p className="mt-1 text-sm font-medium text-zinc-500">
             Real-time monitoring of Reddit API performance and ingestion status.
           </p>
         </div>
         <button
           onClick={fetchStats}
-          className="border border-white/10 bg-white/5 p-3 text-white transition-colors hover:bg-white/10"
+          className="cursor-pointer inline-flex items-center justify-center rounded-full border border-zinc-200/50 bg-white/60 p-3 text-zinc-600 transition-all duration-300 hover:bg-[#ff4500]/5 hover:border-[#ff4500]/30 hover:text-[#ff4500] hover:scale-105 active:scale-95 shadow-xs"
         >
-          <RefreshCcw className="h-5 w-5" />
+          <RefreshCcw className="h-4 w-4" />
         </button>
       </div>
 
@@ -112,50 +143,47 @@ export function ScraperHealthDashboard() {
           title="Overall Success Rate"
           value={`${stats.successRate}%`}
           subtext="Last 7 days of scheduled jobs"
-          icon={
-            <CheckCircle2
-              className={
-                stats.successRate > 90 ? "text-emerald-400" : "text-amber-400"
-              }
-            />
-          }
+          variant="success"
+          icon={<CheckCircle2 className="h-5 w-5" />}
         />
         <HealthCard
           title="Avg Posts Per Scan"
           value={stats.avgPostsPerScan.toString()}
           subtext="Volume of data ingested per run"
-          icon={<BarChart3 className="text-[#ff4500]" />}
+          variant="warning"
+          icon={<BarChart3 className="h-5 w-5" />}
         />
         <HealthCard
           title="Total API Operations"
           value={stats.totalScans.toString()}
           subtext="Unique investigation runs executed"
-          icon={<Activity className="text-blue-400" />}
+          variant="info"
+          icon={<Activity className="h-5 w-5" />}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Trend Chart */}
-        <div className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] lg:col-span-2">
-          <div className="mb-8 flex items-center justify-between">
-            <h4 className="flex items-center gap-3 text-lg font-black text-white">
+        <div className="glass-card p-6 sm:p-8 rounded-2xl lg:col-span-2">
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h4 className="flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
               <TrendingUp className="h-5 w-5 text-[#ff4500]" />
               Discovery & Ingestion Trend
             </h4>
-            <div className="flex items-center gap-4 font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+            <div className="flex items-center gap-4 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 bg-[#ff4500]"></div>
+                <div className="h-2.5 w-2.5 rounded-full bg-[#ff4500]"></div>
                 <span>Pain Points Found</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 bg-blue-500"></div>
+                <div className="h-2.5 w-2.5 rounded-full bg-[#3b82f6]"></div>
                 <span>Success Rate (%)</span>
               </div>
             </div>
           </div>
 
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[300px] w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={stats.dailyTrend}>
                 <defs>
                   <linearGradient
@@ -165,33 +193,25 @@ export function ScraperHealthDashboard() {
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="5%" stopColor="#ff4500" stopOpacity={0.3} />
+                    <stop offset="5%" stopColor="#ff4500" stopOpacity={0.15} />
                     <stop offset="95%" stopColor="#ff4500" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#ffffff05"
+                  stroke="#00000008"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="date"
-                  stroke="#555"
+                  stroke="#94a3b8"
                   fontSize={10}
                   tickFormatter={(val) => val.split("-").slice(1).join("/")}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis hide />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#161616",
-                    border: "1px solid #333",
-                    fontSize: "10px",
-                    fontFamily: "monospace",
-                  }}
-                  itemStyle={{ color: "#fff" }}
-                />
+                <Tooltip content={<CustomTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="discovery"
@@ -216,28 +236,45 @@ export function ScraperHealthDashboard() {
         </div>
 
         {/* Subreddit Performance */}
-        <div className="border-2 border-white/10 bg-[#111] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-          <h4 className="mb-6 flex items-center gap-3 text-lg font-black text-white">
-            <Clock className="h-5 w-5 text-amber-400" />
+        <div className="glass-card p-6 sm:p-8 rounded-2xl">
+          <h4 className="mb-6 flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
+            <Clock className="h-5 w-5 text-[#ff4500]" />
             Top Subreddits
           </h4>
           <div className="space-y-4">
             {stats.subHealth.map((sub) => (
               <div key={sub.subreddit} className="group">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="flex cursor-pointer items-center gap-1.5 font-mono text-[11px] font-bold text-white transition-colors group-hover:text-[#ff4500]">
+                  <a
+                    href={`https://reddit.com/r/${sub.subreddit}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex cursor-pointer items-center gap-1.5 font-mono text-[12px] font-extrabold text-zinc-800 transition-colors group-hover:text-[#ff4500]"
+                  >
                     r/{sub.subreddit}
-                    <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </span>
+                    <ExternalLink className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </a>
                   <span
-                    className={`font-mono text-[10px] font-black ${sub.successRate > 90 ? "text-emerald-400" : sub.successRate > 70 ? "text-amber-400" : "text-rose-400"}`}
+                    className={`font-mono text-[11px] font-extrabold ${
+                      sub.successRate > 90
+                        ? "text-emerald-600"
+                        : sub.successRate > 70
+                        ? "text-amber-600"
+                        : "text-rose-600"
+                    }`}
                   >
                     {sub.successRate}%
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden border border-white/5 bg-white/5">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                   <div
-                    className={`h-full transition-all duration-1000 ${sub.successRate > 90 ? "bg-emerald-500" : sub.successRate > 70 ? "bg-amber-500" : "bg-rose-500"}`}
+                    className={`h-full rounded-full transition-all duration-1000 ${
+                      sub.successRate > 90
+                        ? "bg-emerald-500"
+                        : sub.successRate > 70
+                        ? "bg-amber-500"
+                        : "bg-rose-500"
+                    }`}
                     style={{ width: `${sub.successRate}%` }}
                   />
                 </div>
@@ -255,30 +292,39 @@ function HealthCard({
   value,
   subtext,
   icon,
+  variant,
 }: {
   title: string;
   value: string;
   subtext: string;
   icon: React.ReactNode;
+  variant: "success" | "warning" | "info";
 }) {
+  const iconColors = {
+    success: "border-emerald-500/15 bg-emerald-500/5 text-emerald-600",
+    warning: "border-[#ff4500]/15 bg-[#ff4500]/5 text-[#ff4500]",
+    info: "border-blue-500/15 bg-blue-500/5 text-blue-600",
+  };
+
   return (
-    <div className="group relative overflow-hidden border-2 border-white/12 bg-[#111] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.65)]">
+    <div className="group relative overflow-hidden glass-card glass-card-hover p-6 rounded-2xl">
       <div className="mb-4 flex items-start justify-between">
-        <div className="border border-white/15 bg-white/5 p-2.5 transition-transform group-hover:scale-105">
+        <div className={`rounded-xl border p-2.5 transition-colors duration-300 ${iconColors[variant]}`}>
           {icon}
         </div>
       </div>
       <div>
-        <p className="mb-1.5 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+        <p className="mb-1.5 font-mono text-[10px] font-bold tracking-widest text-zinc-550 uppercase">
           {title}
         </p>
-        <p className="mb-1 text-3xl font-black tracking-tight text-white">
+        <p className="mb-1 text-3xl font-extrabold tracking-tight text-zinc-900">
           {value}
         </p>
-        <p className="font-mono text-[9px] font-bold tracking-widest text-zinc-500 uppercase">
+        <p className="font-mono text-[9px] font-bold tracking-widest text-zinc-400 uppercase">
           {subtext}
         </p>
       </div>
     </div>
   );
 }
+

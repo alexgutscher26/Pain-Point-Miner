@@ -4,8 +4,8 @@ import { z } from "zod";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { db } from "@/lib/db";
-import { discoveryCache, subredditCache } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { discoveryCache, subredditCache, scraper } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { searchSubreddits, type SubredditSuggestion } from "@/lib/reddit";
 
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -52,11 +52,17 @@ export async function POST(req: Request) {
       requestHeaders: req.headers,
     });
 
-    if (planContext.planPurchaseRequired) {
+    const totalScans = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(scraper)
+      .where(eq(scraper.userId, userId));
+    const isFirstScan = (totalScans[0]?.count ?? 0) === 0;
+
+    if (planContext.planPurchaseRequired && !isFirstScan) {
       return apiError(
         403,
         "PLAN_REQUIRED",
-        "Start your 2-day trial with a credit card to unlock AI subreddit suggestions.",
+        "Upgrade to a paid plan to unlock AI subreddit suggestions.",
         { trialEnded: true },
         correlationId,
       );

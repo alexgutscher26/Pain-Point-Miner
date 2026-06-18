@@ -241,7 +241,7 @@ export default function BlogPost() {
               size="lg"
               className="rounded-2xl bg-linear-to-b from-[#ff5100] to-[#e63e00] px-12 py-7 text-xl font-black text-white shadow-xl shadow-[#ff4500]/20 transition-all hover:from-[#ff621a] hover:to-[#ff4500]"
             >
-              <Link href="/sign-up">Start Free Trial <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/sign-up">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>
         </div>

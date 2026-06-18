@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "The problem with most scrapers is noise. ThreddIQ uses LLMs to filter out the fluff and give me the raw, unvarnished pain points. It's transformed our entire product roadmap.",
+      "The problem with most scrapers is noise. ThreddIQ uses semantic patterns to filter out the fluff and give me the raw, unvarnished pain points. It's transformed our entire product roadmap.",
     author: "Elena",
     role: "Lead Researcher",
   },

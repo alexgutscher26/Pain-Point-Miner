@@ -66,6 +66,20 @@ export function UserJotWidget({
   user?: Pick<User, "id" | "email" | "name"> | null;
 }) {
   useEffect(() => {
+    // Prevent UserJot SDK from throwing a JSON.parse SyntaxError on empty strings
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        const keysToCheck = ["uj_userId", "uj_identifyHash"];
+        for (const key of keysToCheck) {
+          if (window.localStorage.getItem(key) === "") {
+            window.localStorage.removeItem(key);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to sanitize UserJot localStorage keys:", e);
+    }
+
     ensureQueueShim();
 
     const initialize = () => {

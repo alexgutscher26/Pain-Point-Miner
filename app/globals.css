@@ -179,3 +179,36 @@
 .animate-fall {
   animation: fall 5s linear forwards;
 }
+
+/* Premium Light Theme Glassmorphism Utilities */
+.landing-gradient {
+  background: radial-gradient(circle at 50% 0%, rgba(255, 69, 0, 0.04), transparent 60%),
+              radial-gradient(circle at 10% 30%, rgba(245, 158, 11, 0.02), transparent 40%),
+              radial-gradient(circle at 90% 70%, rgba(251, 191, 36, 0.02), transparent 40%),
+              #faf9f6;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.01),
+              inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.glass-card-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 69, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(255, 69, 0, 0.03),
+              inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.text-balance-custom {
+  text-wrap: balance;
+}
+

@@ -310,10 +310,10 @@ export function SettingsPageClient({
               Dashboard Settings
             </p>
           </div>
-          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-white">
+          <h2 className="mb-3 text-3xl leading-none font-black tracking-tight text-zinc-900">
             Settings
           </h2>
-          <p className="text-sm font-medium text-zinc-400">
+          <p className="text-sm font-medium text-zinc-500">
             Manage your account preferences, notifications, and scan defaults.
           </p>
         </div>
@@ -321,7 +321,7 @@ export function SettingsPageClient({
           type="submit"
           form="settings-form"
           disabled={isSaving}
-          className="inline-flex items-center gap-2 border border-[#ff8a57] bg-[#ff4500] px-6 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-colors hover:bg-[#e63e00] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#ff4500] hover:bg-[#e63e00] px-6 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSaving ? "Saving..." : "Save Changes"}
@@ -329,15 +329,15 @@ export function SettingsPageClient({
       </div>
 
       {errorMessage && (
-        <div className="border border-rose-400/55 bg-rose-500/10 px-4 py-3 font-mono text-sm text-rose-200">
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 font-mono text-sm text-rose-700">
           {errorMessage}
         </div>
       )}
 
       <form id="settings-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8 xl:col-span-2">
-            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8 xl:col-span-2">
+            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <User2 className="h-5 w-5 text-[#ff4500]" />
               Profile
             </h3>
@@ -374,8 +374,8 @@ export function SettingsPageClient({
             </div>
           </section>
 
-          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <h3 className="mb-5 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+            <h3 className="mb-5 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <Shield className="h-5 w-5 text-[#ff4500]" />
               Security
             </h3>
@@ -395,18 +395,18 @@ export function SettingsPageClient({
           </section>
         </div>
 
-        <section className="group relative overflow-hidden border-2 border-[#ff4500]/30 bg-black/40 p-6 shadow-[6px_6px_0px_0px_rgba(255,69,0,0.15)] md:p-8">
+        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
           <div className="absolute top-0 right-0 p-4">
-            <span className="border border-[#ff4500]/45 bg-[#ff4500]/10 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-[#ff4500] uppercase">
+            <span className="rounded-full border border-[#ff4500]/25 bg-[#ff4500]/5 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-[#ff4500] uppercase">
               Pro Feature
             </span>
           </div>
 
-          <h3 className="mb-2 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+          <h3 className="mb-2 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
             <SlidersHorizontal className="h-5 w-5 text-[#ff4500]" />
             Opportunity Scoring Engine
           </h3>
-          <p className="mb-8 max-w-2xl text-sm text-zinc-400">
+          <p className="mb-8 max-w-2xl text-sm text-zinc-500">
             Fine-tune the weights for the Opportunity Score. Changes are applied
             dynamically to all extracted insights.
           </p>
@@ -458,9 +458,9 @@ export function SettingsPageClient({
                 }
               />
 
-              <div className="border-t border-white/10 pt-4">
+              <div className="border-t border-zinc-200/50 pt-4">
                 <div className="flex items-center justify-between">
-                  <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                  <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                     Total Weight Sum
                   </p>
                   <p
@@ -472,8 +472,8 @@ export function SettingsPageClient({
                           values.scoringWeights.w4 -
                           1.0,
                       ) < 0.01
-                        ? "text-emerald-400"
-                        : "text-rose-400"
+                        ? "text-emerald-600"
+                        : "text-rose-600"
                     }`}
                   >
                     {(
@@ -488,14 +488,14 @@ export function SettingsPageClient({
               </div>
             </div>
 
-            <div className="border border-white/10 bg-white/2 p-6">
+            <div className="rounded-xl border border-zinc-200/50 bg-white/30 p-6">
               <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#ff4500]" />
                 Live Opportunity Preview
               </h4>
               <div className="space-y-4">
                 {sampleOpportunities.length === 0 ? (
-                  <div className="py-12 text-center font-mono text-xs text-zinc-600">
+                  <div className="py-12 text-center font-mono text-xs text-zinc-500">
                     No opportunities found to preview.
                   </div>
                 ) : (
@@ -511,13 +511,13 @@ export function SettingsPageClient({
                     return (
                       <div
                         key={opp.id}
-                        className="space-y-3 border border-white/5 bg-white/2 p-4"
+                        className="space-y-3 rounded-xl border border-zinc-150/40 bg-white/50 p-4 transition-all hover:bg-white/80 shadow-sm"
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <p className="text-sm leading-tight font-bold text-white">
+                          <p className="text-sm leading-tight font-bold text-zinc-800">
                             {opp.title}
                           </p>
-                          <span className="shrink-0 border border-[#ff4500]/20 bg-[#ff4500]/10 px-3 py-1 text-xl font-black text-[#ff4500]">
+                          <span className="shrink-0 rounded-lg border border-[#ff4500]/25 bg-[#ff4500]/10 px-3 py-1 text-xl font-black text-[#ff4500]">
                             {score}
                           </span>
                         </div>
@@ -534,13 +534,13 @@ export function SettingsPageClient({
         </section>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center justify-between gap-3">
-              <h3 className="flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+              <h3 className="flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
                 <Bell className="h-5 w-5 text-[#ff4500]" />
                 Notifications
               </h3>
-              <span className="border border-amber-400/45 bg-amber-500/10 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-amber-300 uppercase">
+              <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-amber-600 uppercase">
                 Coming Soon
               </span>
             </div>
@@ -581,8 +581,8 @@ export function SettingsPageClient({
             </fieldset>
           </section>
 
-          <section className="border-2 border-white/15 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
-            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-white">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+            <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <SlidersHorizontal className="h-5 w-5 text-[#ff4500]" />
               Scan Defaults
             </h3>
@@ -631,7 +631,7 @@ export function SettingsPageClient({
                 }
               />
             </div>
-            <p className="mt-4 font-mono text-xs text-zinc-500">
+            <p className="mt-4 font-mono text-xs text-zinc-400">
               Need higher limits?{" "}
               <Link
                 href="/dashboard/billing"
@@ -645,11 +645,11 @@ export function SettingsPageClient({
         </div>
       </form>
 
-      <section className="border-2 border-rose-500/35 bg-[#111] p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] md:p-8">
-        <h3 className="mb-2 text-lg font-black tracking-tight text-rose-400">
+      <section className="rounded-2xl border border-rose-200 bg-rose-50/30 p-6 shadow-sm md:p-8">
+        <h3 className="mb-2 text-lg font-black tracking-tight text-rose-600">
           Danger Zone
         </h3>
-        <p className="mb-5 text-sm text-zinc-400">
+        <p className="mb-5 text-sm text-zinc-500">
           Deleting your account removes all reports, scans, and team workspaces
           permanently.
         </p>
@@ -657,20 +657,20 @@ export function SettingsPageClient({
           <AlertDialogTrigger asChild>
             <button
               type="button"
-              className="border border-rose-300/45 bg-rose-600 px-5 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-colors hover:bg-rose-500"
+              className="rounded-xl border border-rose-200 bg-rose-600 px-5 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-colors hover:bg-rose-500"
             >
               Delete Account
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="border-2 border-rose-500/35 bg-[#0e0e0e] text-zinc-100">
+          <AlertDialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl max-w-md">
             <AlertDialogHeader className="place-items-start text-left">
-              <AlertDialogTitle className="font-black text-rose-400">
+              <AlertDialogTitle className="font-black text-rose-600">
                 Delete your account?
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-zinc-400">
+              <AlertDialogDescription className="text-zinc-550">
                 This action is permanent and removes your account and all
                 associated data. Type{" "}
-                <span className="font-bold text-zinc-100">DELETE</span> to
+                <span className="font-bold text-zinc-900">DELETE</span> to
                 continue.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -679,11 +679,11 @@ export function SettingsPageClient({
               value={deleteConfirmation}
               onChange={(event) => setDeleteConfirmation(event.target.value)}
               placeholder="Type DELETE"
-              className="h-11 w-full border border-white/20 bg-black/30 px-3 font-mono text-sm text-zinc-100 outline-none focus:border-rose-500/60"
+              className="h-11 w-full rounded-xl border border-zinc-200 bg-white/50 px-3 font-mono text-sm text-zinc-900 outline-none transition-all focus:border-rose-500"
             />
             <AlertDialogFooter>
               <AlertDialogCancel
-                className="border-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                className="rounded-xl border border-zinc-200/50 bg-white text-zinc-700 hover:bg-zinc-50"
                 onClick={() => setDeleteConfirmation("")}
               >
                 Cancel
@@ -694,7 +694,7 @@ export function SettingsPageClient({
                   void handleDeleteAccount();
                 }}
                 disabled={deleteConfirmation !== "DELETE" || isDeleting}
-                className="bg-rose-600 text-white hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-rose-600 text-white hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Delete Account"}
               </AlertDialogAction>
@@ -707,12 +707,12 @@ export function SettingsPageClient({
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
       >
-        <DialogContent className="border-2 border-white/15 bg-[#0e0e0e] text-zinc-100">
+        <DialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-black text-white">
+            <DialogTitle className="font-black text-zinc-900">
               Change Password
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogDescription className="text-zinc-500">
               Update your password. Use at least 8 characters.
             </DialogDescription>
           </DialogHeader>
@@ -735,14 +735,14 @@ export function SettingsPageClient({
               value={confirmNewPassword}
               onChange={setConfirmNewPassword}
             />
-            <label className="flex items-center gap-3 text-sm text-zinc-300">
+            <label className="flex items-center gap-3 text-sm text-zinc-650 cursor-pointer">
               <input
                 type="checkbox"
                 checked={revokeOtherSessions}
                 onChange={(event) =>
                   setRevokeOtherSessions(event.target.checked)
                 }
-                className="h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-[#ff4500] focus:ring-[#ff4500]"
+                className="h-4 w-4 rounded border-zinc-300 bg-white text-[#ff4500] focus:ring-[#ff4500]"
               />
               Revoke other active sessions
             </label>
@@ -751,7 +751,7 @@ export function SettingsPageClient({
             <button
               type="button"
               onClick={() => setIsChangePasswordOpen(false)}
-              className="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-900"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
             >
               Cancel
             </button>
@@ -759,7 +759,7 @@ export function SettingsPageClient({
               type="button"
               onClick={() => void handleChangePassword()}
               disabled={isChangingPassword}
-              className="rounded-lg bg-[#ff4500] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e63e00] disabled:opacity-60"
+              className="rounded-xl bg-[#ff4500] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e63e00] disabled:opacity-60"
             >
               {isChangingPassword ? "Updating..." : "Update Password"}
             </button>
@@ -768,32 +768,32 @@ export function SettingsPageClient({
       </Dialog>
 
       <Dialog open={isSessionsOpen} onOpenChange={setIsSessionsOpen}>
-        <DialogContent className="border-2 border-white/15 bg-[#0e0e0e] text-zinc-100 sm:max-w-2xl">
+        <DialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-black text-white">
+            <DialogTitle className="font-black text-zinc-900">
               Active Sessions
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogDescription className="text-zinc-500">
               Review and revoke active sessions for this account.
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
             {isLoadingSessions ? (
-              <div className="py-8 text-center text-sm text-zinc-500">
+              <div className="py-8 text-center text-sm text-zinc-550">
                 Loading sessions...
               </div>
             ) : sessions.length === 0 ? (
-              <div className="py-8 text-center text-sm text-zinc-500">
+              <div className="py-8 text-center text-sm text-zinc-550">
                 No active sessions found.
               </div>
             ) : (
               sessions.map((session) => (
                 <div
                   key={session.id}
-                  className="flex items-start justify-between gap-4 border border-white/20 bg-black/30 p-4"
+                  className="flex items-start justify-between gap-4 rounded-xl border border-zinc-200/50 bg-white/45 p-4 transition-all hover:bg-white/60"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-white">
+                    <p className="truncate text-sm font-bold text-zinc-800">
                       {session.userAgent || "Unknown device"}
                     </p>
                     <p className="mt-1 text-xs text-zinc-500">
@@ -813,7 +813,7 @@ export function SettingsPageClient({
                     type="button"
                     onClick={() => void handleRevokeSession(session.id)}
                     disabled={isRevokingToken === session.id}
-                    className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                    className="shrink-0 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-100 disabled:opacity-60"
                   >
                     {isRevokingToken === session.id ? "Revoking..." : "Revoke"}
                   </button>
@@ -827,14 +827,14 @@ export function SettingsPageClient({
               onClick={() => {
                 void loadSessions();
               }}
-              className="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-900"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
             >
               Refresh
             </button>
             <button
               type="button"
               onClick={() => setIsSessionsOpen(false)}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-800"
+              className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
             >
               Close
             </button>
@@ -875,7 +875,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="font-mono text-[11px] font-bold tracking-[0.14em] text-zinc-500 uppercase">
+      <span className="font-mono text-[11px] font-bold tracking-[0.14em] text-zinc-550 uppercase">
         {label}
       </span>
       <input
@@ -884,7 +884,7 @@ function Field({
         min={min}
         max={max}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-11 w-full border border-white/20 bg-black/30 px-3 text-sm text-zinc-100 outline-none focus:border-[#ff4500]/60"
+        className="mt-2 h-11 w-full rounded-xl border border-zinc-200/50 bg-white/40 px-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10"
       />
     </label>
   );
@@ -902,16 +902,16 @@ function ToggleRow({
   onCheckedChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-white/5 bg-black/20 p-4">
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-zinc-200/50 bg-white/40 p-4 transition-all hover:bg-white/60">
       <div>
-        <p className="text-sm font-bold text-white">{title}</p>
+        <p className="text-sm font-bold text-zinc-800">{title}</p>
         <p className="mt-1 text-xs text-zinc-500">{description}</p>
       </div>
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onCheckedChange(event.target.checked)}
-        className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-[#ff4500] focus:ring-[#ff4500]"
+        className="mt-1 h-4 w-4 rounded border-zinc-300 bg-white text-[#ff4500] focus:ring-[#ff4500]"
       />
     </label>
   );
@@ -928,7 +928,7 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full border border-white/20 bg-black/20 px-4 py-3 text-left font-mono text-sm font-semibold tracking-wide text-zinc-200 uppercase transition-colors hover:border-[#ff4500]/55 hover:bg-black/40"
+      className="w-full rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-3 text-left font-mono text-sm font-semibold tracking-wide text-zinc-800 uppercase transition-all hover:border-[#ff4500] hover:bg-white/80 hover:text-zinc-900"
     >
       {label}
     </button>
@@ -950,7 +950,7 @@ function WeightSlider({
     <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-[11px] leading-none font-bold tracking-widest text-white uppercase">
+          <p className="font-mono text-[11px] leading-none font-bold tracking-widest text-zinc-800 uppercase">
             {label}
           </p>
           <p className="mt-1 text-[11px] text-zinc-500">{description}</p>
@@ -969,3 +969,4 @@ function WeightSlider({
     </div>
   );
 }
+

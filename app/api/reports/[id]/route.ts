@@ -200,17 +200,7 @@ export async function GET(
       email: userEmail,
       requestHeaders: req.headers,
     });
-    if (planContext.planPurchaseRequired) {
-      return apiError(
-        403,
-        "PLAN_REQUIRED",
-        "Start your 2-day trial with a credit card to unlock full analysis reports.",
-        {
-          trialEnded: true,
-        },
-        correlationId,
-      );
-    }
+    const isTeaser = planContext.planPurchaseRequired;
     const plan = await resolveCurrentPlan({
       userId,
       email: userEmail,
@@ -385,6 +375,7 @@ export async function GET(
 
     // Format the response to match what the frontend expects
     const response = {
+      isTeaser,
       title: currentScraper.keywords?.[0] || "Unknown Investigation",
       date: new Date(currentScraper.createdAt).toLocaleDateString("en-US", {
         month: "short",
@@ -467,64 +458,93 @@ export async function GET(
             (b.urgency ?? 0) - (a.urgency ?? 0) ||
             (b.score ?? 0) - (a.score ?? 0),
         )
-        .map((pp) => ({
-          userLanguage: buildUserLanguageReport({
+        .map((pp, idx) => {
+          if (isTeaser && idx >= 2) {
+            return {
+              userLanguage: null,
+              id: pp.id,
+              title: `Unlock Frustration #${idx + 1}`,
+              validationScore: 0,
+              urgency: "Locked",
+              intensity: 0,
+              monetization: 0,
+              maturity: 0,
+              mentions: 0,
+              description: "Upgrade to a paid plan to unlock full AI description, intensity/urgency breakdown, and Golden Quotes.",
+              subreddits: pp.subreddit ? [pp.subreddit] : [],
+              sentiment: "Neutral",
+              budgetSignals: [],
+              hasWillingnessToPay: false,
+              budgetSignalSummary: "Locked",
+              cluster: null,
+              switchingCosts: "Locked",
+              triedSolutions: [],
+              difficulty: "side_project",
+              communityVoices: ["Upgrade to a paid plan to unlock user comments and golden quotes."],
+              language: [],
+              postUrl: null,
+              angles: [],
+            };
+          }
+          return {
+            userLanguage: buildUserLanguageReport({
+              title: pp.title,
+              body: pp.body,
+              triedSolutions: pp.triedSolutions,
+              quotes: (pp.painPointComments ?? []).map((comment) => comment.body),
+            }),
+            id: pp.id,
             title: pp.title,
-            body: pp.body,
-            triedSolutions: pp.triedSolutions,
-            quotes: (pp.painPointComments ?? []).map((comment) => comment.body),
-          }),
-          id: pp.id,
-          title: pp.title,
-          validationScore: toValidationScore(pp),
-          urgency:
-            pp.urgency >= 8
-              ? "Extreme Urgency"
-              : pp.urgency >= 5
-                ? "High Urgency"
-                : "Medium/Low",
-          intensity: pp.score,
-          monetization: pp.monetizationScore,
-          maturity: pp.marketMaturity,
-          mentions: Math.max(1, pp.mentionCount || 0),
-          description: pp.body,
-          subreddits: [pp.subreddit],
-          sentiment: pp.sentiment,
-          budgetSignals: pp.budgetSignals,
-          hasWillingnessToPay: pp.hasWillingnessToPay,
-          budgetSignalSummary:
-            pp.budgetSignals.length > 0
-              ? summarizeBudgetSignal(pp.budgetSignals[0])
+            validationScore: toValidationScore(pp),
+            urgency:
+              pp.urgency >= 8
+                ? "Extreme Urgency"
+                : pp.urgency >= 5
+                  ? "High Urgency"
+                  : "Medium/Low",
+            intensity: pp.score,
+            monetization: pp.monetizationScore,
+            maturity: pp.marketMaturity,
+            mentions: Math.max(1, pp.mentionCount || 0),
+            description: pp.body,
+            subreddits: [pp.subreddit],
+            sentiment: pp.sentiment,
+            budgetSignals: pp.budgetSignals,
+            hasWillingnessToPay: pp.hasWillingnessToPay,
+            budgetSignalSummary:
+              pp.budgetSignals.length > 0
+                ? summarizeBudgetSignal(pp.budgetSignals[0])
+                : null,
+            cluster: pp.painPointCluster
+              ? {
+                  id: pp.painPointCluster.id,
+                  estimatedTamUsdAnnual:
+                    pp.painPointCluster.estimatedTamUsdAnnual ?? null,
+                  budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
+                  competitorIntel: isTeaser ? [] : (pp.painPointCluster.competitorIntel ?? []),
+                }
               : null,
-          cluster: pp.painPointCluster
-            ? {
-                id: pp.painPointCluster.id,
-                estimatedTamUsdAnnual:
-                  pp.painPointCluster.estimatedTamUsdAnnual ?? null,
-                budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
-                competitorIntel: pp.painPointCluster.competitorIntel ?? [],
-              }
-            : null,
-          switchingCosts: pp.switchingCosts,
-          triedSolutions: pp.triedSolutions || [],
-          difficulty: pp.difficulty || "weekend_project",
-          communityVoices:
-            (pp.painPointComments ?? [])
-              .map((comment) => cleanQuote(comment.body))
-              .filter(Boolean)
-              .slice(0, 3).length > 0
-              ? (pp.painPointComments ?? [])
-                  .map((comment) => cleanQuote(comment.body))
-                  .filter(Boolean)
-                  .slice(0, 3)
-              : [pp.body],
-          language: pp.triedSolutions || [],
-          postUrl: pp.postUrl,
-          angles: [
-            "Solution for " + pp.title,
-            "Cost-effective alternative to existing tools",
-          ],
-        })),
+            switchingCosts: pp.switchingCosts,
+            triedSolutions: pp.triedSolutions || [],
+            difficulty: pp.difficulty || "weekend_project",
+            communityVoices:
+              (pp.painPointComments ?? [])
+                .map((comment) => cleanQuote(comment.body))
+                .filter(Boolean)
+                .slice(0, 3).length > 0
+                ? (pp.painPointComments ?? [])
+                    .map((comment) => cleanQuote(comment.body))
+                    .filter(Boolean)
+                    .slice(0, 3)
+                : [pp.body],
+            language: pp.triedSolutions || [],
+            postUrl: pp.postUrl,
+            angles: [
+              "Solution for " + pp.title,
+              "Cost-effective alternative to existing tools",
+            ],
+          };
+        }),
       saasOpportunities: entitlements.hasSaasOpportunities
         ? saasOpportunities
         : [],

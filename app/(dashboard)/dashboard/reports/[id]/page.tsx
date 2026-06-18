@@ -20,6 +20,7 @@ import {
   Wrench,
   Sparkles,
   ExternalLink,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -92,6 +93,7 @@ interface PainPoint {
 }
 
 interface ReportData {
+  isTeaser?: boolean;
   reportId: string;
   title: string;
   date: string;
@@ -372,7 +374,7 @@ export default function ReportDetailPage() {
     useState<SentimentFilter>("all");
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
-    "Your free trial has ended. Purchase a plan to continue.",
+    "A paid plan is required to continue. Please upgrade your account.",
   );
 
   const categoryOptions = [
@@ -458,6 +460,11 @@ export default function ReportDetailPage() {
     showToast = true,
   ) {
     if (!id || !reportData) return;
+    if (reportData.isTeaser) {
+      setPlanDialogMessage("Saving reports is available on paid plans. Upgrade to Growth or Pro to save and organize your investigations.");
+      setPlanDialogOpen(true);
+      return;
+    }
     setIsSaving(true);
     const categoryToPersist = categoryOverride ?? selectedCategory;
     try {
@@ -482,7 +489,7 @@ export default function ReportDetailPage() {
         ) {
           setPlanDialogMessage(
             errorPayload?.message ??
-              "Your free trial has ended. Purchase a plan to continue.",
+              "A paid plan is required to continue. Please upgrade your account.",
           );
           setPlanDialogOpen(true);
           return;
@@ -529,6 +536,11 @@ export default function ReportDetailPage() {
 
   function handleExportData() {
     if (!reportData) return;
+    if (reportData.isTeaser) {
+      setPlanDialogMessage("Exporting report data is a premium feature. Upgrade to a paid plan to download JSON & CSV exports.");
+      setPlanDialogOpen(true);
+      return;
+    }
     try {
       const safeTitle = reportData.title
         .toLowerCase()
@@ -554,6 +566,11 @@ export default function ReportDetailPage() {
 
   async function handleRunAgain() {
     if (!reportData || isRerunning) return;
+    if (reportData.isTeaser) {
+      setPlanDialogMessage("Running investigations is locked. Upgrade to a paid plan to run new scans.");
+      setPlanDialogOpen(true);
+      return;
+    }
     setIsRerunning(true);
 
     try {
@@ -627,7 +644,7 @@ export default function ReportDetailPage() {
                 setPlanDialogMessage(
                   typeof errorPayload?.message === "string"
                     ? errorPayload.message
-                    : "Your free trial has ended. Purchase a plan to continue.",
+                    : "A paid plan is required to continue. Please upgrade your account.",
                 );
                 setPlanDialogOpen(true);
                 return;
@@ -935,6 +952,33 @@ export default function ReportDetailPage() {
         </div>
       </div>
 
+      {reportData.isTeaser && (
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-dashed border-[#ff4500]/30 bg-[#ff4500]/5 p-6 md:p-8 rounded-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-[#ff4500]/10 blur-xl"></div>
+          <div className="space-y-2 relative z-10">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-[#ff4500] animate-pulse" />
+              <p className="font-mono text-xs font-black tracking-[0.2em] text-[#ff4500] uppercase">
+                Preview Mode
+              </p>
+            </div>
+            <h3 className="text-xl font-black text-white">
+              Showing 2 of {reportData.topPainPoints.length} pain points found.
+            </h3>
+            <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
+              You are viewing a teaser of your investigation results. Upgrade to a paid plan to unlock the remaining pain points, full community feedback logs, AI opportunity analysis, and competitor matrices.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/billing"
+            className="shrink-0 group relative inline-flex items-center justify-center gap-2 bg-[#ff4500] hover:bg-[#ff571a] px-8 py-3.5 text-xs font-black tracking-widest text-white uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,69,0,0.3)]"
+          >
+            <span>Unlock Full Report</span>
+            <Zap className="h-4 w-4 fill-current text-white" />
+          </Link>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {reportData.metrics.map((metric) => (
@@ -996,11 +1040,60 @@ export default function ReportDetailPage() {
             )}
 
           <div className="space-y-6">
-            {visiblePainPoints.map((pain) => (
-              <div
-                key={pain.id}
-                className="group relative space-y-8 overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-[#ff4500]/40"
-              >
+            {visiblePainPoints.map((pain, idx) => {
+              const isLocked = pain.urgency === "Locked";
+
+              if (isLocked) {
+                return (
+                  <div
+                    key={pain.id}
+                    className="relative overflow-hidden border-2 border-white/10 bg-[#0c0c0c]/80 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-zinc-800 animate-in fade-in duration-300"
+                  >
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/45 backdrop-blur-[6px] p-6 text-center space-y-4 animate-in fade-in duration-500">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#ff4500]/10 text-[#ff4500] shadow-[0_0_20px_rgba(255,69,0,0.15)] animate-pulse">
+                        <Zap className="h-5 w-5 fill-current" />
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
+                          Frustration #{startPainPointIndex + idx + 1} • Locked
+                        </h5>
+                        <h4 className="text-xl font-black text-white uppercase tracking-tight">
+                          {pain.title}
+                        </h4>
+                        <p className="mx-auto max-w-md text-xs text-zinc-400">
+                          {pain.description}
+                        </p>
+                      </div>
+                      <Link
+                        href="/dashboard/billing"
+                        className="rounded-lg bg-zinc-900 border border-white/10 hover:border-[#ff4500]/40 hover:bg-[#ff4500]/10 hover:text-white px-5 py-2 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase transition-all duration-300 hover:scale-105 active:scale-95"
+                      >
+                        Upgrade to Unlock
+                      </Link>
+                    </div>
+
+                    <div className="opacity-10 select-none pointer-events-none">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="h-6 w-48 bg-zinc-700 rounded mb-2"></div>
+                          <div className="h-4 w-32 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div className="h-10 w-16 bg-zinc-700 rounded"></div>
+                      </div>
+                      <div className="mt-6 space-y-2">
+                        <div className="h-4 w-full bg-zinc-800 rounded"></div>
+                        <div className="h-4 w-5/6 bg-zinc-800 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={pain.id}
+                  className="group relative space-y-8 overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-[#ff4500]/40"
+                >
                 <div className="absolute top-0 right-0 -mt-32 -mr-32 h-64 w-64 rounded-full bg-[#ff4500]/2 blur-[80px]"></div>
 
                 {/* Pain Header */}
@@ -1388,7 +1481,7 @@ export default function ReportDetailPage() {
                   </div>
                 )}
               </div>
-            ))}
+            )})}
           </div>
 
           {totalPainPoints === 0 && (
@@ -1497,56 +1590,89 @@ export default function ReportDetailPage() {
             </div>
 
             {/* Competitive Landscape */}
-            {allCompetitors.length > 0 && (
-              <div className="border-t border-white/5 pt-8">
+            {(allCompetitors.length > 0 || reportData.isTeaser) && (
+              <div className="border-t border-white/5 pt-8 relative">
                 <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
                   <Wrench className="h-4 w-4 text-[#ff4500]" />
                   Competitive Landscape
                 </h4>
-                <div className="space-y-4">
-                  {allCompetitors.slice(0, 10).map((tool) => (
-                    <div
-                      key={tool.name}
-                      className="group relative overflow-hidden border border-white/10 bg-white/2 p-4 transition-all hover:border-[#ff4500]/30 hover:bg-white/5"
-                    >
-                      <div className="relative z-10 flex items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex items-center gap-2">
-                            <span className="text-sm font-black text-white">
-                              {tool.name}
-                            </span>
-                            <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-black text-[#ff4500] uppercase">
-                              {tool.mentionCount} mentions
-                            </span>
-                          </div>
-                          {tool.description ? (
-                            <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-zinc-500">
-                              {tool.description}
-                            </p>
-                          ) : (
-                            <p className="text-[10px] font-bold text-zinc-700 italic">
-                              Analyzing tool specs...
-                            </p>
-                          )}
+                {reportData.isTeaser ? (
+                  <div className="relative overflow-hidden rounded-xl border border-white/10 p-4 bg-[#0a0a0a] space-y-4 shadow-inner">
+                    <div className="space-y-4 filter blur-[2.5px] opacity-25 select-none pointer-events-none">
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                          <div className="h-4 w-24 bg-zinc-700 rounded"></div>
+                          <div className="h-3 w-40 bg-zinc-800 rounded"></div>
                         </div>
-                        {tool.url && (
-                          <a
-                            href={
-                              tool.url.startsWith("http")
-                                ? tool.url
-                                : `https://${tool.url}`
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-zinc-800 p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
-                          >
-                            <TrendingUp className="h-3 w-3" />
-                          </a>
-                        )}
+                        <div className="h-5 w-16 bg-zinc-750 rounded"></div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                          <div className="h-4 w-28 bg-zinc-700 rounded"></div>
+                          <div className="h-3 w-36 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div className="h-5 w-16 bg-zinc-750 rounded"></div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 p-4 text-center space-y-2">
+                      <Zap className="h-4 w-4 text-[#ff4500] fill-current" />
+                      <p className="text-xs font-bold text-white uppercase tracking-wider">
+                        Competitor Intel Locked
+                      </p>
+                      <Link
+                        href="/dashboard/billing"
+                        className="text-[9px] font-black tracking-widest text-[#ff4500] hover:text-white uppercase transition-colors"
+                      >
+                        Upgrade to Reveal
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {allCompetitors.slice(0, 10).map((tool) => (
+                      <div
+                        key={tool.name}
+                        className="group relative overflow-hidden border border-white/10 bg-white/2 p-4 transition-all hover:border-[#ff4500]/30 hover:bg-white/5"
+                      >
+                        <div className="relative z-10 flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex items-center gap-2">
+                              <span className="text-sm font-black text-white">
+                                {tool.name}
+                              </span>
+                              <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-black text-[#ff4500] uppercase">
+                                {tool.mentionCount} mentions
+                              </span>
+                            </div>
+                            {tool.description ? (
+                              <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-zinc-500">
+                                {tool.description}
+                              </p>
+                            ) : (
+                              <p className="text-[10px] font-bold text-zinc-700 italic">
+                                Analyzing tool specs...
+                              </p>
+                            )}
+                          </div>
+                          {tool.url && (
+                            <a
+                              href={
+                                tool.url.startsWith("http")
+                                  ? tool.url
+                                  : `https://${tool.url}`
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-zinc-800 p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
+                            >
+                              <TrendingUp className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1582,75 +1708,108 @@ export default function ReportDetailPage() {
             </div>
           </div>
 
-          {reportData.saasOpportunities &&
-            reportData.saasOpportunities.length > 0 && (
-              <div className="space-y-5 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          {(reportData.saasOpportunities &&
+            reportData.saasOpportunities.length > 0) || reportData.isTeaser ? (
+              <div className="space-y-5 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.655)] relative">
                 <h4 className="flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
                   <Lightbulb className="h-4 w-4 text-[#ff4500]" /> AI-Generated
                   SaaS Opportunities
                 </h4>
-                <div className="space-y-4">
-                  {reportData.saasOpportunities.slice(0, 3).map((opp) => (
-                    <SpotlightCard
-                      key={opp.title}
-                      active={opp.score > 70}
-                      className="group/opp border border-white/20 bg-white/2 p-5 transition-all duration-300 hover:border-amber-500/30"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm leading-tight font-black text-white">
-                          {opp.title}
+                {reportData.isTeaser ? (
+                  <div className="relative overflow-hidden rounded-xl border border-white/10 p-5 bg-[#0a0a0a] space-y-5 shadow-inner">
+                    <div className="space-y-4 filter blur-[3px] opacity-20 select-none pointer-events-none">
+                      <div className="flex justify-between items-center">
+                        <div className="h-4 w-36 bg-zinc-700 rounded"></div>
+                        <div className="h-4 w-12 bg-zinc-750 rounded"></div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-3.5 w-full bg-zinc-800 rounded"></div>
+                        <div className="h-3.5 w-5/6 bg-zinc-800 rounded"></div>
+                      </div>
+                      <div className="h-3.5 w-32 bg-zinc-850 rounded"></div>
+                    </div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 p-4 text-center space-y-3">
+                      <Sparkles className="h-5 w-5 text-[#ff4500] animate-pulse" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-black text-white uppercase tracking-wider">
+                          SaaS Blueprints Locked
                         </p>
-                        <span className={cn(
-                          "text-[10px] font-black tracking-widest uppercase",
-                          opp.score > 70 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-[#ff4500]"
-                        )}>
-                          {opp.score}/100
-                        </span>
+                        <p className="max-w-[200px] text-[10px] text-zinc-450">
+                          Get actionable product plans, ICP mappings, and launch angles.
+                        </p>
                       </div>
-                      <div className="space-y-2 mt-3">
-                        {formatPainDescription(opp.problemStatement).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-xs leading-relaxed font-medium text-zinc-400"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                      <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase mt-3">
-                        ICP: {opp.targetCustomer}
-                      </p>
-                      <div className="space-y-2 mt-2">
-                        {formatPainDescription(opp.valueProposition).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-xs leading-relaxed font-medium text-zinc-300"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                      <div className="space-y-2 mt-2">
-                        {formatPainDescription(opp.launchAngle).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-[11px] leading-relaxed font-bold text-zinc-500 underline decoration-zinc-800 underline-offset-4"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                    </SpotlightCard>
-                  ))}
-                </div>
+                      <Link
+                        href="/dashboard/billing"
+                        className="rounded-md border border-[#ff4500]/30 bg-[#ff4500]/10 px-4 py-2 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase transition-all duration-300 hover:bg-[#ff4500] hover:text-white"
+                      >
+                        Unlock Blueprints
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reportData.saasOpportunities?.slice(0, 3).map((opp) => (
+                      <SpotlightCard
+                        key={opp.title}
+                        active={opp.score > 70}
+                        className="group/opp border border-white/20 bg-white/2 p-5 transition-all duration-300 hover:border-amber-500/30"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm leading-tight font-black text-white">
+                            {opp.title}
+                          </p>
+                          <span className={cn(
+                            "text-[10px] font-black tracking-widest uppercase",
+                            opp.score > 70 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-[#ff4500]"
+                          )}>
+                            {opp.score}/100
+                          </span>
+                        </div>
+                        <div className="space-y-2 mt-3">
+                          {formatPainDescription(opp.problemStatement).map(
+                            (paragraph) => (
+                              <p
+                                key={paragraph.slice(0, 100)}
+                                className="text-xs leading-relaxed font-medium text-zinc-400"
+                              >
+                                {paragraph}
+                              </p>
+                            ),
+                          )}
+                        </div>
+                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase mt-3">
+                          ICP: {opp.targetCustomer}
+                        </p>
+                        <div className="space-y-2 mt-2">
+                          {formatPainDescription(opp.valueProposition).map(
+                            (paragraph) => (
+                              <p
+                                key={paragraph.slice(0, 100)}
+                                className="text-xs leading-relaxed font-medium text-zinc-300"
+                              >
+                                {paragraph}
+                              </p>
+                            ),
+                          )}
+                        </div>
+                        <div className="space-y-2 mt-2">
+                          {formatPainDescription(opp.launchAngle).map(
+                            (paragraph) => (
+                              <p
+                                key={paragraph.slice(0, 100)}
+                                className="text-[11px] leading-relaxed font-bold text-zinc-500 underline decoration-zinc-800 underline-offset-4"
+                              >
+                                {paragraph}
+                              </p>
+                            ),
+                          )}
+                        </div>
+                      </SpotlightCard>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
         </div>
       </div>
     </div>

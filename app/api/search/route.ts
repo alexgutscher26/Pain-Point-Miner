@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
@@ -260,11 +260,18 @@ export async function POST(req: Request) {
       email: userEmail,
       requestHeaders: req.headers,
     });
-    if (planContext.planPurchaseRequired) {
+
+    const totalScans = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(scraper)
+      .where(eq(scraper.userId, userId));
+    const isFirstScan = (totalScans[0]?.count ?? 0) === 0;
+
+    if (planContext.planPurchaseRequired && !isFirstScan) {
       return apiError(
         403,
         "PLAN_REQUIRED",
-        "Start your 2-day trial with a credit card to unlock new scans.",
+        "Upgrade to a paid plan to unlock new scans.",
         {
           trialEnded: true,
         },

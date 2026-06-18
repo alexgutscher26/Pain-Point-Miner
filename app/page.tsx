@@ -76,7 +76,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#0a0a0a] font-sans text-zinc-300 selection:bg-[#ff4500]/30">
+    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <script type="application/ld+json">
         {safeJsonLd(organizationJsonLd)}
       </script>

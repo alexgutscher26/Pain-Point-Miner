@@ -43,14 +43,15 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+    <div className="fixed top-4 left-0 right-0 z-50 flex w-full justify-center px-4">
+      <header className="w-full max-w-5xl rounded-full border border-zinc-200/60 bg-white/75 shadow-xs backdrop-blur-md">
+        <div className="flex h-14 items-center justify-between px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="group flex items-center gap-2">
-            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded bg-linear-to-tr from-[#ff4500] to-[#ff6b33] shadow-[0_4px_12px_rgba(255,69,0,0.3)]">
+            <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33] shadow-[0_4px_12px_rgba(255,69,0,0.2)]">
               <LogoIcon className="h-4 w-4 text-white" />
             </div>
-            <span className="text-base font-bold tracking-tight text-white sm:text-lg">
+            <span className="text-base font-extrabold tracking-tight text-zinc-900 sm:text-lg">
               ThreddIQ
             </span>
           </Link>
@@ -60,7 +61,7 @@ export function Header() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[13px] font-bold text-zinc-400 transition-colors hover:text-white"
+                className="text-[13px] font-bold text-zinc-600 transition-colors hover:text-zinc-900"
               >
                 {link.name}
               </Link>
@@ -75,7 +76,7 @@ export function Header() {
                 <div className="flex items-center gap-4">
                   <Link
                     href="/dashboard"
-                    className="hidden text-[13px] font-bold text-zinc-400 transition-colors hover:text-white sm:block"
+                    className="hidden text-[13px] font-bold text-zinc-600 transition-colors hover:text-zinc-900 sm:block"
                   >
                     Dashboard
                   </Link>
@@ -84,7 +85,7 @@ export function Header() {
                       <button className="group flex items-center gap-2 outline-hidden">
                         <Avatar
                           size="sm"
-                          className="border border-white/10 transition-colors group-hover:border-[#ff4500]/50"
+                          className="border border-black/10 transition-colors group-hover:border-[#ff4500]/50"
                         >
                           <AvatarImage
                             src={session.user.image || ""}
@@ -95,14 +96,14 @@ export function Header() {
                               "U"}
                           </AvatarFallback>
                         </Avatar>
-                        <ChevronDown className="h-3.5 w-3.5 text-zinc-500 transition-colors group-hover:text-white" />
+                        <ChevronDown className="h-3.5 w-3.5 text-zinc-400 transition-colors group-hover:text-zinc-800" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="w-56 border-white/10 bg-[#0f0f0f] text-zinc-300"
+                      className="w-56 border-zinc-200 bg-white text-zinc-700 shadow-md"
                     >
-                      <DropdownMenuLabel className="font-bold text-white">
+                      <DropdownMenuLabel className="font-bold text-zinc-900">
                         <div className="flex flex-col gap-0.5">
                           <span>{session.user.name}</span>
                           <span className="text-[10px] font-medium text-zinc-500">
@@ -110,29 +111,29 @@ export function Header() {
                           </span>
                         </div>
                       </DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-white/5" />
+                      <DropdownMenuSeparator className="bg-zinc-100" />
                       <DropdownMenuItem asChild>
                         <Link
                           href="/dashboard"
-                          className="flex cursor-pointer items-center gap-2"
+                          className="flex cursor-pointer items-center gap-2 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50"
                         >
-                          <LayoutDashboard className="h-4 w-4" />
+                          <LayoutDashboard className="h-4 w-4 text-zinc-500" />
                           <span>Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link
                           href="/dashboard/settings"
-                          className="flex cursor-pointer items-center gap-2"
+                          className="flex cursor-pointer items-center gap-2 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-4 w-4 text-zinc-500" />
                           <span>Settings</span>
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-white/5" />
+                      <DropdownMenuSeparator className="bg-zinc-100" />
                       <DropdownMenuItem
                         onClick={() => signOut()}
-                        className="flex cursor-pointer items-center gap-2 text-red-400 focus:text-red-400"
+                        className="flex cursor-pointer items-center gap-2 text-red-500 focus:text-red-600 focus:bg-red-50"
                       >
                         <LogOut className="h-4 w-4" />
                         <span>Sign out</span>
@@ -144,13 +145,13 @@ export function Header() {
                 <div className="flex items-center gap-4">
                   <Link
                     href="/sign-in"
-                    className="text-sm font-bold text-zinc-400 transition-colors hover:text-white"
+                    className="text-sm font-bold text-zinc-600 transition-colors hover:text-zinc-900"
                   >
                     Sign in
                   </Link>
                   <Button
                     asChild
-                    className="hidden h-10 rounded-xl bg-[#ff4500] px-5 text-sm font-black text-white shadow-lg shadow-[#ff4500]/10 transition-all hover:bg-[#ff5a1a] md:flex"
+                    className="hidden h-10 rounded-full bg-[#ff4500] px-5 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#e03d00] md:flex"
                   >
                     <Link href="/sign-up">Get Started</Link>
                   </Button>
@@ -166,17 +167,17 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-zinc-400 hover:bg-white/5 hover:text-white"
+                  className="text-zinc-500 hover:bg-black/5 hover:text-zinc-900"
                 >
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-[300px] border-white/5 bg-[#0a0a0a] p-8 text-white"
+                className="w-[300px] border-zinc-100 bg-white p-8 text-zinc-900"
               >
                 <SheetHeader className="mb-12 p-0 text-left">
-                  <SheetTitle className="flex items-center gap-2 text-white">
+                  <SheetTitle className="flex items-center gap-2 text-zinc-900">
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff4500]">
                       <div className="h-2 w-2 rounded-full bg-white" />
                     </div>
@@ -192,17 +193,17 @@ export function Header() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className="group flex items-center justify-between text-2xl font-black text-zinc-500 transition-colors hover:text-white"
+                      className="group flex items-center justify-between text-xl font-bold text-zinc-500 transition-colors hover:text-zinc-900"
                     >
                       {link.name}
                       <ArrowRight className="h-5 w-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                     </Link>
                   ))}
-                  <div className="flex flex-col gap-4 border-t border-white/5 pt-8">
+                  <div className="flex flex-col gap-4 border-t border-zinc-100 pt-8">
                     {session ? (
                       <Button
                         asChild
-                        className="rounded-2xl bg-zinc-800 py-6 text-lg font-black text-white hover:bg-zinc-700"
+                        className="rounded-full bg-zinc-900 py-6 text-base font-bold text-white hover:bg-zinc-800"
                       >
                         <Link
                           href="/dashboard"
@@ -215,7 +216,7 @@ export function Header() {
                       <>
                         <Button
                           asChild
-                          className="rounded-2xl bg-[#ff4500] py-6 text-lg font-black text-white hover:bg-[#ff5a1a]"
+                          className="rounded-full bg-[#ff4500] py-6 text-base font-bold text-white hover:bg-[#e03d00]"
                         >
                           <Link
                             href="/sign-up"
@@ -227,7 +228,7 @@ export function Header() {
                         <Link
                           href="/sign-in"
                           onClick={() => setIsOpen(false)}
-                          className="text-center font-bold text-zinc-500 transition-colors hover:text-white"
+                          className="text-center font-bold text-zinc-500 transition-colors hover:text-zinc-900"
                         >
                           Already have an account? Sign in
                         </Link>
@@ -241,6 +242,7 @@ export function Header() {
         </div>
       </div>
     </header>
+  </div>
   );
 }
 

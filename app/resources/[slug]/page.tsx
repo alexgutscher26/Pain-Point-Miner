@@ -240,7 +240,7 @@ export default async function ResourcePage({
                 size="lg"
                 className="w-full rounded-2xl bg-[#ff4500] px-10 py-7 text-xl font-black text-white hover:bg-[#ff5a1a] sm:w-auto"
               >
-                <Link href="/sign-up">Start Free Trial</Link>
+                <Link href="/sign-up">Get Started Now</Link>
               </Button>
               <Button
                 asChild

@@ -20,9 +20,9 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="group flex w-full items-center gap-3.5 border border-transparent px-3.5 py-2.5 text-left font-mono text-[11px] tracking-wide text-zinc-400 uppercase transition-colors hover:border-rose-400/40 hover:bg-rose-500/8 hover:text-rose-300"
+      className="group flex w-full items-center gap-3.5 border border-transparent px-3.5 py-2.5 text-left font-mono text-[11px] tracking-wide text-zinc-500 uppercase transition-colors rounded-lg hover:bg-rose-500/5 hover:text-rose-600"
     >
-      <LogOut className="h-[18px] w-[18px] text-zinc-500 transition-colors group-hover:text-rose-500" />
+      <LogOut className="h-[18px] w-[18px] text-zinc-400 transition-colors group-hover:text-rose-550" />
       Logout
     </button>
   );

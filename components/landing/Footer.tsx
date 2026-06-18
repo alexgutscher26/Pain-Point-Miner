@@ -1,11 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#1a1a1a] px-4 pt-16 pb-8 sm:px-6">
-      <div className="mx-auto mb-20 flex max-w-[1240px] flex-col justify-between gap-12 md:flex-row md:gap-8">
-        {/* Left Col: Brand & Theme Toggle */}
-        <div className="flex max-w-[280px] flex-col items-start">
+    <footer className="w-full border-t border-zinc-200/60 bg-transparent px-4 pt-16 pb-8 sm:px-6">
+      <div className="mx-auto mb-20 grid max-w-[1240px] flex-col justify-between gap-12 md:flex-row md:gap-8 lg:grid-cols-12">
+        
+        {/* Left Col: Brand & Socials (col-span-4) */}
+        <div className="flex flex-col items-start lg:col-span-4">
           <Link href="/" className="group mb-4 flex items-center gap-2">
             <svg
               width="24"
@@ -16,239 +19,103 @@ export function Footer() {
               className="text-[#ff4500]"
             >
               <path d="M12 2L2 22h20L12 2z" fill="currentColor" />
-              <circle cx="12" cy="15" r="3" fill="#1a1a1a" />
+              <circle cx="12" cy="15" r="3" fill="#ffffff" />
             </svg>
-            <span className="text-[15px] font-extrabold tracking-wide text-white">
+            <span className="text-[15px] font-extrabold tracking-wide text-zinc-900">
               ThreddIQ
             </span>
           </Link>
-          <p className="mb-6 text-[14px] leading-relaxed font-medium text-zinc-400">
-            Find perfect opportunities on Reddit with AI-powered monitoring
+          <p className="mb-6 text-[14px] leading-relaxed font-medium text-zinc-650 max-w-[280px]">
+            Find validated SaaS opportunities on Reddit with automated monitoring.
           </p>
-          <a
-            href="https://startupfa.st"
-            target="_blank"
-            title="Powered by Startup Fast"
-          >
-            <img
-              src="https://startupfa.st/images/badges/powered-by-light.svg"
-              alt="Powered by Startup Fast"
-              width="150"
-              height="44"
-              className="opacity-80 transition-opacity hover:opacity-100"
-            />
-          </a>
-          {/* 
-          <div className="flex items-center p-1 border border-zinc-800 rounded-lg bg-[#141414]">
-            <button
-              aria-label="Light mode"
-              className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
-            >
-              <Sun className="w-4 h-4" aria-hidden="true" />
-            </button>
-            <button
-              aria-label="Dark mode"
-              className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
-            >
-              <Moon className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </div>
-          */}
         </div>
 
-        {/* Links Grid */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col gap-5">
-            <p className="mb-2 text-[15px] font-bold text-white">Features</p>
+        {/* Center Cols: Navigation Links (col-span-8) */}
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-3 lg:col-span-8">
+          <div className="flex flex-col gap-4">
+            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Features</p>
             <Link
               href="/features/pain-point-mining"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               Pain Point Mining
             </Link>
             <Link
               href="/features/idea-validation"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               Idea Validation
             </Link>
             <Link
               href="/features/market-discovery"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               Market Discovery
             </Link>
             <Link
               href="/features/keyword-monitoring"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               Keyword Monitoring
             </Link>
-            <Link
-              href="/features/sentiment-analysis"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Sentiment Analysis
-            </Link>
           </div>
 
-          <div className="flex flex-col gap-5">
-            <p className="mb-2 text-[15px] font-bold text-white">Product</p>
+          <div className="flex flex-col gap-4">
+            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Tools</p>
             <Link
               href="/#faq"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               FAQ
             </Link>
             <Link
-              href="/case-studies"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Case Studies
-            </Link>
-            <Link
-              href="/docs"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Documentation -- Coming Soon
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-5">
-            <p className="mb-2 text-[15px] font-bold text-white">Free Tools</p>
-            <Link
               href="/free-tools/pain-point-miner"
-              className="flex items-center gap-2 text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
-              ThreddIQ{" "}
-              <span className="rounded bg-[#ff4500]/20 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#ff4500] uppercase">
+              Scanner{" "}
+              <span className="rounded bg-[#ff4500]/10 px-1.5 py-0.5 text-[8px] font-black tracking-tighter text-[#ff4500] uppercase">
                 Free
               </span>
             </Link>
             <Link
               href="/free-tools/opportunity-scoreboard"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
-              Opportunity Scoreboard
-            </Link>
-            <Link
-              href="/free-tools/sentiment-context-map"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Sentiment Context Map
-            </Link>
-            <Link
-              href="/free-tools/reddit-lead-generator"
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Reddit Lead Generator
+              Scoreboard
             </Link>
           </div>
-          <div className="flex flex-col gap-5">
-            <p className="mb-2 text-[15px] font-bold text-white">Resources</p>
+
+          <div className="flex flex-col gap-4">
+            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Resources</p>
             <Link
               href="/blog/why-saas-founders-cant-stop-bleeding-users"
-              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-white underline decoration-[#ff4500]/30 underline-offset-4"
+              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-[#e03d00] underline decoration-[#ff4500]/25 underline-offset-4"
             >
-              Why SaaS Bleed Users
+              SaaS Retention
             </Link>
             <Link
               href="/resources/best-subreddits-by-industry"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
-              Best Subreddits by Industry
-            </Link>
-            <Link
-              href="/resources/monitor-reddit-by-industry"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Monitor Reddit by Industry
-            </Link>
-            <Link
-              href="/resources/reddit-monitoring-use-cases"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Reddit Monitoring Use Cases
-            </Link>
-            <Link
-              href="/resources/reddit-marketing-glossary"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Reddit Marketing Glossary
-            </Link>
-            <Link
-              href="/resources/reddit-marketing-by-industry"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Reddit Marketing by Industry
-            </Link>
-            <Link
-              href="/resources/tool-comparisons"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              Tool Comparisons
+              Best Subreddits
             </Link>
             <Link
               href="/resources/reddit-tools"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
+              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
             >
               Reddit Tools
             </Link>
-            <a
-              href="https://aitooltrek.com"
-              title="AI Tool Trek"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] leading-relaxed font-medium text-zinc-400 transition-colors hover:text-white"
-            >
-              AI Tool Trek
-            </a>
           </div>
         </div>
+
       </div>
 
-      {/* From the Maker Banner */}
-      {/* <div className="max-w-[1240px] mx-auto border-t border-zinc-800 py-10 flex flex-col items-center gap-4">
-        <p className="text-[14px] font-bold text-white tracking-wide">
-          From the makers of ThreddIQ
-        </p>
-        <div className="flex items-center gap-6 text-[13px] font-medium text-zinc-400 flex-wrap justify-center">
-          <Link href="#" className="hover:text-white transition-colors">
-            FreeToolsLand
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-1.5 hover:text-white transition-colors"
-          >
-            <span className="text-[14px]">📦</span> FreelanceKit
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-1.5 hover:text-white transition-colors"
-          >
-            <span className="text-blue-500 font-mono text-[11px] bg-blue-500/10 px-1 rounded rounded-sm">
-              ☑
-            </span>{" "}
-            IsMyWebsiteReady
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-1.5 hover:text-white transition-colors"
-          >
-            <div className="w-3.5 h-3.5 bg-purple-500 rounded-full flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-            </div>{" "}
-            MyFeedIn
-          </Link>
-        </div>
-      </div> */}
-
       {/* Copyright Base */}
-      <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-2 border-t border-zinc-800 pt-8 pb-4 text-center text-[12px] text-zinc-400 md:flex-row md:text-left">
+      <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-2 border-t border-zinc-200/60 pt-8 pb-4 text-center text-[12px] text-zinc-500 md:flex-row md:text-left">
         <p>© 2026 ThreddIQ. All rights reserved.</p>
         <div className="flex items-center gap-1.5">
           Built with <span className="text-[#a8a8a8]">☕</span> by{" "}
-          <span className="ml-1 font-bold text-white">Alex</span>
+          <span className="ml-1 font-bold text-zinc-800">Alex</span>
         </div>
       </div>
     </footer>

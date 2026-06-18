@@ -68,14 +68,14 @@ export function SidebarLinks() {
           <Link
             key={link.href}
             href={link.href}
-            className={`group flex items-center gap-3.5 border px-3.5 py-2.5 font-mono text-[11px] tracking-wide uppercase transition-colors ${
+            className={`group flex items-center gap-3.5 border px-3.5 py-2.5 font-mono text-[11px] tracking-wide uppercase transition-colors rounded-lg ${
               isActive
-                ? "border-[#ff8a57] bg-[#ff4500] text-white shadow-[2px_2px_0px_0px_rgba(255,69,0,0.35)]"
-                : "border-white/10 text-zinc-400 hover:border-white/30 hover:bg-white/5 hover:text-white"
+                ? "border-[#ff4500]/10 bg-[#ff4500]/5 text-[#ff4500] font-bold"
+                : "border-transparent text-zinc-500 hover:bg-[#ff4500]/5 hover:text-zinc-900"
             }`}
           >
             <span
-              className={`${isActive ? "text-white" : "text-zinc-500 group-hover:text-white"} transition-colors`}
+              className={`${isActive ? "text-[#ff4500]" : "text-zinc-400 group-hover:text-zinc-900"} transition-colors`}
             >
               {link.icon}
             </span>
