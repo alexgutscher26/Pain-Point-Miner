@@ -155,6 +155,7 @@ export function Hero() {
               className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <img
+                suppressHydrationWarning
                 alt="ThreddIQ - Find profitable SaaS ideas from real Reddit pain points | Product Hunt"
                 width="250"
                 height="54"
@@ -169,6 +170,7 @@ export function Hero() {
               className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <img
+                suppressHydrationWarning
                 src="https://startupdirectory.net/badge/featured-dark.svg"
                 alt="Featured"
                 width="200"
@@ -183,6 +185,7 @@ export function Hero() {
               className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <img
+                suppressHydrationWarning
                 src="https://open-launch.com/api/badge/f8c55855-5ed3-44e6-b583-b09d4bedef8e/featured-dark.svg"
                 alt="Featured on Open-Launch"
                 width="200"
@@ -197,6 +200,7 @@ export function Hero() {
               className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <img
+                suppressHydrationWarning
                 src="https://findly.tools/badges/findly-tools-badge-dark.svg"
                 alt="Featured on Findly.tools"
                 width="175"

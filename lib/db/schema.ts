@@ -504,7 +504,7 @@ export const painPointCluster = pgTable(
     ),
     index("pain_point_cluster_userId_lastMatchedAt_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("timestamp_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
       table.lastMatchedAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({
@@ -571,11 +571,11 @@ export const painPoint = pgTable(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
       table.clusterId.asc().nullsLast().op("text_ops"),
-      table.createdAt.asc().nullsLast().op("text_ops"),
+      table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     index("pain_point_userId_createdAt_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("timestamp_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
       table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({

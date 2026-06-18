@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773991710170,
-      "tag": "0000_add_performance_indexes",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1773994535425,
-      "tag": "0001_add_auth_fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1774644835072,
-      "tag": "0002_slippery_sleepwalker",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1774659560315,
-      "tag": "0003_add_scoring_weights",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1774659617153,
-      "tag": "0004_add_score_explanation",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1774857634606,
-      "tag": "0005_nice_vertigo",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1774980462782,
-      "tag": "0006_keen_marvel_apes",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1777335033362,
-      "tag": "0007_broken_leech",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1777335582836,
-      "tag": "0008_careless_norman_osborn",
+      "when": 1781756711596,
+      "tag": "0000_faithful_mimic",
       "breakpoints": true
     }
   ]

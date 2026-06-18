@@ -1,1 +1,0 @@
-ALTER TABLE "pain_point" ADD COLUMN "scoreExplanation" text;
