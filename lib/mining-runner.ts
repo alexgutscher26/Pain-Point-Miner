@@ -349,6 +349,7 @@ export async function executeMiningRun({
         workspaceId,
         anonymize,
         customPatterns: patterns,
+        miningDepth,
       });
       newPainPoints += count;
     }
@@ -509,6 +510,8 @@ type ProcessSinglePostInput = {
   workspaceId: string | null;
   anonymize: boolean;
   customPatterns: string[];
+  /** Mining depth determines which AI model tier is used for extraction. */
+  miningDepth: MiningDepth;
 };
 
 /**
@@ -523,6 +526,7 @@ export async function processSinglePost({
   workspaceId,
   anonymize,
   customPatterns,
+  miningDepth,
 }: ProcessSinglePostInput): Promise<number> {
   const shouldProcessWithAi = await claimRedditPostForAiProcessing(
     post.id,
@@ -542,6 +546,9 @@ export async function processSinglePost({
       comments: comments.map((comment) => ({ body: comment.body })),
     },
     customPatterns,
+    undefined, // modelOverride — let depth routing decide
+    miningDepth,
+    { userId, scraperId },
   );
 
   if (!points || points.length === 0) return 0;

@@ -5,6 +5,7 @@ import { scraper, user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { fetchComments } from "@/lib/reddit";
 import { processSinglePost } from "@/lib/mining-runner";
+import { type MiningDepth } from "@/lib/plan-gating";
 
 /**
  * Reddit RSS Ingestion Webhook.
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
       workspaceId: scraperRecord.workspaceId,
       anonymize,
       customPatterns: scraperRecord.customPatterns ?? [],
+      miningDepth: scraperRecord.miningDepth as MiningDepth,
     });
 
     return NextResponse.json({

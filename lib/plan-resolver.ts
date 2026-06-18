@@ -24,6 +24,7 @@ type PlanContextResolutionInput = {
   userId: string;
   plan: BillingPlan;
   ltdTier?: string | null;
+  hasActiveSubscription?: boolean;
 };
 
 async function loadSubscriptions(
@@ -89,10 +90,13 @@ export async function resolvePlanContext(input: {
     ltdTier: currentUser?.ltdTier,
   });
   
+  const hasActiveSub = subscriptions.some((s) => isSubscriptionActive(s.status));
+
   return resolvePlanAccessState({
     userId: input.userId,
     plan: resolvedPlan,
     ltdTier: currentUser?.ltdTier ?? "none",
+    hasActiveSubscription: hasActiveSub,
   });
 }
 
@@ -111,8 +115,12 @@ export function resolvePlanAccessState({
   userId,
   plan,
   ltdTier,
+  hasActiveSubscription = false,
 }: PlanContextResolutionInput): ResolvedPlanContext {
-  const isPaidOrLTD = (ltdTier && ltdTier !== "none") || plan !== "starter";
+  const isPaidOrLTD =
+    (ltdTier && ltdTier !== "none") ||
+    plan !== "starter" ||
+    hasActiveSubscription;
 
   return {
     userId,

@@ -18,6 +18,8 @@ import {
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
+import { getModelForDepth, AI_MODEL_LABELS } from "@/lib/ai";
+import type { MiningDepth } from "@/lib/mining-presets";
 
 const reportParamsSchema = z.object({
   id: z.string().uuid("Invalid report id"),
@@ -374,6 +376,8 @@ export async function GET(
       .slice(0, 5);
 
     // Format the response to match what the frontend expects
+    const scraperMiningDepth = (currentScraper.miningDepth ?? "basic") as MiningDepth;
+    const aiModelId = getModelForDepth(scraperMiningDepth);
     const response = {
       isTeaser,
       title: currentScraper.keywords?.[0] || "Unknown Investigation",
@@ -386,6 +390,8 @@ export async function GET(
       saved: currentScraper.reportSaved ?? false,
       category: currentScraper.reportCategory || "Uncategorized",
       customPatterns: currentScraper.customPatterns || [],
+      miningDepth: scraperMiningDepth,
+      aiModel: AI_MODEL_LABELS[aiModelId] ?? aiModelId,
       timeWindow: normalizeTimeWindow(currentScraper.timeWindow),
       timeWindowLabel: getTimeWindowLabel(
         normalizeTimeWindow(currentScraper.timeWindow),
@@ -423,8 +429,8 @@ export async function GET(
           value: latestRun?.postsFetched?.toString() || "0",
           sub: `Across ${currentScraper.subreddits?.length || 0} subreddits`,
           icon: "MessageSquare",
-          color: "text-purple-500",
-          bg: "bg-purple-500/10",
+          color: "text-amber-500",
+          bg: "bg-amber-500/10",
         },
         {
           label: "Opportunity Score",

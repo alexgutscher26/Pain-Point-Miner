@@ -882,3 +882,36 @@ export const scraperRunSummary = pgTable(
       .onDelete("cascade"),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// AI Usage — per-extraction cost tracking for billing reconciliation
+// ---------------------------------------------------------------------------
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: text().primaryKey().notNull(),
+    userId: text().notNull(),
+    /** OpenRouter model identifier, e.g. "openai/gpt-4o" */
+    modelId: text().notNull(),
+    inputTokens: integer().default(0).notNull(),
+    outputTokens: integer().default(0).notNull(),
+    /** Computed cost in USD based on per-model token rates */
+    costUsd: doublePrecision().default(0).notNull(),
+    /** Optional: the scraper that triggered this extraction */
+    scraperId: text(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index("ai_usage_userId_createdAt_idx").on(table.userId, table.createdAt),
+    index("ai_usage_modelId_createdAt_idx").on(table.modelId, table.createdAt),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "ai_usage_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { extractPainPoints } from "@/lib/ai";
+import {
+  extractPainPoints,
+  getModelForDepth,
+  AI_MODELS,
+  AI_MODEL_LABELS,
+} from "@/lib/ai";
 
 describe("extractPainPoints", () => {
   const originalEnv = process.env;
@@ -161,7 +166,41 @@ describe("extractPainPoints", () => {
     expect(result).toEqual([]);
     expect(console.error).toHaveBeenCalledWith(
       "Error in AI extraction:",
-      expect.any(SyntaxError), // JSON.parse throws SyntaxError
+      expect.objectContaining({
+        message: "No JSON object found in AI response",
+      }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getModelForDepth — routing logic
+// ---------------------------------------------------------------------------
+describe("getModelForDepth", () => {
+  it("routes basic depth to Gemini 2.0 Flash", () => {
+    expect(getModelForDepth("basic")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
+  it("routes deep depth to GPT-4o", () => {
+    expect(getModelForDepth("deep")).toBe(AI_MODELS.GPT4O);
+  });
+
+  it("routes advanced depth to Claude Sonnet 3.5", () => {
+    expect(getModelForDepth("advanced")).toBe(AI_MODELS.CLAUDE_SONNET);
+  });
+
+  it("respects a valid modelOverride regardless of depth", () => {
+    expect(getModelForDepth("basic", AI_MODELS.GPT4O)).toBe(AI_MODELS.GPT4O);
+    expect(getModelForDepth("deep", AI_MODELS.CLAUDE_SONNET)).toBe(AI_MODELS.CLAUDE_SONNET);
+  });
+
+  it("ignores an invalid modelOverride and falls back to depth routing", () => {
+    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(AI_MODELS.GPT4O);
+  });
+
+  it("AI_MODEL_LABELS has a human-readable label for every model", () => {
+    for (const modelId of Object.values(AI_MODELS)) {
+      expect(AI_MODEL_LABELS[modelId]).toBeTruthy();
+    }
   });
 });

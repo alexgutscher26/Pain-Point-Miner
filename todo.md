@@ -158,15 +158,15 @@ Score = (mentions × 1.0) + (avg_comments × 0.5) + (avg_upvotes × 0.2)
 
 ### 🔥 High Priority (Planned)
 
-- [ ] **Multi-Model Routing in `lib/ai.ts`**
-  - [ ] `basic` depth → `google/gemini-2.0-flash-001` (fast, cheap, ~$0.001/post)
-  - [ ] `deep` depth → `openai/gpt-4o` (better nuance, budget detection accuracy)
-  - [ ] `advanced` depth → `anthropic/claude-sonnet-3-5` (best market analysis + competitor intel)
-  - [ ] Add `modelId` to `aiUsage` table: `id`, `userId`, `modelId`, `inputTokens`, `outputTokens`, `costUsd`, `createdAt`
-  - [ ] Track per-model cost in `aiUsage` for billing reconciliation
-  - [ ] Expose `user_preferences.defaultAiModel` — allow Pro users to override the default
-  - [ ] Show "Powered by GPT-4o" label in the report metadata header
-  - [ ] _Acceptance:_ A `deep` scan uses GPT-4o exclusively; cost logged to `aiUsage` within 1s of extraction
+- [x] **Multi-Model Routing in `lib/ai.ts`**
+  - [x] `basic` depth → `google/gemini-2.0-flash-001` (fast, cheap, ~$0.001/post)
+  - [x] `deep` depth → `openai/gpt-4o` (better nuance, budget detection accuracy)
+  - [x] `advanced` depth → `anthropic/claude-sonnet-3-5` (best market analysis + competitor intel)
+  - [x] Add `modelId` to `aiUsage` table: `id`, `userId`, `modelId`, `inputTokens`, `outputTokens`, `costUsd`, `createdAt`
+  - [x] Track per-model cost in `aiUsage` for billing reconciliation
+  - [x] Expose `user_preferences.defaultAiModel` — allow Pro users to override the default
+  - [x] Show "Powered by GPT-4o" label in the report metadata header
+  - [x] _Acceptance:_ A `deep` scan uses GPT-4o exclusively; cost logged to `aiUsage` within 1s of extraction
 
 - [x] **Scoring Algorithm V2 — Weighted Formula**
   - [x] Replace `toOpportunityScore()` in `lib/dashboard-metrics.ts` with a weighted multi-factor formula

@@ -48,4 +48,17 @@ describe("plan-resolver", () => {
     expect(result.planPurchaseRequired).toBe(false);
     expect(result.ltdTier).toBe("professional");
   });
+
+  it("grants access to starter plan users if they have an active subscription", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "starter",
+      ltdTier: "none",
+      hasActiveSubscription: true,
+    });
+
+    expect(result.plan).toBe("starter");
+    expect(result.planPurchaseRequired).toBe(false);
+  });
 });
+

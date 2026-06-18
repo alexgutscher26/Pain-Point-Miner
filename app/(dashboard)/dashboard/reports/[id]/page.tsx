@@ -99,6 +99,9 @@ interface ReportData {
   date: string;
   saved: boolean;
   category: string;
+  miningDepth?: "basic" | "deep" | "advanced";
+  /** Human-readable model label, e.g. "GPT-4o" */
+  aiModel?: string;
   timeWindow?: "24h" | "7d" | "30d" | "90d";
   timeWindowLabel?: string;
   trend?: {
@@ -818,14 +821,14 @@ export default function ReportDetailPage() {
   );
 
   return (
-    <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-8 p-8 duration-700">
+    <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8 duration-700">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="border border-white/10 bg-[#111] text-white">
+        <DialogContent className="border border-black/[0.06] bg-white text-zinc-950">
           <DialogHeader>
             <DialogTitle className="text-xl font-black">
               Plan Required
             </DialogTitle>
-            <DialogDescription className="text-zinc-300">
+            <DialogDescription className="text-zinc-500">
               {planDialogMessage}
             </DialogDescription>
           </DialogHeader>
@@ -833,13 +836,13 @@ export default function ReportDetailPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold"
+              className="cursor-pointer rounded-full border border-black/[0.06] bg-white text-zinc-700 px-4 py-2 text-sm font-bold hover:bg-zinc-50 transition-colors"
             >
               Close
             </button>
             <Link
               href="/dashboard/billing"
-              className="rounded-lg bg-[#ff4500] px-4 py-2 text-sm font-bold text-white"
+              className="rounded-full bg-[#ff4500] hover:bg-[#e03d00] px-4 py-2 text-sm font-bold text-white transition-colors"
             >
               Purchase Plan
             </Link>
@@ -849,42 +852,42 @@ export default function ReportDetailPage() {
       {/* Breadcrumbs & Actions */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1">
-          <div className="mb-2 flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
+          <div className="mb-2 flex items-center gap-2 font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
             <Link
               href="/dashboard"
-              className="transition-colors hover:text-white"
+              className="transition-colors hover:text-[#ff4500]"
             >
               Dashboard
             </Link>
-            <ChevronRight className="h-3 w-3" />
+            <ChevronRight className="h-3 w-3 text-zinc-350" />
             <Link
               href="/dashboard/reports"
-              className="transition-colors hover:text-white"
+              className="transition-colors hover:text-[#ff4500]"
             >
               Reports
             </Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-zinc-200">{reportData.title}</span>
+            <ChevronRight className="h-3 w-3 text-zinc-350" />
+            <span className="text-zinc-700">{reportData.title}</span>
           </div>
-          <h2 className="text-4xl leading-none font-black tracking-tighter text-white uppercase">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950 uppercase">
             Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
           </h2>
-          <div className="flex items-center gap-2 pt-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
+          <div className="flex items-center gap-2 pt-2 font-mono text-[11.5px] font-bold tracking-widest text-zinc-400 uppercase">
             <ShieldCheck className="h-3.5 w-3.5 text-[#ff4500]" />
             Scanned on {reportData.date}
           </div>
-          <div className="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
-            <Filter className="h-3.5 w-3.5 text-amber-400" />
+          <div className="flex items-center gap-2 font-mono text-[11.5px] font-bold tracking-widest text-zinc-400 uppercase">
+            <Filter className="h-3.5 w-3.5 text-amber-500" />
             Window: {reportData.timeWindowLabel ?? "Last 90d"}
           </div>
           {reportData.customPatterns &&
             reportData.customPatterns.length > 0 && (
-              <div className="flex items-start gap-2 pt-1 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
-                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
+              <div className="flex items-start gap-2 pt-1 font-mono text-[11.5px] font-bold tracking-widest text-zinc-400 uppercase">
+                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
                 <div className="flex flex-wrap gap-1.5">
                   <span>Patterns:</span>
                   {reportData.customPatterns.map((p, i) => (
-                    <span key={p} className="font-black text-emerald-300">
+                    <span key={p} className="font-extrabold text-emerald-600">
                       "{p}"
                       {i < (reportData.customPatterns?.length ?? 0) - 1
                         ? ","
@@ -894,16 +897,25 @@ export default function ReportDetailPage() {
                 </div>
               </div>
             )}
+          {reportData.aiModel && (
+            <div className="flex items-center gap-2 font-mono text-[11.5px] font-bold tracking-widest text-zinc-400 uppercase">
+              <Zap className="h-3.5 w-3.5 text-sky-500" />
+              <span>
+                Powered by{" "}
+                <span className="text-sky-650 font-extrabold">{reportData.aiModel}</span>
+              </span>
+            </div>
+          )}
           {reportData.trend && (
-            <div className="pt-3">
+            <div className="pt-2">
               <span
-                className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-[10px] font-black tracking-widest uppercase ${
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold tracking-widest uppercase ${
                   reportData.trend.direction === "up" ||
                   reportData.trend.direction === "new"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                    ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-700"
                     : reportData.trend.direction === "down"
-                      ? "border-rose-500/30 bg-rose-500/10 text-rose-400"
-                      : "border-zinc-700 bg-zinc-900 text-zinc-300"
+                      ? "border-rose-500/20 bg-rose-500/5 text-rose-700"
+                      : "border-zinc-200 bg-zinc-50 text-zinc-650"
                 }`}
               >
                 Trend: {reportData.trend.label}
@@ -911,11 +923,11 @@ export default function ReportDetailPage() {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <select
             value={selectedCategory}
             onChange={(event) => handleCategoryChange(event.target.value)}
-            className="border border-white/20 bg-zinc-900 px-4 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 [&>option]:bg-white [&>option]:text-black"
+            className="cursor-pointer appearance-none rounded-full border border-black/[0.06] bg-white/50 px-4 py-2.5 font-mono text-[10px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-zinc-100 hover:text-zinc-850 shadow-2xs focus:outline-none"
           >
             {categoryOptions.map((categoryOption) => (
               <option key={categoryOption} value={categoryOption}>
@@ -926,7 +938,7 @@ export default function ReportDetailPage() {
           <button
             onClick={() => handleSaveToggle(!reportData.saved)}
             disabled={isSaving}
-            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/50 px-5 py-2.5 font-mono text-[10px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-zinc-100 hover:text-zinc-850 shadow-2xs disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving
               ? "Saving..."
@@ -937,7 +949,7 @@ export default function ReportDetailPage() {
           <button
             type="button"
             onClick={handleExportData}
-            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5"
+            className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/50 px-5 py-2.5 font-mono text-[10px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-zinc-100 hover:text-zinc-850 shadow-2xs"
           >
             Export Data
           </button>
@@ -945,7 +957,7 @@ export default function ReportDetailPage() {
             type="button"
             onClick={handleRunAgain}
             disabled={isRerunning}
-            className="group flex min-w-[140px] items-center justify-center gap-2 rounded-xl bg-[#ff4500] px-6 py-3 text-[11px] font-black tracking-wider text-white uppercase shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer group inline-flex min-w-[120px] items-center justify-center gap-2 rounded-full bg-[#ff4500] hover:bg-[#e03d00] px-6 py-2.5 font-mono text-[10px] font-bold tracking-wider text-white uppercase shadow-xs transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isRerunning ? "Running..." : "Run Again"}
           </button>
@@ -953,28 +965,28 @@ export default function ReportDetailPage() {
       </div>
 
       {reportData.isTeaser && (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-dashed border-[#ff4500]/30 bg-[#ff4500]/5 p-6 md:p-8 rounded-2xl relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 border border-dashed border-[#ff4500]/25 bg-[#ff4500]/5 p-6 md:p-8 rounded-3xl relative overflow-hidden group shadow-2xs">
           <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-[#ff4500]/10 blur-xl"></div>
           <div className="space-y-2 relative z-10">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[#ff4500] animate-pulse" />
-              <p className="font-mono text-xs font-black tracking-[0.2em] text-[#ff4500] uppercase">
+              <p className="font-mono text-xs font-bold tracking-[0.2em] text-[#ff4500] uppercase">
                 Preview Mode
               </p>
             </div>
-            <h3 className="text-xl font-black text-white">
+            <h3 className="text-xl font-black text-zinc-950">
               Showing 2 of {reportData.topPainPoints.length} pain points found.
             </h3>
-            <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
+            <p className="max-w-2xl text-sm leading-relaxed text-zinc-600">
               You are viewing a teaser of your investigation results. Upgrade to a paid plan to unlock the remaining pain points, full community feedback logs, AI opportunity analysis, and competitor matrices.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 group relative inline-flex items-center justify-center gap-2 bg-[#ff4500] hover:bg-[#ff571a] px-8 py-3.5 text-xs font-black tracking-widest text-white uppercase transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,69,0,0.3)]"
+            className="cursor-pointer shrink-0 group relative inline-flex items-center justify-center gap-2 bg-[#ff4500] hover:bg-[#e03d00] px-6 py-3 rounded-full font-mono text-[10px] font-bold tracking-wider text-white uppercase transition-all duration-300 shadow-sm"
           >
             <span>Unlock Full Report</span>
-            <Zap className="h-4 w-4 fill-current text-white" />
+            <Zap className="h-4 w-4 fill-current text-white animate-pulse" />
           </Link>
         </div>
       )}
@@ -984,23 +996,23 @@ export default function ReportDetailPage() {
         {reportData.metrics.map((metric) => (
           <div
             key={metric.label}
-            className="group relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
+            className="group relative overflow-hidden glass-card glass-card-hover p-6 rounded-2xl flex flex-col justify-between border border-black/[0.04]"
           >
-            <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-white/2 blur-2xl transition-all group-hover:bg-[#ff4500]/5"></div>
+            <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-black/[0.01] blur-2xl transition-all group-hover:bg-[#ff4500]/5"></div>
             <div className="relative z-10 mb-4 flex items-start justify-between">
-              <div className={`rounded-lg p-2 ${metric.bg} ${metric.color}`}>
+              <div className={`rounded-xl p-2.5 border border-black/[0.04] ${metric.bg} ${metric.color}`}>
                 {iconMap[metric.icon] || <Star className="h-4 w-4" />}
               </div>
             </div>
-            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+            <p className="mb-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               {metric.label}
             </p>
             <div className="flex items-baseline gap-2">
-              <h4 className="text-2xl font-black tracking-tight text-white">
+              <h4 className="text-[28px] font-extrabold tracking-tight text-zinc-950">
                 {metric.value}
               </h4>
               <p
-                className={`text-[11px] font-bold ${metric.color === "text-[#ff4500]" ? "text-zinc-600" : "text-zinc-700"}`}
+                className={`text-[11px] font-bold ${metric.color === "text-[#ff4500]" ? "text-zinc-500" : "text-zinc-600"}`}
               >
                 {metric.sub}
               </p>
@@ -1009,12 +1021,13 @@ export default function ReportDetailPage() {
         ))}
       </div>
 
+
       {/* Main Content Split */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {/* Left Column: Pain Points */}
         <div className="space-y-8 lg:col-span-8">
           <div className="mb-2 flex items-center justify-between px-2">
-            <h3 className="flex items-center gap-2 text-xl font-black tracking-tight text-white uppercase">
+            <h3 className="flex items-center gap-2 text-xl font-black tracking-tight text-zinc-900 uppercase">
               <TrendingUp className="h-5 w-5 text-[#ff4500]" />
               Top Frustrations Identified
             </h3>
@@ -1022,15 +1035,15 @@ export default function ReportDetailPage() {
 
           {reportData.customPatterns &&
             reportData.customPatterns.length > 0 && (
-              <div className="mb-6 border border-amber-400/35 bg-amber-500/5 p-6">
-                <p className="mb-3 flex items-center gap-2 text-[10px] font-black tracking-widest text-amber-500 uppercase">
+              <div className="mb-6 rounded-2xl border border-amber-500/20 bg-amber-500/[0.02] p-6 shadow-2xs">
+                <p className="mb-3 flex items-center gap-2 text-[10px] font-bold tracking-widest text-amber-600 uppercase">
                   <Sparkles className="h-3.5 w-3.5" /> AI Intelligence Patterns
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {reportData.customPatterns.map((pattern) => (
                     <span
                       key={pattern}
-                      className="rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[11px] font-bold text-zinc-400"
+                      className="rounded-lg border border-black/[0.04] bg-white/60 px-3 py-1.5 text-[11px] font-bold text-zinc-600"
                     >
                       {pattern}
                     </span>
@@ -1047,26 +1060,26 @@ export default function ReportDetailPage() {
                 return (
                   <div
                     key={pain.id}
-                    className="relative overflow-hidden border-2 border-white/10 bg-[#0c0c0c]/80 p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-zinc-800 animate-in fade-in duration-300"
+                    className="relative overflow-hidden rounded-2xl border border-black/[0.05] bg-white/40 p-8 shadow-xs transition-colors hover:border-zinc-300 animate-in fade-in duration-300"
                   >
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/45 backdrop-blur-[6px] p-6 text-center space-y-4 animate-in fade-in duration-500">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-[#ff4500]/10 text-[#ff4500] shadow-[0_0_20px_rgba(255,69,0,0.15)] animate-pulse">
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[6px] p-6 text-center space-y-4 animate-in fade-in duration-500">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/[0.05] bg-[#ff4500]/10 text-[#ff4500] shadow-[0_0_20px_rgba(255,69,0,0.1)] animate-pulse">
                         <Zap className="h-5 w-5 fill-current" />
                       </div>
                       <div className="space-y-1">
                         <h5 className="font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
                           Frustration #{startPainPointIndex + idx + 1} • Locked
                         </h5>
-                        <h4 className="text-xl font-black text-white uppercase tracking-tight">
+                        <h4 className="text-xl font-black text-zinc-900 uppercase tracking-tight">
                           {pain.title}
                         </h4>
-                        <p className="mx-auto max-w-md text-xs text-zinc-400">
+                        <p className="mx-auto max-w-md text-xs text-zinc-500">
                           {pain.description}
                         </p>
                       </div>
                       <Link
                         href="/dashboard/billing"
-                        className="rounded-lg bg-zinc-900 border border-white/10 hover:border-[#ff4500]/40 hover:bg-[#ff4500]/10 hover:text-white px-5 py-2 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase transition-all duration-300 hover:scale-105 active:scale-95"
+                        className="rounded-full bg-[#ff4500] hover:bg-[#e03d00] px-5 py-2 font-mono text-[9px] font-bold tracking-wider text-white uppercase transition-all duration-300 hover:scale-105 active:scale-95"
                       >
                         Upgrade to Unlock
                       </Link>
@@ -1075,14 +1088,14 @@ export default function ReportDetailPage() {
                     <div className="opacity-10 select-none pointer-events-none">
                       <div className="flex justify-between items-start">
                         <div>
-                          <div className="h-6 w-48 bg-zinc-700 rounded mb-2"></div>
-                          <div className="h-4 w-32 bg-zinc-800 rounded"></div>
+                          <div className="h-6 w-48 bg-zinc-300 rounded mb-2"></div>
+                          <div className="h-4 w-32 bg-zinc-400 rounded"></div>
                         </div>
-                        <div className="h-10 w-16 bg-zinc-700 rounded"></div>
+                        <div className="h-10 w-16 bg-zinc-300 rounded"></div>
                       </div>
                       <div className="mt-6 space-y-2">
-                        <div className="h-4 w-full bg-zinc-800 rounded"></div>
-                        <div className="h-4 w-5/6 bg-zinc-800 rounded"></div>
+                        <div className="h-4 w-full bg-zinc-400 rounded"></div>
+                        <div className="h-4 w-5/6 bg-zinc-400 rounded"></div>
                       </div>
                     </div>
                   </div>
@@ -1092,7 +1105,7 @@ export default function ReportDetailPage() {
               return (
                 <div
                   key={pain.id}
-                  className="group relative space-y-8 overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-[#ff4500]/40"
+                  className="group relative space-y-8 overflow-hidden rounded-2xl border border-black/[0.05] bg-white/60 backdrop-blur-md p-8 shadow-xs transition-colors hover:border-[#ff4500]/25 duration-300"
                 >
                 <div className="absolute top-0 right-0 -mt-32 -mr-32 h-64 w-64 rounded-full bg-[#ff4500]/2 blur-[80px]"></div>
 
@@ -1100,7 +1113,7 @@ export default function ReportDetailPage() {
                 <div className="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row">
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h4 className="text-2xl font-black tracking-tight text-white transition-colors group-hover:text-[#ff4500]">
+                      <h4 className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 transition-colors group-hover:text-[#ff4500]">
                         {pain.title}
                       </h4>
                       {pain.postUrl && (
@@ -1108,17 +1121,17 @@ export default function ReportDetailPage() {
                           href={pain.postUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-black tracking-widest text-zinc-400 uppercase transition-all hover:border-[#ff4500]/30 hover:bg-[#ff4500]/10 hover:text-[#ff4500]"
+                          className="flex items-center gap-1.5 rounded-lg border border-black/[0.05] bg-white/50 px-2 py-1 text-[9px] font-bold tracking-widest text-zinc-500 uppercase transition-all hover:border-[#ff4500]/20 hover:bg-[#ff4500]/5 hover:text-[#ff4500]"
                         >
                           View Source
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
                       <span
-                        className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${
+                        className={`rounded-full border px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase ${
                           pain.urgency === "High Urgency"
-                            ? "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-500"
+                            ? "border-rose-500/20 bg-rose-500/10 text-rose-600 shadow-[0_0_15px_rgba(244,63,94,0.05)]"
+                            : "border-amber-500/20 bg-amber-500/10 text-amber-600"
                         }`}
                       >
                         {pain.urgency}
@@ -1127,37 +1140,37 @@ export default function ReportDetailPage() {
                         const { label, color } = formatDifficulty(pain.difficulty);
                         return (
                           <span
-                            className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${color}`}
+                            className={`rounded-full border px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase ${color}`}
                           >
                             {label}
                           </span>
                         );
                       })()}
                       {pain.hasWillingnessToPay && (
-                        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black tracking-widest text-emerald-300 uppercase">
+                        <span className="rounded-full border border-emerald-555/20 bg-emerald-500/10 px-2.5 py-1 text-[9px] font-bold tracking-widest text-emerald-600 uppercase">
                           💰 Willingness to Pay
                         </span>
                       )}
                     </div>
-                    <div className="max-w-2xl space-y-3 rounded-xl border border-white/5 bg-[#111]/30 p-4">
+                    <div className="max-w-2xl space-y-3 rounded-2xl border border-black/[0.03] bg-black/[0.01] p-5">
                       {formatPainDescription(pain.description).map(
                         (paragraph) => (
                           <p
                             key={paragraph.slice(0, 100)}
-                            className="leading-relaxed font-medium text-zinc-400"
+                            className="text-sm leading-relaxed font-medium text-zinc-650"
                           >
                             {paragraph}
                           </p>
                         ),
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-black tracking-widest uppercase">
+                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-bold tracking-widest uppercase">
                       <div className="flex items-center gap-1.5 text-[#ff4500]">
                         <MessageSquare className="h-3.5 w-3.5" />
                         {pain.mentions} mentions
                       </div>
                       {typeof pain.validationScore === "number" && (
-                        <div className="flex items-center gap-1.5 text-sky-400">
+                        <div className="flex items-center gap-1.5 text-sky-600">
                           <BarChart3 className="h-3.5 w-3.5" />
                           Validation {pain.validationScore}/100
                         </div>
@@ -1170,12 +1183,12 @@ export default function ReportDetailPage() {
                         return (
                           <div
                             key={sub}
-                            className="flex items-center gap-1.5 text-zinc-500 rounded bg-white/5 px-2 py-0.5"
+                            className="flex items-center gap-1.5 text-zinc-550 rounded-lg border border-black/[0.04] bg-black/[0.02] px-2.5 py-0.5"
                           >
-                            <Users className="h-3.5 w-3.5" />
+                            <Users className="h-3.5 w-3.5 text-zinc-400" />
                             <span>r/{sub}</span>
                             {formattedSubs && (
-                              <span className="text-[9px] text-zinc-600 font-bold ml-0.5">
+                              <span className="text-[9px] text-zinc-500 font-bold ml-0.5">
                                 {formattedSubs}
                               </span>
                             )}
@@ -1183,20 +1196,20 @@ export default function ReportDetailPage() {
                         );
                       })}
                       <div
-                        className={`flex items-center gap-1.5 ${pain.sentiment === "frustrated" ? "text-rose-500" : "text-zinc-500"}`}
+                        className={`flex items-center gap-1.5 ${pain.sentiment === "frustrated" ? "text-rose-600" : "text-zinc-500"}`}
                       >
                         <div
-                          className={`h-1.5 w-1.5 rounded-full ${pain.sentiment === "frustrated" ? "animate-pulse bg-rose-500" : "bg-zinc-700"}`}
+                          className={`h-1.5 w-1.5 rounded-full ${pain.sentiment === "frustrated" ? "animate-pulse bg-rose-500" : "bg-zinc-400"}`}
                         ></div>
                         Vibe: {pain.sentiment}
                       </div>
                     </div>
                   </div>
-                  <div className="shrink-0 border border-white/20 bg-white/2 px-6 py-4 text-center md:text-right">
-                    <p className="text-4xl font-black text-white">
+                  <div className="shrink-0 border border-black/[0.06] bg-black/[0.01] rounded-2xl px-6 py-4 text-center md:text-right">
+                    <p className="text-4xl font-extrabold text-[#ff4500]">
                       {pain.intensity}/10
                     </p>
-                    <p className="text-[10px] font-bold tracking-widest text-zinc-600 uppercase">
+                    <p className="text-[10px] font-bold tracking-widest text-zinc-450 uppercase">
                       Pain Score
                     </p>
                   </div>
@@ -1220,10 +1233,10 @@ export default function ReportDetailPage() {
                         onClick={() =>
                           setActiveTab(pain.id, tab.key as CardTab)
                         }
-                        className={`rounded-lg border px-3 py-2 text-[10px] font-black tracking-widest uppercase transition-all ${
+                        className={`cursor-pointer rounded-full border px-4 py-2 text-[10px] font-bold tracking-wider uppercase transition-all duration-300 ${
                           isActive
-                            ? "border-[#ff4500]/40 bg-[#ff4500]/20 text-[#ff4500]"
-                            : "border-white/10 bg-zinc-900 text-zinc-400 hover:bg-white/5"
+                            ? "border-[#ff4500]/20 bg-[#ff4500]/5 text-[#ff4500] shadow-2xs"
+                            : "border-black/[0.06] bg-white/50 text-zinc-550 hover:bg-zinc-100 hover:text-zinc-800"
                         }`}
                       >
                         {tab.label}
@@ -1244,7 +1257,7 @@ export default function ReportDetailPage() {
                           pain.monetization,
                           pain.urgency,
                         )}
-                        color="text-emerald-500"
+                        color="text-emerald-600"
                         preserveCase
                       />
                       <InfoSquare
@@ -1255,13 +1268,13 @@ export default function ReportDetailPage() {
                           pain.maturity,
                           pain.triedSolutions,
                         )}
-                        color="text-amber-500"
+                        color="text-amber-600"
                       />
                       <InfoSquare
                         icon={<Wrench className="h-3.5 w-3.5" />}
                         label="Tried"
                         value={formatTriedValue(pain.triedSolutions)}
-                        color="text-blue-500"
+                        color="text-blue-600"
                       />
                       <InfoSquare
                         icon={<TrendingUp className="h-3.5 w-3.5" />}
@@ -1271,7 +1284,7 @@ export default function ReportDetailPage() {
                             ? `${pain.budgetSignals?.length ?? 0} quote${(pain.budgetSignals?.length ?? 0) === 1 ? "" : "s"}`
                             : formatPaySignalValue(pain.monetization)
                         }
-                        color="text-violet-500"
+                        color="text-amber-650"
                       />
                       <InfoSquare
                         icon={<DollarSign className="h-3.5 w-3.5" />}
@@ -1279,25 +1292,25 @@ export default function ReportDetailPage() {
                         value={formatCurrency(
                           pain.cluster?.estimatedTamUsdAnnual,
                         )}
-                        color="text-fuchsia-500"
+                        color="text-emerald-600"
                         preserveCase
                       />
                       <InfoSquare
                         icon={<BarChart3 className="h-3.5 w-3.5" />}
                         label="Stage"
                         value={formatStageValue(pain.maturity)}
-                        color="text-rose-500"
+                        color="text-rose-600"
                       />
                     </div>
                     {pain.hasWillingnessToPay &&
                     (pain.budgetSignals?.length ?? 0) > 0 ? (
-                      <div className="space-y-3 border border-emerald-400/20 bg-emerald-500/5 p-5">
+                      <div className="space-y-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.02] p-5 shadow-2xs animate-in fade-in duration-350">
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-[10px] font-black tracking-widest text-emerald-300 uppercase">
+                          <p className="text-[10px] font-bold tracking-widest text-emerald-600 uppercase">
                             WTP Quotes
                           </p>
                           {pain.cluster?.budgetSignalCount ? (
-                            <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                            <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                               {pain.cluster.budgetSignalCount} cluster quote
                               {pain.cluster.budgetSignalCount === 1 ? "" : "s"}
                             </p>
@@ -1307,12 +1320,12 @@ export default function ReportDetailPage() {
                           {pain.budgetSignals?.map((signal) => (
                             <div
                               key={signal.quote.slice(0, 100)}
-                              className="space-y-1 border border-white/10 bg-black/20 p-3"
+                              className="space-y-1 rounded-xl border border-black/[0.04] bg-white/70 p-3.5 shadow-2xs"
                             >
-                              <p className="text-sm leading-relaxed font-medium text-zinc-200">
+                              <p className="text-sm leading-relaxed font-medium text-zinc-700">
                                 "{signal.quote}"
                               </p>
-                              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                              <p className="text-[9px] font-mono font-bold tracking-wider text-zinc-400 uppercase">
                                 {signal.source} signal
                                 {signal.annualizedMidpointUsd !== null
                                   ? ` • ${formatCurrency(signal.annualizedMidpointUsd)} annualized`
@@ -1327,13 +1340,13 @@ export default function ReportDetailPage() {
                 )}
 
                 {getActiveTab(pain.id) === "community" && (
-                  <div className="relative z-10 space-y-4">
-                    <p className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
+                  <div className="relative z-10 space-y-4 animate-in fade-in duration-300">
+                    <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                       Community Pulse
                     </p>
                     {pain.userLanguage && (
-                      <div className="space-y-3 border border-white/20 bg-zinc-900/40 p-5">
-                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                      <div className="space-y-3 rounded-2xl border border-black/[0.04] bg-black/[0.01] p-5 shadow-2xs">
+                        <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                           Language Overview
                         </p>
                         <div className="space-y-2">
@@ -1342,7 +1355,7 @@ export default function ReportDetailPage() {
                           ).map((paragraph) => (
                             <p
                               key={paragraph.slice(0, 100)}
-                              className="text-sm leading-relaxed font-medium text-zinc-300"
+                              className="text-sm leading-relaxed font-medium text-zinc-650"
                             >
                               {paragraph}
                             </p>
@@ -1353,13 +1366,13 @@ export default function ReportDetailPage() {
                     {pain.communityVoices.map((voice) => (
                       <div
                         key={voice.slice(0, 100)}
-                        className="border border-l-4 border-white/20 border-l-[#ff4500] bg-white/2 p-6"
+                        className="rounded-2xl border border-l-4 border-black/[0.04] border-l-[#ff4500] bg-white/50 p-6 shadow-2xs"
                       >
                         <div className="space-y-2">
                           {formatPainDescription(voice).map((paragraph) => (
                             <p
                               key={paragraph.slice(0, 100)}
-                              className="text-[14px] leading-relaxed font-medium text-zinc-300 italic"
+                              className="text-[14px] leading-relaxed font-medium text-zinc-700 italic"
                             >
                               {paragraph}
                             </p>
@@ -1370,9 +1383,9 @@ export default function ReportDetailPage() {
                     {pain.userLanguage?.sections?.map((section) => (
                       <div
                         key={`${pain.id}-lang-${section.label}`}
-                        className="space-y-3 border border-white/20 bg-white/2 p-6"
+                        className="space-y-3 rounded-2xl border border-black/[0.04] bg-white/40 p-6 shadow-2xs"
                       >
-                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+                        <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                           {section.label}
                         </p>
                         <div className="space-y-2">
@@ -1380,7 +1393,7 @@ export default function ReportDetailPage() {
                             (paragraph) => (
                               <p
                                 key={paragraph.slice(0, 100)}
-                                className="text-xs leading-relaxed font-medium text-zinc-500"
+                                className="text-xs leading-relaxed font-medium text-zinc-550"
                               >
                                 {paragraph}
                               </p>
@@ -1394,7 +1407,7 @@ export default function ReportDetailPage() {
                                 (paragraph, paragraphIdx) => (
                                   <p
                                     key={paragraph.slice(0, 100)}
-                                    className="text-sm leading-relaxed font-medium text-zinc-300"
+                                    className="text-sm leading-relaxed font-medium text-zinc-650"
                                   >
                                     {paragraphIdx === 0
                                       ? `- ${paragraph}`
@@ -1411,10 +1424,10 @@ export default function ReportDetailPage() {
                 )}
 
                 {getActiveTab(pain.id) === "build" && (
-                  <div className="relative z-10 space-y-6">
+                  <div className="relative z-10 space-y-6 animate-in fade-in duration-300">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                      <div className="space-y-4 rounded-3xl border border-blue-500/10 bg-blue-500/5 p-6 shadow-inner">
-                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-blue-400 uppercase">
+                      <div className="space-y-4 rounded-2xl border border-blue-500/10 bg-blue-500/[0.02] p-6 shadow-2xs">
+                        <p className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-blue-650 uppercase">
                           <BarChart3 className="h-4 w-4" /> Marketing Language
                         </p>
                         <div className="space-y-2">
@@ -1423,46 +1436,46 @@ export default function ReportDetailPage() {
                             pain.triedSolutions.map((sol) => (
                               <div
                                 key={sol}
-                                className="flex items-center gap-3 font-medium text-zinc-400"
+                                className="flex items-center gap-3 font-medium text-zinc-600 text-sm"
                               >
-                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30"></div>
+                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500/40"></div>
                                 User tried &quot;{sol}&quot;
                               </div>
                             ))
                           ) : (
-                            <p className="text-xs font-medium text-zinc-600 italic">
+                            <p className="text-xs font-medium text-zinc-555 italic">
                               No tools mentioned specifically.
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="space-y-4 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6 shadow-inner">
-                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-emerald-400 uppercase">
+                      <div className="space-y-4 rounded-2xl border border-emerald-500/10 bg-emerald-500/[0.02] p-6 shadow-2xs">
+                        <p className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-emerald-655 uppercase">
                           <Lightbulb className="h-4 w-4" /> Suggested Angles
                         </p>
                         <div className="space-y-2">
                           {pain.angles.map((angle) => (
                             <div
                               key={angle}
-                              className="flex items-center gap-3 font-medium text-zinc-400"
+                              className="flex items-center gap-3 font-medium text-zinc-600 text-sm"
                             >
-                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/30"></div>
+                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/40"></div>
                               {angle}
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-4 rounded-3xl border border-[#ff4500]/15 bg-[#ff4500]/5 p-6">
-                      <p className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
+                    <div className="space-y-4 rounded-2xl border border-[#ff4500]/15 bg-gradient-to-br from-[#ff4500]/[0.01] to-[#ff4500]/[0.03] p-6 shadow-2xs">
+                      <p className="text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
                         What to Build
                       </p>
-                      <h5 className="text-lg font-black tracking-tight text-white">
+                      <h5 className="text-lg font-extrabold tracking-tight text-zinc-950">
                         {deriveBuildIdea(pain)}
                       </h5>
-                      <p className="text-[12px] font-medium text-zinc-300">
+                      <p className="text-[12px] font-medium text-zinc-555">
                         Build for:{" "}
-                        <span className="text-white">
+                        <span className="text-zinc-900 font-bold">
                           {deriveTargetUser(pain)}
                         </span>
                       </p>
@@ -1470,7 +1483,7 @@ export default function ReportDetailPage() {
                         {deriveMvpFeatures(pain).map((feature) => (
                           <div
                             key={feature}
-                            className="flex items-start gap-3 text-[13px] font-medium text-zinc-300"
+                            className="flex items-start gap-3 text-[13px] font-medium text-zinc-655"
                           >
                             <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#ff4500]"></div>
                             <span>{feature}</span>
@@ -1496,7 +1509,7 @@ export default function ReportDetailPage() {
 
           {totalPainPoints > PAIN_POINTS_PER_PAGE && (
             <div className="flex items-center justify-between px-2">
-              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
+              <p className="text-[10px] font-bold tracking-widest text-zinc-555 uppercase">
                 Showing {startPainPointIndex + 1}-{endPainPointIndex} of{" "}
                 {totalPainPoints}
               </p>
@@ -1507,12 +1520,12 @@ export default function ReportDetailPage() {
                     setPainPointsPage((prev) => Math.max(1, prev - 1))
                   }
                   disabled={painPointsPage === 1}
-                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="cursor-pointer flex items-center gap-1 rounded-full border border-black/[0.06] bg-white/50 px-4 py-2 font-mono text-[9px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 shadow-2xs"
                 >
-                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <ChevronLeft className="h-3.5 w-3.5 animate-pulse" />
                   Prev
                 </button>
-                <span className="px-2 text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+                <span className="px-2 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                   Page {painPointsPage} / {totalPainPointPages}
                 </span>
                 <button
@@ -1523,10 +1536,10 @@ export default function ReportDetailPage() {
                     )
                   }
                   disabled={painPointsPage === totalPainPointPages}
-                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="cursor-pointer flex items-center gap-1 rounded-full border border-black/[0.06] bg-white/50 px-4 py-2 font-mono text-[9px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 shadow-2xs"
                 >
                   Next
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <ChevronRight className="h-3.5 w-3.5 animate-pulse" />
                 </button>
               </div>
             </div>
@@ -1534,55 +1547,59 @@ export default function ReportDetailPage() {
         </div>
 
         {/* Right Column: Sidebar Intel */}
-        <div className="space-y-8 lg:col-span-4">
+        <div className="space-y-8 lg:col-span-4 animate-in fade-in duration-500">
           {/* Refine Section */}
-          <div className="space-y-8 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
+          <div className="space-y-8 glass-card border border-black/[0.04] p-8 rounded-2xl shadow-xs">
             <div>
-              <h4 className="mb-6 flex items-center gap-2 text-sm font-black tracking-widest text-white uppercase">
+              <h4 className="mb-6 flex items-center gap-2 text-sm font-bold tracking-widest text-zinc-900 uppercase">
                 <Filter className="h-4 w-4 text-[#ff4500]" />
                 Investigation Tools
               </h4>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
+                  <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                     Filter by Intensity
                   </label>
-                  <select
-                    value={intensityFilterDraft}
-                    onChange={(event) =>
-                      setIntensityFilterDraft(
-                        event.target.value as IntensityFilter,
-                      )
-                    }
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
-                  >
-                    <option value="all">All Intensity Levels</option>
-                    <option value="high">High Core Pain (8+)</option>
-                    <option value="medium">Medium Friction (5+)</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={intensityFilterDraft}
+                      onChange={(event) =>
+                        setIntensityFilterDraft(
+                          event.target.value as IntensityFilter,
+                        )
+                      }
+                      className="w-full appearance-none rounded-xl border border-black/[0.06] bg-white/70 px-4 py-3 text-sm font-bold text-zinc-800 transition-colors focus:border-[#ff4500] focus:outline-none [&>option]:bg-white [&>option]:text-zinc-850 shadow-2xs"
+                    >
+                      <option value="all">All Intensity Levels</option>
+                      <option value="high">High Core Pain (8+)</option>
+                      <option value="medium">Medium Friction (5+)</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
+                  <label className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
                     Sentiment Filter
                   </label>
-                  <select
-                    value={sentimentFilterDraft}
-                    onChange={(event) =>
-                      setSentimentFilterDraft(
-                        event.target.value as SentimentFilter,
-                      )
-                    }
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
-                  >
-                    <option value="all">All Sentiment Types</option>
-                    <option value="frustrated">Frustrated / Desperate</option>
-                    <option value="neutral">Neutral Explorations</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={sentimentFilterDraft}
+                      onChange={(event) =>
+                        setSentimentFilterDraft(
+                          event.target.value as SentimentFilter,
+                        )
+                      }
+                      className="w-full appearance-none rounded-xl border border-black/[0.06] bg-white/70 px-4 py-3 text-sm font-bold text-zinc-800 transition-colors focus:border-[#ff4500] focus:outline-none [&>option]:bg-white [&>option]:text-zinc-850 shadow-2xs"
+                    >
+                      <option value="all">All Sentiment Types</option>
+                      <option value="frustrated">Frustrated / Desperate</option>
+                      <option value="neutral">Neutral Explorations</option>
+                    </select>
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={handleApplyFilters}
-                  className="w-full border border-[#ff8a57] bg-[#ff4500] py-4 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-[0.98]"
+                  className="cursor-pointer w-full rounded-full bg-[#ff4500] hover:bg-[#e03d00] py-3.5 font-mono text-[11px] font-bold tracking-widest text-white uppercase transition-colors shadow-2xs active:scale-[0.98]"
                 >
                   Apply Filter Logic
                 </button>
@@ -1591,37 +1608,37 @@ export default function ReportDetailPage() {
 
             {/* Competitive Landscape */}
             {(allCompetitors.length > 0 || reportData.isTeaser) && (
-              <div className="border-t border-white/5 pt-8 relative">
-                <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+              <div className="border-t border-black/[0.05] pt-8 relative">
+                <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                   <Wrench className="h-4 w-4 text-[#ff4500]" />
                   Competitive Landscape
                 </h4>
                 {reportData.isTeaser ? (
-                  <div className="relative overflow-hidden rounded-xl border border-white/10 p-4 bg-[#0a0a0a] space-y-4 shadow-inner">
+                  <div className="relative overflow-hidden rounded-2xl border border-black/[0.05] p-5 bg-black/[0.01] space-y-4 shadow-inner">
                     <div className="space-y-4 filter blur-[2.5px] opacity-25 select-none pointer-events-none">
                       <div className="flex justify-between items-center">
                         <div className="space-y-1">
-                          <div className="h-4 w-24 bg-zinc-700 rounded"></div>
-                          <div className="h-3 w-40 bg-zinc-800 rounded"></div>
+                          <div className="h-4 w-24 bg-zinc-200 rounded"></div>
+                          <div className="h-3 w-40 bg-zinc-300 rounded"></div>
                         </div>
-                        <div className="h-5 w-16 bg-zinc-750 rounded"></div>
+                        <div className="h-5 w-16 bg-zinc-250 rounded"></div>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="space-y-1">
-                          <div className="h-4 w-28 bg-zinc-700 rounded"></div>
-                          <div className="h-3 w-36 bg-zinc-800 rounded"></div>
+                          <div className="h-4 w-28 bg-zinc-200 rounded"></div>
+                          <div className="h-3 w-36 bg-zinc-300 rounded"></div>
                         </div>
-                        <div className="h-5 w-16 bg-zinc-750 rounded"></div>
+                        <div className="h-5 w-16 bg-zinc-250 rounded"></div>
                       </div>
                     </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 p-4 text-center space-y-2">
-                      <Zap className="h-4 w-4 text-[#ff4500] fill-current" />
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/75 backdrop-blur-[3px] p-4 text-center space-y-2">
+                      <Zap className="h-4 w-4 text-[#ff4500] fill-current animate-bounce" />
+                      <p className="text-xs font-bold text-zinc-800 uppercase tracking-wider">
                         Competitor Intel Locked
                       </p>
                       <Link
                         href="/dashboard/billing"
-                        className="text-[9px] font-black tracking-widest text-[#ff4500] hover:text-white uppercase transition-colors"
+                        className="text-[9px] font-bold tracking-widest text-[#ff4500] hover:text-[#e03d00] uppercase transition-colors"
                       >
                         Upgrade to Reveal
                       </Link>
@@ -1632,15 +1649,15 @@ export default function ReportDetailPage() {
                     {allCompetitors.slice(0, 10).map((tool) => (
                       <div
                         key={tool.name}
-                        className="group relative overflow-hidden border border-white/10 bg-white/2 p-4 transition-all hover:border-[#ff4500]/30 hover:bg-white/5"
+                        className="group relative overflow-hidden rounded-xl border border-black/[0.04] bg-white/50 p-4 transition-all hover:border-[#ff4500]/25 hover:bg-zinc-55 shadow-2xs"
                       >
                         <div className="relative z-10 flex items-start justify-between gap-4">
                           <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex items-center gap-2">
-                              <span className="text-sm font-black text-white">
+                            <div className="mb-1 flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-bold text-zinc-900">
                                 {tool.name}
                               </span>
-                              <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-black text-[#ff4500] uppercase">
+                              <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-bold text-[#ff4500] uppercase">
                                 {tool.mentionCount} mentions
                               </span>
                             </div>
@@ -1649,7 +1666,7 @@ export default function ReportDetailPage() {
                                 {tool.description}
                               </p>
                             ) : (
-                              <p className="text-[10px] font-bold text-zinc-700 italic">
+                              <p className="text-[10px] font-bold text-zinc-400 italic">
                                 Analyzing tool specs...
                               </p>
                             )}
@@ -1663,7 +1680,7 @@ export default function ReportDetailPage() {
                               }
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-zinc-800 p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
+                              className="rounded-lg border border-black/[0.05] bg-white p-2 text-zinc-400 opacity-0 transition-all group-hover:opacity-100 hover:text-[#ff4500] hover:bg-zinc-50"
                             >
                               <TrendingUp className="h-3 w-3" />
                             </a>
@@ -1677,30 +1694,30 @@ export default function ReportDetailPage() {
             )}
 
             {/* Validation Signals */}
-            <div className="border-t border-white/5 pt-8">
-              <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+            <div className="border-t border-black/[0.05] pt-8">
+              <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                 <BarChart3 className="h-4 w-4" /> Market Signals
               </h4>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
-                    <span className="text-zinc-400 uppercase">
+                  <div className="mb-2 flex justify-between font-mono text-[11px] font-bold">
+                    <span className="text-zinc-555 uppercase">
                       Analysis Confidence
                     </span>
-                    <span className="tracking-widest text-white">94%</span>
+                    <span className="tracking-widest text-zinc-800 font-extrabold">94%</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.06]">
                     <div className="h-full w-[94%] bg-[#ff4500]"></div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
-                    <span className="text-zinc-400 uppercase">
+                  <div className="mb-2 flex justify-between font-mono text-[11px] font-bold">
+                    <span className="text-zinc-555 uppercase">
                       AI Data Fidelity
                     </span>
-                    <span className="tracking-widest text-white">High</span>
+                    <span className="tracking-widest text-zinc-800 font-extrabold">High</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.06]">
                     <div className="h-full w-[88%] bg-emerald-500"></div>
                   </div>
                 </div>
@@ -1710,37 +1727,37 @@ export default function ReportDetailPage() {
 
           {(reportData.saasOpportunities &&
             reportData.saasOpportunities.length > 0) || reportData.isTeaser ? (
-              <div className="space-y-5 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.655)] relative">
-                <h4 className="flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+              <div className="space-y-5 glass-card border border-black/[0.04] p-8 rounded-2xl shadow-xs relative">
+                <h4 className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                   <Lightbulb className="h-4 w-4 text-[#ff4500]" /> AI-Generated
                   SaaS Opportunities
                 </h4>
                 {reportData.isTeaser ? (
-                  <div className="relative overflow-hidden rounded-xl border border-white/10 p-5 bg-[#0a0a0a] space-y-5 shadow-inner">
+                  <div className="relative overflow-hidden rounded-2xl border border-black/[0.05] p-5 bg-black/[0.01] space-y-5 shadow-inner">
                     <div className="space-y-4 filter blur-[3px] opacity-20 select-none pointer-events-none">
                       <div className="flex justify-between items-center">
-                        <div className="h-4 w-36 bg-zinc-700 rounded"></div>
-                        <div className="h-4 w-12 bg-zinc-750 rounded"></div>
+                        <div className="h-4 w-36 bg-zinc-200 rounded"></div>
+                        <div className="h-4 w-12 bg-zinc-350 rounded"></div>
                       </div>
                       <div className="space-y-2">
-                        <div className="h-3.5 w-full bg-zinc-800 rounded"></div>
-                        <div className="h-3.5 w-5/6 bg-zinc-800 rounded"></div>
+                        <div className="h-3.5 w-full bg-zinc-300 rounded"></div>
+                        <div className="h-3.5 w-5/6 bg-zinc-300 rounded"></div>
                       </div>
-                      <div className="h-3.5 w-32 bg-zinc-850 rounded"></div>
+                      <div className="h-3.5 w-32 bg-zinc-300 rounded"></div>
                     </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 p-4 text-center space-y-3">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/75 backdrop-blur-[3px] p-4 text-center space-y-3">
                       <Sparkles className="h-5 w-5 text-[#ff4500] animate-pulse" />
                       <div className="space-y-1">
-                        <p className="text-sm font-black text-white uppercase tracking-wider">
+                        <p className="text-sm font-bold text-zinc-800 uppercase tracking-wider">
                           SaaS Blueprints Locked
                         </p>
-                        <p className="max-w-[200px] text-[10px] text-zinc-450">
+                        <p className="max-w-[200px] text-[10px] text-zinc-500">
                           Get actionable product plans, ICP mappings, and launch angles.
                         </p>
                       </div>
                       <Link
                         href="/dashboard/billing"
-                        className="rounded-md border border-[#ff4500]/30 bg-[#ff4500]/10 px-4 py-2 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase transition-all duration-300 hover:bg-[#ff4500] hover:text-white"
+                        className="rounded-full bg-[#ff4500] hover:bg-[#e03d00] px-4 py-2 font-mono text-[9px] font-bold tracking-widest text-white uppercase transition-all duration-300 hover:scale-105 active:scale-95"
                       >
                         Unlock Blueprints
                       </Link>
@@ -1752,15 +1769,15 @@ export default function ReportDetailPage() {
                       <SpotlightCard
                         key={opp.title}
                         active={opp.score > 70}
-                        className="group/opp border border-white/20 bg-white/2 p-5 transition-all duration-300 hover:border-amber-500/30"
+                        className="group/opp rounded-2xl border border-black/[0.04] bg-white/50 p-5 transition-all duration-300 hover:border-amber-500/25 hover:bg-zinc-50 shadow-2xs"
                       >
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm leading-tight font-black text-white">
+                          <p className="text-sm leading-tight font-extrabold text-zinc-900">
                             {opp.title}
                           </p>
                           <span className={cn(
-                            "text-[10px] font-black tracking-widest uppercase",
-                            opp.score > 70 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-[#ff4500]"
+                            "text-[10px] font-bold tracking-widest uppercase",
+                            opp.score > 70 ? "text-amber-600 drop-shadow-[0_0_8px_rgba(245,158,11,0.1)]" : "text-[#ff4500]"
                           )}>
                             {opp.score}/100
                           </span>
@@ -1770,22 +1787,22 @@ export default function ReportDetailPage() {
                             (paragraph) => (
                               <p
                                 key={paragraph.slice(0, 100)}
-                                className="text-xs leading-relaxed font-medium text-zinc-400"
+                                className="text-xs leading-relaxed font-medium text-zinc-650"
                               >
                                 {paragraph}
                               </p>
                             ),
                           )}
                         </div>
-                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase mt-3">
-                          ICP: {opp.targetCustomer}
+                        <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase mt-3">
+                          ICP: <span className="text-zinc-700 font-extrabold">{opp.targetCustomer}</span>
                         </p>
                         <div className="space-y-2 mt-2">
                           {formatPainDescription(opp.valueProposition).map(
                             (paragraph) => (
                               <p
                                 key={paragraph.slice(0, 100)}
-                                className="text-xs leading-relaxed font-medium text-zinc-300"
+                                className="text-xs leading-relaxed font-medium text-zinc-655"
                               >
                                 {paragraph}
                               </p>
@@ -1797,7 +1814,7 @@ export default function ReportDetailPage() {
                             (paragraph) => (
                               <p
                                 key={paragraph.slice(0, 100)}
-                                className="text-[11px] leading-relaxed font-bold text-zinc-500 underline decoration-zinc-800 underline-offset-4"
+                                className="text-[11px] leading-relaxed font-bold text-zinc-550 underline decoration-zinc-200 underline-offset-4"
                               >
                                 {paragraph}
                               </p>
@@ -1830,17 +1847,17 @@ function InfoSquare({
   preserveCase?: boolean;
 }) {
   return (
-    <div className="flex min-h-[104px] items-start gap-3 border border-white/20 bg-white/2 p-4">
+    <div className="flex min-h-[104px] items-start gap-3 border border-black/[0.05] bg-white/50 p-4 rounded-2xl shadow-2xs">
       <div
-        className={`mt-0.5 rounded-xl border border-white/5 bg-zinc-900 p-2.5 ${color} shrink-0`}
+        className={`mt-0.5 rounded-xl border border-black/[0.04] bg-black/[0.02] p-2.5 ${color} shrink-0`}
       >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[10px] font-black tracking-[0.18em] text-zinc-600 uppercase">
+        <p className="font-mono text-[10px] font-bold tracking-[0.18em] text-zinc-500 uppercase">
           {label}
         </p>
-        <p className="mt-2 text-base leading-[1.15] font-black wrap-break-word whitespace-normal text-white sm:text-[19px]">
+        <p className="mt-2 text-base leading-[1.15] font-black wrap-break-word whitespace-normal text-zinc-900 sm:text-[19px]">
           {preserveCase ? value : toTitleCase(value)}
         </p>
       </div>

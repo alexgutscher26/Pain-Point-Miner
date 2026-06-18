@@ -3,15 +3,116 @@ import {
   type BudgetSignal,
   type BudgetCadence,
 } from "@/lib/budget-signals";
+import type { MiningDepth } from "@/lib/mining-presets";
 
+// ---------------------------------------------------------------------------
+// Model catalogue
+// ---------------------------------------------------------------------------
 export const AI_MODELS = {
   GEMINI_FLASH: "google/gemini-2.0-flash-001",
-  // CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
   GPT4O: "openai/gpt-4o",
+  CLAUDE_SONNET: "anthropic/claude-sonnet-3-5",
 } as const;
 
-export const DEFAULT_AI_MODEL = AI_MODELS.GEMINI_FLASH;
+export type AiModelId = (typeof AI_MODELS)[keyof typeof AI_MODELS];
 
+export const DEFAULT_AI_MODEL: AiModelId = AI_MODELS.GEMINI_FLASH;
+
+/** Human-readable display label for each model, used in report metadata. */
+export const AI_MODEL_LABELS: Record<AiModelId, string> = {
+  [AI_MODELS.GEMINI_FLASH]: "Gemini 2.0 Flash",
+  [AI_MODELS.GPT4O]: "GPT-4o",
+  [AI_MODELS.CLAUDE_SONNET]: "Claude Sonnet 3.5",
+};
+
+// ---------------------------------------------------------------------------
+// Per-model cost rates (USD per 1 token)
+// ---------------------------------------------------------------------------
+const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
+  [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 },  // $0.10 / $0.40 per 1M
+  [AI_MODELS.GPT4O]:        { input: 0.0000025, output: 0.00001 },    // $2.50 / $10.00 per 1M
+  [AI_MODELS.CLAUDE_SONNET]:{ input: 0.000003,  output: 0.000015 },   // $3.00 / $15.00 per 1M
+};
+
+/**
+ * Returns the canonical OpenRouter model ID to use for a given mining depth.
+ * Can be overridden via explicit `modelOverride`.
+ */
+export function getModelForDepth(
+  depth: MiningDepth,
+  modelOverride?: string,
+): AiModelId {
+  if (modelOverride && Object.values(AI_MODELS).includes(modelOverride as AiModelId)) {
+    return modelOverride as AiModelId;
+  }
+  switch (depth) {
+    case "advanced":
+      return AI_MODELS.CLAUDE_SONNET;
+    case "deep":
+      return AI_MODELS.GPT4O;
+    case "basic":
+    default:
+      return AI_MODELS.GEMINI_FLASH;
+  }
+}
+
+/**
+ * Compute USD cost for a given model + token counts.
+ */
+function computeCostUsd(
+  modelId: AiModelId,
+  inputTokens: number,
+  outputTokens: number,
+): number {
+  const rates = MODEL_COST_RATES[modelId] ?? MODEL_COST_RATES[AI_MODELS.GEMINI_FLASH];
+  return inputTokens * rates.input + outputTokens * rates.output;
+}
+
+// ---------------------------------------------------------------------------
+// AI Usage logging
+// ---------------------------------------------------------------------------
+interface AiUsageInput {
+  userId: string;
+  modelId: AiModelId;
+  inputTokens: number;
+  outputTokens: number;
+  scraperId?: string | null;
+}
+
+/**
+ * Fire-and-forget: write one row to `ai_usage` for billing reconciliation.
+ * Intentionally swallows errors so a DB issue never breaks the mining pipeline.
+ */
+export async function logAiUsage({
+  userId,
+  modelId,
+  inputTokens,
+  outputTokens,
+  scraperId,
+}: AiUsageInput): Promise<void> {
+  try {
+    const { db } = await import("@/lib/db");
+    const { aiUsage } = await import("@/lib/db/schema");
+
+    const costUsd = computeCostUsd(modelId, inputTokens, outputTokens);
+    await db.insert(aiUsage).values({
+      id: crypto.randomUUID(),
+      userId,
+      modelId,
+      inputTokens,
+      outputTokens,
+      costUsd,
+      scraperId: scraperId ?? null,
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    console.error("[logAiUsage] Failed to record AI usage:", err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Pain point extraction
+// ---------------------------------------------------------------------------
 export interface PainPointData {
   title: string;
   body: string;
@@ -74,8 +175,17 @@ export const extractPainPoints = async (
   },
   customPatterns: string[] = [],
   modelOverride?: string,
+  /** Pass miningDepth so the correct model tier is selected automatically. */
+  miningDepth?: MiningDepth,
+  /** Pass userId + scraperId for cost logging. */
+  usageContext?: { userId: string; scraperId?: string | null },
 ) => {
-  const model = modelOverride || DEFAULT_AI_MODEL;
+  const model = modelOverride
+    ? modelOverride
+    : miningDepth
+      ? getModelForDepth(miningDepth)
+      : DEFAULT_AI_MODEL;
+
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
@@ -84,8 +194,7 @@ export const extractPainPoints = async (
 
   const customPatternsSection =
     customPatterns.length > 0
-      ? `CUSTOM INTELLIGENCE PATTERNS TO MATCH:
-${customPatterns.map((pattern, index) => `${index + 1}. ${pattern}`).join("\n")}`
+      ? `CUSTOM INTELLIGENCE PATTERNS TO MATCH:\n${customPatterns.map((pattern, index) => `${index + 1}. ${pattern}`).join("\n")}`
       : "";
 
   const systemPrompt = `You are a rigorous product researcher extracting SaaS opportunities from Reddit discussions.
@@ -223,6 +332,20 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     }
 
     const data = await response.json();
+
+    // Log AI usage for billing reconciliation (fire-and-forget)
+    if (usageContext?.userId && data?.usage) {
+      const inputTokens: number = data.usage.prompt_tokens ?? 0;
+      const outputTokens: number = data.usage.completion_tokens ?? 0;
+      void logAiUsage({
+        userId: usageContext.userId,
+        modelId: model as AiModelId,
+        inputTokens,
+        outputTokens,
+        scraperId: usageContext.scraperId,
+      });
+    }
+
     const rawContent = extractMessageContent(
       data?.choices?.[0]?.message?.content,
     );
@@ -280,6 +403,10 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     return [];
   }
 };
+
+// ---------------------------------------------------------------------------
+// Competitor metadata resolution
+// ---------------------------------------------------------------------------
 
 /**
  * Uses AI to resolve metadata (description, official URL, category) for a tool by name.
