@@ -13,6 +13,10 @@ import {
   Gauge,
   Crosshair,
   Zap,
+  Users,
+  Target,
+  CreditCard,
+  Briefcase,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -101,6 +105,42 @@ const blogPosts = [
     href: "/blog/reddit-to-notion-10-minutes",
     icon: <Zap className="h-6 w-6 text-indigo-500" />,
     badge: "Workflow",
+    date: "July 2026",
+  },
+  {
+    title: "Best Subreddits for Finding B2B SaaS Ideas in 2026",
+    subtitle: "The highest-signal communities for idea validation",
+    description: "A ranked guide to the six best subreddits for B2B SaaS idea validation — scored by desperation signal density, budget mention frequency, and purchase intent.",
+    href: "/blog/best-subreddits-b2b-saas-ideas-2026",
+    icon: <Users className="h-6 w-6 text-blue-500" />,
+    badge: "Guide",
+    date: "July 2026",
+  },
+  {
+    title: "Where Marketers Complain Online, and What It Means If You're Building for Them",
+    subtitle: "Top subreddits for marketing tool pain points",
+    description: "The six highest-signal subreddits for marketing tool complaints — and the three complaint archetypes that reveal exactly what to build next.",
+    href: "/blog/where-marketers-complain-online",
+    icon: <Target className="h-6 w-6 text-pink-500" />,
+    badge: "Deep-Dive",
+    date: "July 2026",
+  },
+  {
+    title: "Best Subreddits for Validating a Fintech or Billing Tool Idea",
+    subtitle: "Where finance and billing pain points surface",
+    description: "The top subreddits for fintech and billing tool validation — ranked by signal quality, with the five most common billing pain points showing up right now.",
+    href: "/blog/best-subreddits-fintech-billing-tool",
+    icon: <CreditCard className="h-6 w-6 text-emerald-500" />,
+    badge: "Deep-Dive",
+    date: "July 2026",
+  },
+  {
+    title: "Where Freelancers and Agencies Vent About Their Tools",
+    subtitle: "Tool complaints from the people who spend their own money",
+    description: "The top subreddits where freelancers and agencies complain about project management, CRM, invoicing, and collaboration tools — and why they're your best early customers.",
+    href: "/blog/where-freelancers-agencies-vent-tools",
+    icon: <Briefcase className="h-6 w-6 text-amber-500" />,
+    badge: "Deep-Dive",
     date: "July 2026",
   },
 ];
