@@ -7,6 +7,12 @@ import {
   Search,
   ArrowRight,
   DollarSign,
+  BarChart3,
+  Swords,
+  Bell,
+  Gauge,
+  Crosshair,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -17,12 +23,30 @@ export const metadata: Metadata = {
 
 const blogPosts = [
   {
+    title: "Reddit vs. Customer Interviews vs. Surveys",
+    subtitle: "Which validation method actually predicts revenue?",
+    description: "A data-backed comparison of three validation methods — and why Reddit is the most underrated signal source for predicting revenue.",
+    href: "/blog/reddit-vs-interviews-vs-surveys",
+    icon: <BarChart3 className="h-6 w-6 text-blue-500" />,
+    badge: "Comparison",
+    date: "July 2026",
+  },
+  {
     title: 'The "I\'d Pay For This" Test',
     subtitle: "Spotting a real buying signal vs. someone just venting",
     description: "Learn how to distinguish genuine willingness-to-pay signals from casual complaints — the exact skill ThreddIQ automates across 1,400+ subreddits.",
     href: "/blog/id-pay-for-this-test",
     icon: <DollarSign className="h-6 w-6 text-green-500" />,
     badge: "Signal Deep Dive",
+    date: "July 2026",
+  },
+  {
+    title: "Why Most \"Validated\" Ideas Still Fail",
+    subtitle: "Validation tells you demand exists — not that you can win",
+    description: "The contrarian take: most founders confuse market demand with competitive readiness. Here's why validated ideas fail and how to spot the difference.",
+    href: "/blog/why-validated-ideas-still-fail",
+    icon: <Swords className="h-6 w-6 text-red-500" />,
+    badge: "Strategy",
     date: "July 2026",
   },
   {
@@ -42,6 +66,42 @@ const blogPosts = [
     icon: <TrendingDown className="h-6 w-6 text-red-500" />,
     badge: "Research",
     date: "June 2026",
+  },
+  {
+    title: "How to Set Up Real-Time Slack Alerts So You Never Miss a Hot Pain Point",
+    subtitle: "Real-time Reddit monitoring for your ICP",
+    description: "A step-by-step guide to configuring real-time Slack alerts so you never miss a high-signal complaint the moment it drops.",
+    href: "/blog/slack-alerts-hot-pain-points",
+    icon: <Bell className="h-6 w-6 text-purple-500" />,
+    badge: "Tutorial",
+    date: "July 2026",
+  },
+  {
+    title: "Reading a Desperation Score: What Actually Makes a Complaint 'Validated'",
+    subtitle: "Venting vs. validated demand — a scoring framework",
+    description: "A repeatable framework for scoring Reddit complaints by urgency, specificity, and budget intent — the methodology behind ThreddIQ's Desperation Score.",
+    href: "/blog/desperation-score-explained",
+    icon: <Gauge className="h-6 w-6 text-amber-500" />,
+    badge: "Methodology",
+    date: "July 2026",
+  },
+  {
+    title: "How to Track a Competitor's Complaints on Reddit and Turn Them Into Your Roadmap",
+    subtitle: "Competitor intelligence from organic Reddit data",
+    description: "Learn how to monitor competitor criticism on Reddit and turn customer frustration into your product roadmap — without scraping or manual searching.",
+    href: "/blog/track-competitor-complaints-reddit",
+    icon: <Crosshair className="h-6 w-6 text-cyan-500" />,
+    badge: "Guide",
+    date: "July 2026",
+  },
+  {
+    title: "From Reddit Thread to Notion Doc in 10 Minutes",
+    subtitle: "A workflow for turning signals into specs",
+    description: "A repeatable workflow that takes you from a raw Reddit thread to a structured Notion doc — capturing the pain point, quote, context, and market signal in under 10 minutes.",
+    href: "/blog/reddit-to-notion-10-minutes",
+    icon: <Zap className="h-6 w-6 text-indigo-500" />,
+    badge: "Workflow",
+    date: "July 2026",
   },
 ];
 
