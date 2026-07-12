@@ -39,21 +39,14 @@ const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
  * Can be overridden via explicit `modelOverride`.
  */
 export function getModelForDepth(
-  depth: MiningDepth,
+  _depth: MiningDepth,
   modelOverride?: string,
 ): AiModelId {
   if (modelOverride && Object.values(AI_MODELS).includes(modelOverride as AiModelId)) {
     return modelOverride as AiModelId;
   }
-  switch (depth) {
-    case "advanced":
-      return AI_MODELS.CLAUDE_SONNET;
-    case "deep":
-      return AI_MODELS.GPT4O;
-    case "basic":
-    default:
-      return AI_MODELS.GEMINI_FLASH;
-  }
+  // All depths use Gemini 2.0 Flash — affordable, fast, great at structured extraction.
+  return AI_MODELS.GEMINI_FLASH;
 }
 
 /**

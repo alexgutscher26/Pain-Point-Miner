@@ -181,21 +181,21 @@ describe("getModelForDepth", () => {
     expect(getModelForDepth("basic")).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
-  it("routes deep depth to GPT-4o", () => {
-    expect(getModelForDepth("deep")).toBe(AI_MODELS.GPT4O);
+  it("routes deep depth to Gemini 2.0 Flash (cost reduction)", () => {
+    expect(getModelForDepth("deep")).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
-  it("routes advanced depth to Claude Sonnet 3.5", () => {
-    expect(getModelForDepth("advanced")).toBe(AI_MODELS.CLAUDE_SONNET);
+  it("routes advanced depth to Gemini 2.0 Flash (cost reduction)", () => {
+    expect(getModelForDepth("advanced")).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
   it("respects a valid modelOverride regardless of depth", () => {
-    expect(getModelForDepth("basic", AI_MODELS.GPT4O)).toBe(AI_MODELS.GPT4O);
-    expect(getModelForDepth("deep", AI_MODELS.CLAUDE_SONNET)).toBe(AI_MODELS.CLAUDE_SONNET);
+    expect(getModelForDepth("basic", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
+    expect(getModelForDepth("deep", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
-  it("ignores an invalid modelOverride and falls back to depth routing", () => {
-    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(AI_MODELS.GPT4O);
+  it("ignores an invalid modelOverride and falls back to Gemini Flash", () => {
+    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
   it("AI_MODEL_LABELS has a human-readable label for every model", () => {
