@@ -46,13 +46,13 @@ export const metadata: Metadata = {
 
 export default function CaseStudiesPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#0a0a0a] font-sans text-zinc-300 selection:bg-[#ff4500]/30">
+    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="flex flex-col items-center px-6 pt-32 pb-24">
         <div className="w-full max-w-5xl">
           <header className="mb-20 text-center">
-            <h1 className="mb-6 text-[48px] leading-tight font-extrabold text-white md:text-[64px]">
+            <h1 className="mb-6 text-[48px] leading-tight font-extrabold text-zinc-900 md:text-[64px]">
               Proof that validation{" "}
               <span className="text-[#ff4500]">works</span>
             </h1>
@@ -66,38 +66,38 @@ export default function CaseStudiesPage() {
             {caseStudies.map((cs) => (
               <div
                 key={cs.slug}
-                className="group relative flex flex-col items-start overflow-hidden rounded-[32px] border border-white/5 bg-[#0f0f0f] p-10 text-left shadow-2xl backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/2"
+                className="group relative flex flex-col items-start overflow-hidden rounded-[32px] glass-card p-10 text-left transition-all"
               >
-                <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[#ff4500]/10 opacity-50 blur-[80px] transition-opacity" />
+                <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[#ff4500]/5 opacity-50 blur-[80px] transition-opacity" />
 
                 <div className="mb-8 flex items-center gap-2">
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-2 transition-transform duration-500 group-hover:scale-110">
+                  <div className="rounded-lg border border-black/10 bg-black/5 p-2 transition-transform duration-500 group-hover:scale-110">
                     <CheckCircle2
                       className="h-5 w-5 text-green-500"
                       strokeWidth={3}
                     />
                   </div>
-                  <span className="text-sm font-black tracking-widest text-white uppercase">
+                  <span className="text-sm font-black tracking-widest text-zinc-900 uppercase">
                     {cs.company}
                   </span>
                 </div>
 
-                <h3 className="mb-6 text-2xl leading-snug font-extrabold text-[#f4f4f5] transition-colors group-hover:text-[#ff4500]">
+                <h3 className="mb-6 text-2xl leading-snug font-extrabold text-zinc-900 transition-colors group-hover:text-[#ff4500]">
                   {cs.title}
                 </h3>
 
-                <p className="mb-10 flex-1 text-lg leading-relaxed font-medium text-zinc-400">
+                <p className="mb-10 flex-1 text-lg leading-relaxed font-medium text-zinc-500">
                   {cs.impact}
                 </p>
 
-                <div className="mt-auto w-full border-t border-white/5 pt-8">
+                <div className="mt-auto w-full border-t border-black/10 pt-8">
                   <div className="mb-2 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-[#ff4500]" />
-                    <span className="text-sm font-black tracking-widest text-white uppercase">
+                    <span className="text-sm font-black tracking-widest text-zinc-900 uppercase">
                       Key Result
                     </span>
                   </div>
-                  <div className="text-xl font-black text-white">
+                  <div className="text-xl font-black text-zinc-900">
                     {cs.results}
                   </div>
                 </div>
@@ -105,12 +105,12 @@ export default function CaseStudiesPage() {
             ))}
           </div>
 
-          <div className="relative mt-32 flex flex-col items-center overflow-hidden rounded-[48px] border-2 border-white/5 bg-[#0c0c0c] p-16 shadow-2xl">
-            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#ff4500]/50 to-transparent opacity-50" />
-            <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/10">
+          <div className="relative mt-32 flex flex-col items-center overflow-hidden rounded-[48px] glass-card p-16">
+            <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#ff4500]/30 to-transparent opacity-80" />
+            <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/5">
               <Users className="h-8 w-8 text-[#ff4500]" />
             </div>
-            <h2 className="mb-6 text-center text-3xl font-extrabold text-white md:text-5xl">
+            <h2 className="mb-6 text-center text-3xl font-extrabold text-zinc-900 md:text-5xl">
               Be our next success <span className="text-[#ff4500]">story</span>
             </h2>
             <p className="mb-12 max-w-2xl text-center text-xl leading-relaxed font-medium text-zinc-500">

@@ -11,11 +11,11 @@ export default function PrivacyPage() {
   const lastUpdated = "March 31, 2026";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] font-sans text-zinc-300 selection:bg-[#ff4500]/30">
+    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
       <main className="container mx-auto max-w-4xl px-6 pt-32 pb-24">
         <div className="mb-12">
-          <h1 className="mb-4 bg-linear-to-br from-white to-zinc-500 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl">
+          <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">
             Privacy Policy
           </h1>
           <p className="text-sm font-medium text-zinc-500">
@@ -23,9 +23,9 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        <div className="prose prose-invert max-w-none space-y-8 text-[15px] leading-relaxed text-zinc-400">
+        <div className="prose max-w-none space-y-8 text-[15px] leading-relaxed text-zinc-600">
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">1. Introduction</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">1. Introduction</h2>
             <p>
               Welcome to ThreddIQ. We respect your privacy and are committed to protecting your personal data. 
               This Privacy Policy explains how we collect, use, and safe guard your information when you visit 
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">2. Information We Collect</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">2. Information We Collect</h2>
             <p>
               We collect information that you provide directly to us when you create an account, subscribe to our service, 
               or communicate with us. This may include:
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">3. How We Use Your Information</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">3. How We Use Your Information</h2>
             <p>
               We use the information we collect to:
             </p>
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">4. Data Security</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">4. Data Security</h2>
             <p>
               We implement industry-standard security measures to protect your personal information. 
               However, no method of transmission over the Internet or electronic storage is 100% secure, 
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">5. Third-Party Services</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">5. Third-Party Services</h2>
             <p>
               We use third-party services like Stripe for payment processing and Vercel for analytics. 
               These third parties have their own privacy policies governing how they use your data. 
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">6. Your Data Rights</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">6. Your Data Rights</h2>
             <p>
               Depending on your location, you may have rights to access, correct, or delete your personal data. 
               You can manage most of your data through your account settings or by contacting us directly.
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">7. Cookies</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">7. Cookies</h2>
             <p>
               We use cookies to improve your experience on our site, remember your preferences, and understand how 
               you use our service. You can control cookies through your browser settings.
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight mb-4">8. Contact Us</h2>
+            <h2 className="text-xl font-bold text-zinc-900 uppercase tracking-tight mb-4">8. Contact Us</h2>
             <p>
               If you have any questions about this Privacy Policy, please contact us at support@threddiq.com.
             </p>
