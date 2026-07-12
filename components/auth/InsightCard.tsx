@@ -25,23 +25,23 @@ export function InsightCard({
   intent,
 }: InsightCardProps) {
   return (
-    <div className="rounded-[20px] border border-white/5 bg-[#0f0f0f] p-6 shadow-2xl">
+    <div className="rounded-[20px] border border-black/[0.04] bg-white/80 p-6 shadow-xs backdrop-blur-md">
       <div className="mb-4 flex items-center gap-2">
         <span className="rounded-full border border-[#ff4500]/20 bg-[#ff4500]/10 px-2.5 py-1 text-[10px] font-bold tracking-wider text-[#ff4500] uppercase">
           {badge}
         </span>
-        <span className="text-xs font-medium text-zinc-500">
+        <span className="text-xs font-medium text-zinc-400">
           {subreddit} • {time}
         </span>
       </div>
 
-      <blockquote className="mb-6 text-[17px] leading-relaxed font-medium text-white">
+      <blockquote className="mb-6 text-[17px] leading-relaxed font-medium text-zinc-700">
         &quot;{quote}&quot;
       </blockquote>
 
-      <div className="flex items-center justify-between border-t border-white/5 pt-4">
+      <div className="flex items-center justify-between border-t border-black/[0.04] pt-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/5 bg-zinc-800">
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-black/[0.04] bg-zinc-100">
             {typeof avatar === "string" ? (
               <img
                 className="h-full w-full object-cover"
@@ -56,8 +56,8 @@ export function InsightCard({
             )}
           </div>
           <div className="text-sm">
-            <p className="font-bold text-zinc-200">{username}</p>
-            <p className="text-xs text-zinc-500">
+            <p className="font-bold text-zinc-800">{username}</p>
+            <p className="text-xs text-zinc-400">
               {upvotes} Upvotes • {comments} Comments
             </p>
           </div>
