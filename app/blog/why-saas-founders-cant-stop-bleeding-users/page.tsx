@@ -1,17 +1,14 @@
+/* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { siteConfig } from "@/lib/seo";
 import { 
   AlertTriangle, 
-  Search, 
-  TrendingDown, 
   Zap, 
   ShieldAlert, 
   BarChart3, 
   DollarSign, 
   Settings2, 
-  Unlock,
   Trash2,
   CheckCircle2,
   ArrowRight
