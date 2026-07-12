@@ -1,123 +1,104 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { 
-  Trophy, 
-  ArrowRight, 
-  Sparkles,
-  Zap,
-  Globe
-} from "lucide-react";
 import { useEffect, useState } from "react";
-import { twMerge } from "tailwind-merge";
-import { clsx, type ClassValue } from "clsx";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { 
+  ArrowRight, 
+  Sparkles, 
+  Target, 
+  Lightbulb, 
+  TrendingUp,
+  Zap
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { completeOnboardingAction } from "../actions";
 
 export default function OnboardingCelebration() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const count = searchParams.get("count") || "12";
-  const [showConfetti, setShowConfetti] = useState(false);
+  const niche = searchParams.get("niche");
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    setShowConfetti(true);
-    const timer = setTimeout(() => setShowConfetti(false), 5000);
+    if (countdown <= 0) {
+      completeOnboardingAction().then(() => {
+        router.push("/dashboard");
+      });
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [countdown, router]);
 
-  const goToDashboard = () => {
+  const handleDashNow = async () => {
+    await completeOnboardingAction();
     router.push("/dashboard");
   };
 
-  return (
-    <div className="relative space-y-12 text-center">
-      {/* Celebration animation space holder */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-         {showConfetti && <ConfettiOverlay />}
-      </div>
+  const benefits = [
+    { icon: Target, label: "Your subreddits are being monitored for pain points" },
+    { icon: Lightbulb, label: "AI will surface the most common frustrations and needs" },
+    { icon: TrendingUp, label: "Get weekly digests with actionable product insights" },
+    { icon: Zap, label: "Build what your audience actually wants — no more guessing" },
+  ];
 
-      <div className="relative z-10 space-y-6">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#ff4500] bg-[#ff4500]/10 text-[#ff4500] shadow-[0_0_50px_rgba(255,69,0,0.3)] animate-bounce">
-          <Trophy className="h-12 w-12" />
+  return (
+    <div className="space-y-12">
+      {/* Hero */}
+      <div className="flex flex-col items-center gap-6 text-center">
+        <div className="relative">
+          <div className="absolute inset-0 animate-ping rounded-full bg-[#ff4500]/20" />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-[28px] border border-[#ff4500]/20 bg-[#ff4500]/10">
+            <Sparkles className="h-9 w-9 text-[#ff4500]" />
+          </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
-            Success! You found <span className="text-[#ff4500]">{count}</span> pain points!
+            You're all set{niche ? ` for ${niche}` : ""}!
           </h2>
-          <p className="mx-auto max-w-lg text-lg text-zinc-400">
-            Your first reconnaissance mission is complete. These insights are now waiting for you in your dashboard.
+          <p className="mx-auto max-w-md text-lg leading-relaxed text-zinc-500">
+            We're already scanning Reddit for pain points your future customers are sharing right now.
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <BenefitCard 
-          icon={Zap} 
-          title="Monetization" 
-          description="We've scored each point based on how likely users are to pay for a solution."
-        />
-        <BenefitCard 
-          icon={Sparkles} 
-          title="AI Insights" 
-          description="Our agent has interpreted the raw complaints into actionable SaaS ideas."
-        />
-        <BenefitCard 
-          icon={Globe} 
-          title="Market Fit" 
-          description="You've successfully validated your niche with real human problems."
-        />
+      {/* Benefits */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {benefits.map((benefit) => {
+          const Icon = benefit.icon;
+          return (
+            <div
+              key={benefit.label}
+              className="flex items-start gap-4 rounded-[24px] border border-zinc-200/60 bg-white/60 p-5 backdrop-blur-md transition-all duration-300 hover:border-[#ff4500]/20 hover:bg-white/80"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-black/[0.04] bg-white/80">
+                <Icon className="h-5 w-5 text-zinc-600" />
+              </div>
+              <p className="text-sm font-semibold leading-relaxed text-zinc-700">
+                {benefit.label}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="relative z-10 pt-6">
+      {/* CTA */}
+      <div className="flex flex-col items-center gap-6 pt-6">
         <button
-          onClick={goToDashboard}
-          className="group relative inline-flex items-center justify-center gap-3 border-[#ff8a57] bg-[#ff4500] px-12 py-4 text-white shadow-[0_0_30px_rgba(255,69,0,0.4)] transition-all hover:bg-[#e63e00] hover:scale-105 active:scale-95"
+          onClick={handleDashNow}
+          className="flex items-center gap-3 rounded-full border border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white shadow-[0_4px_20px_rgba(255,69,0,0.3)] transition-all duration-300 hover:bg-[#e63e00] hover:scale-105 active:scale-95"
         >
-          <span className="font-mono text-sm font-black tracking-[0.2em] uppercase">
-            Enter Dashboard
+          <span className="font-mono text-[13px] font-black tracking-widest uppercase">
+            Go to dashboard
           </span>
-          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-4 w-4" />
         </button>
+
+        <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
+          Redirecting in {countdown}s
+        </p>
       </div>
     </div>
   );
-}
-
-function BenefitCard({ icon: Icon, title, description }: { icon: any, title: string, description: string }) {
-  return (
-    <div className="border border-white/10 bg-[#161616] p-6 text-center transition-all hover:border-[#ff4500]/30 hover:bg-[#1a1a1a]">
-      <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#ff4500]/10 text-[#ff4500]">
-        <Icon className="h-5 w-5" />
-      </div>
-      <h3 className="mb-2 font-bold text-white">{title}</h3>
-      <p className="text-[13px] leading-relaxed text-zinc-500">{description}</p>
-    </div>
-  );
-}
-
-function ConfettiOverlay() {
-    return (
-        <div className="fixed inset-0 pointer-events-none z-50">
-           {/* Simple CSS-based confetti simulation */}
-           {[...Array(50)].map((_, i) => (
-               <div 
-                key={i}
-                className="absolute top-[-20px] animate-fall"
-                style={{
-                    left: `${Math.random() * 100}%`,
-                    backgroundColor: ["#ff4500", "#ffffff", "#ff8a57", "#ffd700"][Math.floor(Math.random() * 4)],
-                    width: `${Math.random() * 10 + 5}px`,
-                    height: `${Math.random() * 10 + 5}px`,
-                    animationDelay: `${Math.random() * 5}s`,
-                    animationDuration: `${Math.random() * 3 + 2}s`,
-                    transform: `rotate(${Math.random() * 360}deg)`
-                }}
-               />
-           ))}
-        </div>
-    )
 }

@@ -1,187 +1,213 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  SkipForward, 
-  Plus, 
-  Check, 
-  Trash2,
-  AlertCircle
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { twMerge } from "tailwind-merge";
-import { clsx, type ClassValue } from "clsx";
+import { useState } from "react";
+import { Search, Check, X, ArrowRight, ArrowLeft, SkipForward, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-const NICHES_DATA: Record<string, { subreddits: string[] }> = {
-  saas: { subreddits: ["saas", "entrepreneur", "startups", "smallbusiness", "sales"] },
-  ai: { subreddits: ["artificial", "artificialinteligence", "openai", "chatgpt", "machinelearning"] },
-  ecommerce: { subreddits: ["ecommerce", "shopify", "dropshipping", "amazonfba", "marketing"] },
-  agency: { subreddits: ["freelance", "marketing", "digitalmarketing", "agency", "upwork"] },
-  finance: { subreddits: ["personalfinance", "fintech", "investing", "cryptocurrency", "wealth"] },
+const NICHE_SUBREDDITS: Record<string, Array<{ name: string; subscribers: string; description: string }>> = {
+  saas: [
+    { name: "SaaS", subscribers: "150k", description: "Software as a Service discussions" },
+    { name: "Entrepreneur", subscribers: "3.2m", description: "Entrepreneurship & business" },
+    { name: "startups", subscribers: "1.4m", description: "Startup culture & growth" },
+    { name: "smallbusiness", subscribers: "1.1m", description: "Small business owners" },
+    { name: "sales", subscribers: "600k", description: "Sales professionals" },
+  ],
+  ai: [
+    { name: "artificialintelligence", subscribers: "2.8m", description: "AI research & discussions" },
+    { name: "openai", subscribers: "1.9m", description: "OpenAI & GPT discussions" },
+    { name: "automation", subscribers: "400k", description: "Automation technologies" },
+    { name: "ChatGPT", subscribers: "4.5m", description: "ChatGPT use cases" },
+    { name: "Futurology", subscribers: "19m", description: "Future of technology" },
+  ],
+  ecommerce: [
+    { name: "ecommerce", subscribers: "900k", description: "E-commerce strategies" },
+    { name: "shopify", subscribers: "400k", description: "Shopify ecosystem" },
+    { name: "dropshipping", subscribers: "500k", description: "Dropshipping business" },
+    { name: "AmazonFBA", subscribers: "300k", description: "Amazon FBA sellers" },
+    { name: "marketing", subscribers: "1.1m", description: "Marketing professionals" },
+  ],
+  agency: [
+    { name: "freelance", subscribers: "950k", description: "Freelancing community" },
+    { name: "marketing", subscribers: "1.1m", description: "Digital marketing" },
+    { name: "digitalmarketing", subscribers: "600k", description: "Digital marketing strategies" },
+    { name: "agency", subscribers: "150k", description: "Agency owners" },
+    { name: "Upwork", subscribers: "350k", description: "Upwork freelancers" },
+  ],
+  finance: [
+    { name: "personalfinance", subscribers: "19m", description: "Personal finance advice" },
+    { name: "fintech", subscribers: "400k", description: "Financial technology" },
+    { name: "investing", subscribers: "2.5m", description: "Investment strategies" },
+    { name: "CryptoCurrency", subscribers: "6.5m", description: "Cryptocurrency discussions" },
+    { name: "wealth", subscribers: "100k", description: "Wealth building" },
+  ],
 };
 
 export default function OnboardingStep2() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const niche = searchParams.get("niche") || "saas";
-  
-  const [selectedSubs, setSelectedSubs] = useState<string[]>([]);
-  const [customSub, setCustomSub] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    if (NICHES_DATA[niche]) {
-      setSelectedSubs(NICHES_DATA[niche].subreddits);
-    }
-  }, [niche]);
+  const subreddits = NICHE_SUBREDDITS[niche] || NICHE_SUBREDDITS.saas;
 
-  const toggleSub = (sub: string) => {
-    if (selectedSubs.includes(sub)) {
-      setSelectedSubs(selectedSubs.filter(s => s !== sub));
+  const filtered = subreddits.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const toggle = (name: string) => {
+    setSelected((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  const selectAll = () => {
+    if (selected.length === subreddits.length) {
+      setSelected([]);
     } else {
-      setSelectedSubs([...selectedSubs, sub]);
+      setSelected(subreddits.map((s) => s.name));
     }
-  };
-
-  const addCustomSub = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanSub = customSub.trim().toLowerCase().replace(/^r\//, "");
-    if (!cleanSub) return;
-    if (selectedSubs.includes(cleanSub)) {
-      setError("Subreddit already added");
-      return;
-    }
-    if (!/^[a-z0-9_]{2,24}$/.test(cleanSub)) {
-      setError("Invalid subreddit name");
-      return;
-    }
-    setSelectedSubs([...selectedSubs, cleanSub]);
-    setCustomSub("");
-    setError(null);
-  };
-
-  const handleSkip = async () => {
-    const { completeOnboardingAction } = await import("../actions");
-    await completeOnboardingAction();
-    router.push("/dashboard");
   };
 
   const handleNext = () => {
-    if (selectedSubs.length > 0) {
-      router.push(`/onboarding/step-3?niche=${niche}&subs=${selectedSubs.join(",")}`);
+    const params = new URLSearchParams();
+    if (niche) params.set("niche", niche);
+    if (selected.length > 0) {
+      params.set("subreddits", selected.join(","));
     }
+    router.push(`/onboarding/step-3?${params.toString()}`);
   };
 
   return (
     <div className="space-y-10">
       <div className="space-y-3">
         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-          Pick your battlefields
+          Pick your subreddits
         </h2>
-        <p className="text-lg text-zinc-400">
-          We've suggested these subreddits based on your niche. Add or remove them as you like.
+        <p className="text-lg text-zinc-500">
+          We'll monitor these communities for pain points related to <span className="font-bold capitalize text-zinc-900">{niche}</span>.
         </p>
       </div>
 
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-3">
-          {selectedSubs.map((sub) => (
-            <div
-              key={sub}
-              className="group flex items-center gap-2 border border-[#ff4500]/30 bg-[#ff4500]/5 px-4 py-2 font-mono text-sm font-bold text-[#ff4500] animate-in zoom-in-95"
-            >
-              <span className="opacity-60">r/</span>
-              {sub}
-              <button
-                onClick={() => toggleSub(sub)}
-                className="ml-2 rounded-full p-0.5 transition-colors hover:bg-[#ff4500]/20"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
-
-          {selectedSubs.length === 0 && (
-            <div className="flex w-full items-center justify-center border-2 border-dashed border-white/5 bg-white/5 py-12 text-zinc-600">
-              <p className="font-mono text-xs font-black tracking-widest uppercase">
-                No subreddits selected
-              </p>
-            </div>
-          )}
-        </div>
-
-        <form onSubmit={addCustomSub} className="max-w-md space-y-2">
-          <label className="block font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
-            Add custom subreddit
-          </label>
-          <div className="group relative flex items-center">
-            <span className="absolute left-4 font-mono text-sm font-bold text-zinc-600">r/</span>
-            <input
-              type="text"
-              value={customSub}
-              onChange={(e) => {
-                setCustomSub(e.target.value);
-                setError(null);
-              }}
-              placeholder="saas-founders"
-              className="w-full border-2 border-white/10 bg-[#161616] py-3 pl-10 pr-12 font-mono text-sm font-bold text-white transition-all focus:border-[#ff4500] focus:outline-none focus:ring-4 focus:ring-[#ff4500]/10"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 flex h-8 w-8 items-center justify-center bg-white text-black transition-colors hover:bg-zinc-200"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-          {error && (
-            <p className="flex items-center gap-1.5 font-mono text-[10px] font-bold tracking-tight text-red-500 uppercase">
-              <AlertCircle className="h-3 w-3" />
-              {error}
-            </p>
-          )}
-        </form>
+      {/* Search */}
+      <div className="group relative">
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-[#ff4500]" />
+        <input
+          type="text"
+          placeholder="Search subreddits..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-2xl border border-zinc-200/60 bg-white/70 py-3.5 pl-12 pr-4 font-mono text-sm tracking-tight text-zinc-900 backdrop-blur-md placeholder:text-zinc-400 focus:border-[#ff4500]/30 focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#ff4500]/10"
+        />
       </div>
 
-      <div className="flex flex-col-reverse justify-between gap-6 pt-10 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-6">
+      {/* Subreddit Grid */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+            Recommended subreddits
+          </p>
           <button
-            onClick={() => router.push(`/onboarding/step-1?niche=${niche}`)}
-            className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-600 uppercase transition-colors hover:text-white"
+            onClick={selectAll}
+            className="font-mono text-[10px] font-bold tracking-wider text-zinc-400 uppercase transition-colors hover:text-[#ff4500]"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back
-          </button>
-          
-          <button
-            onClick={handleSkip}
-            className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-800 transition-colors hover:text-zinc-600 uppercase"
-          >
-            <SkipForward className="h-3 w-3" />
-            Skip
+            {selected.length === subreddits.length ? "Deselect all" : "Select all"}
           </button>
         </div>
 
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {filtered.map((sub) => {
+            const isSelected = selected.includes(sub.name);
+            return (
+              <button
+                key={sub.name}
+                onClick={() => toggle(sub.name)}
+                className={cn(
+                  "flex items-start gap-4 rounded-[20px] border border-zinc-200/60 bg-white/60 p-4 text-left backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ff4500]/30 hover:bg-white/80 hover:shadow-md",
+                  isSelected && "border-[#ff4500] bg-white/85 ring-2 ring-[#ff4500]/20"
+                )}
+              >
+                <div
+                  className={cn(
+                    "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
+                    isSelected
+                      ? "border-[#ff4500] bg-[#ff4500]"
+                      : "border-zinc-300 bg-white/80"
+                  )}
+                >
+                  {isSelected && <Check className="h-3 w-3 text-white" />}
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-900">
+                    r/{sub.name}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-zinc-400">{sub.description}</p>
+                  <p className="mt-1 font-mono text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                    {sub.subscribers} members
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Selected Pills */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selected.map((name) => (
+            <div
+              key={name}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-3 py-1.5 text-xs font-bold text-[#ff4500] transition-all hover:bg-[#ff4500]/10"
+              onClick={() => toggle(name)}
+            >
+              r/{name}
+              <X className="h-3 w-3" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex flex-col-reverse justify-between gap-6 pt-6 sm:flex-row sm:items-center">
         <button
-          disabled={selectedSubs.length === 0}
-          onClick={handleNext}
-          className={cn(
-            "flex w-full items-center justify-center gap-3 border shadow-lg transition-all duration-300 sm:w-auto",
-            selectedSubs.length > 0 
-              ? "border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white animate-in zoom-in-95 hover:bg-[#e63e00] hover:scale-105 active:scale-95" 
-              : "cursor-not-allowed border-white/5 bg-white/5 px-8 py-3.5 text-zinc-700"
-          )}
+          onClick={() => router.push(`/onboarding/step-1?niche=${niche}`)}
+          className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase transition-colors hover:text-zinc-900"
         >
-          <span className="font-mono text-[13px] font-black tracking-widest uppercase">
-            Start Free Scan
-          </span>
-          <ArrowRight className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back
         </button>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (niche) params.set("niche", niche);
+              router.push(`/onboarding/step-3?${params.toString()}`);
+            }}
+            className="flex items-center justify-center gap-2 rounded-full border border-zinc-200/60 bg-white/60 px-6 py-3 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase backdrop-blur-md transition-all hover:border-zinc-300 hover:text-zinc-700"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Skip — use all
+          </button>
+
+          <button
+            disabled={selected.length === 0}
+            onClick={handleNext}
+            className={cn(
+              "flex items-center justify-center gap-3 rounded-full border shadow-lg transition-all duration-300",
+              selected.length > 0 
+                ? "border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white animate-in zoom-in-95 shadow-[0_4px_20px_rgba(255,69,0,0.3)] hover:bg-[#e63e00] hover:scale-105 active:scale-95" 
+                : "cursor-not-allowed border-zinc-200/60 bg-zinc-100/50 px-8 py-3.5 text-zinc-400"
+            )}
+          >
+            <span className="font-mono text-[13px] font-black tracking-widest uppercase">
+              Monitor {selected.length > 0 ? selected.length : ""} subreddit{selected.length !== 1 ? "s" : ""}
+            </span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

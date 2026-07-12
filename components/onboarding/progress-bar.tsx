@@ -38,12 +38,12 @@ export function OnboardingProgressBar() {
               {/* Step Indicator */}
               <div
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center border-2 transition-all duration-500",
+                  "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-500",
                   isCompleted
                     ? "border-[#ff4500] bg-[#ff4500] text-white"
                     : isActive
                       ? "border-[#ff4500] bg-[#ff4500]/10 text-[#ff4500]"
-                      : "border-white/10 bg-white/5 text-zinc-500"
+                      : "border-zinc-200/60 bg-white/60 text-zinc-400"
                 )}
               >
                 {isCompleted ? (
@@ -55,7 +55,7 @@ export function OnboardingProgressBar() {
 
               {/* Connector */}
               {idx < STEPS.length - 1 && (
-                <div className="mx-2 h-[2px] flex-1 bg-white/10 overflow-hidden">
+                <div className="mx-2 h-[2px] flex-1 overflow-hidden bg-zinc-200/60">
                   <div
                     className={cn(
                       "h-full bg-[#ff4500] transition-all duration-700 ease-in-out",
@@ -67,7 +67,7 @@ export function OnboardingProgressBar() {
             </div>
             
             <p className={cn(
-                "mt-2 hidden truncate font-mono text-[9px] font-bold tracking-widest text-zinc-500 uppercase md:block",
+                "mt-2 hidden truncate font-mono text-[9px] font-bold tracking-widest text-zinc-400 uppercase md:block",
                 isActive && "text-[#ff4500]"
             )}>
                 {step.label}
