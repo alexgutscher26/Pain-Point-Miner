@@ -29,6 +29,13 @@
       "when": 1781756711599,
       "tag": "0003_pain_point_tags_gin_idx",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781756711600,
+      "tag": "0004_create_dashboard_opportunity_mv",
+      "breakpoints": true
     }
   ]
 }

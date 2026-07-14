@@ -5,8 +5,37 @@ import { sql, desc, eq } from "drizzle-orm";
 import crypto from "node:crypto";
 
 /**
+ * Weekly Materialized View Refresh
+ *
+ * REFRESH MATERIALIZED VIEW CONCURRENTLY dashboard_opportunity_mv
+ * so that the dashboard and reports pages see up-to-date opportunity data
+ * without performing full table scans on every page load.
+ */
+export const refreshDashboardMv = inngest.createFunction(
+  {
+    id: "refresh-dashboard-opportunity-mv",
+    name: "Refresh Dashboard Opportunity MV",
+    triggers: [{ cron: "0 4 * * *" }], // Every day at 4 AM
+  },
+  async ({ step }) => {
+    await step.run("mv-refresh", async () => {
+      const startTime = Date.now();
+      try {
+        await db.execute(
+          sql.raw(`REFRESH MATERIALIZED VIEW CONCURRENTLY "dashboard_opportunity_mv"`),
+        );
+        return { ok: true, durationMs: Date.now() - startTime };
+      } catch (e: any) {
+        console.error("[MV REFRESH ERROR]", e.message);
+        return { ok: false, error: e.message, durationMs: Date.now() - startTime };
+      }
+    });
+  },
+);
+
+/**
  * Weekly PGVector HNSW Index Maintenance
- * 
+ *
  * 1. Measure index size and similarity search latency before maintenance.
  * 2. Run REINDEX INDEX CONCURRENTLY to defragment the index.
  * 3. Measure size and latency after maintenance.

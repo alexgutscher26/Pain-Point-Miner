@@ -2,8 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
-import { and, desc, eq, gte, isNull } from "drizzle-orm";
+import { dashboardOpportunityMv, painPointFeedback, userPreferences } from "@/lib/db/schema";
+import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import {
   TrendingUp,
   Search,
@@ -49,47 +49,51 @@ const LazyCommunityMapPanel = dynamicLoader(
 const getCachedDashboardData = unstable_cache(
   async (userId: string, workspaceId: string | null, windowDateMs: number) => {
     const fromDate = new Date(windowDateMs);
-    const whereClause = and(
-      eq(scraper.userId, userId),
+    const mvFilter = and(
+      eq(dashboardOpportunityMv.userId, userId),
       workspaceId
-        ? eq(scraper.workspaceId, workspaceId)
-        : isNull(scraper.workspaceId),
-      gte(scraper.createdAt, fromDate),
+        ? eq(dashboardOpportunityMv.workspaceId, workspaceId)
+        : isNull(dashboardOpportunityMv.workspaceId),
+      gte(dashboardOpportunityMv.createdAt, fromDate),
     );
 
-    return await db.query.scraper.findMany({
-      where: whereClause,
-      orderBy: [desc(scraper.createdAt)],
-      with: {
-        scraperRuns: {
-          orderBy: [desc(scraperRun.startedAt)],
-          limit: 1,
-        },
-        painPoints: {
-          columns: {
-            id: true,
-            title: true,
-            score: true,
-            urgency: true,
-            monetizationScore: true,
-            marketMaturity: true,
-            sentiment: true,
-            mentionCount: true,
-            commentCount: true,
-            subreddit: true,
-            subredditDisplayName: true,
-            scoreExplanation: true,
-          },
-          with: {
-            painPointFeedback: {
-              columns: {
-                vote: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const mvRows = await db
+      .select()
+      .from(dashboardOpportunityMv)
+      .where(mvFilter)
+      .orderBy(desc(dashboardOpportunityMv.createdAt));
+
+    // Batch fetch feedback votes
+    const allPainPointIds = mvRows.flatMap(
+      (r) => (r.painPoints as Array<{ id: string }> | null)?.map((pp) => pp.id) ?? [],
+    );
+    const feedbackRows = allPainPointIds.length > 0
+      ? await db
+          .select()
+          .from(painPointFeedback)
+          .where(inArray(painPointFeedback.painPointId, allPainPointIds))
+      : [];
+    const feedbackByPainPointId = new Map<string, Array<{ vote: number }>>();
+    for (const fb of feedbackRows) {
+      const arr = feedbackByPainPointId.get(fb.painPointId) ?? [];
+      arr.push({ vote: fb.vote });
+      feedbackByPainPointId.set(fb.painPointId, arr);
+    }
+
+    // Transform to match the previous relational query shape
+    return (mvRows as any[]).map((r) => ({
+      id: r.scraperId,
+      keywords: r.keywords,
+      createdAt: r.createdAt,
+      reportSaved: r.reportSaved,
+      scraperRuns: r.latestRunStatus
+        ? [{ status: r.latestRunStatus, startedAt: r.latestRunStartedAt, postsFetched: r.latestPostsFetched }]
+        : [],
+      painPoints: ((r.painPoints as any[]) || []).map((pp: any) => ({
+        ...pp,
+        painPointFeedback: feedbackByPainPointId.get(pp.id) ?? [],
+      })),
+    }));
   },
   ["dashboard-metrics-cache"],
   { revalidate: 30, tags: ["dashboard"] },
@@ -187,10 +191,10 @@ export default async function DashboardPage({
     ...report,
     painPoints: report.painPoints.map((point) => {
       const userUpvotes = (point.painPointFeedback ?? []).filter(
-        (v) => v.vote === 1,
+        (v: { vote: number }) => v.vote === 1,
       ).length;
       const userDownvotes = (point.painPointFeedback ?? []).filter(
-        (v) => v.vote === -1,
+        (v: { vote: number }) => v.vote === -1,
       ).length;
       return {
         ...point,

@@ -6,6 +6,7 @@ import {
   integer,
   jsonb,
   pgEnum,
+  pgMaterializedView,
   pgTable,
   text,
   timestamp,
@@ -921,3 +922,23 @@ export const aiUsage = pgTable(
       .onDelete("cascade"),
   ],
 );
+
+export const dashboardOpportunityMv = pgMaterializedView(
+  "dashboard_opportunity_mv",
+  {
+    scraperId: text("scraper_id").primaryKey().notNull(),
+    userId: text("user_id").notNull(),
+    workspaceId: text("workspace_id"),
+    keywords: text("keywords").array(),
+    createdAt: timestamp("created_at", { precision: 3, mode: "date" }).notNull(),
+    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }).notNull(),
+    reportSaved: boolean("report_saved").notNull(),
+    reportCategory: text("report_category").notNull(),
+    reportSavedAt: timestamp("report_saved_at", { precision: 3, mode: "date" }),
+    latestRunStatus: text("latest_run_status"),
+    latestRunStartedAt: timestamp("latest_run_started_at", { precision: 3, mode: "date" }),
+    latestPostsFetched: integer("latest_posts_fetched"),
+    painPointCount: integer("pain_point_count").notNull(),
+    painPoints: jsonb("pain_points").notNull(),
+  },
+).existing();
