@@ -167,6 +167,7 @@ export const scraper = pgTable("scraper", {
 	postsScanned: integer().default(0).notNull(),
 	painPointsFound: integer().default(0).notNull(),
 	lastRunAt: timestamp({ precision: 3, mode: 'string' }),
+	lastSuccessfulRunAt: timestamp({ precision: 3, mode: 'string' }),
 	userId: text().notNull(),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
@@ -300,6 +301,7 @@ export const workspace = pgTable("workspace", {
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 	deletedAt: timestamp({ precision: 3, mode: 'string' }),
+	plan: text(),
 }, (table) => [
 	uniqueIndex("workspace_slug_key").using("btree", table.slug.asc().nullsLast().op("text_ops")),
 	foreignKey({
@@ -466,6 +468,7 @@ export const painPoint = pgTable("pain_point", {
 	postUrl: text(),
 	author: text(),
 	score: integer().default(0).notNull(),
+	upvoteCount: integer().default(0).notNull(),
 	urgency: integer().default(0),
 	monetizationScore: integer().default(0),
 	marketMaturity: integer().default(0),
@@ -530,6 +533,7 @@ export const painPointCluster = pgTable("pain_point_cluster", {
 	canonicalTitle: text().notNull(),
 	canonicalBody: text().notNull(),
 	sourceCount: integer().default(1).notNull(),
+	memberCount: integer().default(0).notNull(),
 	estimatedTamUsdAnnual: integer(),
 	competitorIntel: jsonb(),
 	budgetSignalCount: integer().default(0).notNull(),

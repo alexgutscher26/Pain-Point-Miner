@@ -195,6 +195,7 @@ export const workspace = pgTable(
       .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
+    plan: text(),
   },
   (table) => [
     uniqueIndex("workspace_slug_key").using(
@@ -290,6 +291,7 @@ export const scraper = pgTable(
     postsScanned: integer().default(0).notNull(),
     painPointsFound: integer().default(0).notNull(),
     lastRunAt: timestamp({ precision: 3, mode: "date" }),
+    lastSuccessfulRunAt: timestamp({ precision: 3, mode: "date" }),
     userId: text().notNull(),
     createdAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -488,6 +490,7 @@ export const painPointCluster = pgTable(
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
+    memberCount: integer().default(0).notNull(),
     estimatedTamUsdAnnual: integer(),
     competitorIntel: jsonb().$type<CompetitorIntel[]>(),
     budgetSignalCount: integer().default(0).notNull(),
@@ -539,6 +542,7 @@ export const painPoint = pgTable(
     postUrl: text(),
     author: text(),
     score: integer().default(0).notNull(),
+    upvoteCount: integer().default(0).notNull(),
     urgency: integer().default(0),
     monetizationScore: integer().default(0),
     marketMaturity: integer().default(0),

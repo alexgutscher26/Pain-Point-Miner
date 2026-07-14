@@ -36,6 +36,13 @@
       "when": 1781756711600,
       "tag": "0004_create_dashboard_opportunity_mv",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781756711601,
+      "tag": "0005_schema_columns_and_triggers",
+      "breakpoints": true
     }
   ]
 }
