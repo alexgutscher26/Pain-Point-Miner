@@ -696,7 +696,7 @@ export const painPointEmbedding = pgTable(
     index("pain_point_embedding_hnsw_idx").using(
       "hnsw",
       table.embedding.op("vector_cosine_ops"),
-    ),
+    ).with({ m: 24, ef_construction: 200 }),
   ],
 );
 
