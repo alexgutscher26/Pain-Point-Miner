@@ -3,6 +3,13 @@ import postgres from "postgres";
 import * as schema from "./schema";
 import * as relations from "./relations";
 import crypto from "node:crypto";
+import { validateEnv } from "@/lib/env";
+
+// Fail fast at server startup if critical env vars are missing.
+// Skip in test environments where env vars are mocked per-test.
+if (typeof window === "undefined" && process.env.NODE_ENV !== "test") {
+  validateEnv();
+}
 
 const connectionString = process.env.DATABASE_URL!;
 

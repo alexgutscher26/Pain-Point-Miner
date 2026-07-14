@@ -7,8 +7,9 @@ import {
   normalizeBudgetSignals,
 } from "@/lib/budget-signals";
 import { aggregateCompetitorIntel } from "@/lib/competitor-intel";
+import { num } from "@/lib/env";
 
-const CLUSTER_SIMILARITY_THRESHOLD = 0.82;
+const CLUSTER_SIMILARITY_THRESHOLD = num("PGVECTOR_COSINE_THRESHOLD", 0.82);
 const EMBEDDING_PROVIDER = "openrouter";
 const EMBEDDING_MODEL = "openai/text-embedding-3-small";
 

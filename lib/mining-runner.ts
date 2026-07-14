@@ -12,6 +12,7 @@ import {
   user,
 } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
+import { num } from "@/lib/env";
 import {
   fetchComments,
   fetchSubredditPostsMultiSort,
@@ -157,8 +158,9 @@ export async function executeMiningRun({
       Math.max(1, subLimit),
     );
 
-    const baseSubConcurrency = 5;
-    const baseCommentConcurrency = 5;
+    const maxAiExtractions = num("MAX_CONCURRENT_AI_EXTRACTIONS", 5);
+    const baseSubConcurrency = maxAiExtractions;
+    const baseCommentConcurrency = maxAiExtractions;
 
     const global429Rate = await getGlobal429Rate();
     const adaptiveSubConcurrency = global429Rate > 0.2 ? 1 : baseSubConcurrency;

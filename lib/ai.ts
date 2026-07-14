@@ -4,6 +4,7 @@ import {
   type BudgetCadence,
 } from "@/lib/budget-signals";
 import type { MiningDepth } from "@/lib/mining-presets";
+import { str } from "@/lib/env";
 
 // ---------------------------------------------------------------------------
 // Model catalogue
@@ -296,9 +297,11 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 - Prefer the root cause over symptoms.
 - Return JSON only.`;
 
+  const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
+
   try {
     const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      `${baseUrl}/api/v1/chat/completions`,
       {
         method: "POST",
         headers: {
@@ -423,9 +426,11 @@ Return ONLY valid JSON:
   "category": "string or null"
 }`;
 
+  const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
+
   try {
     const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      `${baseUrl}/api/v1/chat/completions`,
       {
         method: "POST",
         headers: {

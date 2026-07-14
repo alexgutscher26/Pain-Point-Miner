@@ -38,14 +38,14 @@
 - [x] Add `ai_usage.runId` FK to `scraper_run` for complete cost-per-run attribution
 
 ### 1.2 Environment & Configuration
-- [ ] Validate all required env vars at startup (throw descriptive errors, not cryptic runtime failures)
-- [ ] Add `OPENROUTER_BASE_URL` override env var for self-hosted or proxy setups
-- [ ] Add `MAX_CONCURRENT_AI_EXTRACTIONS` env var to throttle parallelism (currently hardcoded)
-- [ ] Add `PGVECTOR_COSINE_THRESHOLD` env var to make cluster similarity configurable without deploys
-- [ ] Add `EMBEDDING_BATCH_SIZE` env var (currently embeds pain points one by one)
-- [ ] Document all env vars in `.env.example` with type annotations and valid values
-- [ ] Validate `STRIPE_WEBHOOK_SECRET` is set before registering webhook route (fail fast)
-- [ ] Add `FEATURE_FLAGS` JSON env var for runtime feature toggling without deploys
+- [x] Validate all required env vars at startup (throw descriptive errors, not cryptic runtime failures)
+- [x] Add `OPENROUTER_BASE_URL` override env var for self-hosted or proxy setups
+- [x] Add `MAX_CONCURRENT_AI_EXTRACTIONS` env var to throttle parallelism (currently hardcoded)
+- [x] Add `PGVECTOR_COSINE_THRESHOLD` env var to make cluster similarity configurable without deploys
+- [x] Add `EMBEDDING_BATCH_SIZE` env var (currently embeds pain points one by one)
+- [x] Document all env vars in `.env.example` with type annotations and valid values
+- [x] Validate `STRIPE_WEBHOOK_SECRET` is set before registering webhook route (fail fast)
+- [x] Add `FEATURE_FLAGS` JSON env var for runtime feature toggling without deploys
 
 ### 1.3 Error Handling & Observability
 - [ ] Implement structured logging with `pino` or `winston` (replace scattered `console.log/error`)

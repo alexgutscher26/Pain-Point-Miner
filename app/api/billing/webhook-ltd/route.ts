@@ -4,12 +4,14 @@ import Stripe from "stripe";
 import { db } from "@/lib/db";
 import { user, userPreferences, purchasedCredits } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { requireEnv } from "@/lib/env";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripeKey = requireEnv("STRIPE_SECRET_KEY");
+const webhookSecret = requireEnv("STRIPE_WEBHOOK_SECRET");
+
+const stripe = new Stripe(stripeKey, {
   apiVersion: "2025-01-27.acacia" as any,
 });
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
   const body = await req.text();

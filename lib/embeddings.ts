@@ -1,10 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { painPoint, painPointEmbedding } from "@/lib/db/schema";
+import { str, num } from "@/lib/env";
 
 const EMBEDDING_MODEL = "openai/text-embedding-3-small";
 const EMBEDDING_PROVIDER = "openrouter";
 const EMBEDDING_DIMENSIONS = 1536;
+export const EMBEDDING_BATCH_SIZE = num("EMBEDDING_BATCH_SIZE", 10);
 
 /**
  * Generate a vector embedding for the given text using OpenRouter's embeddings API.
@@ -16,8 +18,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   const truncated = text.slice(0, 8_000);
+  const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
 
-  const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  const response = await fetch(`${baseUrl}/api/v1/embeddings`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
