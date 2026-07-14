@@ -22,7 +22,7 @@
 
 ### 1.1 Database & Schema
 - [z] Add `HNSW` index tuning parameters (`m`, `ef_construction`) to `pain_point_embedding` for better ANN recall at scale
-- [ ] Add a composite GIN index on `pain_point.tags` array column for fast tag filtering
+- [x] Add a composite GIN index on `pain_point.tags` array column for fast tag filtering
 - [ ] Create a materialized view for the dashboard opportunity scoring query (avoids full scans on every page load)
 - [ ] Add `pain_point.upvoteCount` column (currently using `score` which conflates upvotes + downvotes)
 - [ ] Add `scraper.lastSuccessfulRunAt` column separate from `lastRunAt` (currently ambiguous if last run errored)

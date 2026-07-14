@@ -497,6 +497,7 @@ export const painPoint = pgTable("pain_point", {
 	index("pain_point_userId_clusterId_createdAt_idx").using("btree", table.userId.asc().nullsLast().op("text_ops"), table.clusterId.asc().nullsLast().op("text_ops"), table.createdAt.asc().nullsLast().op("text_ops")),
 	index("pain_point_userId_createdAt_idx").using("btree", table.userId.asc().nullsLast().op("timestamp_ops"), table.createdAt.asc().nullsLast().op("text_ops")),
 	index("pain_point_workspaceId_scraperId_createdAt_idx").using("btree", table.workspaceId.asc().nullsLast().op("timestamp_ops"), table.scraperId.asc().nullsLast().op("text_ops"), table.createdAt.desc().nullsLast().op("text_ops")),
+	index("pain_point_tags_idx").using("gin", table.tags.asc().nullsLast().op("array_ops")),
 	foreignKey({
 			columns: [table.scraperId],
 			foreignColumns: [scraper.id],

@@ -617,6 +617,7 @@ export const painPoint = pgTable(
       table.scraperId,
       table.createdAt.desc(),
     ),
+    index("pain_point_tags_idx").using("gin", table.tags),
   ],
 );
 

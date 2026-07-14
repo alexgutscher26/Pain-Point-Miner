@@ -1,0 +1,1 @@
+CREATE INDEX "pain_point_tags_idx" ON "pain_point" USING gin ("tags");--> statement-breakpoint
