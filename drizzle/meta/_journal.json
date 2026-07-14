@@ -43,6 +43,13 @@
       "when": 1781756711601,
       "tag": "0005_schema_columns_and_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781756711602,
+      "tag": "0006_schema_partition_tables",
+      "breakpoints": true
     }
   ]
 }

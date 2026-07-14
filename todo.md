@@ -24,18 +24,18 @@
 - [z] Add `HNSW` index tuning parameters (`m`, `ef_construction`) to `pain_point_embedding` for better ANN recall at scale
 - [x] Add a composite GIN index on `pain_point.tags` array column for fast tag filtering
 - [x] Create a materialized view for the dashboard opportunity scoring query (avoids full scans on every page load)
-- [ ] Add `pain_point.upvoteCount` column (currently using `score` which conflates upvotes + downvotes)
-- [ ] Add `scraper.lastSuccessfulRunAt` column separate from `lastRunAt` (currently ambiguous if last run errored)
-- [ ] Implement soft-delete cascade: when `scraper.deletedAt` is set, also set `pain_point.deletedAt` in a trigger/job
-- [ ] Add `pain_point_cluster.memberCount` denormalized column (avoid COUNT(*) on every cluster render)
-- [ ] Add `workspace.plan` column so workspace-level entitlements can override user-level plan
-- [ ] Add a `changelog` table to track schema migrations with description + applied_at for ops visibility
-- [ ] Create `user_notification_preferences` table (email digest, scan complete alerts, threshold notifications)
-- [ ] Partition `scraper_run` by month for improved query performance at scale (>1M rows)
-- [ ] Add `pain_point.sourceType` enum: `post | comment | cross_post` for source attribution
-- [ ] Add `pain_point.redditPostId` column to de-duplicate at the pain point level (not just AI idempotency)
-- [ ] Create `scraper_run_event` table for granular per-phase timing/metrics instead of only start/finish timestamps
-- [ ] Add `ai_usage.runId` FK to `scraper_run` for complete cost-per-run attribution
+- [x] Add `pain_point.upvoteCount` column (currently using `score` which conflates upvotes + downvotes)
+- [x] Add `scraper.lastSuccessfulRunAt` column separate from `lastRunAt` (currently ambiguous if last run errored)
+- [x] Implement soft-delete cascade: when `scraper.deletedAt` is set, also set `pain_point.deletedAt` in a trigger/job
+- [x] Add `pain_point_cluster.memberCount` denormalized column (avoid COUNT(*) on every cluster render)
+- [x] Add `workspace.plan` column so workspace-level entitlements can override user-level plan
+- [x] Add a `changelog` table to track schema migrations with description + applied_at for ops visibility
+- [x] Create `user_notification_preferences` table (email digest, scan complete alerts, threshold notifications)
+- [x] Partition `scraper_run` by month for improved query performance at scale (>1M rows)
+- [x] Add `pain_point.sourceType` enum: `post | comment | cross_post` for source attribution
+- [x] Add `pain_point.redditPostId` column to de-duplicate at the pain point level (not just AI idempotency)
+- [x] Create `scraper_run_event` table for granular per-phase timing/metrics instead of only start/finish timestamps
+- [x] Add `ai_usage.runId` FK to `scraper_run` for complete cost-per-run attribution
 
 ### 1.2 Environment & Configuration
 - [ ] Validate all required env vars at startup (throw descriptive errors, not cryptic runtime failures)

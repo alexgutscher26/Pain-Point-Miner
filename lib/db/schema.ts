@@ -8,6 +8,7 @@ import {
   pgEnum,
   pgMaterializedView,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -37,6 +38,12 @@ export const painPointDifficulty = pgEnum("PainPointDifficulty", [
   "side_project",
   "startup_mvp",
   "vc_scale_moat",
+]);
+
+export const painPointSourceType = pgEnum("PainPointSourceType", [
+  "post",
+  "comment",
+  "cross_post",
 ]);
 
 export const verification = pgTable("verification", {
@@ -340,7 +347,7 @@ export const scraper = pgTable(
 export const scraperRun = pgTable(
   "scraper_run",
   {
-    id: text().primaryKey().notNull(),
+    id: text().notNull(),
     scraperId: text().notNull(),
     status: text().default("success").notNull(),
     startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
@@ -362,6 +369,7 @@ export const scraperRun = pgTable(
       .notNull(),
   },
   (table) => [
+    primaryKey({ columns: [table.id, table.startedAt], name: "scraper_run_pkey" }),
     foreignKey({
       columns: [table.scraperId],
       foreignColumns: [scraper.id],
@@ -574,6 +582,8 @@ export const painPoint = pgTable(
     clusterId: text(),
     clusterSimilarity: doublePrecision(),
     scoreExplanation: text(),
+    sourceType: painPointSourceType().default("post"),
+    redditPostId: text(),
     difficulty: painPointDifficulty().default("weekend_project"),
   },
   (table) => [
@@ -910,6 +920,8 @@ export const aiUsage = pgTable(
     costUsd: doublePrecision().default(0).notNull(),
     /** Optional: the scraper that triggered this extraction */
     scraperId: text(),
+    /** FK to scraper_run for complete cost-per-run attribution */
+    runId: text(),
     createdAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -917,10 +929,86 @@ export const aiUsage = pgTable(
   (table) => [
     index("ai_usage_userId_createdAt_idx").on(table.userId, table.createdAt),
     index("ai_usage_modelId_createdAt_idx").on(table.modelId, table.createdAt),
+    index("ai_usage_runId_idx").on(table.runId),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [user.id],
       name: "ai_usage_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    foreignKey({
+      columns: [table.runId],
+      foreignColumns: [scraperRun.id],
+      name: "ai_usage_runId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("set null"),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Changelog — schema migration tracking for ops visibility
+// ---------------------------------------------------------------------------
+export const changelog = pgTable("changelog", {
+  id: text().primaryKey().notNull(),
+  version: text().notNull(),
+  description: text().notNull(),
+  appliedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// User Notification Preferences — granular notification toggles
+// ---------------------------------------------------------------------------
+export const userNotificationPreferences = pgTable(
+  "user_notification_preferences",
+  {
+    id: text().primaryKey().notNull(),
+    userId: text().notNull(),
+    weeklyDigest: boolean().default(true).notNull(),
+    scanCompleteAlerts: boolean().default(true).notNull(),
+    thresholdNotifications: boolean().default(false).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_notification_preferences_userId_key").on(table.userId),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "user_notification_preferences_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Scraper Run Event — per-phase timing/metrics for granular run observability
+// ---------------------------------------------------------------------------
+export const scraperRunEvent = pgTable(
+  "scraper_run_event",
+  {
+    id: text().primaryKey().notNull(),
+    runId: text().notNull(),
+    phase: text().notNull(),
+    startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    finishedAt: timestamp({ precision: 3, mode: "date" }),
+    metrics: jsonb(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index("scraper_run_event_runId_phase_idx").on(table.runId, table.phase),
+    foreignKey({
+      columns: [table.runId],
+      foreignColumns: [scraperRun.id],
+      name: "scraper_run_event_runId_fkey",
     })
       .onUpdate("cascade")
       .onDelete("cascade"),

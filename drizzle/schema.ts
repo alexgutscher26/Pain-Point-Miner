@@ -1,9 +1,10 @@
-import { pgTable, uniqueIndex, foreignKey, text, integer, timestamp, index, doublePrecision, vector, boolean, jsonb, unique, pgEnum } from "drizzle-orm/pg-core"
+import { pgTable, uniqueIndex, foreignKey, primaryKey, text, integer, timestamp, index, doublePrecision, vector, boolean, jsonb, unique, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const ltdTier = pgEnum("LtdTier", ['none', 'founder', 'professional'])
 export const painPointDifficulty = pgEnum("PainPointDifficulty", ['weekend_project', 'side_project', 'startup_mvp', 'vc_scale_moat'])
 export const scraperStatus = pgEnum("ScraperStatus", ['running', 'paused', 'error'])
+export const painPointSourceType = pgEnum("PainPointSourceType", ['post', 'comment', 'cross_post'])
 
 
 export const painPointFeedback = pgTable("pain_point_feedback", {
@@ -42,7 +43,7 @@ export const purchasedCredits = pgTable("purchased_credits", {
 ]);
 
 export const scraperRun = pgTable("scraper_run", {
-	id: text().primaryKey().notNull(),
+	id: text().notNull(),
 	scraperId: text().notNull(),
 	status: text().default('success').notNull(),
 	startedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
@@ -59,6 +60,7 @@ export const scraperRun = pgTable("scraper_run", {
 	workspaceId: text(),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
+	primaryKey({ columns: [table.id, table.startedAt], name: "scraper_run_pkey" }),
 	index("scraper_run_scraperId_startedAt_idx").using("btree", table.scraperId.asc().nullsLast().op("text_ops"), table.startedAt.asc().nullsLast().op("text_ops")),
 	index("scraper_run_workspaceId_status_createdAt_idx").using("btree", table.workspaceId.asc().nullsLast().op("text_ops"), table.status.asc().nullsLast().op("text_ops"), table.createdAt.desc().nullsLast().op("text_ops")),
 	foreignKey({
@@ -426,15 +428,22 @@ export const aiUsage = pgTable("ai_usage", {
 	outputTokens: integer().default(0).notNull(),
 	costUsd: doublePrecision().default(0).notNull(),
 	scraperId: text(),
+	runId: text(),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	index("ai_usage_modelId_createdAt_idx").using("btree", table.modelId.asc().nullsLast().op("text_ops"), table.createdAt.asc().nullsLast().op("timestamp_ops")),
+	index("ai_usage_runId_idx").using("btree", table.runId.asc().nullsLast().op("text_ops")),
 	index("ai_usage_userId_createdAt_idx").using("btree", table.userId.asc().nullsLast().op("timestamp_ops"), table.createdAt.asc().nullsLast().op("timestamp_ops")),
 	foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: "ai_usage_userId_fkey"
 		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.runId],
+			foreignColumns: [scraperRun.id],
+			name: "ai_usage_runId_fkey"
+		}).onUpdate("cascade").onDelete("set null"),
 ]);
 
 export const keywordStat = pgTable("keyword_stat", {
@@ -494,6 +503,8 @@ export const painPoint = pgTable("pain_point", {
 	clusterId: text(),
 	clusterSimilarity: doublePrecision(),
 	scoreExplanation: text(),
+	sourceType: painPointSourceType().default('post'),
+	redditPostId: text(),
 	difficulty: painPointDifficulty().default('weekend_project'),
 }, (table) => [
 	index("pain_point_scraperId_idx").using("btree", table.scraperId.asc().nullsLast().op("text_ops")),
@@ -591,3 +602,44 @@ export const dbMaintenanceLog = pgTable("db_maintenance_log", {
 	error: text(),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
+
+export const changelog = pgTable("changelog", {
+	id: text().primaryKey().notNull(),
+	version: text().notNull(),
+	description: text().notNull(),
+	appliedAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const userNotificationPreferences = pgTable("user_notification_preferences", {
+	id: text().primaryKey().notNull(),
+	userId: text().notNull(),
+	weeklyDigest: boolean().default(true).notNull(),
+	scanCompleteAlerts: boolean().default(true).notNull(),
+	thresholdNotifications: boolean().default(false).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+}, (table) => [
+	uniqueIndex("user_notification_preferences_userId_key").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: "user_notification_preferences_userId_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const scraperRunEvent = pgTable("scraper_run_event", {
+	id: text().primaryKey().notNull(),
+	runId: text().notNull(),
+	phase: text().notNull(),
+	startedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+	finishedAt: timestamp({ precision: 3, mode: 'string' }),
+	metrics: jsonb(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	index("scraper_run_event_runId_phase_idx").using("btree", table.runId.asc().nullsLast().op("text_ops"), table.phase.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.runId],
+			foreignColumns: [scraperRun.id],
+			name: "scraper_run_event_runId_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
