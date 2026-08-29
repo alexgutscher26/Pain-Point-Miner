@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -111,9 +111,7 @@ export default async function DashboardPage({
 }) {
   const requestHeaders = await headers();
   const resolvedSearchParams = (await searchParams) ?? {};
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   if (!session) {
     redirect("/sign-in");

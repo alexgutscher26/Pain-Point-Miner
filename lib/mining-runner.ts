@@ -10,6 +10,7 @@ import {
   scraperRun,
   scraperPost,
   user,
+  userPreferences,
 } from "@/lib/db/schema";
 import { extractPainPoints } from "@/lib/ai";
 import { num } from "@/lib/env";
@@ -125,7 +126,14 @@ export async function executeMiningRun({
     const userRecord = await db.query.user.findFirst({
       where: eq(user.id, userId),
     });
+    const prefsRecord = db.query.userPreferences
+      ? await db.query.userPreferences.findFirst({
+          where: eq(userPreferences.userId, userId),
+          columns: { customApiKey: true },
+        })
+      : null;
     const anonymize = userRecord?.anonymizeRedditUsernames ?? false;
+    const customApiKey = prefsRecord?.customApiKey || null;
 
     // Insert a scraperRun record upfront so SSE can track progress
     await db.insert(scraperRun).values({
@@ -352,6 +360,7 @@ export async function executeMiningRun({
         anonymize,
         customPatterns: patterns,
         miningDepth,
+        customApiKey,
       });
       newPainPoints += count;
     }
@@ -514,6 +523,7 @@ type ProcessSinglePostInput = {
   customPatterns: string[];
   /** Mining depth determines which AI model tier is used for extraction. */
   miningDepth: MiningDepth;
+  customApiKey?: string | null;
 };
 
 /**
@@ -529,6 +539,7 @@ export async function processSinglePost({
   anonymize,
   customPatterns,
   miningDepth,
+  customApiKey,
 }: ProcessSinglePostInput): Promise<number> {
   const shouldProcessWithAi = await claimRedditPostForAiProcessing(
     post.id,
@@ -551,6 +562,7 @@ export async function processSinglePost({
     undefined, // modelOverride — let depth routing decide
     miningDepth,
     { userId, scraperId },
+    customApiKey,
   );
 
   if (!points || points.length === 0) return 0;
@@ -620,7 +632,7 @@ export async function processSinglePost({
   }
 
   for (const painPointId of clusterJobs) {
-    void clusterPainPoint(painPointId, userId, workspaceId).catch((err) =>
+    void clusterPainPoint(painPointId, userId, workspaceId, customApiKey).catch((err) =>
       console.error(`Embedding/clustering failed for ${painPointId}:`, err),
     );
   }

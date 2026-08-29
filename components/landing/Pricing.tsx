@@ -29,7 +29,6 @@ export function Pricing() {
     };
   };
 
-  const starterPricing = getPricing(15);
   const growthPricing = getPricing(29);
   const proPricing = getPricing(69);
 
@@ -82,17 +81,15 @@ export function Pricing() {
             </p>
             <div className="mb-6 flex items-baseline gap-1.5">
               <span className="text-[44px] leading-none font-extrabold tracking-tight text-zinc-900">
-                {starterPricing.displayPrice}
+                $0
               </span>
               <span className="text-[14px] font-semibold text-zinc-500">
-                {starterPricing.suffix}
+                /month
               </span>
             </div>
-            {starterPricing.detail ? (
-              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
-                {starterPricing.detail}
-              </p>
-            ) : null}
+            <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
+              Free forever · No credit card required
+            </p>
           </div>
 
           <div className="relative z-10 mb-8 w-full flex-1 px-8">
@@ -101,7 +98,7 @@ export function Pricing() {
               label="INBOUND"
             />
             <ul className="mb-8 space-y-4">
-              <FeatureItem label="10 Reddit scans per month" />
+              <FeatureItem label="2 Reddit scans per month" />
               <FeatureItem label="Up to 3 subreddits per search" />
               <FeatureItem label="Access to top Reddit posts" />
             </ul>
@@ -114,16 +111,16 @@ export function Pricing() {
               <FeatureItem label="Basic pain-point extraction" />
               <FeatureItem label="Mention count insights" />
               <FeatureItem label="Export basic report" />
-              <FeatureItem label="Email support" />
+              <FeatureItem label="Community support" />
             </ul>
           </div>
 
           <div className="relative z-10 mt-auto w-full border-t border-black/5 bg-zinc-50/50 p-8 pt-6">
             <Link
-              href={`/sign-up?plan=starter&billing=${isYearly ? "yearly" : "monthly"}`}
+              href="/sign-up?plan=starter"
               className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white text-[14px] font-bold text-zinc-800 transition-all hover:bg-zinc-50 shadow-xs"
             >
-              Get Started
+              Start for Free
             </Link>
             <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Best for:

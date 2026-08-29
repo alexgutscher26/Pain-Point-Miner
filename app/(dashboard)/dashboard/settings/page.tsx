@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { eq, desc } from "drizzle-orm";
 import { SettingsPageClient } from "@/components/dashboard/settings-page-client";
@@ -34,9 +34,8 @@ function parseDashboardLayout(input: unknown): DashboardLayoutSettings {
 }
 
 export default async function SettingsPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const requestHeaders = await headers();
+  const session = await getServerSession(requestHeaders);
   if (!session) {
     redirect("/sign-in");
   }
@@ -47,6 +46,7 @@ export default async function SettingsPage() {
       emailNotifications: true,
       dashboardLayout: true,
       scoringWeights: true,
+      customApiKey: true,
     },
   });
 
@@ -87,6 +87,7 @@ export default async function SettingsPage() {
     defaultLocale: scanDefaults.defaultLocale ?? "United States",
     scoringWeights:
       (preferences?.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
+    customApiKey: preferences?.customApiKey ?? "",
   };
 
   return (

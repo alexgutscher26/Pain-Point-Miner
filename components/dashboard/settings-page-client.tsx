@@ -4,7 +4,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Loader2, Shield, SlidersHorizontal, User2 } from "lucide-react";
+import { Bell, Key, Loader2, Shield, SlidersHorizontal, User2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -46,6 +46,7 @@ export interface SettingsFormValues {
   minimumOpportunityScore: number;
   defaultLocale: string;
   scoringWeights: ScoringWeights;
+  customApiKey: string;
 }
 
 export function SettingsPageClient({
@@ -394,6 +395,64 @@ export function SettingsPageClient({
             </div>
           </section>
         </div>
+
+        {/* BYOK (Bring Your Own Key) Card */}
+        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Key className="h-5 w-5 text-[#ff4500]" />
+                <h3 className="text-lg font-black tracking-tight text-zinc-900">
+                  BYOK — Bring Your Own AI Key (OpenRouter)
+                </h3>
+                <span className="rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 uppercase">
+                  Bypass Plan Limits
+                </span>
+              </div>
+              <p className="mt-2 max-w-3xl text-sm text-zinc-500">
+                Want unlimited mining without a monthly subscription? Add your personal{" "}
+                <a
+                  href="https://openrouter.ai/keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-[#ff4500] hover:underline"
+                >
+                  OpenRouter API key
+                </a>
+                . All AI extraction and embedding costs will be billed directly to your OpenRouter account at cost (fractions of a cent per scan).
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 max-w-xl">
+            <label className="block font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+              OpenRouter API Key
+            </label>
+            <div className="mt-2 flex gap-3">
+              <input
+                type="password"
+                placeholder="sk-or-v1-..."
+                value={values.customApiKey}
+                onChange={(e) =>
+                  setValues((prev) => ({ ...prev, customApiKey: e.target.value }))
+                }
+                className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 font-mono text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-1 focus:ring-[#ff4500] focus:outline-none"
+              />
+              {values.customApiKey && (
+                <button
+                  type="button"
+                  onClick={() => setValues((prev) => ({ ...prev, customApiKey: "" }))}
+                  className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-xs text-zinc-600 hover:bg-zinc-100"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <p className="mt-2 text-xs text-zinc-400">
+              Your key is encrypted in your personal settings and used strictly for your own mining runs.
+            </p>
+          </div>
+        </section>
 
         <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
           <div className="absolute top-0 right-0 p-4">

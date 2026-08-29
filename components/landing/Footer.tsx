@@ -88,10 +88,16 @@ export function Footer() {
           <div className="flex flex-col gap-4">
             <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Resources</p>
             <Link
-              href="/blog/why-saas-founders-cant-stop-bleeding-users"
-              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-[#e03d00] underline decoration-[#ff4500]/25 underline-offset-4"
+              href="/blog"
+              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-[#e03d00]"
             >
-              SaaS Retention
+              Blog & Articles
+            </Link>
+            <Link
+              href="/blog/why-saas-founders-cant-stop-bleeding-users"
+              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+            >
+              SaaS Retention Study
             </Link>
             <Link
               href="/resources/best-subreddits-by-industry"

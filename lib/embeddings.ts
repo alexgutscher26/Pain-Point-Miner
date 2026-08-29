@@ -11,8 +11,11 @@ export const EMBEDDING_BATCH_SIZE = num("EMBEDDING_BATCH_SIZE", 10);
 /**
  * Generate a vector embedding for the given text using OpenRouter's embeddings API.
  */
-export async function generateEmbedding(text: string): Promise<number[]> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+export async function generateEmbedding(
+  text: string,
+  apiKeyOverride?: string | null,
+): Promise<number[]> {
+  const apiKey = apiKeyOverride?.trim() || process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY is not configured.");
   }
@@ -59,6 +62,7 @@ export async function embedPainPoint(
   painPointId: string,
   userId: string,
   workspaceId: string | null,
+  apiKeyOverride?: string | null,
 ): Promise<number[]> {
   const point = await db.query.painPoint.findFirst({
     where: eq(painPoint.id, painPointId),
@@ -69,7 +73,7 @@ export async function embedPainPoint(
   }
 
   const text = `${point.title}\n${point.body}`;
-  const embedding = await generateEmbedding(text);
+  const embedding = await generateEmbedding(text, apiKeyOverride);
 
   await db
     .insert(painPointEmbedding)

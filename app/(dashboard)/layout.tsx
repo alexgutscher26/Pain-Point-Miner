@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { auth } from "@/lib/auth";
+import { auth, getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -41,9 +41,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   if (!session) {
     redirect("/sign-in");

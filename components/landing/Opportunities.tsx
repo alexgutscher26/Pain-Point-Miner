@@ -193,6 +193,15 @@ export function Opportunities() {
           </div>
         ))}
       </div>
+
+      <div className="mt-12 flex justify-center">
+        <a
+          href="/niches"
+          className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-6 py-3 text-xs font-extrabold text-[#ff4500] shadow-xs hover:bg-orange-100 transition-colors"
+        >
+          Explore All 20+ Pre-Mined SaaS Niches & Teardowns →
+        </a>
+      </div>
     </section>
   );
 }

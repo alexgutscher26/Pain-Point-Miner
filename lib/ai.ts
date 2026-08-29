@@ -173,6 +173,8 @@ export const extractPainPoints = async (
   miningDepth?: MiningDepth,
   /** Pass userId + scraperId for cost logging. */
   usageContext?: { userId: string; scraperId?: string | null },
+  /** Pass user's BYOK OpenRouter API key if configured. */
+  customApiKey?: string | null,
 ) => {
   const model = modelOverride
     ? modelOverride
@@ -180,7 +182,7 @@ export const extractPainPoints = async (
       ? getModelForDepth(miningDepth)
       : DEFAULT_AI_MODEL;
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = customApiKey?.trim() || process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY is not configured.");

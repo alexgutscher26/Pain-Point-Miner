@@ -17,6 +17,13 @@ import {
   Target,
   CreditCard,
   Briefcase,
+  PieChart,
+  Repeat,
+  MessageSquareQuote,
+  Code,
+  Brain,
+  Compass,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -45,7 +52,7 @@ const blogPosts = [
     date: "July 2026",
   },
   {
-    title: "Why Most \"Validated\" Ideas Still Fail",
+    title: 'Why Most "Validated" Ideas Still Fail',
     subtitle: "Validation tells you demand exists — not that you can win",
     description: "The contrarian take: most founders confuse market demand with competitive readiness. Here's why validated ideas fail and how to spot the difference.",
     href: "/blog/why-validated-ideas-still-fail",
@@ -61,6 +68,69 @@ const blogPosts = [
     icon: <Search className="h-6 w-6 text-[#ff4500]" />,
     badge: "Foundational",
     date: "July 2026",
+  },
+  {
+    title: "We Analyzed 10,000 Reddit Complaints — Here's What SaaS Founders Are Actually Building",
+    subtitle: "Data across 200+ subreddits",
+    description: "After parsing 10,000 complaints, we found the five categories where founder attention clusters — and the one nobody's building for.",
+    href: "/blog/analyzed-10000-reddit-complaints",
+    icon: <PieChart className="h-6 w-6 text-purple-500" />,
+    badge: "Data Study",
+    date: "August 2026",
+  },
+  {
+    title: "The Most Repeated SaaS Complaint on Reddit This Month",
+    subtitle: "Real-time trends in user frustration",
+    description: "A monthly breakdown of the single most frequently voiced software problem across founder and operator communities.",
+    href: "/blog/most-repeated-saas-complaint-this-month",
+    icon: <Repeat className="h-6 w-6 text-orange-500" />,
+    badge: "Monthly Signal",
+    date: "August 2026",
+  },
+  {
+    title: "7 Subtle Phrases People Say on Reddit Right Before 'I'd Pay For This'",
+    subtitle: "Hidden intent markers in everyday discussions",
+    description: "The verbal patterns that indicate extreme buyer frustration and readiness to switch software before explicit budget talk happens.",
+    href: "/blog/phrases-before-id-pay-for-this",
+    icon: <MessageSquareQuote className="h-6 w-6 text-emerald-500" />,
+    badge: "Linguistics",
+    date: "August 2026",
+  },
+  {
+    title: "The 4 Hidden Churn Patterns in Developer Tools",
+    subtitle: "Based on 450+ developer threads",
+    description: "Why engineers abandon infrastructure tools and the product and pricing mistakes that drive technical churn.",
+    href: "/blog/churn-patterns-in-developer-tools",
+    icon: <Code className="h-6 w-6 text-blue-600" />,
+    badge: "DevTools",
+    date: "August 2026",
+  },
+  {
+    title: "AI Wrapper Fatigue: How Reddit Sentiment Shifted in 2026",
+    subtitle: "What users actually want from AI products now",
+    description: "How community perception of simple wrappers plummeted and what differentiated AI architectures users willingly pay $50+/mo for.",
+    href: "/blog/ai-wrapper-fatigue-reddit-sentiment",
+    icon: <Brain className="h-6 w-6 text-pink-600" />,
+    badge: "Market Trends",
+    date: "August 2026",
+  },
+  {
+    title: "How to Spot $10k/mo Micro-SaaS Niches Hiding in Plain Sight",
+    subtitle: "Boring B2B verticals with low churn",
+    description: "A playbook for finding niche business software ideas in professional subreddits with low maintenance and zero VC competition.",
+    href: "/blog/finding-high-intent-b2b-micro-saas-niches",
+    icon: <Compass className="h-6 w-6 text-amber-600" />,
+    badge: "Micro-SaaS",
+    date: "August 2026",
+  },
+  {
+    title: "Automating User Research: From 20 Hours of Calls to 2 Minutes of AI Mining",
+    subtitle: "Continuous discovery without calendar friction",
+    description: "Why product teams are augmenting customer discovery calls with automated semantic mining across developer and founder communities.",
+    href: "/blog/automating-user-research-with-ai-scrapers",
+    icon: <Sparkles className="h-6 w-6 text-teal-600" />,
+    badge: "Discovery",
+    date: "August 2026",
   },
   {
     title: "Why SaaS Founders Can't Stop Bleeding Users",
@@ -152,11 +222,14 @@ export default function BlogPage() {
 
       <main className="mx-auto flex w-full max-w-7xl flex-col px-6 pt-32 pb-24">
         <header className="mb-20 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-4 py-1.5 font-mono text-[11px] font-black tracking-widest text-[#ff4500] uppercase shadow-xs">
+            ThreddIQ Articles & Research
+          </div>
           <h1 className="mb-6 text-[48px] leading-tight font-black tracking-tight text-zinc-900 md:text-[64px]">
-            <span className="text-[#ff4500]">Blog</span>
+            The <span className="text-[#ff4500]">Blog</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-xl font-medium text-zinc-500">
-            Research-backed insights and practical guides for founders who want to build what people actually need.
+          <p className="mx-auto max-w-2xl text-xl font-medium text-zinc-600">
+            Research-backed insights, data studies, and practical guides for founders who want to build software with validated market demand.
           </p>
         </header>
 
@@ -165,7 +238,7 @@ export default function BlogPage() {
             <Link
               key={post.href}
               href={post.href}
-              className="group relative flex flex-col overflow-hidden rounded-[32px] glass-card p-8 transition-all"
+              className="group relative flex flex-col overflow-hidden rounded-[32px] glass-card p-8 transition-all hover:border-[#ff4500]/30 hover:shadow-lg"
             >
               <div className="absolute top-0 right-0 h-32 w-32 bg-[#ff4500]/5 opacity-0 blur-[80px] transition-opacity group-hover:opacity-100" />
 
@@ -184,20 +257,20 @@ export default function BlogPage() {
                 {post.title}
               </h3>
               {post.subtitle && (
-                <p className="mb-4 text-sm font-bold text-zinc-500 italic">
+                <p className="mb-4 text-sm font-bold text-zinc-600 italic">
                   {post.subtitle}
                 </p>
               )}
 
-              <p className="mb-8 flex-1 text-sm font-medium leading-relaxed text-zinc-500">
+              <p className="mb-8 flex-1 text-sm font-medium leading-relaxed text-zinc-600">
                 {post.description}
               </p>
 
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+              <div className="flex items-center justify-between border-t border-black/5 pt-4">
+                <span className="text-[11px] font-bold text-zinc-600 uppercase tracking-widest">
                   {post.date}
                 </span>
-                <div className="flex items-center gap-2 text-xs font-black text-zinc-500 uppercase tracking-widest transition-colors group-hover:text-zinc-900">
+                <div className="flex items-center gap-2 text-xs font-black text-zinc-600 uppercase tracking-widest transition-colors group-hover:text-zinc-900">
                   Read Post <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>

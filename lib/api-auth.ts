@@ -4,7 +4,7 @@ import type { SQL } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { auth, getServerSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { workspace, workspaceMember } from "@/lib/db/schema";
 import { apiError, getCorrelationId } from "@/lib/api-error";
@@ -58,9 +58,7 @@ export async function requireApiContext(req: Request) {
     }
   }
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession(await headers());
 
   if (
     session?.user &&

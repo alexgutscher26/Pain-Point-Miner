@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth, sanitizeAuthHeaders } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { resolvePlanForIdentity, type BillingPlan } from "@/lib/plan-gating";
@@ -46,8 +46,9 @@ async function loadSubscriptions(
   }
 
   try {
+    const cleanHeaders = sanitizeAuthHeaders(requestHeaders);
     const subscriptions = await authApi.listActiveSubscriptions({
-      headers: requestHeaders,
+      headers: cleanHeaders,
     });
 
     if (!Array.isArray(subscriptions)) {
@@ -126,7 +127,7 @@ export function resolvePlanAccessState({
     userId,
     plan,
     ltdTier: ltdTier || null,
-    planPurchaseRequired: !isPaidOrLTD,
+    planPurchaseRequired: false,
     hasActiveSubscription: isPaidOrLTD,
     trialActive: false, // Trials are disabled
     trialEndsAt: null,

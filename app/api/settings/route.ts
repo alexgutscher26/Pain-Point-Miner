@@ -35,6 +35,7 @@ const settingsSchema = z.object({
   minimumOpportunityScore: z.number().int().min(0).max(100),
   defaultLocale: z.string().trim().max(80, "Locale is too long"),
   scoringWeights: weightSchema,
+  customApiKey: z.string().trim().max(255).optional().nullable(),
 });
 
 type SettingsPayload = z.infer<typeof settingsSchema>;
@@ -70,6 +71,7 @@ function toSettingsPayload(args: {
   emailNotifications: boolean;
   dashboardLayout: unknown;
   scoringWeights: unknown;
+  customApiKey?: string | null;
 }): SettingsPayload {
   const parsedLayout = parseDashboardLayout(args.dashboardLayout);
   const persistedSettings = parsedLayout.settings ?? {};
@@ -88,6 +90,7 @@ function toSettingsPayload(args: {
     minimumOpportunityScore: scanDefaults.minimumOpportunityScore ?? 70,
     defaultLocale: scanDefaults.defaultLocale ?? "United States",
     scoringWeights: (args.scoringWeights as ScoringWeights) || DEFAULT_WEIGHTS,
+    customApiKey: args.customApiKey ?? "",
   };
 }
 
@@ -119,6 +122,7 @@ export async function GET(req: Request) {
         emailNotifications: true,
         dashboardLayout: true,
         scoringWeights: true,
+        customApiKey: true,
       },
     });
 
@@ -129,6 +133,7 @@ export async function GET(req: Request) {
         emailNotifications: preferences?.emailNotifications ?? true,
         dashboardLayout: preferences?.dashboardLayout,
         scoringWeights: preferences?.scoringWeights,
+        customApiKey: preferences?.customApiKey,
       }),
       200,
       correlationId,
@@ -207,6 +212,11 @@ export async function PATCH(req: Request) {
         })
         .where(eq(user.id, userId));
 
+      const sanitizedApiKey =
+        payload.customApiKey !== undefined
+          ? payload.customApiKey?.trim() || null
+          : undefined;
+
       if (existingPreferences) {
         await tx
           .update(userPreferences)
@@ -214,6 +224,7 @@ export async function PATCH(req: Request) {
             emailNotifications: payload.weeklyDigest,
             dashboardLayout: nextDashboardLayout,
             scoringWeights: payload.scoringWeights,
+            ...(sanitizedApiKey !== undefined ? { customApiKey: sanitizedApiKey } : {}),
           })
           .where(eq(userPreferences.id, existingPreferences.id));
       } else {
@@ -223,6 +234,7 @@ export async function PATCH(req: Request) {
           emailNotifications: payload.weeklyDigest,
           dashboardLayout: nextDashboardLayout,
           scoringWeights: payload.scoringWeights,
+          customApiKey: sanitizedApiKey ?? null,
         });
       }
     });

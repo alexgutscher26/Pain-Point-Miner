@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth, getServerSession } from "@/lib/auth";
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -12,9 +12,7 @@ export default async function OnboardingLayout({
   children: React.ReactNode;
 }) {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   if (!session) {
     redirect("/sign-in");

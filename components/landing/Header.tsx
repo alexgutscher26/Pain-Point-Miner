@@ -37,7 +37,9 @@ export function Header() {
 
   const navLinks = [
     { name: "Features", href: "/#features" },
+    { name: "Pre-Mined Niches", href: "/niches" },
     { name: "Pricing", href: "/#pricing" },
+    { name: "Blog", href: "/blog" },
     { name: "Resources", href: "/resources" },
     { name: "FAQ", href: "/#faq" },
   ];

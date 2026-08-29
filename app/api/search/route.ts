@@ -12,6 +12,7 @@ import {
   getPlanEntitlements,
   isDepthAllowed,
   calculateMiningCost,
+  getPurchasedCreditsBalance,
 } from "@/lib/plan-gating";
 
 import { resolvePlanContext } from "@/lib/plan-resolver";
@@ -261,31 +262,20 @@ export async function POST(req: Request) {
       requestHeaders: req.headers,
     });
 
-    const totalScans = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(scraper)
-      .where(eq(scraper.userId, userId));
-    const isFirstScan = (totalScans[0]?.count ?? 0) === 0;
+    const userPrefs = await db.query.userPreferences.findFirst({
+      where: eq(userPreferences.userId, userId),
+      columns: { customApiKey: true },
+    });
+    const isByok = Boolean(userPrefs?.customApiKey?.trim());
 
-    if (planContext.planPurchaseRequired && !isFirstScan) {
-      return apiError(
-        403,
-        "PLAN_REQUIRED",
-        "Upgrade to a paid plan to unlock new scans.",
-        {
-          trialEnded: true,
-        },
-        correlationId,
-      );
-    }
     const plan = planContext.plan;
     const entitlements = getPlanEntitlements(plan);
 
-    if (!isDepthAllowed(plan, miningDepth)) {
+    if (!isByok && !isDepthAllowed(plan, miningDepth)) {
       return apiError(
         403,
         "PLAN_UPGRADE_REQUIRED",
-        `Your ${plan} plan does not include ${miningDepth} mining depth. Upgrade to continue.`,
+        `Your ${plan} plan does not include ${miningDepth} mining depth. Upgrade to continue or use BYOK.`,
         {
           plan,
           allowedMiningDepths: entitlements.allowedMiningDepths,
@@ -294,22 +284,30 @@ export async function POST(req: Request) {
       );
     }
 
-    const monthlyScansUsed = await getMonthlyScanUsage(userId);
-    if (
-      entitlements.monthlyScans !== null &&
-      monthlyScansUsed >= entitlements.monthlyScans
-    ) {
-      return apiError(
-        403,
-        "PLAN_LIMIT_REACHED",
-        `You have reached your monthly scan limit (${entitlements.monthlyScans}) for the ${plan} plan.`,
-        {
-          plan,
-          monthlyScansUsed,
-          monthlyScansLimit: entitlements.monthlyScans,
-        },
-        correlationId,
-      );
+    if (!isByok) {
+      const monthlyScansUsed = await getMonthlyScanUsage(userId);
+      const purchasedBalance = await getPurchasedCreditsBalance(userId);
+      const hasPlanScansRemaining =
+        entitlements.monthlyScans === null ||
+        monthlyScansUsed < entitlements.monthlyScans;
+
+      if (!hasPlanScansRemaining && purchasedBalance <= 0) {
+        return apiError(
+          403,
+          "PLAN_LIMIT_REACHED",
+          plan === "starter"
+            ? `You have used your ${entitlements.monthlyScans} free monthly scans. Upgrade to Pro, top-up credits, or add your OpenRouter API key in Settings to keep mining.`
+            : `You have reached your monthly scan limit (${entitlements.monthlyScans}) for the ${plan} plan. Top-up credits or upgrade to continue.`,
+          {
+            plan,
+            monthlyScansUsed,
+            monthlyScansLimit: entitlements.monthlyScans,
+            purchasedBalance,
+            canTopUp: true,
+          },
+          correlationId,
+        );
+      }
     }
 
     const rawSubreddits = subreddits

@@ -66,12 +66,13 @@ export function UserJotWidget({
   user?: Pick<User, "id" | "email" | "name"> | null;
 }) {
   useEffect(() => {
-    // Prevent UserJot SDK from throwing a JSON.parse SyntaxError on empty strings
+    // Clear stale identify keys to prevent UserJot SDK from attempting unsanctioned token sync
     try {
       if (typeof window !== "undefined" && window.localStorage) {
-        const keysToCheck = ["uj_userId", "uj_identifyHash"];
-        for (const key of keysToCheck) {
-          if (window.localStorage.getItem(key) === "") {
+        const keysToClean = ["uj_userId", "uj_identifyHash"];
+        for (const key of keysToClean) {
+          const val = window.localStorage.getItem(key);
+          if (val === "" || val !== null) {
             window.localStorage.removeItem(key);
           }
         }
@@ -95,14 +96,6 @@ export function UserJotWidget({
           position: "right",
           theme: "auto",
         });
-
-        if (
-          user &&
-          "identify" in userJot &&
-          typeof userJot.identify === "function"
-        ) {
-          userJot.identify(getUserJotIdentity(user));
-        }
 
         window.__userJotInitialized = true;
       }

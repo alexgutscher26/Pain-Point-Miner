@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { scraper, scraperRun, painPoint } from "@/lib/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { normalizeRunStatus, type RunStatus } from "@/lib/run-status";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
@@ -81,7 +81,7 @@ function phaseToMessage(
 }
 
 export async function GET(req: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getServerSession(await headers());
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
   }

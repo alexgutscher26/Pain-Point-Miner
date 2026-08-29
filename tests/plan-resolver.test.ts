@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolvePlanAccessState } from "@/lib/plan-resolver";
 
 describe("plan-resolver", () => {
-  it("requires a paid plan for starter users without LTD", () => {
+  it("grants access to starter users without requiring immediate purchase", () => {
     const result = resolvePlanAccessState({
       userId: "user_1",
       plan: "starter",
@@ -10,7 +10,7 @@ describe("plan-resolver", () => {
     });
 
     expect(result.plan).toBe("starter");
-    expect(result.planPurchaseRequired).toBe(true);
+    expect(result.planPurchaseRequired).toBe(false);
     expect(result.ltdTier).toBe("none");
   });
 

@@ -6,7 +6,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { defaultMetadata } from "@/lib/seo";
 import { UserJotWidget } from "@/components/userjot-widget";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
@@ -31,9 +31,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>

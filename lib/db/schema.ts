@@ -272,6 +272,7 @@ export const userPreferences = pgTable(
       w3: number; // urgency
       w4: number; // marketMaturity
     }>(),
+    customApiKey: text("custom_api_key"),
   },
   (table) => [
     uniqueIndex("user_preferences_userId_key").using(

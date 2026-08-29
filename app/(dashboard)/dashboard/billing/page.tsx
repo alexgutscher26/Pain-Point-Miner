@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { BillingPageClient } from "@/components/dashboard/billing-page-client";
 import {
   type BillingPlan,
@@ -25,9 +25,7 @@ export const dynamic = "force-dynamic";
 
 export default async function BillingPage() {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   if (!session) {
     redirect("/sign-in");
