@@ -80,6 +80,17 @@ export const auth = betterAuth({
             clientId: githubClientId!,
             clientSecret: githubClientSecret!,
             scope: ["user:email", "read:user"],
+            mapProfileToUser: (profile) => {
+              return {
+                email:
+                  profile.email ||
+                  (profile.login
+                    ? `${profile.login}@users.noreply.github.com`
+                    : `${profile.id}@users.noreply.github.com`),
+                name: profile.name || profile.login || "GitHub User",
+                image: profile.avatar_url,
+              };
+            },
           },
         },
       }
