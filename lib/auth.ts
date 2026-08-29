@@ -79,6 +79,7 @@ export const auth = betterAuth({
           github: {
             clientId: githubClientId!,
             clientSecret: githubClientSecret!,
+            scope: ["user:email", "read:user"],
           },
         },
       }
