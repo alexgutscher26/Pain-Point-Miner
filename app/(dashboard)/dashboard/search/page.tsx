@@ -278,13 +278,14 @@ export default function SearchPage() {
     };
   }, []);
 
+  const visibleCommunitiesKey = visibleCommunities.join(",");
+
   useEffect(() => {
     let cancelled = false;
     async function loadMetadata() {
-      if (visibleCommunities.length === 0) return;
+      if (!visibleCommunitiesKey) return;
       try {
-        const query = visibleCommunities.join(",");
-        const res = await fetch(`/api/subreddits/metadata?names=${query}`);
+        const res = await fetch(`/api/subreddits/metadata?names=${visibleCommunitiesKey}`);
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && data.subreddits) {
@@ -300,7 +301,7 @@ export default function SearchPage() {
     return () => {
       cancelled = true;
     };
-  }, [visibleCommunities]);
+  }, [visibleCommunitiesKey]);
 
   const handleSuggestSubreddits = async () => {
     if (trialEnded) {

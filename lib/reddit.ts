@@ -467,7 +467,14 @@ async function fetchRedditResponse(url: string): Promise<Response> {
 function isRedditBlockedError(error: unknown) {
   if (!(error instanceof Error)) return false;
   const message = error.message.toLowerCase();
-  return message.includes("403") || message.includes("blocked");
+  return (
+    message.includes("403") ||
+    message.includes("429") ||
+    message.includes("blocked") ||
+    message.includes("rate-limited") ||
+    message.includes("throttled") ||
+    message.includes("too many requests")
+  );
 }
 
 function normalizeText(text: string) {
