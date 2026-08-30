@@ -2,8 +2,8 @@ import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { dashboardOpportunityMv, painPointFeedback, userPreferences } from "@/lib/db/schema";
-import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
+import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
+import { and, desc, eq, gte, isNull } from "drizzle-orm";
 import {
   TrendingUp,
   Search,
@@ -41,7 +41,9 @@ const LazyCommunityMapPanel = dynamicLoader(
     ),
   {
     loading: () => (
-      <div className="h-[400px] w-full animate-pulse border border-black/[0.05] bg-black/[0.01] rounded-2xl" />
+      <div className="flex h-80 items-center justify-center rounded-2xl border border-black/[0.06] bg-white/60 text-sm text-zinc-400">
+        Loading community map...
+      </div>
     ),
   },
 );
@@ -49,54 +51,41 @@ const LazyCommunityMapPanel = dynamicLoader(
 const getCachedDashboardData = unstable_cache(
   async (userId: string, workspaceId: string | null, windowDateMs: number) => {
     const fromDate = new Date(windowDateMs);
-    const mvFilter = and(
-      eq(dashboardOpportunityMv.userId, userId),
-      workspaceId
-        ? eq(dashboardOpportunityMv.workspaceId, workspaceId)
-        : isNull(dashboardOpportunityMv.workspaceId),
-      gte(dashboardOpportunityMv.createdAt, fromDate),
-    );
+    const scraperRows = await db.query.scraper.findMany({
+      where: and(
+        eq(scraper.userId, userId),
+        isNull(scraper.deletedAt),
+        gte(scraper.createdAt, fromDate),
+      ),
+      orderBy: [desc(scraper.createdAt)],
+      with: {
+        scraperRuns: {
+          orderBy: [desc(scraperRun.startedAt)],
+          limit: 1,
+        },
+        painPoints: {
+          with: {
+            painPointFeedback: {
+              columns: {
+                vote: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    const mvRows = await db
-      .select()
-      .from(dashboardOpportunityMv)
-      .where(mvFilter)
-      .orderBy(desc(dashboardOpportunityMv.createdAt));
-
-    // Batch fetch feedback votes
-    const allPainPointIds = mvRows.flatMap(
-      (r) => (r.painPoints as Array<{ id: string }> | null)?.map((pp) => pp.id) ?? [],
-    );
-    const feedbackRows = allPainPointIds.length > 0
-      ? await db
-          .select()
-          .from(painPointFeedback)
-          .where(inArray(painPointFeedback.painPointId, allPainPointIds))
-      : [];
-    const feedbackByPainPointId = new Map<string, Array<{ vote: number }>>();
-    for (const fb of feedbackRows) {
-      const arr = feedbackByPainPointId.get(fb.painPointId) ?? [];
-      arr.push({ vote: fb.vote });
-      feedbackByPainPointId.set(fb.painPointId, arr);
-    }
-
-    // Transform to match the previous relational query shape
-    return (mvRows as any[]).map((r) => ({
-      id: r.scraperId,
+    return scraperRows.map((r) => ({
+      id: r.id,
       keywords: r.keywords,
       createdAt: r.createdAt,
       reportSaved: r.reportSaved,
-      scraperRuns: r.latestRunStatus
-        ? [{ status: r.latestRunStatus, startedAt: r.latestRunStartedAt, postsFetched: r.latestPostsFetched }]
-        : [],
-      painPoints: ((r.painPoints as any[]) || []).map((pp: any) => ({
-        ...pp,
-        painPointFeedback: feedbackByPainPointId.get(pp.id) ?? [],
-      })),
+      scraperRuns: r.scraperRuns,
+      painPoints: r.painPoints,
     }));
   },
   ["dashboard-metrics-cache"],
-  { revalidate: 30, tags: ["dashboard"] },
+  { revalidate: 10, tags: ["dashboard"] },
 );
 
 const workspaceHeaderSchema = z.string().uuid().nullable();

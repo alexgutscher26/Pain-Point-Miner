@@ -2,13 +2,14 @@
 
 import { db } from "@/lib/db";
 import {
-  dashboardOpportunityMv,
+  scraper,
+  scraperRun,
   painPointComment,
   painPointFeedback,
 } from "@/lib/db/schema";
-import { and, desc, eq, gte, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
-import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { requireApiContext } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
 import {
   buildLatestTrendInsights,
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
   const { searchParams } = new URL(req.url);
 
   const days = searchParams.get("days");
@@ -40,27 +41,46 @@ export async function GET(req: Request) {
     });
     const entitlements = getPlanEntitlements(plan);
 
-    let mvFilter = and(
-      eq(dashboardOpportunityMv.userId, userId),
-      workspaceScope(dashboardOpportunityMv.workspaceId, workspaceId),
-    );
+    const fromDate =
+      days && days !== "all"
+        ? (() => {
+            const d = new Date();
+            d.setDate(d.getDate() - parseInt(days));
+            return d;
+          })()
+        : null;
 
-    if (days && days !== "all") {
-      const date = new Date();
-      date.setDate(date.getDate() - parseInt(days));
-      mvFilter = and(mvFilter, gte(dashboardOpportunityMv.createdAt, date));
-    }
-
-    // Query materialized view (avoids joins across scraper + scraper_run + pain_point)
-    const mvRows = await db
-      .select()
-      .from(dashboardOpportunityMv)
-      .where(mvFilter)
-      .orderBy(desc(dashboardOpportunityMv.createdAt));
+    // Fetch scrapers for the current user
+    const scraperRows = await db.query.scraper.findMany({
+      where: and(
+        eq(scraper.userId, userId),
+        isNull(scraper.deletedAt),
+        fromDate ? gte(scraper.createdAt, fromDate) : undefined,
+      ),
+      orderBy: [desc(scraper.createdAt)],
+      with: {
+        scraperRuns: {
+          orderBy: [desc(scraperRun.startedAt)],
+          limit: 1,
+        },
+        painPoints: {
+          columns: {
+            id: true,
+            score: true,
+            urgency: true,
+            monetizationScore: true,
+            marketMaturity: true,
+            sentiment: true,
+            commentCount: true,
+            mentionCount: true,
+          },
+        },
+      },
+    });
 
     // Batch fetch feedback votes for all pain points across all scrapers
-    const allPainPointIds = mvRows.flatMap(
-      (r) => (r.painPoints as Array<{ id: string }> | null)?.map((pp) => pp.id) ?? [],
+    const allPainPointIds = scraperRows.flatMap(
+      (r) => r.painPoints?.map((pp) => pp.id) ?? [],
     );
     const feedbackRows = allPainPointIds.length > 0
       ? await db
@@ -92,28 +112,15 @@ export async function GET(req: Request) {
       }
     }
 
-    // Trend history: use MV for pain point count per scraper
-    const trendHistoryRows = await db
-      .select({
-        keywords: dashboardOpportunityMv.keywords,
-        painPointCount: dashboardOpportunityMv.painPointCount,
-        createdAt: dashboardOpportunityMv.createdAt,
-      })
-      .from(dashboardOpportunityMv)
-      .where(and(
-        eq(dashboardOpportunityMv.userId, userId),
-        workspaceScope(dashboardOpportunityMv.workspaceId, workspaceId),
-      ))
-      .orderBy(desc(dashboardOpportunityMv.createdAt));
-
+    // Trend history
     const trendInsights = buildLatestTrendInsights(
-      trendHistoryRows
+      scraperRows
         .map((row) => {
           const keyword = row.keywords?.[0]?.trim().toLowerCase();
           if (!keyword) return null;
           return {
             key: keyword,
-            value: row.painPointCount,
+            value: row.painPoints.length,
             createdAt: row.createdAt,
           };
         })
@@ -125,17 +132,9 @@ export async function GET(req: Request) {
       trendInsights.map((trend) => [trend.key, trend]),
     );
 
-    let formattedReports = (mvRows as any[]).map((r) => {
-      const pps: Array<{
-        id: string;
-        score: number;
-        urgency: number;
-        monetizationScore: number;
-        marketMaturity: number;
-        sentiment: string | null;
-        commentCount: number;
-        mentionCount: number;
-      }> = (r.painPoints as any[]) || [];
+    let formattedReports = scraperRows.map((r) => {
+      const pps = r.painPoints || [];
+      const latestRun = r.scraperRuns?.[0];
       const keywordKey = (r.keywords?.[0] || "").trim().toLowerCase();
       const trend = keywordKey ? trendByKeyword.get(keywordKey) : undefined;
       const enrichedPainPoints = pps.map((point: any) => {
@@ -180,7 +179,7 @@ export async function GET(req: Request) {
           : 0;
 
       return {
-        id: r.scraperId,
+        id: r.id,
         niche: r.keywords?.[0] || "Unknown Investigation",
         date: new Date(r.createdAt).toLocaleDateString("en-US", {
           month: "short",
@@ -217,7 +216,7 @@ export async function GET(req: Request) {
             : null
           : null,
         status: (() => {
-          const normalized = normalizeRunStatus(r.latestRunStatus);
+          const normalized = normalizeRunStatus(latestRun?.status);
           if (normalized === "completed") return "Completed";
           if (normalized === "failed" || normalized === "canceled")
             return "Failed";
