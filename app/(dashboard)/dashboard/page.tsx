@@ -2,8 +2,8 @@ import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
-import { and, desc, eq, gte, isNull } from "drizzle-orm";
+import { painPointFeedback, scraper, scraperRun, userPreferences } from "@/lib/db/schema";
+import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import {
   TrendingUp,
   Search,
@@ -63,17 +63,26 @@ const getCachedDashboardData = unstable_cache(
           orderBy: [desc(scraperRun.startedAt)],
           limit: 1,
         },
-        painPoints: {
-          with: {
-            painPointFeedback: {
-              columns: {
-                vote: true,
-              },
-            },
-          },
-        },
+        painPoints: true,
       },
     });
+
+    const allPainPointIds = scraperRows.flatMap(
+      (r) => r.painPoints?.map((pp) => pp.id) ?? [],
+    );
+    const feedbackRows =
+      allPainPointIds.length > 0
+        ? await db
+            .select()
+            .from(painPointFeedback)
+            .where(inArray(painPointFeedback.painPointId, allPainPointIds))
+        : [];
+    const feedbackByPainPointId = new Map<string, Array<{ vote: number }>>();
+    for (const fb of feedbackRows) {
+      const arr = feedbackByPainPointId.get(fb.painPointId) ?? [];
+      arr.push({ vote: fb.vote });
+      feedbackByPainPointId.set(fb.painPointId, arr);
+    }
 
     return scraperRows.map((r) => ({
       id: r.id,
@@ -81,7 +90,10 @@ const getCachedDashboardData = unstable_cache(
       createdAt: r.createdAt,
       reportSaved: r.reportSaved,
       scraperRuns: r.scraperRuns,
-      painPoints: r.painPoints,
+      painPoints: (r.painPoints || []).map((pp) => ({
+        ...pp,
+        painPointFeedback: feedbackByPainPointId.get(pp.id) ?? [],
+      })),
     }));
   },
   ["dashboard-metrics-cache"],

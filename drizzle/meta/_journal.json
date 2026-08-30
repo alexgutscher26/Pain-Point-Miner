@@ -50,6 +50,13 @@
       "when": 1781756711602,
       "tag": "0006_schema_partition_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788125594747,
+      "tag": "0007_married_colonel_america",
+      "breakpoints": true
     }
   ]
 }
