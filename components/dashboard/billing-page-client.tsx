@@ -51,7 +51,6 @@ export function BillingPageClient({
   const [openingPortal, setOpeningPortal] = useState(false);
   const [startingCheckoutPlan, setStartingCheckoutPlan] =
     useState<BillingPlan | null>(null);
-  const [loadingPackage, setLoadingPackage] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">(
     "monthly",
   );
@@ -141,29 +140,6 @@ export function BillingPageClient({
       });
     } finally {
       setStartingCheckoutPlan(null);
-    }
-  }
-
-  async function startTopupCheckout(packId: string) {
-    if (!stripeConfigured) return;
-    setLoadingPackage(packId);
-    try {
-      const res = await fetch("/api/billing/create-credit-checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ pack: packId }),
-      });
-      const data = await safeJson(res);
-      if (!res.ok) throw new Error(data?.message ?? "Unable to start checkout.");
-      if (data?.url) window.location.href = data.url;
-    } catch (error) {
-      console.error("Top-up Error:", error);
-      setActionState({
-        type: "error",
-        message: error instanceof Error ? error.message : "Unable to purchase credits.",
-      });
-    } finally {
-      setLoadingPackage(null);
     }
   }
 
@@ -535,61 +511,6 @@ export function BillingPageClient({
           </div>
         </div>
       </div>
-
-      {/* Credit Top-up Packages */}
-      <section className="space-y-6 pt-4">
-        <div>
-          <h3 className="text-xl font-extrabold text-zinc-955">Buy More Scans</h3>
-          <p className="mt-1.5 text-[14px] font-medium text-zinc-500">
-            Permanent rollover scan credits that never expire.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {[
-            { id: "starter", name: "Starter Pack", scans: 50, price: 19 },
-            { id: "pro", name: "Pro Pack", scans: 250, price: 79 },
-            { id: "elite", name: "Elite Pack", scans: 1000, price: 249 },
-          ].map((pack) => {
-            const discount = displayLtdTier === "professional" ? 0.4 : displayLtdTier === "founder" ? 0.2 : 0;
-            const finalPrice = Math.round(pack.price * (1 - discount));
-
-            return (
-              <div
-                key={pack.id}
-                className="group glass-card glass-card-hover p-6 rounded-2xl flex flex-col justify-between border border-black/[0.04]"
-              >
-                <div>
-                  <h4 className="text-base font-extrabold text-zinc-900 group-hover:text-[#ff4500] transition-colors">
-                    {pack.name}
-                  </h4>
-                  <div className="mt-3 mb-4 flex items-baseline gap-1 text-zinc-955">
-                    <span className="text-3xl font-black">{pack.scans}</span>
-                    <span className="text-xs text-zinc-400 font-medium">scans</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5 text-zinc-900">
-                    <span className="text-2xl font-extrabold">${finalPrice}</span>
-                    {discount > 0 && (
-                      <span className="text-xs text-zinc-400 line-through font-semibold">
-                        ${pack.price}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => startTopupCheckout(pack.id)}
-                  disabled={loadingPackage === pack.id}
-                  className="cursor-pointer mt-6 flex h-10 w-full items-center justify-center rounded-full bg-[#ff4500] hover:bg-[#e03d00] text-xs font-bold text-white transition-colors disabled:opacity-50"
-                >
-                  {loadingPackage === pack.id ? "Redirecting..." : "Buy Now"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
     </div>
   );
 }
