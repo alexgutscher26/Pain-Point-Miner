@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
 import Stripe from "stripe";
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
       allow_promotion_codes: true,
-      success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true`,
+      success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?canceled=true`,
       metadata: {
         userId: session.user.id,

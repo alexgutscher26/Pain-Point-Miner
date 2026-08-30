@@ -9,6 +9,7 @@ import {
   getPlanEntitlements,
 } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
+import { Stripe } from "stripe";
 
 type BillingPurchaseOption = {
   plan: BillingPlan;
@@ -23,7 +24,12 @@ type BillingPurchaseConfig = {
 
 export const dynamic = "force-dynamic";
 
-export default async function BillingPage() {
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ success?: string; session_id?: string; canceled?: string }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const requestHeaders = await headers();
   const session = await getServerSession(requestHeaders);
 
@@ -34,6 +40,64 @@ export default async function BillingPage() {
   const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET,
   );
+
+  if (
+    stripeConfigured &&
+    (resolvedSearchParams.session_id || resolvedSearchParams.success === "true")
+  ) {
+    try {
+      const Stripe = (await import("stripe")).default;
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+      let checkoutSession: Stripe.Checkout.Session | null = null;
+
+      if (resolvedSearchParams.session_id) {
+        checkoutSession = await stripe.checkout.sessions.retrieve(
+          resolvedSearchParams.session_id,
+        );
+      } else {
+        const recent = await stripe.checkout.sessions.list({
+          limit: 3,
+        });
+        checkoutSession =
+          recent.data.find(
+            (s) =>
+              s.metadata?.userId === session.user.id &&
+              (s.payment_status === "paid" || s.status === "complete"),
+          ) || null;
+      }
+
+      if (
+        checkoutSession &&
+        (checkoutSession.payment_status === "paid" ||
+          checkoutSession.status === "complete") &&
+        checkoutSession.metadata?.type === "ltd_purchase" &&
+        checkoutSession.metadata?.userId === session.user.id
+      ) {
+        const tier = checkoutSession.metadata.ltdTier as
+          | "founder"
+          | "professional";
+        const amountPaid = parseFloat(
+          checkoutSession.metadata.amountPaid || "0",
+        );
+        const { db } = await import("@/lib/db");
+        const { user } = await import("@/lib/db/schema");
+        const { eq } = await import("drizzle-orm");
+
+        await db
+          .update(user)
+          .set({
+            ltdTier: tier,
+            ltdPricePaid: amountPaid,
+            stripeCustomerId:
+              (checkoutSession.customer as string) ||
+              session.user.stripeCustomerId,
+          })
+          .where(eq(user.id, session.user.id));
+      }
+    } catch (err) {
+      console.error("[BillingPage] Checkout sync check:", err);
+    }
+  }
 
   let stripeCustomerId = session.user.stripeCustomerId;
 
