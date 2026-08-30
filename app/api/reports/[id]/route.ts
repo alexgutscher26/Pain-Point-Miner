@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { scraper, scraperRun, workspace, workspaceMember } from "@/lib/db/schema";
+import { and, eq, desc, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
-import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { requireApiContext } from "@/lib/api-auth";
 import {
   buildLatestTrendInsights,
   formatTrendChangePercent,
@@ -210,11 +211,11 @@ export async function GET(
     });
     const entitlements = getPlanEntitlements(plan);
 
-    const currentScraper = await db.query.scraper.findFirst({
+    let targetScraperId = id;
+    let currentScraper = await db.query.scraper.findFirst({
       where: and(
-        eq(scraper.id, id),
-        eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId),
+        eq(scraper.id, targetScraperId),
+        isNull(scraper.deletedAt),
       ),
       with: {
         scraperRuns: {
@@ -250,6 +251,88 @@ export async function GET(
     });
 
     if (!currentScraper) {
+      // Check if `id` was a scraperRun id
+      const runRecord = await db.query.scraperRun.findFirst({
+        where: eq(scraperRun.id, id),
+        columns: { id: true, scraperId: true },
+      });
+      if (runRecord?.scraperId) {
+        targetScraperId = runRecord.scraperId;
+        currentScraper = await db.query.scraper.findFirst({
+          where: and(
+            eq(scraper.id, targetScraperId),
+            isNull(scraper.deletedAt),
+          ),
+          with: {
+            scraperRuns: {
+              orderBy: [desc(scraperRun.startedAt)],
+              limit: 1,
+            },
+            painPoints: {
+              with: {
+                painPointCluster: {
+                  columns: {
+                    id: true,
+                    estimatedTamUsdAnnual: true,
+                    budgetSignalCount: true,
+                    competitorIntel: true,
+                  },
+                },
+                painPointComments: {
+                  columns: {
+                    body: true,
+                    score: true,
+                  },
+                  orderBy: (comment, { desc }) => [desc(comment.score)],
+                  limit: 12,
+                },
+                painPointFeedback: {
+                  columns: {
+                    vote: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    if (!currentScraper) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
+    // Authorize: User must be report owner OR member/owner of the report's workspace
+    let hasAccess = currentScraper.userId === userId;
+    if (!hasAccess && currentScraper.workspaceId) {
+      const member = await db.query.workspaceMember.findFirst({
+        where: and(
+          eq(workspaceMember.workspaceId, currentScraper.workspaceId),
+          eq(workspaceMember.userId, userId),
+        ),
+      });
+      if (member) {
+        hasAccess = true;
+      } else {
+        const ownedWorkspace = await db.query.workspace.findFirst({
+          where: and(
+            eq(workspace.id, currentScraper.workspaceId),
+            eq(workspace.ownerId, userId),
+          ),
+        });
+        if (ownedWorkspace) {
+          hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
       return apiError(
         404,
         "NOT_FOUND",
@@ -269,7 +352,7 @@ export async function GET(
     const trendHistoryRows = await db.query.scraper.findMany({
       where: and(
         eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId),
+        isNull(scraper.deletedAt),
       ),
       orderBy: [desc(scraper.createdAt)],
       with: {
@@ -625,6 +708,73 @@ export async function PATCH(
       );
     }
 
+    let targetScraperId = id;
+    let existingScraper = await db.query.scraper.findFirst({
+      where: and(
+        eq(scraper.id, targetScraperId),
+        isNull(scraper.deletedAt),
+      ),
+    });
+
+    if (!existingScraper) {
+      const runRecord = await db.query.scraperRun.findFirst({
+        where: eq(scraperRun.id, id),
+        columns: { id: true, scraperId: true },
+      });
+      if (runRecord?.scraperId) {
+        targetScraperId = runRecord.scraperId;
+        existingScraper = await db.query.scraper.findFirst({
+          where: and(
+            eq(scraper.id, targetScraperId),
+            isNull(scraper.deletedAt),
+          ),
+        });
+      }
+    }
+
+    if (!existingScraper) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
+    let hasAccess = existingScraper.userId === userId;
+    if (!hasAccess && existingScraper.workspaceId) {
+      const member = await db.query.workspaceMember.findFirst({
+        where: and(
+          eq(workspaceMember.workspaceId, existingScraper.workspaceId),
+          eq(workspaceMember.userId, userId),
+        ),
+      });
+      if (member) {
+        hasAccess = true;
+      } else {
+        const ownedWorkspace = await db.query.workspace.findFirst({
+          where: and(
+            eq(workspace.id, existingScraper.workspaceId),
+            eq(workspace.ownerId, userId),
+          ),
+        });
+        if (ownedWorkspace) {
+          hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
     const updated = await db
       .update(scraper)
       .set({
@@ -633,13 +783,7 @@ export async function PATCH(
         reportCategory: category ?? "Uncategorized",
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          eq(scraper.id, id),
-          eq(scraper.userId, userId),
-          workspaceScope(scraper.workspaceId, workspaceId),
-        ),
-      )
+      .where(eq(scraper.id, targetScraperId))
       .returning({
         id: scraper.id,
         reportSaved: scraper.reportSaved,
