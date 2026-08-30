@@ -348,7 +348,7 @@ export const scraper = pgTable(
 export const scraperRun = pgTable(
   "scraper_run",
   {
-    id: text().notNull(),
+    id: text().primaryKey().notNull(),
     scraperId: text().notNull(),
     status: text().default("success").notNull(),
     startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
@@ -370,7 +370,6 @@ export const scraperRun = pgTable(
       .notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.id, table.startedAt], name: "scraper_run_pkey" }),
     foreignKey({
       columns: [table.scraperId],
       foreignColumns: [scraper.id],
