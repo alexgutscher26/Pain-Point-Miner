@@ -11,6 +11,7 @@ import {
   Settings,
   ShieldCheck,
   Activity,
+  Bookmark,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 
@@ -34,6 +35,11 @@ export function SidebarLinks() {
       href: "/dashboard/reports",
       icon: <FileText className="h-[18px] w-[18px]" />,
       label: "Reports",
+    },
+    {
+      href: "/dashboard/bookmarks",
+      icon: <Bookmark className="h-[18px] w-[18px]" />,
+      label: "Bookmarks",
     },
     {
       href: "/dashboard/billing",
