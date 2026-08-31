@@ -635,6 +635,149 @@ export function rankRedditPosts(
   });
 }
 
+function parseRedditRss(xml: string, subreddit: string): RedditPost[] {
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
+  const posts: RedditPost[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = entryRegex.exec(xml)) !== null) {
+    const entryXml = match[1];
+    const titleMatch = entryXml.match(/<title>([\s\S]*?)<\/title>/);
+    const contentMatch = entryXml.match(/<content type="html">([\s\S]*?)<\/content>/);
+    const idMatch = entryXml.match(/<id>([\s\S]*?)<\/id>/);
+    const linkMatch = entryXml.match(/<link href="([\s\S]*?)"/);
+    const authorMatch = entryXml.match(/<author><name>([\s\S]*?)<\/name>/);
+    const updatedMatch = entryXml.match(/<updated>([\s\S]*?)<\/updated>/);
+
+    const rawContent = contentMatch ? contentMatch[1] : "";
+    const selftext = rawContent
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/<[^>]*>?/gm, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    let id = idMatch ? idMatch[1] : "";
+    const t3Match = id.match(/t3_([a-z0-9]+)/i);
+    if (t3Match) {
+      id = t3Match[1];
+    } else {
+      const commentMatch = (linkMatch ? linkMatch[1] : "").match(/\/comments\/([a-z0-9]+)\//i);
+      id = commentMatch ? commentMatch[1] : crypto.randomUUID();
+    }
+
+    const title = titleMatch
+      ? titleMatch[1]
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .trim()
+      : "";
+
+    const createdUtc = updatedMatch
+      ? Math.floor(new Date(updatedMatch[1]).getTime() / 1000)
+      : Math.floor(Date.now() / 1000);
+
+    posts.push({
+      id,
+      title,
+      selftext,
+      author: authorMatch ? authorMatch[1].replace("/u/", "") : "unknown",
+      score: 1,
+      subreddit,
+      url: linkMatch ? linkMatch[1] : "",
+      num_comments: 0,
+      created_utc: createdUtc,
+      is_self: !rawContent.includes("<span>[link]</span>"),
+    });
+  }
+
+  return posts;
+}
+
+async function fetchFromRedditRSS(
+  subreddit: string,
+  keyword: string,
+  maxPosts: number,
+  sort: RedditSortMode = "relevance",
+): Promise<RedditPost[]> {
+  const url = `https://www.reddit.com/r/${subreddit}/search.rss?q=${encodeURIComponent(keyword)}&restrict_sr=1&sort=${sort}&limit=${Math.min(100, maxPosts)}`;
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": currentUA,
+      Accept: "application/atom+xml,application/xml,text/xml",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Reddit RSS returned ${response.status}: ${response.statusText}`);
+  }
+
+  const xml = await response.text();
+  return parseRedditRss(xml, subreddit);
+}
+
+async function fetchFromArcticShiftSubmissions(
+  subreddit: string,
+  keyword: string,
+  maxPosts: number,
+): Promise<RedditPost[]> {
+  const url = `https://arctic-shift.photon-reddit.com/api/posts/search?subreddit=${subreddit}&limit=${Math.min(100, maxPosts)}`;
+  const response = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Arctic Shift returned ${response.status}: ${response.statusText}`);
+  }
+
+  const json = (await response.json()) as { data?: any[] };
+  const rows = json.data ?? [];
+
+  return rows.map((r: any) => ({
+    id: r.id,
+    title: r.title || "",
+    selftext: r.selftext || "",
+    author: r.author || "unknown",
+    score: r.score ?? 1,
+    subreddit: r.subreddit || subreddit,
+    url: r.permalink ? `https://www.reddit.com${r.permalink}` : (r.url || ""),
+    num_comments: r.num_comments ?? 0,
+    created_utc: r.created_utc ?? Math.floor(Date.now() / 1000),
+    is_self: r.is_self ?? true,
+  }));
+}
+
+async function fetchFromArcticShiftComments(
+  postId: string,
+): Promise<RedditComment[]> {
+  const url = `https://arctic-shift.photon-reddit.com/api/comments/search?link_id=${postId}&limit=100`;
+  const response = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Arctic Shift comments returned ${response.status}: ${response.statusText}`);
+  }
+
+  const json = (await response.json()) as { data?: any[] };
+  const rows = json.data ?? [];
+
+  return rows.map((r: any) => ({
+    id: r.id,
+    body: r.body || "",
+    author: r.author || "unknown",
+    score: r.score ?? 0,
+    permalink: r.permalink ? `https://www.reddit.com${r.permalink}` : "",
+    created_utc: r.created_utc ?? Math.floor(Date.now() / 1000),
+  }));
+}
+
 async function fetchFromPullPushSubmissions(
   subreddit: string,
   keyword: string,
@@ -868,23 +1011,55 @@ export async function fetchSubredditPostsBatched(
 
     return rankRedditPosts(posts, keyword);
   } catch (error) {
-    if (isRedditBlockedError(error)) {
-      try {
-        const fallbackPosts = await fetchFromPullPushSubmissions(
-          subreddit,
-          keyword,
-          Math.max(1, Math.min(2_000, options?.maxPosts ?? 25)),
-        );
-        return rankRedditPosts(fallbackPosts, keyword);
-      } catch (fallbackError) {
-        console.error(
-          `Error fetching posts from fallback source for r/${subreddit}:`,
-          fallbackError,
-        );
-        return [];
+    // Multi-source Fallback Chain: Reddit RSS -> Arctic Shift -> PullPush
+    const requestedMax = Math.max(1, Math.min(2_000, options?.maxPosts ?? 25));
+
+    // 1. Try Reddit RSS Feed
+    try {
+      const rssPosts = await fetchFromRedditRSS(
+        subreddit,
+        keyword,
+        requestedMax,
+        options?.sort ?? "relevance",
+      );
+      if (rssPosts.length > 0) {
+        return rankRedditPosts(rssPosts, keyword);
       }
+    } catch (rssError) {
+      // Continue to next fallback
     }
-    console.error(`Error fetching posts from r/${subreddit}:`, error);
+
+    // 2. Try Arctic Shift Archive API
+    try {
+      const arcticPosts = await fetchFromArcticShiftSubmissions(
+        subreddit,
+        keyword,
+        requestedMax,
+      );
+      if (arcticPosts.length > 0) {
+        return rankRedditPosts(arcticPosts, keyword);
+      }
+    } catch (arcticError) {
+      // Continue to next fallback
+    }
+
+    // 3. Try PullPush Archive API
+    try {
+      const fallbackPosts = await fetchFromPullPushSubmissions(
+        subreddit,
+        keyword,
+        requestedMax,
+      );
+      if (fallbackPosts.length > 0) {
+        return rankRedditPosts(fallbackPosts, keyword);
+      }
+    } catch (pullPushError) {
+      console.error(
+        `All scraping fallback sources failed for r/${subreddit}:`,
+        pullPushError,
+      );
+    }
+
     return [];
   }
 }
@@ -955,19 +1130,23 @@ export const fetchComments = async (
 
     return collectedComments;
   } catch (error) {
-    if (isRedditBlockedError(error)) {
-      try {
-        return await fetchFromPullPushComments(postId);
-      } catch (fallbackError) {
-        console.error(
-          "Error fetching comments from fallback source for post:",
-          postId,
-          fallbackError,
-        );
-        return [];
-      }
+    // Multi-source Comment Fallback: Arctic Shift -> PullPush
+    try {
+      const arcticComments = await fetchFromArcticShiftComments(postId);
+      if (arcticComments.length > 0) return arcticComments;
+    } catch {}
+
+    try {
+      const pullPushComments = await fetchFromPullPushComments(postId);
+      if (pullPushComments.length > 0) return pullPushComments;
+    } catch (fallbackError) {
+      console.error(
+        "Error fetching comments from fallback sources for post:",
+        postId,
+        fallbackError,
+      );
     }
-    console.error(`Error fetching comments for post ${postId}:`, error);
+
     return [];
   }
 };

@@ -10,26 +10,29 @@ import { str } from "@/lib/env";
 // Model catalogue
 // ---------------------------------------------------------------------------
 export const AI_MODELS = {
-  GEMINI_FLASH: "google/gemini-2.0-flash-001",
+  FREE: "minimax/minimax-m2.7:free",
+  GEMINI_FLASH: "google/gemini-2.5-flash",
   GPT4O: "openai/gpt-4o",
-  CLAUDE_SONNET: "anthropic/claude-sonnet-3-5",
+  CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
 } as const;
 
 export type AiModelId = (typeof AI_MODELS)[keyof typeof AI_MODELS];
 
-export const DEFAULT_AI_MODEL: AiModelId = AI_MODELS.GEMINI_FLASH;
+export const DEFAULT_AI_MODEL: AiModelId = (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.GEMINI_FLASH;
 
 /** Human-readable display label for each model, used in report metadata. */
 export const AI_MODEL_LABELS: Record<AiModelId, string> = {
-  [AI_MODELS.GEMINI_FLASH]: "Gemini 2.0 Flash",
+  [AI_MODELS.FREE]: "MiniMax M2.7 (Free)",
+  [AI_MODELS.GEMINI_FLASH]: "Gemini 2.5 Flash",
   [AI_MODELS.GPT4O]: "GPT-4o",
-  [AI_MODELS.CLAUDE_SONNET]: "Claude Sonnet 3.5",
+  [AI_MODELS.CLAUDE_SONNET]: "Claude 3.5 Sonnet",
 };
 
 // ---------------------------------------------------------------------------
 // Per-model cost rates (USD per 1 token)
 // ---------------------------------------------------------------------------
 const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
+  [AI_MODELS.FREE]:         { input: 0, output: 0 },                  // 100% Free
   [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 },  // $0.10 / $0.40 per 1M
   [AI_MODELS.GPT4O]:        { input: 0.0000025, output: 0.00001 },    // $2.50 / $10.00 per 1M
   [AI_MODELS.CLAUDE_SONNET]:{ input: 0.000003,  output: 0.000015 },   // $3.00 / $15.00 per 1M
@@ -46,7 +49,6 @@ export function getModelForDepth(
   if (modelOverride && Object.values(AI_MODELS).includes(modelOverride as AiModelId)) {
     return modelOverride as AiModelId;
   }
-  // All depths use Gemini 2.0 Flash — affordable, fast, great at structured extraction.
   return AI_MODELS.GEMINI_FLASH;
 }
 
@@ -58,7 +60,7 @@ function computeCostUsd(
   inputTokens: number,
   outputTokens: number,
 ): number {
-  const rates = MODEL_COST_RATES[modelId] ?? MODEL_COST_RATES[AI_MODELS.GEMINI_FLASH];
+  const rates = MODEL_COST_RATES[modelId] ?? MODEL_COST_RATES[AI_MODELS.FREE];
   return inputTokens * rates.input + outputTokens * rates.output;
 }
 
@@ -302,7 +304,8 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
   const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
 
   try {
-    const response = await fetch(
+    let activeModel = model;
+    let response = await fetch(
       `${baseUrl}/api/v1/chat/completions`,
       {
         method: "POST",
@@ -313,7 +316,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
           "X-Title": "ThreddIQ - Reddit Intelligence Engine",
         },
         body: JSON.stringify({
-          model,
+          model: activeModel,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
@@ -321,6 +324,33 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
         }),
       },
     );
+
+    // If paid model returns 402 (insufficient credits) or 404, fallback to free model
+    if (!response.ok && (response.status === 402 || response.status === 404) && activeModel !== AI_MODELS.FREE) {
+      console.warn(
+        `[AI] OpenRouter paid model ${activeModel} failed (${response.status}). Retrying with free model: ${AI_MODELS.FREE}...`,
+      );
+      activeModel = AI_MODELS.FREE;
+      response = await fetch(
+        `${baseUrl}/api/v1/chat/completions`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "ThreddIQ - Reddit Intelligence Engine",
+          },
+          body: JSON.stringify({
+            model: activeModel,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        },
+      );
+    }
 
     if (!response.ok) {
       const details = await response.text().catch(() => "");
@@ -337,7 +367,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       const outputTokens: number = data.usage.completion_tokens ?? 0;
       void logAiUsage({
         userId: usageContext.userId,
-        modelId: model as AiModelId,
+        modelId: activeModel as AiModelId,
         inputTokens,
         outputTokens,
         scraperId: usageContext.scraperId,
