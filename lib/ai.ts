@@ -325,31 +325,44 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       },
     );
 
-    // If paid model returns 402 (insufficient credits) or 404, fallback to free model
-    if (!response.ok && (response.status === 402 || response.status === 404) && activeModel !== AI_MODELS.FREE) {
-      console.warn(
-        `[AI] OpenRouter paid model ${activeModel} failed (${response.status}). Retrying with free model: ${AI_MODELS.FREE}...`,
-      );
-      activeModel = AI_MODELS.FREE;
-      response = await fetch(
-        `${baseUrl}/api/v1/chat/completions`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "ThreddIQ - Reddit Intelligence Engine",
+    // Free models cascade pool to handle 402 (no credits) and 429 (temporary rate limit)
+    const FREE_MODELS_POOL = [
+      "minimax/minimax-m2.7:free",
+      "google/gemma-4-31b-it:free",
+      "liquid/lfm-2.5-2.6b:free",
+      "z-ai/glm-5.2:free",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    ];
+
+    if (!response.ok && (response.status === 402 || response.status === 404 || response.status === 429)) {
+      for (const fallbackModel of FREE_MODELS_POOL) {
+        if (fallbackModel === activeModel) continue;
+        console.warn(
+          `[AI] Model ${activeModel} failed (${response.status}). Retrying with free fallback: ${fallbackModel}...`,
+        );
+        activeModel = fallbackModel as AiModelId;
+        response = await fetch(
+          `${baseUrl}/api/v1/chat/completions`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "http://localhost:3000",
+              "X-Title": "ThreddIQ - Reddit Intelligence Engine",
+            },
+            body: JSON.stringify({
+              model: activeModel,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+            }),
           },
-          body: JSON.stringify({
-            model: activeModel,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-          }),
-        },
-      );
+        );
+
+        if (response.ok) break;
+      }
     }
 
     if (!response.ok) {
