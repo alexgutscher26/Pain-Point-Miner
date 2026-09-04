@@ -85,12 +85,6 @@ const docSections = [
   },
 ];
 
-export const metadata: Metadata = {
-  title: `Documentation - ${siteConfig.name}`,
-  description:
-    "Learn how to use ThreddIQ to find, validate, and build successful SaaS ideas using Reddit data.",
-};
-
 export default function DocsPage() {
   return (
     <div className="landing-gradient min-h-screen overflow-x-hidden font-sans text-zinc-900 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
