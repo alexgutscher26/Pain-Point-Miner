@@ -71,6 +71,11 @@ describe("extractPainPoints", () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       ...mockPainPoint,
+      confidenceScore: 0.7,
+      targetUser: undefined,
+      competingProducts: [],
+      willingnessToPay: "unknown",
+      featureRequested: undefined,
       url: mockPost.url,
       author: mockPost.author,
       subreddit: mockPost.subreddit,
@@ -112,12 +117,115 @@ describe("extractPainPoints", () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       ...mockPainPoint,
+      confidenceScore: 0.7,
+      targetUser: undefined,
+      competingProducts: [],
+      willingnessToPay: "unknown",
+      featureRequested: undefined,
       url: mockPost.url,
       author: mockPost.author,
       subreddit: mockPost.subreddit,
       budget: [],
       triedSolutions: ["Solution A"],
     });
+  });
+
+  it("should extract confidenceScore, targetUser, competingProducts, willingnessToPay, and featureRequested", async () => {
+    const mockPainPoint = {
+      title: "DevOps Pipeline Breakage",
+      body: "CI/CD builds frequently timeout and fail silently.",
+      painIntensity: 9,
+      urgency: 8,
+      monetizationScore: 8,
+      marketMaturity: 7,
+      confidenceScore: 0.92,
+      targetUser: "enterprise IT manager",
+      competingProducts: ["Jenkins", "CircleCI"],
+      willingnessToPay: "paid_signal",
+      featureRequested: "Automated timeout alerts and dead-letter queue retries",
+      sentiment: "frustrated",
+      triedSolutions: ["GitHub Actions"],
+      budget: [],
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ painPoints: [mockPainPoint] }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(mockPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].confidenceScore).toBe(0.92);
+    expect(result[0].targetUser).toBe("enterprise IT manager");
+    expect(result[0].competingProducts).toEqual(["Jenkins", "CircleCI"]);
+    expect(result[0].willingnessToPay).toBe("paid_signal");
+    expect(result[0].featureRequested).toBe(
+      "Automated timeout alerts and dead-letter queue retries",
+    );
+  });
+
+  it("should filter out low-confidence extractions (< 0.3)", async () => {
+    const highConfPoint = {
+      title: "High Confidence Issue",
+      body: "Very clear detailed bug.",
+      painIntensity: 8,
+      urgency: 7,
+      monetizationScore: 8,
+      marketMaturity: 5,
+      confidenceScore: 0.85,
+      targetUser: "solo founder",
+      sentiment: "frustrated",
+      triedSolutions: [],
+      budget: [],
+    };
+
+    const lowConfPoint = {
+      title: "Low Confidence Vague Complaint",
+      body: "Something might be slow occasionally.",
+      painIntensity: 2,
+      urgency: 1,
+      monetizationScore: 1,
+      marketMaturity: 2,
+      confidenceScore: 0.2,
+      targetUser: "casual lurker",
+      sentiment: "neutral",
+      triedSolutions: [],
+      budget: [],
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              painPoints: [highConfPoint, lowConfPoint],
+            }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(mockPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("High Confidence Issue");
+    expect(result[0].confidenceScore).toBe(0.85);
   });
 
   it("should catch fetch error when response is not ok and return empty array", async () => {
@@ -189,9 +297,14 @@ describe("getModelForDepth", () => {
     expect(getModelForDepth("advanced")).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
+  it("routes ultra depth to Gemini 2.0 Flash", () => {
+    expect(getModelForDepth("ultra")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
   it("respects a valid modelOverride regardless of depth", () => {
     expect(getModelForDepth("basic", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
     expect(getModelForDepth("deep", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
+    expect(getModelForDepth("ultra", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
   });
 
   it("ignores an invalid modelOverride and falls back to Gemini Flash", () => {

@@ -41,7 +41,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
   pro: {
     monthlyScans: null,
     maxSubredditsPerSearch: null,
-    allowedMiningDepths: ["basic", "deep", "advanced"],
+    allowedMiningDepths: ["basic", "deep", "advanced", "ultra"],
     canSaveReports: true,
     hasTrendDetection: true,
     hasSaasOpportunities: true,
@@ -59,7 +59,7 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
   professional: {
     monthlyScans: 100,
     maxSubredditsPerSearch: null,
-    allowedMiningDepths: ["basic", "deep", "advanced"],
+    allowedMiningDepths: ["basic", "deep", "advanced", "ultra"],
     canSaveReports: true,
     hasTrendDetection: true,
     hasSaasOpportunities: true,

@@ -17,6 +17,7 @@ import {
 
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { DEFAULT_TIME_WINDOW, normalizeTimeWindow } from "@/lib/time-window";
+import { validateCustomPatternRegex } from "@/lib/reddit";
 
 const KEYWORD_MIN_LENGTH = 2;
 const KEYWORD_MAX_LENGTH = 120;
@@ -26,6 +27,7 @@ const MAX_SUBREDDITS_BY_DEPTH = {
   basic: 10,
   deep: 10,
   advanced: 15,
+  ultra: 20,
 } as const;
 const DUPLICATE_SUBMISSION_WINDOW_MS = 30_000;
 const IDEMPOTENCY_KEY_HEADER = "idempotency-key";
@@ -103,6 +105,12 @@ const customPatternItemSchema = z
   .max(
     CUSTOM_PATTERN_MAX_LENGTH,
     `Pattern must be at most ${CUSTOM_PATTERN_MAX_LENGTH} characters`,
+  )
+  .refine(
+    (pattern) => validateCustomPatternRegex(pattern).valid,
+    (pattern) => ({
+      message: `Invalid regex pattern "${pattern}": ${validateCustomPatternRegex(pattern).error ?? "Syntax error"}`,
+    }),
   );
 
 const searchPayloadSchema = z.object({
@@ -156,7 +164,7 @@ const searchPayloadSchema = z.object({
         ),
     ),
   miningDepth: z
-    .enum(["basic", "deep", "advanced"])
+    .enum(["basic", "deep", "advanced", "ultra"])
     .optional()
     .default("basic"),
   timeWindow: z

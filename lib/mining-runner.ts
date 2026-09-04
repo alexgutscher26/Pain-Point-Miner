@@ -21,6 +21,7 @@ import {
   resolveProblemPatterns,
   isSubredditThrottled,
   getGlobal429Rate,
+  validateSubredditsBulk,
   type RedditPost,
 } from "@/lib/reddit";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
@@ -161,10 +162,28 @@ export async function executeMiningRun({
       throttleWarnings.push(`⚠️ r/${sub} is rate-limited, skipping for 15 min`);
     }
 
-    const targetSubreddits = nonThrottledSubreddits.slice(
+    const candidateSubreddits = nonThrottledSubreddits.slice(
       0,
       Math.max(1, subLimit),
     );
+
+    // Validate subreddit existence and minimum subscriber threshold prior to scanning
+    const minSubscribers = num("MIN_SUBREDDIT_SUBSCRIBERS", 1000);
+    const validationResult = await validateSubredditsBulk(candidateSubreddits, {
+      minSubscribers,
+    });
+    for (const invalidSub of validationResult.invalid) {
+      if (invalidSub.reason === "low_subscribers") {
+        throttleWarnings.push(
+          `⚠️ r/${invalidSub.name} has only ${invalidSub.subscribers ?? 0} subscribers (< ${minSubscribers} min threshold), skipping due to low signal`,
+        );
+      } else {
+        throttleWarnings.push(
+          `⚠️ r/${invalidSub.name} does not exist or is inaccessible (${invalidSub.reason ?? "404"}), skipping`,
+        );
+      }
+    }
+    const targetSubreddits = validationResult.valid;
 
     const maxAiExtractions = num("MAX_CONCURRENT_AI_EXTRACTIONS", 5);
     const baseSubConcurrency = maxAiExtractions;
@@ -573,6 +592,37 @@ export async function processSinglePost({
 
   for (const point of points) {
     const painPointId = crypto.randomUUID();
+    const tags: string[] = [];
+    if (point.targetUser) {
+      tags.push(`persona:${point.targetUser}`);
+    }
+    if (point.willingnessToPay && point.willingnessToPay !== "unknown") {
+      tags.push(`wtp:${point.willingnessToPay}`);
+    }
+    if (point.competingProducts && point.competingProducts.length > 0) {
+      for (const comp of point.competingProducts) {
+        tags.push(`competitor:${comp}`);
+      }
+    }
+
+    const mergedTriedSolutions = Array.from(
+      new Set([...(point.triedSolutions || []), ...(point.competingProducts || [])]),
+    );
+
+    const explanationParts: string[] = [];
+    if (point.confidenceScore !== undefined) {
+      explanationParts.push(`Confidence: ${(point.confidenceScore * 100).toFixed(0)}%`);
+    }
+    if (point.targetUser) {
+      explanationParts.push(`Persona: ${point.targetUser}`);
+    }
+    if (point.willingnessToPay && point.willingnessToPay !== "unknown") {
+      explanationParts.push(`WTP: ${point.willingnessToPay}`);
+    }
+    if (point.featureRequested) {
+      explanationParts.push(`Feature: ${point.featureRequested}`);
+    }
+
     painPointsToInsert.push({
       id: painPointId,
       title: point.title,
@@ -583,7 +633,7 @@ export async function processSinglePost({
       marketMaturity: point.marketMaturity,
       budget: point.budget,
       switchingCosts: point.switchingCosts,
-      triedSolutions: point.triedSolutions,
+      triedSolutions: mergedTriedSolutions,
       userId,
       scraperId,
       subreddit: post.subreddit,
@@ -593,6 +643,8 @@ export async function processSinglePost({
       difficulty: point.difficulty,
       commentCount: comments.length,
       mentionCount: 1,
+      tags,
+      scoreExplanation: explanationParts.length > 0 ? explanationParts.join(" | ") : undefined,
       workspaceId,
       updatedAt: new Date(),
     });

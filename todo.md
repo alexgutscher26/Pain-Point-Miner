@@ -64,30 +64,30 @@
 ## 🤖 2. Mining Pipeline
 
 ### 2.1 Reddit API & Scraping
-- [ ] Add Reddit OAuth token refresh logic with automatic retry (currently token can expire mid-run)
-- [ ] Implement subreddit existence validation before starting a scan (avoid silent 404s)
-- [ ] Add support for Reddit's `after`/`before` pagination cursors to fetch more than 100 posts per subreddit
+- [x] Add Reddit OAuth token refresh logic with automatic retry (currently token can expire mid-run)
+- [x] Implement subreddit existence validation before starting a scan (avoid silent 404s)
+- [x] Add support for Reddit's `after`/`before` pagination cursors to fetch more than 100 posts per subreddit
 - [ ] Cache Reddit OAuth tokens in Redis/DB across requests (not per-request re-auth)
 - [ ] Add `REDDIT_RATE_LIMIT_DELAY_MS` env var to insert deliberate delays and stay within Reddit's API limits
 - [ ] Support fetching from multiple Reddit sort modes in a single run (new + hot + top) without duplicating posts
-- [ ] Add PullPush.io as a more robust fallback for historical data (currently partially implemented)
-- [ ] Validate that `customPatterns` regex strings compile without errors before accepting a scan config
-- [ ] Add subreddit subscriber count check — skip subreddits with < 1,000 subscribers (low signal)
+- [x] Add PullPush.io as a more robust fallback for historical data (currently partially implemented)
+- [x] Validate that `customPatterns` regex strings compile without errors before accepting a scan config
+- [x] Add subreddit subscriber count check — skip subreddits with < 1,000 subscribers (low signal)
 - [ ] Track which subreddit each post came from in `scraperPost` for per-subreddit analytics
-- [ ] Add support for `r/all` search using Reddit's global search endpoint
-- [ ] Implement `multiReddit` scraping (combine multiple subreddits into a single Reddit API call)
-- [ ] Add `miningDepth` = `"ultra"` tier for exhaustive comment tree traversal (Pro plan only)
+- [x] Add support for `r/all` search using Reddit's global search endpoint
+- [x] Implement `multiReddit` scraping (combine multiple subreddits into a single Reddit API call)
+- [x] Add `miningDepth` = `"ultra"` tier for exhaustive comment tree traversal (Pro plan only)
 
 ### 2.2 AI Extraction
 - [ ] Batch multiple posts into a single OpenRouter request to reduce API call overhead and latency
-- [ ] Add a confidence score to each AI extraction (0–1) and filter out low-confidence results
+- [x] Add a confidence score to each AI extraction (0–1) and filter out low-confidence results
 - [ ] Implement fallback model chain: if primary model fails, retry with a cheaper/faster model
 - [ ] Add extraction schema versioning — when the prompt changes, re-run extraction on cached posts
-- [ ] Extract `targetUser` persona from posts (e.g., "solo founder", "enterprise IT manager")
-- [ ] Extract `competingProducts` from post text automatically during AI extraction
-- [ ] Add `willingnessToPay` signal extraction (free-tier vs paid signal from post language)
+- [x] Extract `targetUser` persona from posts (e.g., "solo founder", "enterprise IT manager")
+- [x] Extract `competingProducts` from post text automatically during AI extraction
+- [x] Add `willingnessToPay` signal extraction (free-tier vs paid signal from post language)
 - [ ] Support multi-language posts — detect language and extract in English with `originalLanguage` stored
-- [ ] Add `featureRequested` extraction field: what specific solution/feature is the user asking for
+- [x] Add `featureRequested` extraction field: what specific solution/feature is the user asking for
 - [ ] Implement streaming AI responses for long posts to reduce timeout risk
 - [ ] Create a golden dataset validation pipeline: run extractions against `ai_golden_dataset` on every deploy
 - [ ] Add A/B testing for prompt versions (randomly assign prompts, compare F1 scores in `ai_eval_log`)

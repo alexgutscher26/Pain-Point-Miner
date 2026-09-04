@@ -1,4 +1,4 @@
-export type MiningDepth = "basic" | "deep" | "advanced";
+export type MiningDepth = "basic" | "deep" | "advanced" | "ultra";
 
 export const MINING_PRESETS: Record<
   MiningDepth,
@@ -50,6 +50,18 @@ export const MINING_PRESETS: Record<
     estimatedCredits: 5,
     description: "Deep recursive mining. Full thread analysis + clustering.",
     timeEstimate: "~30+ mins",
+  },
+  ultra: {
+    name: "Ultra Deep Dive",
+    subreddits: 15,
+    sortModes: 4,
+    maxDepth: 100, // Exhaustive comment tree traversal
+    maxComments: 1000,
+    postsPerSub: 500,
+    analyzeLimit: 100,
+    estimatedCredits: 10,
+    description: "Exhaustive comment tree traversal + full recursive context analysis.",
+    timeEstimate: "~45+ mins",
   },
 };
 

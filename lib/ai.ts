@@ -109,6 +109,14 @@ export async function logAiUsage({
 // ---------------------------------------------------------------------------
 // Pain point extraction
 // ---------------------------------------------------------------------------
+export const MIN_AI_CONFIDENCE_SCORE = 0.3;
+
+export type WillingnessToPaySignal =
+  | "free_only"
+  | "paid_signal"
+  | "explicit_budget"
+  | "unknown";
+
 export interface PainPointData {
   title: string;
   body: string;
@@ -116,6 +124,11 @@ export interface PainPointData {
   urgency: number;
   monetizationScore: number;
   marketMaturity: number;
+  confidenceScore?: number;
+  targetUser?: string;
+  competingProducts?: string[];
+  willingnessToPay?: WillingnessToPaySignal;
+  featureRequested?: string;
   budget: BudgetSignal[];
   switchingCosts?: string;
   triedSolutions: string[];
@@ -234,10 +247,31 @@ Scoring rubric:
   side_project = 1–2 weeks, 1–2 third-party integrations; e.g., a simple SaaS dashboard
   startup_mvp = 1–3 months, auth + billing + complex domain logic; e.g., an analytics platform
   vc_scale_moat = 6+ months, network effects, regulatory complexity (HIPAA, SOC2), data moat required
+- confidenceScore:
+  0.0-0.3 = vague, speculative, ambiguous complaint, or lacks concrete evidence
+  0.4-0.6 = moderate confidence, clear struggle but limited context or edge case
+  0.7-0.8 = high confidence, validated real-world workflow friction with clear evidence
+  0.9-1.0 = very high confidence, unmistakable recurring business pain with explicit details
+- targetUser:
+  A concise label for the user persona or role experiencing this problem (e.g., "solo founder", "enterprise IT manager", "freelance designer", "early-stage CTO", "e-commerce merchant", "devops engineer", etc.)
+- competingProducts:
+  List of specific existing tools, competitors, or incumbent products mentioned in the post/comments (e.g., ["Notion", "Airtable", "Zapier"]). Empty array [] if none mentioned.
+- willingnessToPay:
+  free_only = user explicitly requests free/open-source tools or refuses to pay
+  paid_signal = commercial context, business problem, or user expresses willingness to pay for a solution
+  explicit_budget = explicit dollar quote or subscription budget mentioned
+  unknown = no clear signal
+- featureRequested:
+  Concise 1-2 sentence description of the specific feature, automation, or capability the user is asking for. Empty string "" if no specific feature is requested.
 
 Field rules:
 - title: 4-10 words, specific, no hype
 - body: 2-4 sentences summarizing the root pain, who feels it, and why it matters
+- targetUser: 2-5 words describing the persona experiencing this pain
+- competingProducts: array of tool/competitor names or []
+- willingnessToPay: choose exactly one of free_only, paid_signal, explicit_budget, unknown
+- featureRequested: specific solution/feature requested or ""
+- confidenceScore: float between 0.0 and 1.0 representing extraction confidence
 - budget: [] unless the thread contains an explicit willingness-to-pay quote such as "I would pay $50/month", "budget of $5k", "willing to spend $200", or "shut up and take my money"
 - switchingCosts: empty string if not stated or strongly implied
 - triedSolutions: specific tools, workarounds, or alternatives only; otherwise []
@@ -253,6 +287,11 @@ Return only valid JSON matching:
     {
       "title": "string",
       "body": "string",
+      "targetUser": "solo founder",
+      "competingProducts": ["Zapier", "Make"],
+      "willingnessToPay": "paid_signal",
+      "featureRequested": "Automated webhook retry with error alerts",
+      "confidenceScore": 0.85,
       "painIntensity": 1,
       "urgency": 1,
       "monetizationScore": 1,
@@ -407,6 +446,11 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       urgency: number;
       monetizationScore: number;
       marketMaturity: number;
+      confidenceScore?: number | null;
+      targetUser?: string | null;
+      competingProducts?: string[] | null;
+      willingnessToPay?: WillingnessToPaySignal | string | null;
+      featureRequested?: string | null;
       budget?:
         | Array<{
             quote?: string;
@@ -431,14 +475,51 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       ? parsed
       : parsed.painPoints || parsed.data || [parsed];
 
-    return rawPainPoints.map((pp: RawPainPoint) => ({
-      ...pp,
-      budget: normalizeBudgetSignals(pp.budget),
-      url: post.url,
-      author: post.author,
-      subreddit: post.subreddit,
-      triedSolutions: pp.triedSolutions || [],
-    })) as PainPointData[];
+    return rawPainPoints
+      .map((pp: RawPainPoint) => {
+        const rawConf = typeof pp.confidenceScore === "number" && !isNaN(pp.confidenceScore)
+          ? pp.confidenceScore
+          : 0.7;
+        const confidenceScore = Number(Math.max(0, Math.min(1, rawConf)).toFixed(2));
+
+        const targetUser = typeof pp.targetUser === "string" && pp.targetUser.trim().length > 0
+          ? pp.targetUser.trim()
+          : undefined;
+
+        const competingProducts = Array.isArray(pp.competingProducts)
+          ? pp.competingProducts
+              .filter((p): p is string => typeof p === "string" && p.trim().length > 0)
+              .map((p) => p.trim())
+          : [];
+
+        const rawWtp = typeof pp.willingnessToPay === "string" ? pp.willingnessToPay.trim().toLowerCase() : "";
+        const validWtpList: WillingnessToPaySignal[] = ["free_only", "paid_signal", "explicit_budget", "unknown"];
+        const willingnessToPay: WillingnessToPaySignal = validWtpList.includes(rawWtp as WillingnessToPaySignal)
+          ? (rawWtp as WillingnessToPaySignal)
+          : pp.budget && Array.isArray(pp.budget) && pp.budget.length > 0
+            ? "explicit_budget"
+            : "unknown";
+
+        const featureRequested =
+          typeof pp.featureRequested === "string" && pp.featureRequested.trim().length > 0
+            ? pp.featureRequested.trim()
+            : undefined;
+
+        return {
+          ...pp,
+          confidenceScore,
+          targetUser,
+          competingProducts,
+          willingnessToPay,
+          featureRequested,
+          budget: normalizeBudgetSignals(pp.budget),
+          url: post.url,
+          author: post.author,
+          subreddit: post.subreddit,
+          triedSolutions: pp.triedSolutions || [],
+        };
+      })
+      .filter((pp) => (pp.confidenceScore ?? 0.7) >= MIN_AI_CONFIDENCE_SCORE) as PainPointData[];
   } catch (error) {
     console.error("Error in AI extraction:", error);
     return [];

@@ -36,6 +36,7 @@ export const SORT_MODES_BY_DEPTH: Record<string, RedditSortMode[]> = {
   basic: ["relevance"],
   deep: ["relevance", "hot"],
   advanced: ["relevance", "hot", "new", "top"],
+  ultra: ["relevance", "hot", "new", "top"],
 };
 
 export function getSortModesForDepth(depth: string): RedditSortMode[] {
@@ -184,10 +185,12 @@ type CachedToken = {
 };
 
 let cachedToken: CachedToken | null = null;
+let activeTokenPromise: Promise<string | null> | null = null;
 
 type RedditListingResponse = {
   data?: {
     after?: string | null;
+    before?: string | null;
     children?: Array<{ data?: RedditPost }>;
   };
 };
@@ -365,14 +368,29 @@ async function fetchWithRetry(
     : new Error("Reddit request failed");
 }
 
-function hasOAuthCredentials() {
-  return Boolean(REDDIT_CLIENT_ID && REDDIT_CLIENT_SECRET);
+function getOAuthCredentials() {
+  const clientId = (process.env.REDDIT_CLIENT_ID ?? REDDIT_CLIENT_ID)?.trim();
+  const clientSecret = (process.env.REDDIT_CLIENT_SECRET ?? REDDIT_CLIENT_SECRET)?.trim();
+  if (clientId && clientSecret) {
+    return { clientId, clientSecret };
+  }
+  return null;
 }
 
-async function getRedditAccessToken(
+function hasOAuthCredentials() {
+  return Boolean(getOAuthCredentials());
+}
+
+/**
+ * Retrieves a valid Reddit OAuth access token.
+ * Uses a single-flight promise to avoid duplicate concurrent token requests
+ * and caches the token until close to expiration.
+ */
+export async function getRedditAccessToken(
   forceRefresh = false,
 ): Promise<string | null> {
-  if (!hasOAuthCredentials()) return null;
+  const creds = getOAuthCredentials();
+  if (!creds) return null;
 
   const nowSeconds = Math.floor(Date.now() / 1_000);
   if (
@@ -383,37 +401,79 @@ async function getRedditAccessToken(
     return cachedToken.token;
   }
 
-  const basicAuth = Buffer.from(
-    `${REDDIT_CLIENT_ID}:${REDDIT_CLIENT_SECRET}`,
-  ).toString("base64");
-  const response = await fetchWithRetry(
-    "https://www.reddit.com/api/v1/access_token",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basicAuth}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": currentUA,
-      },
-      body: "grant_type=client_credentials",
-    },
-    1,
-  );
-
-  const payload = (await response.json()) as RedditTokenResponse;
-  if (!payload.access_token) {
-    throw new Error("Failed to obtain Reddit access token");
+  if (activeTokenPromise) {
+    return activeTokenPromise;
   }
 
-  const expiresIn = payload.expires_in ?? 3_600;
-  cachedToken = {
-    token: payload.access_token,
-    expiresAtEpochSeconds: nowSeconds + Math.max(60, expiresIn),
-  };
-  return cachedToken.token;
+  activeTokenPromise = (async () => {
+    try {
+      const basicAuth = Buffer.from(
+        `${creds.clientId}:${creds.clientSecret}`,
+      ).toString("base64");
+
+      let tokenResponse: Response | null = null;
+      let lastTokenError: unknown = null;
+
+      // Retry token fetch up to 3 attempts with progressive delay
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          tokenResponse = await fetchWithRetry(
+            "https://www.reddit.com/api/v1/access_token",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Basic ${basicAuth}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": currentUA,
+              },
+              body: "grant_type=client_credentials",
+            },
+            1,
+          );
+          if (tokenResponse.ok) break;
+        } catch (err) {
+          lastTokenError = err;
+          if (attempt < 2) {
+            await sleep(300 * (attempt + 1));
+          }
+        }
+      }
+
+      if (!tokenResponse || !tokenResponse.ok) {
+        cachedToken = null;
+        throw lastTokenError instanceof Error
+          ? lastTokenError
+          : new Error("Failed to obtain Reddit access token after retries");
+      }
+
+      const payload = (await tokenResponse.json()) as RedditTokenResponse;
+      if (!payload.access_token) {
+        cachedToken = null;
+        throw new Error("Failed to obtain Reddit access token: missing token in response");
+      }
+
+      const expiresIn = payload.expires_in ?? 3_600;
+      cachedToken = {
+        token: payload.access_token,
+        expiresAtEpochSeconds:
+          Math.floor(Date.now() / 1_000) + Math.max(60, expiresIn),
+      };
+      return cachedToken.token;
+    } finally {
+      activeTokenPromise = null;
+    }
+  })();
+
+  return activeTokenPromise;
 }
 
-async function fetchRedditResponse(url: string): Promise<Response> {
+/**
+ * Executes a request to Reddit API with automatic token injection and 401 token refresh retry.
+ */
+export async function fetchRedditResponse(
+  url: string,
+  retriesOnAuthFailure = 1,
+): Promise<Response> {
   const authToken = await getRedditAccessToken();
 
   if (authToken) {
@@ -432,18 +492,15 @@ async function fetchRedditResponse(url: string): Promise<Response> {
       return response;
     } catch (error) {
       if (
+        retriesOnAuthFailure > 0 &&
         error instanceof Error &&
         (error.message.includes("401") ||
-          error.message.toLowerCase().includes("unauthorized"))
+          error.message.toLowerCase().includes("unauthorized") ||
+          error.message.toLowerCase().includes("expired"))
       ) {
         const refreshedToken = await getRedditAccessToken(true);
         if (refreshedToken) {
-          return fetchWithRetry(oauthUrl, {
-            headers: {
-              Authorization: `Bearer ${refreshedToken}`,
-              "User-Agent": currentUA,
-            },
-          });
+          return fetchRedditResponse(url, retriesOnAuthFailure - 1);
         }
       }
 
@@ -489,8 +546,60 @@ function normalizePattern(pattern: string) {
   return pattern.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Validates whether a custom pattern string compiles into a valid regular expression.
+ */
+export function validateCustomPatternRegex(pattern: string): {
+  valid: boolean;
+  error?: string;
+} {
+  if (!pattern || typeof pattern !== "string" || !pattern.trim()) {
+    return { valid: false, error: "Pattern cannot be empty" };
+  }
+
+  const trimmed = pattern.trim();
+  try {
+    new RegExp(trimmed, "i");
+    return { valid: true };
+  } catch (err) {
+    return {
+      valid: false,
+      error: err instanceof Error ? err.message : "Invalid regular expression",
+    };
+  }
+}
+
+/**
+ * Validates an array of custom patterns, returning whether all patterns are valid.
+ */
+export function validateCustomPatterns(patterns: string[]): {
+  valid: boolean;
+  errors: Array<{ pattern: string; error: string }>;
+} {
+  const errors: Array<{ pattern: string; error: string }> = [];
+  for (const pattern of patterns) {
+    const res = validateCustomPatternRegex(pattern);
+    if (!res.valid) {
+      errors.push({ pattern, error: res.error ?? "Invalid regex" });
+    }
+  }
+  return { valid: errors.length === 0, errors };
+}
+
 function createPatternRegex(pattern: string) {
   const normalizedPattern = normalizePattern(pattern);
+  if (!normalizedPattern) return null;
+
+  // Check if pattern contains explicit regex syntax like (a|b), [abc], etc.
+  const hasRegexSyntax = /[()[\]{}|\\^$+*?]/.test(pattern);
+  if (hasRegexSyntax) {
+    try {
+      return new RegExp(normalizedPattern, "gi");
+    } catch {
+      // If invalid as raw regex, fall back to tokenized word match
+    }
+  }
+
   const parts = normalizedPattern
     .split(" ")
     .map((part) => escapeRegExp(part))
@@ -778,10 +887,15 @@ async function fetchFromArcticShiftComments(
   }));
 }
 
-async function fetchFromPullPushSubmissions(
+export async function fetchFromPullPushSubmissions(
   subreddit: string,
   keyword: string,
   maxPosts: number,
+  options?: {
+    after?: number | string;
+    before?: number | string;
+    retries?: number;
+  },
 ): Promise<RedditPost[]> {
   const size = Math.max(1, Math.min(250, maxPosts));
   const params = new URLSearchParams({
@@ -791,40 +905,66 @@ async function fetchFromPullPushSubmissions(
     sort: "desc",
     sort_type: "score",
   });
-  const response = await fetch(
-    `https://api.pullpush.io/reddit/search/submission/?${params.toString()}`,
-  );
-  if (!response.ok) {
-    throw new Error(
-      `PullPush API returned ${response.status}: ${response.statusText}`,
-    );
+
+  if (options?.after) params.set("after", String(options.after));
+  if (options?.before) params.set("before", String(options.before));
+
+  const maxAttempts = options?.retries ?? 2;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(
+        `https://api.pullpush.io/reddit/search/submission/?${params.toString()}`,
+        {
+          headers: {
+            "User-Agent": currentUA,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `PullPush API returned ${response.status}: ${response.statusText}`,
+        );
+      }
+      const data = (await response.json()) as PullPushListingResponse;
+      const rows = data.data ?? [];
+      return rows
+        .filter(
+          (row): row is NonNullable<typeof row> & { id: string; title: string } =>
+            Boolean(row?.id && row?.title),
+        )
+        .map((row) => ({
+          id: row.id,
+          title: row.title,
+          selftext: row.selftext ?? "",
+          author: row.author ?? "unknown",
+          score: row.score ?? 0,
+          subreddit: row.subreddit ?? subreddit,
+          url:
+            row.url ??
+            (row.permalink ? `https://www.reddit.com${row.permalink}` : ""),
+          num_comments: row.num_comments ?? 0,
+          created_utc:
+            row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+          is_self: row.is_self ?? true, // PullPush usually returns self-posts for search
+        }));
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) {
+        await sleep(300 * (attempt + 1));
+      }
+    }
   }
-  const data = (await response.json()) as PullPushListingResponse;
-  const rows = data.data ?? [];
-  return rows
-    .filter(
-      (row): row is NonNullable<typeof row> & { id: string; title: string } =>
-        Boolean(row?.id && row?.title),
-    )
-    .map((row) => ({
-      id: row.id,
-      title: row.title,
-      selftext: row.selftext ?? "",
-      author: row.author ?? "unknown",
-      score: row.score ?? 0,
-      subreddit: row.subreddit ?? subreddit,
-      url:
-        row.url ??
-        (row.permalink ? `https://www.reddit.com${row.permalink}` : ""),
-      num_comments: row.num_comments ?? 0,
-      created_utc:
-        row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
-      is_self: row.is_self ?? true, // PullPush usually returns self-posts for search
-    }));
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("PullPush API failed");
 }
 
-async function fetchFromPullPushComments(
+export async function fetchFromPullPushComments(
   postId: string,
+  options?: { retries?: number },
 ): Promise<RedditComment[]> {
   const params = new URLSearchParams({
     link_id: postId,
@@ -832,30 +972,98 @@ async function fetchFromPullPushComments(
     sort: "desc",
     sort_type: "score",
   });
-  const response = await fetch(
-    `https://api.pullpush.io/reddit/search/comment/?${params.toString()}`,
-  );
-  if (!response.ok) {
-    throw new Error(
-      `PullPush API returned ${response.status}: ${response.statusText}`,
-    );
+
+  const maxAttempts = options?.retries ?? 2;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(
+        `https://api.pullpush.io/reddit/search/comment/?${params.toString()}`,
+        {
+          headers: {
+            "User-Agent": currentUA,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error(
+          `PullPush API returned ${response.status}: ${response.statusText}`,
+        );
+      }
+      const data = (await response.json()) as PullPushCommentResponse;
+      const rows = data.data ?? [];
+      return rows
+        .filter(
+          (row): row is NonNullable<typeof row> & { id: string; body: string } =>
+            Boolean(row?.id && row?.body),
+        )
+        .map((row) => ({
+          id: row.id,
+          body: row.body,
+          author: row.author ?? "unknown",
+          score: row.score ?? 0,
+          permalink: row.permalink ? `https://www.reddit.com${row.permalink}` : "",
+          created_utc:
+            row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
+        }));
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) {
+        await sleep(300 * (attempt + 1));
+      }
+    }
   }
-  const data = (await response.json()) as PullPushCommentResponse;
-  const rows = data.data ?? [];
-  return rows
-    .filter(
-      (row): row is NonNullable<typeof row> & { id: string; body: string } =>
-        Boolean(row?.id && row?.body),
-    )
-    .map((row) => ({
-      id: row.id,
-      body: row.body,
-      author: row.author ?? "unknown",
-      score: row.score ?? 0,
-      permalink: row.permalink ? `https://www.reddit.com${row.permalink}` : "",
-      created_utc:
-        row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
-    }));
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("PullPush comments API failed");
+}
+
+export interface FetchSubredditPostsOptions {
+  maxPosts?: number;
+  time?: RedditTimeRange;
+  delayMs?: number;
+  requestLimit?: number;
+  /** Reddit search sort mode. Defaults to "relevance". */
+  sort?: RedditSortMode;
+  /** Pagination cursor to fetch results after this post ID / fullname */
+  after?: string | null;
+  /** Pagination cursor to fetch results before this post ID / fullname */
+  before?: string | null;
+}
+
+export interface RedditPagedPostsResult {
+  posts: RedditPost[];
+  after: string | null;
+  before: string | null;
+}
+
+/**
+ * Constructs the Reddit search URL supporting single subreddits, multi-reddits (sub1+sub2), and global r/all search.
+ */
+export function buildRedditSearchUrl(
+  subreddit: string,
+  params: URLSearchParams,
+): string {
+  const cleanSub = subreddit.replace(/^r\//i, "").trim();
+
+  if (!cleanSub || cleanSub.toLowerCase() === "all") {
+    params.delete("restrict_sr");
+    return `https://www.reddit.com/r/all/search.json?${params.toString()}`;
+  }
+
+  if (cleanSub.includes("+")) {
+    const validSubs = cleanSub
+      .split("+")
+      .map((s) => s.replace(/^r\//i, "").trim())
+      .filter(Boolean);
+    params.set("restrict_sr", "1");
+    return `https://www.reddit.com/r/${validSubs.join("+")}/search.json?${params.toString()}`;
+  }
+
+  params.set("restrict_sr", "1");
+  return `https://www.reddit.com/r/${cleanSub}/search.json?${params.toString()}`;
 }
 
 /**
@@ -867,7 +1075,7 @@ async function fetchFromPullPushComments(
  *  - deep:     relevance, hot
  *  - advanced: relevance, hot, new, top
  *
- * @param subreddit - The subreddit to search.
+ * @param subreddit - The subreddit to search (single, multi-reddit with +, or 'all').
  * @param keyword - The search keyword.
  * @param depth - Mining depth string used to resolve sort modes.
  * @param options - Forwarded to `fetchSubredditPostsBatched` (maxPosts applies per sort mode).
@@ -877,12 +1085,7 @@ export async function fetchSubredditPostsMultiSort(
   subreddit: string,
   keyword: string,
   depth: string,
-  options?: {
-    maxPosts?: number;
-    time?: RedditTimeRange;
-    delayMs?: number;
-    requestLimit?: number;
-  },
+  options?: FetchSubredditPostsOptions,
 ): Promise<RedditPostWithMeta[]> {
   const sortModes = getSortModesForDepth(depth);
 
@@ -922,6 +1125,101 @@ export async function fetchSubredditPostsMultiSort(
 }
 
 /**
+ * Fetches posts from multiple subreddits by grouping them into multi-reddit composite queries (`sub1+sub2+...`).
+ * Dramatically reduces the number of API requests required to mine across multiple communities.
+ */
+export async function fetchMultiRedditPostsBatched(
+  subreddits: string[],
+  keyword: string,
+  options?: FetchSubredditPostsOptions & { chunkSize?: number },
+): Promise<RedditPost[]> {
+  const uniqueSubs = Array.from(
+    new Set(
+      subreddits
+        .map((s) => s.replace(/^r\//i, "").trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (uniqueSubs.length === 0) return [];
+
+  const chunkSize = Math.max(1, Math.min(10, options?.chunkSize ?? 5));
+  const chunks: string[][] = [];
+  for (let i = 0; i < uniqueSubs.length; i += chunkSize) {
+    chunks.push(uniqueSubs.slice(i, i + chunkSize));
+  }
+
+  const allPosts: RedditPost[] = [];
+  for (const chunk of chunks) {
+    const multiRedditName = chunk.join("+");
+    const posts = await fetchSubredditPostsBatched(
+      multiRedditName,
+      keyword,
+      options,
+    );
+    allPosts.push(...posts);
+  }
+
+  const seen = new Set<string>();
+  const deduped: RedditPost[] = [];
+  for (const p of allPosts) {
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
+    deduped.push(p);
+  }
+
+  return rankRedditPosts(deduped, keyword);
+}
+
+/**
+ * Multi-sort fetch across multiple subreddits using multi-reddit composite grouping.
+ */
+export async function fetchMultiRedditPostsMultiSort(
+  subreddits: string[],
+  keyword: string,
+  depth: string,
+  options?: FetchSubredditPostsOptions & { chunkSize?: number },
+): Promise<RedditPostWithMeta[]> {
+  const uniqueSubs = Array.from(
+    new Set(
+      subreddits
+        .map((s) => s.replace(/^r\//i, "").trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (uniqueSubs.length === 0) return [];
+
+  const chunkSize = Math.max(1, Math.min(10, options?.chunkSize ?? 5));
+  const chunks: string[][] = [];
+  for (let i = 0; i < uniqueSubs.length; i += chunkSize) {
+    chunks.push(uniqueSubs.slice(i, i + chunkSize));
+  }
+
+  const allPosts: RedditPostWithMeta[] = [];
+  for (const chunk of chunks) {
+    const multiRedditName = chunk.join("+");
+    const posts = await fetchSubredditPostsMultiSort(
+      multiRedditName,
+      keyword,
+      depth,
+      options,
+    );
+    allPosts.push(...posts);
+  }
+
+  const seen = new Set<string>();
+  const deduped: RedditPostWithMeta[] = [];
+  for (const p of allPosts) {
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
+    deduped.push(p);
+  }
+
+  return rankRedditPosts(deduped, keyword) as RedditPostWithMeta[];
+}
+
+/**
  * Fetches posts from a specified subreddit containing a keyword.
  */
 export const fetchSubredditPosts = async (
@@ -938,32 +1236,66 @@ export const fetchSubredditPosts = async (
 };
 
 /**
+ * Fetches a single page of posts with pagination cursor metadata (after/before).
+ */
+export async function fetchSubredditPostsPaginated(
+  subreddit: string,
+  keyword: string,
+  options?: FetchSubredditPostsOptions,
+): Promise<RedditPagedPostsResult> {
+  const limit = Math.max(1, Math.min(100, options?.requestLimit ?? options?.maxPosts ?? 25));
+  const time = options?.time ?? "all";
+  const params = new URLSearchParams({
+    q: keyword,
+    sort: options?.sort ?? "relevance",
+    limit: String(limit),
+    t: time,
+  });
+
+  if (options?.after) params.set("after", options.after);
+  if (options?.before && !options?.after) params.set("before", options.before);
+
+  const url = buildRedditSearchUrl(subreddit, params);
+  const response = await fetchRedditResponse(url);
+  const data = (await response.json()) as RedditListingResponse;
+  const children = data.data?.children ?? [];
+  const posts: RedditPost[] = [];
+
+  for (const child of children) {
+    if (child.data) {
+      posts.push(child.data);
+    }
+  }
+
+  return {
+    posts: rankRedditPosts(posts, keyword),
+    after: data.data?.after ?? null,
+    before: data.data?.before ?? null,
+  };
+}
+
+/**
  * Fetch posts from a specified subreddit in batches based on a keyword.
  *
  * This function retrieves posts from Reddit by constructing a search URL with the provided subreddit and keyword.
- * It handles pagination using the 'after' parameter and respects the specified limits for maximum posts, request limits, and delays between requests.
+ * It handles pagination using the 'after'/'before' parameter and respects the specified limits for maximum posts, request limits, and delays between requests.
  * The function continues fetching until the desired number of posts is collected or no more posts are available.
  *
- * @param subreddit - The name of the subreddit to fetch posts from.
+ * @param subreddit - The name of the subreddit to fetch posts from (supports multi-reddit 'sub1+sub2' or 'all').
  * @param keyword - The keyword to search for in the subreddit posts.
  * @param options - Optional parameters to customize the fetching behavior.
  * @param options.maxPosts - The maximum number of posts to fetch (default is 25, capped at 2000).
  * @param options.time - The time range for the posts (default is "all").
  * @param options.delayMs - The delay in milliseconds between requests (default is 250ms).
  * @param options.requestLimit - The maximum number of posts to request per API call (default is 100).
+ * @param options.after - Starting pagination cursor to fetch posts after.
+ * @param options.before - Starting pagination cursor to fetch posts before.
  * @returns A promise that resolves to an array of RedditPost objects.
  */
 export async function fetchSubredditPostsBatched(
   subreddit: string,
   keyword: string,
-  options?: {
-    maxPosts?: number;
-    time?: RedditTimeRange;
-    delayMs?: number;
-    requestLimit?: number;
-    /** Reddit search sort mode. Defaults to "relevance". */
-    sort?: RedditSortMode;
-  },
+  options?: FetchSubredditPostsOptions,
 ): Promise<RedditPost[]> {
   try {
     const maxPosts = Math.max(1, Math.min(2_000, options?.maxPosts ?? 25));
@@ -974,20 +1306,21 @@ export async function fetchSubredditPostsBatched(
       Math.min(100, options?.requestLimit ?? 100),
     );
     const posts: RedditPost[] = [];
-    let after: string | null = null;
+    let after: string | null = options?.after ?? null;
+    let before: string | null = options?.before ?? null;
 
     while (posts.length < maxPosts) {
       const limit = Math.min(requestLimit, maxPosts - posts.length);
       const params = new URLSearchParams({
         q: keyword,
-        restrict_sr: "1",
         sort: options?.sort ?? "relevance",
         limit: String(limit),
         t: time,
       });
       if (after) params.set("after", after);
+      if (before && !after) params.set("before", before);
 
-      const url = `https://www.reddit.com/r/${subreddit}/search.json?${params.toString()}`;
+      const url = buildRedditSearchUrl(subreddit, params);
       const response = await fetchRedditResponse(url);
 
       const data = (await response.json()) as RedditListingResponse;
@@ -1002,6 +1335,7 @@ export async function fetchSubredditPostsBatched(
       }
 
       after = data.data?.after ?? null;
+      before = data.data?.before ?? null;
       if (!after) break;
 
       if (delayMs > 0) {
@@ -1236,4 +1570,167 @@ export async function getSubredditMetadataBulk(
   }
 
   return results;
+}
+
+export interface SubredditValidationResult {
+  exists: boolean;
+  name: string;
+  reason?:
+    | "not_found"
+    | "banned"
+    | "private"
+    | "invalid_name"
+    | "low_subscribers"
+    | "error";
+  title?: string;
+  subscribers?: number;
+  lowSubscribers?: boolean;
+}
+
+/**
+ * Validates whether a single subreddit exists, is active, and accessible (not banned/private/404).
+ * Optionally checks if subscriber count meets a minimum threshold (e.g. 1,000).
+ */
+export async function validateSubredditExists(
+  subreddit: string,
+  options?: { minSubscribers?: number },
+): Promise<SubredditValidationResult> {
+  const cleanSub = subreddit.replace(/^r\//i, "").trim();
+
+  // Allow global search target
+  if (cleanSub.toLowerCase() === "all") {
+    return {
+      exists: true,
+      name: "all",
+      title: "All Reddit Communities",
+      subscribers: 100_000_000,
+    };
+  }
+
+  // Allow multi-reddit combinations (e.g. saas+startups+entrepreneur)
+  if (cleanSub.includes("+")) {
+    const parts = cleanSub
+      .split("+")
+      .map((s) => s.replace(/^r\//i, "").trim())
+      .filter(Boolean);
+    const validParts = parts.filter((part) =>
+      /^[A-Za-z0-9_]{2,24}$/.test(part),
+    );
+    if (validParts.length === 0) {
+      return {
+        exists: false,
+        name: cleanSub,
+        reason: "invalid_name",
+      };
+    }
+    return {
+      exists: true,
+      name: validParts.join("+"),
+      title: `Multi-Reddit (${validParts.join(", ")})`,
+    };
+  }
+
+  // Validate standard Reddit subreddit name constraints
+  if (!cleanSub || !/^[A-Za-z0-9_]{3,21}$/.test(cleanSub)) {
+    return {
+      exists: false,
+      name: cleanSub,
+      reason: "invalid_name",
+    };
+  }
+
+  const minSubscribers = options?.minSubscribers ?? 0;
+
+  try {
+    const url = `https://www.reddit.com/r/${cleanSub}/about.json`;
+    const response = await fetchRedditResponse(url);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { exists: false, name: cleanSub, reason: "not_found" };
+      }
+      if (response.status === 403) {
+        return { exists: false, name: cleanSub, reason: "private" };
+      }
+    }
+
+    const data = (await response.json()) as any;
+    if (data?.error === 404 || (data?.data?.name === undefined && data?.data?.display_name === undefined)) {
+      if (data?.reason === "banned") {
+        return { exists: false, name: cleanSub, reason: "banned" };
+      }
+      if (data?.reason === "private") {
+        return { exists: false, name: cleanSub, reason: "private" };
+      }
+      return { exists: false, name: cleanSub, reason: "not_found" };
+    }
+
+    const subscribers = data.data?.subscribers ?? 0;
+    if (minSubscribers > 0 && subscribers < minSubscribers) {
+      return {
+        exists: false,
+        name: data.data.display_name ?? cleanSub,
+        title: data.data.title ?? "",
+        subscribers,
+        lowSubscribers: true,
+        reason: "low_subscribers",
+      };
+    }
+
+    return {
+      exists: true,
+      name: data.data.display_name ?? cleanSub,
+      title: data.data.title ?? "",
+      subscribers,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+    if (message.includes("404") || message.includes("not found")) {
+      return { exists: false, name: cleanSub, reason: "not_found" };
+    }
+    if (message.includes("403") || message.includes("private") || message.includes("forbidden")) {
+      return { exists: false, name: cleanSub, reason: "private" };
+    }
+    if (message.includes("banned")) {
+      return { exists: false, name: cleanSub, reason: "banned" };
+    }
+    // Fallback on transient rate-limiting / network blips
+    return { exists: true, name: cleanSub };
+  }
+}
+
+/**
+ * Validates a list of subreddit names concurrently and separates them into valid vs invalid.
+ */
+export async function validateSubredditsBulk(
+  subreddits: string[],
+  options?: { minSubscribers?: number },
+): Promise<{
+  valid: string[];
+  invalid: Array<{ name: string; reason?: string; subscribers?: number }>;
+}> {
+  const uniqueSubs = Array.from(
+    new Set(subreddits.map((s) => s.replace(/^r\//i, "").trim()).filter(Boolean)),
+  );
+
+  const results = await Promise.all(
+    uniqueSubs.map((sub) => validateSubredditExists(sub, options)),
+  );
+
+  const valid: string[] = [];
+  const invalid: Array<{ name: string; reason?: string; subscribers?: number }> = [];
+
+  for (const res of results) {
+    if (res.exists) {
+      valid.push(res.name);
+    } else {
+      invalid.push({
+        name: res.name,
+        reason: res.reason,
+        subscribers: res.subscribers,
+      });
+    }
+  }
+
+  return { valid, invalid };
 }

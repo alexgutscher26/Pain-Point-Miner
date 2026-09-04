@@ -26,6 +26,9 @@ vi.mock("@/lib/reddit", () => ({
   resolveProblemPatterns: vi.fn(),
   isSubredditThrottled: vi.fn().mockReturnValue(false),
   getGlobal429Rate: vi.fn().mockResolvedValue(0),
+  validateSubredditsBulk: vi.fn().mockImplementation((subs: string[]) =>
+    Promise.resolve({ valid: subs, invalid: [] }),
+  ),
 }));
 
 vi.mock("@/lib/clustering", () => ({

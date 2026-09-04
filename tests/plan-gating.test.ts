@@ -58,6 +58,11 @@ describe("plan-gating", () => {
     expect(isAtLeastPlan("starter", "growth")).toBe(false);
     expect(isDepthAllowed("starter", "basic")).toBe(true);
     expect(isDepthAllowed("starter", "advanced")).toBe(false);
+    expect(isDepthAllowed("starter", "ultra")).toBe(false);
+    expect(isDepthAllowed("growth", "ultra")).toBe(false);
+    expect(isDepthAllowed("founder", "ultra")).toBe(false);
     expect(isDepthAllowed("pro", "deep")).toBe(true);
+    expect(isDepthAllowed("pro", "ultra")).toBe(true);
+    expect(isDepthAllowed("professional", "ultra")).toBe(true);
   });
 });

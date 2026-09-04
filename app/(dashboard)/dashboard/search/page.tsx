@@ -14,6 +14,7 @@ import {
   Lock,
   Database,
   HelpCircle,
+  Flame,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
@@ -37,7 +38,7 @@ type SearchDraft = {
   keyword: string;
   subreddits: string;
   customPatterns: string;
-  miningDepth: "basic" | "deep" | "advanced";
+  miningDepth: MiningDepth;
   timeWindow: TimeWindow;
   savedAt: string;
 };
@@ -709,8 +710,8 @@ export default function SearchPage() {
               <label className="block font-mono text-[11px] font-black tracking-widest text-zinc-550 uppercase">
                 Expert Discovery Presets
               </label>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                {(["basic", "deep", "advanced"] as const).map((depth) => {
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {(["basic", "deep", "advanced", "ultra"] as const).map((depth) => {
                   const preset = MINING_PRESETS[depth];
                   const isAllowed = billing
                     ? billing.entitlements.allowedMiningDepths.includes(depth)
@@ -738,6 +739,8 @@ export default function SearchPage() {
                         >
                           {depth === "basic" ? (
                             <Zap className="h-5 w-5" />
+                          ) : depth === "ultra" ? (
+                            <Flame className="h-5 w-5" />
                           ) : (
                             <Sparkles className="h-5 w-5" />
                           )}
