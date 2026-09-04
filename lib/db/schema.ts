@@ -55,6 +55,32 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }),
 });
 
+export const tool = pgTable(
+  "tool",
+  {
+    id: text().primaryKey().notNull(),
+    name: text().notNull(),
+    slug: text().notNull(),
+    url: text(),
+    description: text(),
+    category: text(),
+    iconUrl: text(),
+    lastCrawledAt: timestamp({ precision: 3, mode: "date" }),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("tool_slug_unique").using(
+      "btree",
+      table.slug.asc().nullsLast().op("text_ops"),
+    ),
+  ],
+);
+
 export const user = pgTable(
   "user",
   {
