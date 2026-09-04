@@ -1,13 +1,23 @@
 import { and, eq, gte, sql } from "drizzle-orm";
 import { startOfMonth } from "date-fns";
 import { db } from "@/lib/db";
-import { scraper, scraperRun, userPreferences, purchasedCredits } from "@/lib/db/schema";
+import {
+  scraper,
+  scraperRun,
+  userPreferences,
+  purchasedCredits,
+} from "@/lib/db/schema";
 import { MINING_PRESETS, type MiningDepth } from "./mining-presets";
 
 export { MINING_PRESETS };
 export type { MiningDepth };
 
-export type BillingPlan = "starter" | "growth" | "pro" | "founder" | "professional";
+export type BillingPlan =
+  | "starter"
+  | "growth"
+  | "pro"
+  | "founder"
+  | "professional";
 
 export type PlanEntitlements = {
   monthlyScans: number | null;
@@ -71,10 +81,7 @@ export function calculateMiningCost(depth: MiningDepth): number {
   return MINING_PRESETS[depth]?.estimatedCredits ?? 1;
 }
 
-const ACTIVE_SUBSCRIPTION_STATUSES = new Set([
-  "active",
-  "past_due",
-]);
+const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "past_due"]);
 const PLAN_ORDER: Record<BillingPlan, number> = {
   starter: 1,
   growth: 2,
@@ -203,7 +210,7 @@ export async function getMonthlyScanUsage(userId: string, now = new Date()) {
     const month = now.getMonth();
     const year = now.getFullYear();
     const currentAnniversary = new Date(year, month, day);
-    
+
     // If today is before this month's anniversary, the period started last month
     if (now < currentAnniversary) {
       fromDate = new Date(year, month - 1, day);
@@ -228,7 +235,8 @@ export async function getCreditSummary(userId: string, plan: BillingPlan) {
   const limit = PLAN_ENTITLEMENTS[plan].monthlyScans;
 
   const baseRemaining = limit === null ? null : Math.max(limit - used, 0);
-  const totalRemaining = baseRemaining === null ? null : baseRemaining + purchased;
+  const totalRemaining =
+    baseRemaining === null ? null : baseRemaining + purchased;
 
   return {
     monthlyUsed: used,

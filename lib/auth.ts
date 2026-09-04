@@ -98,9 +98,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data, request) {
-      const { sendResetPasswordEmailProgrammatically } = await import(
-        "./loops/service"
-      );
+      const { sendResetPasswordEmailProgrammatically } =
+        await import("./loops/service");
       await sendResetPasswordEmailProgrammatically(data.user.email, data.url);
     },
   },
@@ -216,12 +215,19 @@ export const auth = betterAuth({
       if (ctx.path === "/sign-up/email" && ctx.context.returned) {
         const body = ctx.body as { email?: string; name?: string };
         if (body.email) {
-          const { syncUserToLoops, sendWelcomeEmailProgrammatically } = await import("./loops/service");
+          const { syncUserToLoops, sendWelcomeEmailProgrammatically } =
+            await import("./loops/service");
           await syncUserToLoops(body.email, body.name);
 
           const firstName = body.name ? body.name.split(" ")[0] : "there";
-          const scanUrl = process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/search` : "https://threddiq.com/dashboard/search";
-          await sendWelcomeEmailProgrammatically(body.email, firstName, scanUrl);
+          const scanUrl = process.env.NEXT_PUBLIC_APP_URL
+            ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/search`
+            : "https://threddiq.com/dashboard/search";
+          await sendWelcomeEmailProgrammatically(
+            body.email,
+            firstName,
+            scanUrl,
+          );
         }
       }
     }),
@@ -288,12 +294,17 @@ export const auth = betterAuth({
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
 
-export function sanitizeAuthHeaders(inputHeaders?: Headers | HeadersInit | null): Headers {
+export function sanitizeAuthHeaders(
+  inputHeaders?: Headers | HeadersInit | null,
+): Headers {
   const headers = new Headers(inputHeaders ?? undefined);
   const cookie = headers.get("cookie");
   if (!cookie) return headers;
 
-  const cookies = cookie.split(";").map((c) => c.trim()).filter(Boolean);
+  const cookies = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .filter(Boolean);
   const sanitized = cookies.filter((c) => {
     const eqIdx = c.indexOf("=");
     if (eqIdx === -1) return true;
@@ -310,7 +321,9 @@ export function sanitizeAuthHeaders(inputHeaders?: Headers | HeadersInit | null)
   return headers;
 }
 
-export async function getServerSession(customHeaders?: Headers | HeadersInit | null) {
+export async function getServerSession(
+  customHeaders?: Headers | HeadersInit | null,
+) {
   try {
     let requestHeaders = customHeaders ? new Headers(customHeaders) : null;
     if (!requestHeaders) {

@@ -42,13 +42,16 @@ type HealthStats = {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl border border-zinc-200/50 bg-white/80 p-3.5 shadow-lg backdrop-blur-md animate-in fade-in duration-200">
+      <div className="animate-in fade-in rounded-xl border border-zinc-200/50 bg-white/80 p-3.5 shadow-lg backdrop-blur-md duration-200">
         <p className="mb-2 font-mono text-[10px] font-bold text-zinc-400 uppercase">
           {label}
         </p>
         <div className="space-y-1">
           {payload.map((item: any) => (
-            <div key={item.name} className="flex items-center gap-4 justify-between">
+            <div
+              key={item.name}
+              className="flex items-center justify-between gap-4"
+            >
               <span className="flex items-center gap-1.5 font-sans text-xs font-semibold text-zinc-600">
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -95,17 +98,20 @@ export function ScraperHealthDashboard() {
     return (
       <div className="grid animate-pulse grid-cols-1 gap-6 md:grid-cols-3">
         {[1, 2, 3].map((key) => (
-          <div key={key} className="h-36 rounded-2xl glass-card border border-zinc-200/30" />
+          <div
+            key={key}
+            className="glass-card h-36 rounded-2xl border border-zinc-200/30"
+          />
         ))}
-        <div className="h-96 rounded-2xl glass-card border border-zinc-200/30 md:col-span-2" />
-        <div className="h-96 rounded-2xl glass-card border border-zinc-200/30" />
+        <div className="glass-card h-96 rounded-2xl border border-zinc-200/30 md:col-span-2" />
+        <div className="glass-card h-96 rounded-2xl border border-zinc-200/30" />
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="glass-card p-12 rounded-2xl text-center border border-zinc-200/50">
+      <div className="glass-card rounded-2xl border border-zinc-200/50 p-12 text-center">
         <Activity className="mx-auto mb-4 h-12 w-12 text-zinc-300" />
         <h3 className="mb-2 text-xl font-extrabold tracking-tight text-zinc-900 uppercase">
           No Health Data Available
@@ -122,7 +128,7 @@ export function ScraperHealthDashboard() {
     <div className="space-y-8 pb-12">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900">
+          <h3 className="text-xl font-extrabold tracking-tight text-zinc-900 sm:text-2xl">
             Scraper Health & Reliability
           </h3>
           <p className="mt-1 text-sm font-medium text-zinc-500">
@@ -131,7 +137,7 @@ export function ScraperHealthDashboard() {
         </div>
         <button
           onClick={fetchStats}
-          className="cursor-pointer inline-flex items-center justify-center rounded-full border border-zinc-200/50 bg-white/60 p-3 text-zinc-600 transition-all duration-300 hover:bg-[#ff4500]/5 hover:border-[#ff4500]/30 hover:text-[#ff4500] hover:scale-105 active:scale-95 shadow-xs"
+          className="inline-flex cursor-pointer items-center justify-center rounded-full border border-zinc-200/50 bg-white/60 p-3 text-zinc-600 shadow-xs transition-all duration-300 hover:scale-105 hover:border-[#ff4500]/30 hover:bg-[#ff4500]/5 hover:text-[#ff4500] active:scale-95"
         >
           <RefreshCcw className="h-4 w-4" />
         </button>
@@ -164,8 +170,8 @@ export function ScraperHealthDashboard() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Trend Chart */}
-        <div className="glass-card p-6 sm:p-8 rounded-2xl lg:col-span-2">
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="glass-card rounded-2xl p-6 sm:p-8 lg:col-span-2">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h4 className="flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
               <TrendingUp className="h-5 w-5 text-[#ff4500]" />
               Discovery & Ingestion Trend
@@ -236,7 +242,7 @@ export function ScraperHealthDashboard() {
         </div>
 
         {/* Subreddit Performance */}
-        <div className="glass-card p-6 sm:p-8 rounded-2xl">
+        <div className="glass-card rounded-2xl p-6 sm:p-8">
           <h4 className="mb-6 flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
             <Clock className="h-5 w-5 text-[#ff4500]" />
             Top Subreddits
@@ -259,8 +265,8 @@ export function ScraperHealthDashboard() {
                       sub.successRate > 90
                         ? "text-emerald-600"
                         : sub.successRate > 70
-                        ? "text-amber-600"
-                        : "text-rose-600"
+                          ? "text-amber-600"
+                          : "text-rose-600"
                     }`}
                   >
                     {sub.successRate}%
@@ -272,8 +278,8 @@ export function ScraperHealthDashboard() {
                       sub.successRate > 90
                         ? "bg-emerald-500"
                         : sub.successRate > 70
-                        ? "bg-amber-500"
-                        : "bg-rose-500"
+                          ? "bg-amber-500"
+                          : "bg-rose-500"
                     }`}
                     style={{ width: `${sub.successRate}%` }}
                   />
@@ -307,14 +313,16 @@ function HealthCard({
   };
 
   return (
-    <div className="group relative overflow-hidden glass-card glass-card-hover p-6 rounded-2xl">
+    <div className="group glass-card glass-card-hover relative overflow-hidden rounded-2xl p-6">
       <div className="mb-4 flex items-start justify-between">
-        <div className={`rounded-xl border p-2.5 transition-colors duration-300 ${iconColors[variant]}`}>
+        <div
+          className={`rounded-xl border p-2.5 transition-colors duration-300 ${iconColors[variant]}`}
+        >
           {icon}
         </div>
       </div>
       <div>
-        <p className="mb-1.5 font-mono text-[10px] font-bold tracking-widest text-zinc-550 uppercase">
+        <p className="text-zinc-550 mb-1.5 font-mono text-[10px] font-bold tracking-widest uppercase">
           {title}
         </p>
         <p className="mb-1 text-3xl font-extrabold tracking-tight text-zinc-900">
@@ -327,4 +335,3 @@ function HealthCard({
     </div>
   );
 }
-

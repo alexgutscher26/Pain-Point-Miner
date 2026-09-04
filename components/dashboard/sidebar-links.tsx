@@ -74,9 +74,9 @@ export function SidebarLinks() {
           <Link
             key={link.href}
             href={link.href}
-            className={`group flex items-center gap-3.5 border px-3.5 py-2.5 font-mono text-[11px] tracking-wide uppercase transition-colors rounded-lg ${
+            className={`group flex items-center gap-3.5 rounded-lg border px-3.5 py-2.5 font-mono text-[11px] tracking-wide uppercase transition-colors ${
               isActive
-                ? "border-[#ff4500]/10 bg-[#ff4500]/5 text-[#ff4500] font-bold"
+                ? "border-[#ff4500]/10 bg-[#ff4500]/5 font-bold text-[#ff4500]"
                 : "border-transparent text-zinc-500 hover:bg-[#ff4500]/5 hover:text-zinc-900"
             }`}
           >

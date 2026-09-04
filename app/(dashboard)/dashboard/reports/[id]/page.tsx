@@ -5,42 +5,19 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
-  TrendingUp,
-  ShieldCheck,
-  Users,
-  BarChart3,
-  Filter,
-  Star,
-  AlertTriangle,
-  Lightbulb,
-  Loader2,
-  DollarSign,
-  ArrowRightLeft,
-  Wrench,
-  Sparkles,
   ExternalLink,
   Zap,
   Copy,
   Check,
-  Smartphone,
-  Laptop,
-  Flame,
-  ArrowUpRight,
-  Clock,
-  Target,
-  Layers,
-  HelpCircle,
-  Share2,
   Bookmark,
-  RefreshCw,
-  SlidersHorizontal,
-  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ReportDetailSkeleton } from "@/components/dashboard/report-detail-skeleton";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { MetricTooltip } from "@/components/ui/metric-tooltip";
 import {
   Dialog,
   DialogContent,
@@ -49,8 +26,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
-import { EmptyState } from "@/components/dashboard/empty-state";
 
 interface CompetitorIntel {
   name: string;
@@ -102,7 +77,11 @@ interface PainPoint {
   } | null;
   switchingCosts?: string;
   triedSolutions?: string[];
-  difficulty: "weekend_project" | "side_project" | "startup_mvp" | "vc_scale_moat";
+  difficulty:
+    | "weekend_project"
+    | "side_project"
+    | "startup_mvp"
+    | "vc_scale_moat";
   postUrl: string | null;
 }
 
@@ -203,7 +182,10 @@ function deriveCompetition(pain: PainPoint): string {
   if (pain.triedSolutions && pain.triedSolutions.length > 0) {
     return pain.triedSolutions[0];
   }
-  if (pain.cluster?.competitorIntel && pain.cluster.competitorIntel.length > 0) {
+  if (
+    pain.cluster?.competitorIntel &&
+    pain.cluster.competitorIntel.length > 0
+  ) {
     return pain.cluster.competitorIntel[0].name;
   }
   return "Manual Spreadsheets & Email";
@@ -228,7 +210,8 @@ function deriveDemandNumeric(pain: PainPoint): string {
 function derivePricing(pain: PainPoint): string {
   if (pain.budgetSignals && pain.budgetSignals.length > 0) {
     const s = pain.budgetSignals[0];
-    if (s.amountMinUsd && s.amountMaxUsd) return `$${s.amountMinUsd}-$${s.amountMaxUsd}/mo`;
+    if (s.amountMinUsd && s.amountMaxUsd)
+      return `$${s.amountMinUsd}-$${s.amountMaxUsd}/mo`;
     if (s.amountMinUsd) return `$${s.amountMinUsd}/mo`;
   }
   if (pain.monetization >= 8) return "$49-$149/mo";
@@ -255,7 +238,10 @@ function deriveDifficultyLabel(difficulty: PainPoint["difficulty"]): string {
 
 function formatNarrativeIdea(pain: PainPoint): string[] {
   const desc = pain.description.replace(/\r\n/g, "\n").trim();
-  const rawParts = desc.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const rawParts = desc
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   if (rawParts.length >= 2) {
     return rawParts;
@@ -273,7 +259,10 @@ function formatNarrativeIdea(pain: PainPoint): string[] {
   ];
 }
 
-function deriveWhyNowSection(pain: PainPoint): { headline: string; paragraphs: string[] } {
+function deriveWhyNowSection(pain: PainPoint): {
+  headline: string;
+  paragraphs: string[];
+} {
   const competitor = deriveCompetition(pain);
   const headline = `Voice & Workflow AI cost fell 5x since late 2024, and buyer search jumped 10x in May`;
   const paragraphs = [
@@ -300,9 +289,13 @@ export default function ReportDetailPage() {
   const [agentPromptCopied, setAgentPromptCopied] = useState(false);
   const [agentModalOpen, setAgentModalOpen] = useState(false);
 
-  const [subredditMetadata, setSubredditMetadata] = useState<Record<string, number>>({});
-  const [intensityFilterApplied, setIntensityFilterApplied] = useState<IntensityFilter>("all");
-  const [sentimentFilterApplied, setSentimentFilterApplied] = useState<SentimentFilter>("all");
+  const [subredditMetadata, setSubredditMetadata] = useState<
+    Record<string, number>
+  >({});
+  const [intensityFilterApplied, setIntensityFilterApplied] =
+    useState<IntensityFilter>("all");
+  const [sentimentFilterApplied, setSentimentFilterApplied] =
+    useState<SentimentFilter>("all");
 
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
@@ -468,7 +461,9 @@ export default function ReportDetailPage() {
             }
           : prev,
       );
-      toast.success(nextSaved ? "Idea saved to My Stuff." : "Idea removed from saved.");
+      toast.success(
+        nextSaved ? "Idea saved to My Stuff." : "Idea removed from saved.",
+      );
     } catch (error) {
       console.error("Error updating report:", error);
       toast.error("Unable to update report.");
@@ -483,7 +478,10 @@ export default function ReportDetailPage() {
     const customer = deriveCustomer(currentPain);
     const pricingVal = derivePricing(currentPain);
     const competitor = deriveCompetition(currentPain);
-    const quotes = currentPain.communityVoices.slice(0, 3).map((q) => `"${q}"`).join("\n");
+    const quotes = currentPain.communityVoices
+      .slice(0, 3)
+      .map((q) => `"${q}"`)
+      .join("\n");
 
     return `You are a Senior Full-Stack Architect and SaaS Builder.
 
@@ -517,35 +515,30 @@ Please generate the schema, API routes, and main dashboard screen.`;
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[75vh] flex-col items-center justify-center gap-4 bg-white">
-        <Loader2 className="h-9 w-9 animate-spin text-[#2563eb]" />
-        <p className="font-sans text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-          Loading Idea Browser...
-        </p>
-      </div>
-    );
+    return <ReportDetailSkeleton />;
   }
 
   if (!reportData) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center bg-white">
-        <h2 className="mb-3 text-2xl font-serif text-zinc-900">Idea Not Found</h2>
-        <p className="mb-6 max-w-md text-sm text-zinc-500">
-          The requested idea archive could not be retrieved.
-        </p>
-        <Link
-          href="/dashboard/reports"
-          className="rounded-full bg-zinc-900 px-6 py-2.5 text-xs font-bold text-white uppercase tracking-wider transition-all"
-        >
-          Back to Browse
-        </Link>
+      <div className="mx-auto w-full max-w-7xl p-8">
+        <EmptyState
+          title="Idea Report Not Found"
+          description="The requested idea archive could not be retrieved or has been removed."
+          actionLabel="Browse All Reports"
+          actionHref="/dashboard/reports"
+          secondaryActionLabel="Start New Scan"
+          secondaryActionHref="/dashboard/search"
+          icon="reports"
+          variant="hero"
+        />
       </div>
     );
   }
 
   // Derived values for active idea
-  const ideaTitle = currentPain ? deriveIdeaTitle(currentPain, reportData.title) : "";
+  const ideaTitle = currentPain
+    ? deriveIdeaTitle(currentPain, reportData.title)
+    : "";
   const customer = currentPain ? deriveCustomer(currentPain) : "";
   const market = currentPain ? deriveMarket(currentPain, selectedCategory) : "";
   const revenueCeiling = currentPain ? deriveRevenueCeiling(currentPain) : "";
@@ -554,38 +547,49 @@ Please generate the schema, API routes, and main dashboard screen.`;
   const demandNumeric = currentPain ? deriveDemandNumeric(currentPain) : "";
   const pricing = currentPain ? derivePricing(currentPain) : "";
   const year1ARR = currentPain ? deriveYear1ARR(currentPain) : "";
-  const difficultyLabel = currentPain ? deriveDifficultyLabel(currentPain.difficulty) : "Moderate";
-  const whyNow = currentPain ? deriveWhyNowSection(currentPain) : { headline: "", paragraphs: [] };
-  const narrativeParagraphs = currentPain ? formatNarrativeIdea(currentPain) : [];
+  const difficultyLabel = currentPain
+    ? deriveDifficultyLabel(currentPain.difficulty)
+    : "Moderate";
+  const whyNow = currentPain
+    ? deriveWhyNowSection(currentPain)
+    : { headline: "", paragraphs: [] };
+  const narrativeParagraphs = currentPain
+    ? formatNarrativeIdea(currentPain)
+    : [];
 
   const scoreFormatted = currentPain?.validationScore
     ? (currentPain.validationScore / 10).toFixed(1)
     : currentPain
-      ? ((currentPain.intensity * 0.7 + (currentPain.monetization || 5) * 0.3)).toFixed(1)
+      ? (
+          currentPain.intensity * 0.7 +
+          (currentPain.monetization || 5) * 0.3
+        ).toFixed(1)
       : "7.3";
 
   return (
-    <div className="min-h-screen bg-white text-[#1a1a1a] font-sans antialiased selection:bg-blue-100">
+    <div className="min-h-screen bg-white font-sans text-[#1a1a1a] antialiased selection:bg-blue-100">
       {/* Plan Dialog */}
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="border border-zinc-200 bg-white text-zinc-950 max-w-md">
+        <DialogContent className="max-w-md border border-zinc-200 bg-white text-zinc-950">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold">Plan Upgrade Required</DialogTitle>
-            <DialogDescription className="text-zinc-500 text-xs">
+            <DialogTitle className="text-lg font-bold">
+              Plan Upgrade Required
+            </DialogTitle>
+            <DialogDescription className="text-xs text-zinc-500">
               {planDialogMessage}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <DialogFooter className="gap-2 pt-2 sm:gap-2">
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="cursor-pointer rounded-full border border-zinc-200 bg-white text-zinc-700 px-4 py-1.5 text-xs font-semibold hover:bg-zinc-50 transition-colors"
+              className="cursor-pointer rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
             >
               Cancel
             </button>
             <Link
               href="/dashboard/billing"
-              className="rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] px-4 py-1.5 text-xs font-bold text-white transition-colors"
+              className="rounded-full bg-[#2563eb] px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#1d4ed8]"
             >
               Upgrade Plan
             </Link>
@@ -601,21 +605,22 @@ Please generate the schema, API routes, and main dashboard screen.`;
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#2563eb]">
                 <Zap className="h-4 w-4 fill-current" />
               </div>
-              <DialogTitle className="text-lg font-bold font-serif">
+              <DialogTitle className="font-serif text-lg font-bold">
                 Build &quot;{ideaTitle}&quot; with AI Agent
               </DialogTitle>
             </div>
-            <DialogDescription className="text-zinc-500 text-xs">
-              Paste this blueprint into Cursor, Claude, ChatGPT, or your AI coding assistant.
+            <DialogDescription className="text-xs text-zinc-500">
+              Paste this blueprint into Cursor, Claude, ChatGPT, or your AI
+              coding assistant.
             </DialogDescription>
           </DialogHeader>
           <div className="relative mt-2">
-            <pre className="max-h-[320px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 font-mono text-xs text-zinc-200 whitespace-pre-wrap leading-relaxed">
+            <pre className="max-h-[320px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-200">
               {generateAgentPrompt()}
             </pre>
             <button
               onClick={handleCopyAgentPrompt}
-              className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] px-3 py-1 font-mono text-[10px] font-bold text-white uppercase shadow-sm transition-all"
+              className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-[#2563eb] px-3 py-1 font-mono text-[10px] font-bold text-white uppercase shadow-sm transition-all hover:bg-[#1d4ed8]"
             >
               {agentPromptCopied ? (
                 <>
@@ -632,7 +637,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
             <button
               type="button"
               onClick={() => setAgentModalOpen(false)}
-              className="rounded-full border border-zinc-200 bg-zinc-100 text-zinc-700 px-4 py-1.5 text-xs font-semibold hover:bg-zinc-200 transition-colors"
+              className="rounded-full border border-zinc-200 bg-zinc-100 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
             >
               Close
             </button>
@@ -640,24 +645,24 @@ Please generate the schema, API routes, and main dashboard screen.`;
         </DialogContent>
       </Dialog>
 
-      <div className="mx-auto w-full max-w-[1340px] px-4 sm:px-6 lg:px-8 py-4 space-y-6">
+      <div className="mx-auto w-full max-w-[1340px] space-y-6 px-4 py-4 sm:px-6 lg:px-8">
         {/* Top Breadcrumb & Actions Bar (IdeaBrowser Exact Top Bar) */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-150 pb-3 text-xs">
-          <div className="flex items-center gap-2 text-zinc-500 font-normal">
+        <div className="border-zinc-150 flex flex-col gap-3 border-b pb-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 font-normal text-zinc-500">
             <Link
               href="/dashboard"
-              className="hover:text-zinc-900 transition-colors flex items-center gap-1.5"
+              className="flex items-center gap-1.5 transition-colors hover:text-zinc-900"
             >
               <span className="text-zinc-400">Browse Ideas</span>
             </Link>
             <ChevronRight className="h-3 w-3 text-zinc-300" />
-            <span className="text-zinc-900 font-medium truncate max-w-[280px] sm:max-w-md">
+            <span className="max-w-[280px] truncate font-medium text-zinc-900 sm:max-w-md">
               {ideaTitle || reportData.title}
             </span>
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500 bg-zinc-50 border border-zinc-200 px-3 py-1 rounded-full">
+            <div className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-500">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
               <span className="text-[11px] font-medium text-zinc-600">
                 Idea Miner AI Suite
@@ -666,7 +671,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
             <button
               onClick={() => handleSaveToggle(!reportData.saved)}
               disabled={isSaving}
-              className="flex items-center gap-1 text-xs text-zinc-700 border border-zinc-200 hover:bg-zinc-50 px-3 py-1 rounded-full transition-colors font-medium shadow-2xs"
+              className="flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
             >
               <Bookmark className="h-3.5 w-3.5" />
               <span>{reportData.saved ? "Saved" : "Bookmark"}</span>
@@ -675,9 +680,9 @@ Please generate the schema, API routes, and main dashboard screen.`;
         </div>
 
         {/* Pagination Switcher Pill Bar (1 Idea Per Page Switcher) */}
-        <div className="flex items-center justify-between bg-zinc-50/80 border border-zinc-200/80 rounded-xl px-4 py-2 text-xs">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider shrink-0 mr-1">
+        <div className="flex items-center justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-4 py-2 text-xs">
+          <div className="scrollbar-none flex items-center gap-2 overflow-x-auto py-0.5">
+            <span className="mr-1 shrink-0 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">
               Ideas ({filteredPainPoints.length}):
             </span>
             {filteredPainPoints.map((p, idx) => {
@@ -694,18 +699,22 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     setIsDescriptionExpanded(false);
                   }}
                   className={cn(
-                    "cursor-pointer shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1 font-sans text-xs font-medium transition-all",
+                    "flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 font-sans text-xs font-medium transition-all",
                     active
-                      ? "bg-[#2563eb] text-white shadow-xs font-semibold"
-                      : "bg-white border border-zinc-200 text-zinc-650 hover:bg-zinc-100 hover:text-zinc-900",
+                      ? "bg-[#2563eb] font-semibold text-white shadow-xs"
+                      : "text-zinc-650 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900",
                   )}
                 >
                   <span>#{idx + 1}</span>
-                  <span className="max-w-[140px] truncate">{deriveIdeaTitle(p, reportData.title)}</span>
+                  <span className="max-w-[140px] truncate">
+                    {deriveIdeaTitle(p, reportData.title)}
+                  </span>
                   <span
                     className={cn(
-                      "text-[10px] px-1 rounded",
-                      active ? "bg-white/20 text-white" : "text-zinc-500 font-mono",
+                      "rounded px-1 text-[10px]",
+                      active
+                        ? "bg-white/20 text-white"
+                        : "font-mono text-zinc-500",
                     )}
                   >
                     ★ {pScore}
@@ -715,22 +724,22 @@ Please generate the schema, API routes, and main dashboard screen.`;
             })}
           </div>
 
-          <div className="flex items-center gap-1 shrink-0 pl-2">
+          <div className="flex shrink-0 items-center gap-1 pl-2">
             <button
               onClick={handlePrevIdea}
               disabled={currentPainIndex === 0}
-              className="cursor-pointer p-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="cursor-pointer rounded-md border border-zinc-200 bg-white p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
               title="Previous idea (Left Arrow)"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-[11px] font-mono text-zinc-500 px-1">
+            <span className="px-1 font-mono text-[11px] text-zinc-500">
               {currentPainIndex + 1}/{filteredPainPoints.length}
             </span>
             <button
               onClick={handleNextIdea}
               disabled={currentPainIndex >= filteredPainPoints.length - 1}
-              className="cursor-pointer p-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="cursor-pointer rounded-md border border-zinc-200 bg-white p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
               title="Next idea (Right Arrow)"
             >
               <ChevronRight className="h-4 w-4" />
@@ -742,27 +751,31 @@ Please generate the schema, API routes, and main dashboard screen.`;
         {currentPain && (
           <div className="space-y-10 pt-2">
             {/* 1. Header: Title + Score Badge */}
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] leading-[1.18] font-normal text-[#1a1a1a] tracking-tight max-w-4xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <h1 className="max-w-4xl font-serif text-3xl leading-[1.18] font-normal tracking-tight text-[#1a1a1a] sm:text-4xl lg:text-[42px]">
                 {ideaTitle}
               </h1>
 
               {/* Exact IdeaBrowser Score Pill ⭐ 7.3/10 */}
-              <div className="shrink-0 flex items-center">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 shadow-2xs">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-50 text-amber-500 text-xs font-bold">
-                    ★
+              <div className="flex shrink-0 items-center">
+                <MetricTooltip metric="validationScore">
+                  <div className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 shadow-2xs">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-50 text-xs font-bold text-amber-500">
+                      ★
+                    </div>
+                    <span className="font-sans text-base font-bold tracking-tight text-zinc-900">
+                      {scoreFormatted}
+                    </span>
+                    <span className="text-xs font-medium text-zinc-400">
+                      /10
+                    </span>
                   </div>
-                  <span className="text-base font-bold text-zinc-900 tracking-tight font-sans">
-                    {scoreFormatted}
-                  </span>
-                  <span className="text-xs text-zinc-400 font-medium">/10</span>
-                </div>
+                </MetricTooltip>
               </div>
             </div>
 
             {/* 2. Top Two-Column Grid: Left Column (Idea + Meta + CTA) & Right Column (Mockup + 2x2 Grid) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12">
               {/* LEFT COLUMN (Wide ~60%) */}
               <div className="space-y-7 lg:col-span-7">
                 {/* THE IDEA Section */}
@@ -771,7 +784,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     THE IDEA
                   </p>
 
-                  <div className="space-y-3.5 font-serif text-[16px] sm:text-[17px] leading-[1.68] text-[#2c2c2c]">
+                  <div className="space-y-3.5 font-serif text-[16px] leading-[1.68] text-[#2c2c2c] sm:text-[17px]">
                     {(() => {
                       const displayed = isDescriptionExpanded
                         ? narrativeParagraphs
@@ -782,24 +795,26 @@ Please generate the schema, API routes, and main dashboard screen.`;
                           {displayed.map((p, idx) => (
                             <p key={idx}>{p}</p>
                           ))}
-                          {narrativeParagraphs.length > 2 && !isDescriptionExpanded && (
-                            <button
-                              type="button"
-                              onClick={() => setIsDescriptionExpanded(true)}
-                              className="cursor-pointer inline-flex items-center gap-1 font-sans text-xs font-semibold text-zinc-700 hover:text-blue-600 transition-colors pt-1"
-                            >
-                              Keep reading →
-                            </button>
-                          )}
-                          {isDescriptionExpanded && narrativeParagraphs.length > 2 && (
-                            <button
-                              type="button"
-                              onClick={() => setIsDescriptionExpanded(false)}
-                              className="cursor-pointer inline-flex items-center gap-1 font-sans text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition-colors pt-1"
-                            >
-                              Show less ↑
-                            </button>
-                          )}
+                          {narrativeParagraphs.length > 2 &&
+                            !isDescriptionExpanded && (
+                              <button
+                                type="button"
+                                onClick={() => setIsDescriptionExpanded(true)}
+                                className="inline-flex cursor-pointer items-center gap-1 pt-1 font-sans text-xs font-semibold text-zinc-700 transition-colors hover:text-blue-600"
+                              >
+                                Keep reading →
+                              </button>
+                            )}
+                          {isDescriptionExpanded &&
+                            narrativeParagraphs.length > 2 && (
+                              <button
+                                type="button"
+                                onClick={() => setIsDescriptionExpanded(false)}
+                                className="inline-flex cursor-pointer items-center gap-1 pt-1 font-sans text-xs font-semibold text-zinc-400 transition-colors hover:text-zinc-600"
+                              >
+                                Show less ↑
+                              </button>
+                            )}
                         </>
                       );
                     })()}
@@ -807,12 +822,12 @@ Please generate the schema, API routes, and main dashboard screen.`;
                 </div>
 
                 {/* 4-Field Metadata Grid in IdeaBrowser Style */}
-                <div className="grid grid-cols-2 gap-x-8 gap-y-5 border-t border-zinc-150 pt-6">
+                <div className="border-zinc-150 grid grid-cols-2 gap-x-8 gap-y-5 border-t pt-6">
                   <div>
                     <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                       THE CUSTOMER
                     </p>
-                    <p className="mt-1 text-[13px] sm:text-sm font-bold text-zinc-900 leading-snug">
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
                       {customer}
                     </p>
                   </div>
@@ -820,7 +835,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                       MARKET
                     </p>
-                    <p className="mt-1 text-[13px] sm:text-sm font-bold text-zinc-900 leading-snug">
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
                       {market}
                     </p>
                   </div>
@@ -828,7 +843,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                       REVENUE CEILING
                     </p>
-                    <p className="mt-1 text-[13px] sm:text-sm font-bold text-zinc-900 leading-snug font-mono">
+                    <p className="mt-1 font-mono text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
                       {revenueCeiling}
                     </p>
                   </div>
@@ -836,18 +851,18 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
                       COMPETITION
                     </p>
-                    <p className="mt-1 text-[13px] sm:text-sm font-bold text-zinc-900 leading-snug">
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
                       {competition}
                     </p>
                   </div>
                 </div>
 
                 {/* IdeaBrowser Style Blue Gradient Button */}
-                <div className="pt-2 flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setAgentModalOpen(true)}
-                    className="cursor-pointer inline-flex items-center gap-2 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-6 py-3 font-sans text-xs font-bold tracking-wide transition-all shadow-xs active:scale-98"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#2563eb] px-6 py-3 font-sans text-xs font-bold tracking-wide text-white shadow-xs transition-all hover:bg-[#1d4ed8] active:scale-98"
                   >
                     <div className="flex items-center -space-x-1">
                       <div className="h-2 w-2 rounded-full bg-white"></div>
@@ -859,7 +874,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                   <button
                     type="button"
                     onClick={handleCopyAgentPrompt}
-                    className="cursor-pointer inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 px-4 py-3 font-sans text-xs font-semibold transition-colors shadow-2xs"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-3 font-sans text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                   >
                     {agentPromptCopied ? (
                       <>
@@ -879,36 +894,40 @@ Please generate the schema, API routes, and main dashboard screen.`;
               {/* RIGHT COLUMN (~40%): Mockup Card + 2x2 Metric Cards */}
               <div className="space-y-5 lg:col-span-5">
                 {/* Concept Mockup Card */}
-                <div className="rounded-2xl border border-zinc-200/90 bg-[#f8f9fa] p-4.5 space-y-4 shadow-2xs">
+                <div className="space-y-4 rounded-2xl border border-zinc-200/90 bg-[#f8f9fa] p-4.5 shadow-2xs">
                   {/* Dual Phone Concept Mockup UI */}
                   <div className="grid grid-cols-2 gap-3">
                     {/* Phone 1: Dark Intake App Screen */}
-                    <div className="rounded-xl border border-zinc-300/80 bg-[#0f2327] text-white p-3 space-y-2.5 shadow-sm">
+                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-[#0f2327] p-3 text-white shadow-sm">
                       <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
                         <div className="flex items-center gap-1">
                           <div className="h-2 w-2 rounded-full bg-emerald-400"></div>
-                          <span className="text-[9px] font-bold tracking-wider text-zinc-200 uppercase font-mono">
+                          <span className="font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase">
                             RingMaster
                           </span>
                         </div>
-                        <span className="text-[8px] bg-white/10 px-1.5 py-0.2 rounded text-zinc-300">
+                        <span className="py-0.2 rounded bg-white/10 px-1.5 text-[8px] text-zinc-300">
                           Live AI
                         </span>
                       </div>
 
                       <div className="space-y-1.5">
-                        <div className="rounded-lg bg-white/5 p-2 space-y-1 border border-white/5">
-                          <p className="text-[8px] text-zinc-400 font-mono">Incoming Job</p>
-                          <p className="text-[10px] font-bold text-white truncate">
+                        <div className="space-y-1 rounded-lg border border-white/5 bg-white/5 p-2">
+                          <p className="font-mono text-[8px] text-zinc-400">
+                            Incoming Job
+                          </p>
+                          <p className="truncate text-[10px] font-bold text-white">
                             Emergency Pipe Leak
                           </p>
-                          <p className="text-[9px] text-emerald-400 font-semibold">$450 estimate</p>
+                          <p className="text-[9px] font-semibold text-emerald-400">
+                            $450 estimate
+                          </p>
                         </div>
                         <div className="flex gap-1">
-                          <span className="flex-1 bg-white/10 text-center py-1 rounded text-[8px] font-mono">
+                          <span className="flex-1 rounded bg-white/10 py-1 text-center font-mono text-[8px]">
                             Scripts
                           </span>
-                          <span className="flex-1 bg-amber-500/20 text-amber-300 text-center py-1 rounded text-[8px] font-mono">
+                          <span className="flex-1 rounded bg-amber-500/20 py-1 text-center font-mono text-[8px] text-amber-300">
                             Rules
                           </span>
                         </div>
@@ -916,32 +935,36 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     </div>
 
                     {/* Phone 2: White Operator Dashboard Screen */}
-                    <div className="rounded-xl border border-zinc-300/80 bg-white text-zinc-900 p-3 space-y-2.5 shadow-sm">
+                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-white p-3 text-zinc-900 shadow-sm">
                       <div className="flex items-center justify-between border-b border-zinc-100 pb-1.5">
-                        <span className="text-[9px] font-bold text-zinc-800 font-mono uppercase">
+                        <span className="font-mono text-[9px] font-bold text-zinc-800 uppercase">
                           Dispatch
                         </span>
-                        <span className="text-[8px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded font-bold">
+                        <span className="py-0.2 rounded bg-emerald-50 px-1.5 text-[8px] font-bold text-emerald-600">
                           98% Auto
                         </span>
                       </div>
 
                       <div className="space-y-1.5">
-                        <div className="rounded-lg bg-zinc-50 p-2 space-y-1 border border-zinc-100">
+                        <div className="space-y-1 rounded-lg border border-zinc-100 bg-zinc-50 p-2">
                           <div className="flex justify-between text-[8px] text-zinc-500">
                             <span>Today</span>
-                            <span className="font-bold text-zinc-800">12 calls</span>
+                            <span className="font-bold text-zinc-800">
+                              12 calls
+                            </span>
                           </div>
-                          <div className="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
-                            <div className="h-full w-4/5 bg-[#2563eb] rounded-full"></div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+                            <div className="h-full w-4/5 rounded-full bg-[#2563eb]"></div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-1 text-[8px] text-center font-mono">
-                          <div className="bg-zinc-50 p-1 rounded border border-zinc-100">
-                            <span className="text-zinc-400">Won:</span> <b>$2.8K</b>
+                        <div className="grid grid-cols-2 gap-1 text-center font-mono text-[8px]">
+                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1">
+                            <span className="text-zinc-400">Won:</span>{" "}
+                            <b>$2.8K</b>
                           </div>
-                          <div className="bg-zinc-50 p-1 rounded border border-zinc-100">
-                            <span className="text-zinc-400">Cost:</span> <b>$3.20</b>
+                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1">
+                            <span className="text-zinc-400">Cost:</span>{" "}
+                            <b>$3.20</b>
                           </div>
                         </div>
                       </div>
@@ -955,7 +978,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     </span>
                     <button
                       onClick={() => setAgentModalOpen(true)}
-                      className="cursor-pointer inline-flex items-center gap-1.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white px-3.5 py-1.5 font-sans text-[11px] font-bold tracking-wide transition-all shadow-xs"
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#2563eb] px-3.5 py-1.5 font-sans text-[11px] font-bold tracking-wide text-white shadow-xs transition-all hover:bg-[#1d4ed8]"
                     >
                       <div className="flex items-center -space-x-1">
                         <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
@@ -969,12 +992,20 @@ Please generate the schema, API routes, and main dashboard screen.`;
                 {/* 2x2 Metric Cards in Exact IdeaBrowser Design */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Metric 1: SOLUTION DEMAND */}
-                  <div className="rounded-xl border border-zinc-200/90 bg-white p-3.5 space-y-2 hover:border-zinc-300 transition-colors shadow-2xs">
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
                     <div className="flex items-center justify-between">
-                      <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                        SOLUTION DEMAND
-                      </p>
-                      <span className="text-zinc-300 text-xs font-light">+</span>
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Solution Demand"
+                        explanation="Calculated demand score based on search velocity, user complaints, and alternative queries."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          SOLUTION DEMAND
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
@@ -982,7 +1013,10 @@ Please generate the schema, API routes, and main dashboard screen.`;
                       </p>
                       {/* IdeaBrowser Smooth Purple/Blue Sparkline Curve */}
                       <div className="pt-1">
-                        <svg viewBox="0 0 100 24" className="w-full h-5 text-blue-600 stroke-current fill-none">
+                        <svg
+                          viewBox="0 0 100 24"
+                          className="h-5 w-full fill-none stroke-current text-blue-600"
+                        >
                           <path
                             d="M 0 18 Q 25 18, 45 14 T 70 8 T 90 2 L 100 4"
                             strokeWidth="2"
@@ -994,56 +1028,83 @@ Please generate the schema, API routes, and main dashboard screen.`;
                   </div>
 
                   {/* Metric 2: PAIN */}
-                  <div className="rounded-xl border border-zinc-200/90 bg-white p-3.5 space-y-2 hover:border-zinc-300 transition-colors shadow-2xs">
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
                     <div className="flex items-center justify-between">
-                      <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                        PAIN
-                      </p>
-                      <span className="text-zinc-300 text-xs font-light">+</span>
+                      <MetricTooltip metric="painIntensity">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          PAIN
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
                         {currentPain.intensity}{" "}
-                        <span className="text-xs font-normal text-zinc-500">/10 severity</span>
+                        <span className="text-xs font-normal text-zinc-500">
+                          /10 severity
+                        </span>
                       </p>
-                      <p className="text-[10px] text-zinc-500 font-normal leading-tight pt-1">
-                        {currentPain.subreddits[0] ? `r/${currentPain.subreddits[0]}` : "Community"} and {currentPain.mentions} more feel it
+                      <p className="pt-1 text-[10px] leading-tight font-normal text-zinc-500">
+                        {currentPain.subreddits[0]
+                          ? `r/${currentPain.subreddits[0]}`
+                          : "Community"}{" "}
+                        and {currentPain.mentions} more feel it
                       </p>
                     </div>
                   </div>
 
                   {/* Metric 3: TIMING */}
-                  <div className="rounded-xl border border-zinc-200/90 bg-white p-3.5 space-y-2 hover:border-zinc-300 transition-colors shadow-2xs">
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
                     <div className="flex items-center justify-between">
-                      <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                        TIMING
-                      </p>
-                      <span className="text-zinc-300 text-xs font-light">+</span>
+                      <MetricTooltip
+                        metric="urgency"
+                        title="Market Timing"
+                        explanation="Why the window is open now: AI turn latencies, API cost drops, and incumbent bloat."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          TIMING
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
                         {currentPain.maturity || 8}{" "}
-                        <span className="text-xs font-normal text-zinc-500">/10</span>
+                        <span className="text-xs font-normal text-zinc-500">
+                          /10
+                        </span>
                       </p>
-                      <p className="text-[10px] text-blue-600 font-medium leading-tight pt-1">
+                      <p className="pt-1 text-[10px] leading-tight font-medium text-blue-600">
                         why the window is open
                       </p>
                     </div>
                   </div>
 
                   {/* Metric 4: YEAR 1, DONE RIGHT */}
-                  <div className="rounded-xl border border-zinc-200/90 bg-white p-3.5 space-y-2 hover:border-zinc-300 transition-colors shadow-2xs">
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
                     <div className="flex items-center justify-between">
-                      <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                        YEAR 1, DONE RIGHT
-                      </p>
-                      <span className="text-zinc-300 text-xs font-light">+</span>
+                      <MetricTooltip
+                        metric="monetization"
+                        title="Year 1 ARR Potential"
+                        explanation="Estimated ARR range reachable in year 1 with focused execution and modern pricing."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          YEAR 1, DONE RIGHT
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
                         {year1ARR}
                       </p>
-                      <p className="text-[10px] text-emerald-600 font-normal leading-tight pt-1">
+                      <p className="pt-1 text-[10px] leading-tight font-normal text-emerald-600">
                         ceiling {revenueCeiling}
                       </p>
                     </div>
@@ -1053,7 +1114,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
             </div>
 
             {/* 3. Lower Section: WHY NOW (Left) & AT A GLANCE (Right Sticky Sidebar) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 border-t border-zinc-150 pt-10 items-start">
+            <div className="border-zinc-150 grid grid-cols-1 items-start gap-10 border-t pt-10 lg:grid-cols-12">
               {/* LEFT LOWER COLUMN (Wide ~65%) */}
               <div className="space-y-10 lg:col-span-8">
                 {/* WHY NOW Section */}
@@ -1061,7 +1122,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                   <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
                     WHY NOW
                   </p>
-                  <h2 className="font-serif text-2xl sm:text-3xl leading-snug font-normal text-[#1a1a1a]">
+                  <h2 className="font-serif text-2xl leading-snug font-normal text-[#1a1a1a] sm:text-3xl">
                     {whyNow.headline}
                   </h2>
                   <div className="space-y-3.5 font-serif text-[16px] leading-[1.68] text-[#2c2c2c]">
@@ -1082,7 +1143,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                         href={currentPain.postUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                        className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
                       >
                         <span>View Reddit Thread</span>
                         <ExternalLink className="h-3 w-3" />
@@ -1094,17 +1155,20 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     {currentPain.communityVoices.map((voice, idx) => (
                       <div
                         key={idx}
-                        className="rounded-xl border border-zinc-200 bg-white p-4.5 space-y-2 shadow-2xs"
+                        className="space-y-2 rounded-xl border border-zinc-200 bg-white p-4.5 shadow-2xs"
                       >
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-mono font-semibold text-zinc-700">
-                            r/{currentPain.subreddits[idx % currentPain.subreddits.length] || "reddit"}
+                            r/
+                            {currentPain.subreddits[
+                              idx % currentPain.subreddits.length
+                            ] || "reddit"}
                           </span>
-                          <span className="text-[10px] font-mono text-zinc-400">
+                          <span className="font-mono text-[10px] text-zinc-400">
                             Verified Community Quote
                           </span>
                         </div>
-                        <p className="font-serif italic text-zinc-800 text-[15px] leading-relaxed">
+                        <p className="font-serif text-[15px] leading-relaxed text-zinc-800 italic">
                           &quot;{voice}&quot;
                         </p>
                       </div>
@@ -1124,12 +1188,12 @@ Please generate the schema, API routes, and main dashboard screen.`;
                         {currentPain.budgetSignals.map((signal, sIdx) => (
                           <div
                             key={sIdx}
-                            className="rounded-xl border border-emerald-100 bg-white p-3.5 space-y-1 shadow-2xs"
+                            className="space-y-1 rounded-xl border border-emerald-100 bg-white p-3.5 shadow-2xs"
                           >
-                            <p className="font-serif italic text-zinc-800 text-sm">
+                            <p className="font-serif text-sm text-zinc-800 italic">
                               &quot;{signal.quote}&quot;
                             </p>
-                            <p className="text-[10px] font-mono text-emerald-600 font-semibold uppercase">
+                            <p className="font-mono text-[10px] font-semibold text-emerald-600 uppercase">
                               {signal.source} signal
                               {signal.annualizedMidpointUsd
                                 ? ` • $${signal.annualizedMidpointUsd.toLocaleString()} annualized value`
@@ -1147,18 +1211,24 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
                       NATURAL BUYER LANGUAGE & COPY ANGLES
                     </p>
-                    <p className="text-xs text-zinc-700 font-medium leading-relaxed">
+                    <p className="text-xs leading-relaxed font-medium text-zinc-700">
                       {currentPain.userLanguage.overview}
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
                       {currentPain.userLanguage.sections.map((sec, sIdx) => (
-                        <div key={sIdx} className="rounded-xl border border-zinc-200 bg-white p-3.5 space-y-1.5 shadow-2xs">
-                          <p className="font-sans text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                        <div
+                          key={sIdx}
+                          className="space-y-1.5 rounded-xl border border-zinc-200 bg-white p-3.5 shadow-2xs"
+                        >
+                          <p className="font-sans text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                             {sec.label}
                           </p>
                           <ul className="space-y-1">
                             {sec.examples.map((ex, eIdx) => (
-                              <li key={eIdx} className="font-serif italic text-xs text-zinc-800">
+                              <li
+                                key={eIdx}
+                                className="font-serif text-xs text-zinc-800 italic"
+                              >
                                 &quot;{ex}&quot;
                               </li>
                             ))}
@@ -1171,42 +1241,62 @@ Please generate the schema, API routes, and main dashboard screen.`;
               </div>
 
               {/* RIGHT STICKY SIDEBAR ("AT A GLANCE") */}
-              <div className="space-y-6 lg:col-span-4 sticky top-6">
+              <div className="sticky top-6 space-y-6 lg:col-span-4">
                 {/* AT A GLANCE Summary Card */}
-                <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4 shadow-2xs">
-                  <div className="flex items-center justify-between border-b border-zinc-150 pb-2.5">
+                <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xs">
+                  <div className="border-zinc-150 flex items-center justify-between border-b pb-2.5">
                     <span className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
                       AT A GLANCE
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-bold text-zinc-800 font-sans">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-sans text-xs font-bold text-zinc-800">
                       ★ {scoreFormatted}
                     </span>
                   </div>
 
-                  <div className="divide-y divide-zinc-150 text-xs font-sans">
+                  <div className="divide-zinc-150 divide-y font-sans text-xs">
                     <div className="flex items-center justify-between py-2.5">
-                      <span className="text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
-                        SOLUTION DEMAND
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Solution Demand"
+                        explanation="Calculated demand score based on search velocity, user complaints, and alternative queries."
+                      >
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          SOLUTION DEMAND
+                        </span>
+                      </MetricTooltip>
+                      <span className="font-bold text-zinc-900">
+                        {demandNumeric}
                       </span>
-                      <span className="font-bold text-zinc-900">{demandNumeric}</span>
                     </div>
                     <div className="flex items-center justify-between py-2.5">
-                      <span className="text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
-                        PRICING
-                      </span>
+                      <MetricTooltip metric="willingnessToPay">
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          PRICING
+                        </span>
+                      </MetricTooltip>
                       <span className="font-bold text-zinc-900">{pricing}</span>
                     </div>
                     <div className="flex items-center justify-between py-2.5">
-                      <span className="text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
-                        DIFFICULTY
+                      <MetricTooltip metric="difficulty">
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          DIFFICULTY
+                        </span>
+                      </MetricTooltip>
+                      <span className="font-bold text-zinc-900">
+                        {difficultyLabel}
                       </span>
-                      <span className="font-bold text-zinc-900">{difficultyLabel}</span>
                     </div>
                     <div className="flex items-center justify-between py-2.5">
-                      <span className="text-zinc-400 font-semibold uppercase tracking-wider text-[10px]">
-                        UP AGAINST
-                      </span>
-                      <span className="font-bold text-zinc-900 flex items-center gap-1">
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Incumbents & Competitors"
+                        explanation="The existing alternatives and legacy solutions currently dominating the workflow."
+                      >
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          UP AGAINST
+                        </span>
+                      </MetricTooltip>
+                      <span className="flex items-center gap-1 font-bold text-zinc-900">
                         <span>{competition}</span>
                         <ChevronRight className="h-3 w-3 text-zinc-400" />
                       </span>
@@ -1215,21 +1305,25 @@ Please generate the schema, API routes, and main dashboard screen.`;
                 </div>
 
                 {/* MVP Implementation Blueprint */}
-                <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-3 shadow-2xs">
+                <div className="space-y-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xs">
                   <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
                     WHAT TO BUILD (MVP BLUEPRINT)
                   </p>
                   <div className="space-y-2 text-xs text-zinc-700">
                     <div className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
-                      <span>Single-purpose intake dashboard for {customer}</span>
+                      <span className="font-bold text-blue-600">•</span>
+                      <span>
+                        Single-purpose intake dashboard for {customer}
+                      </span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
-                      <span>Instant SMS & webhook alerts to prevent lost deals</span>
+                      <span className="font-bold text-blue-600">•</span>
+                      <span>
+                        Instant SMS & webhook alerts to prevent lost deals
+                      </span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
+                      <span className="font-bold text-blue-600">•</span>
                       <span>One-click export to Google Sheets & CRM</span>
                     </div>
                   </div>

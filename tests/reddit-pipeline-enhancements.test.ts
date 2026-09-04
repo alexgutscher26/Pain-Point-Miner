@@ -13,7 +13,9 @@ describe("Custom Pattern Regex Validation", () => {
     expect(validateCustomPatternRegex("struggling with").valid).toBe(true);
     expect(validateCustomPatternRegex("pain point").valid).toBe(true);
     expect(validateCustomPatternRegex("(bug|issue|crash)").valid).toBe(true);
-    expect(validateCustomPatternRegex("\\b(slow|lag|latency)\\b").valid).toBe(true);
+    expect(validateCustomPatternRegex("\\b(slow|lag|latency)\\b").valid).toBe(
+      true,
+    );
     expect(validateCustomPatternRegex("error code: \\d+").valid).toBe(true);
   });
 
@@ -251,7 +253,9 @@ describe("PullPush.io Historical Fallback Robustness", () => {
       });
     });
 
-    const comments = await fetchFromPullPushComments("post_123", { retries: 2 });
+    const comments = await fetchFromPullPushComments("post_123", {
+      retries: 2,
+    });
     expect(commentAttempts).toBe(2);
     expect(comments).toHaveLength(1);
     expect(comments[0]?.id).toBe("c_1");

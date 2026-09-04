@@ -1,5 +1,14 @@
 import { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/seo";
+import { getAllPreminedNiches } from "@/lib/premined-niches";
+
+const featureSlugs = [
+  "pain-point-mining",
+  "idea-validation",
+  "market-discovery",
+  "keyword-monitoring",
+  "sentiment-analysis",
+];
 
 const freeTools = [
   "pain-point-miner",
@@ -60,6 +69,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}/blog/${slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
+  const featureEntries = featureSlugs.map((slug) => ({
+    url: `${siteUrl}/features/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }));
+
+  const niches = getAllPreminedNiches();
+  const nicheEntries = niches.map((n) => ({
+    url: `${siteUrl}/niches/${n.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
@@ -68,7 +92,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: siteUrl,
       lastModified: new Date(),
       changeFrequency: "daily",
-      priority: 1,
+      priority: 1.0,
     },
     {
       url: `${siteUrl}/blog`,
@@ -77,18 +101,50 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${siteUrl}/privacy`,
+      url: `${siteUrl}/docs`,
       lastModified: new Date(),
       changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/case-studies`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/niches`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/free-tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${siteUrl}/resources`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${siteUrl}/terms`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "yearly",
       priority: 0.3,
     },
+    ...featureEntries,
     ...blogEntries,
+    ...nicheEntries,
     ...toolsEntries,
     ...resourcesEntries,
   ];

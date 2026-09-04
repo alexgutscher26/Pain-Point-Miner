@@ -39,7 +39,10 @@ export async function GET(req: Request) {
     return clearStaleSessionDataCookies(res, req);
   } catch (error) {
     console.error("Caught error in Auth GET handler:", error);
-    const res = NextResponse.json({ session: null, user: null }, { status: 200 });
+    const res = NextResponse.json(
+      { session: null, user: null },
+      { status: 200 },
+    );
     return clearStaleSessionDataCookies(res, req);
   }
 }
@@ -51,7 +54,10 @@ export async function POST(req: Request) {
     return clearStaleSessionDataCookies(res, req);
   } catch (error) {
     console.error("Caught error in Auth POST handler:", error);
-    const res = NextResponse.json({ error: "Internal Auth Error" }, { status: 500 });
+    const res = NextResponse.json(
+      { error: "Internal Auth Error" },
+      { status: 500 },
+    );
     return clearStaleSessionDataCookies(res, req);
   }
 }

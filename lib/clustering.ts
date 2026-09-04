@@ -24,7 +24,12 @@ export async function clusterPainPoint(
   apiKeyOverride?: string | null,
 ): Promise<{ clusterId: string; isNew: boolean }> {
   // 1. Generate / retrieve the embedding
-  const embedding = await embedPainPoint(painPointId, userId, workspaceId, apiKeyOverride);
+  const embedding = await embedPainPoint(
+    painPointId,
+    userId,
+    workspaceId,
+    apiKeyOverride,
+  );
 
   // 2. Search for existing cluster centroids that are close enough
   const candidates = await findSimilarClusterCentroids(

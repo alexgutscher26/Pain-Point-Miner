@@ -82,12 +82,13 @@ export async function GET(req: Request) {
     const allPainPointIds = scraperRows.flatMap(
       (r) => r.painPoints?.map((pp) => pp.id) ?? [],
     );
-    const feedbackRows = allPainPointIds.length > 0
-      ? await db
-          .select()
-          .from(painPointFeedback)
-          .where(inArray(painPointFeedback.painPointId, allPainPointIds))
-      : [];
+    const feedbackRows =
+      allPainPointIds.length > 0
+        ? await db
+            .select()
+            .from(painPointFeedback)
+            .where(inArray(painPointFeedback.painPointId, allPainPointIds))
+        : [];
     const feedbackByPainPointId = new Map<string, Array<{ vote: number }>>();
     for (const fb of feedbackRows) {
       const arr = feedbackByPainPointId.get(fb.painPointId) ?? [];
@@ -96,13 +97,14 @@ export async function GET(req: Request) {
     }
 
     // Batch fetch top comment scores for all pain points
-    const commentRows = allPainPointIds.length > 0
-      ? await db
-          .select()
-          .from(painPointComment)
-          .where(inArray(painPointComment.painPointId, allPainPointIds))
-          .orderBy(desc(painPointComment.score))
-      : [];
+    const commentRows =
+      allPainPointIds.length > 0
+        ? await db
+            .select()
+            .from(painPointComment)
+            .where(inArray(painPointComment.painPointId, allPainPointIds))
+            .orderBy(desc(painPointComment.score))
+        : [];
     const commentsByPainPointId = new Map<string, Array<{ score: number }>>();
     for (const c of commentRows) {
       const arr = commentsByPainPointId.get(c.painPointId) ?? [];
@@ -146,18 +148,12 @@ export async function GET(req: Request) {
         const upvoteSignal =
           topCommentScores.length > 0
             ? Math.round(
-                topCommentScores.reduce(
-                  (sum, s) => sum + Math.max(0, s),
-                  0,
-                ) / topCommentScores.length,
+                topCommentScores.reduce((sum, s) => sum + Math.max(0, s), 0) /
+                  topCommentScores.length,
               )
             : 0;
-        const userUpvotes = pointFeedback.filter(
-          (v) => v.vote === 1,
-        ).length;
-        const userDownvotes = pointFeedback.filter(
-          (v) => v.vote === -1,
-        ).length;
+        const userUpvotes = pointFeedback.filter((v) => v.vote === 1).length;
+        const userDownvotes = pointFeedback.filter((v) => v.vote === -1).length;
 
         return {
           ...point,

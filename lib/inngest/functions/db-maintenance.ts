@@ -22,12 +22,18 @@ export const refreshDashboardMv = inngest.createFunction(
       const startTime = Date.now();
       try {
         await db.execute(
-          sql.raw(`REFRESH MATERIALIZED VIEW CONCURRENTLY "dashboard_opportunity_mv"`),
+          sql.raw(
+            `REFRESH MATERIALIZED VIEW CONCURRENTLY "dashboard_opportunity_mv"`,
+          ),
         );
         return { ok: true, durationMs: Date.now() - startTime };
       } catch (e: any) {
         console.error("[MV REFRESH ERROR]", e.message);
-        return { ok: false, error: e.message, durationMs: Date.now() - startTime };
+        return {
+          ok: false,
+          error: e.message,
+          durationMs: Date.now() - startTime,
+        };
       }
     });
   },
@@ -43,10 +49,10 @@ export const refreshDashboardMv = inngest.createFunction(
  * 5. Alert if index growth exceeds 20% week-over-week.
  */
 export const weeklyPgVectorReindex = inngest.createFunction(
-  { 
+  {
     id: "weekly-pgvector-reindex",
     name: "Weekly PGVector Reindex",
-    triggers: [{ cron: "0 3 * * 0" }] // Every Sunday at 3 AM
+    triggers: [{ cron: "0 3 * * 0" }], // Every Sunday at 3 AM
   },
   async ({ step }) => {
     const taskName = "weekly_pgvector_reindex";
@@ -55,7 +61,7 @@ export const weeklyPgVectorReindex = inngest.createFunction(
     const results = await step.run("maintenance-execution", async () => {
       const startTime = Date.now();
       let error: string | undefined;
-      
+
       let sizeBefore = 0;
       let latencyBefore = 0;
       let sizeAfter = 0;
@@ -64,7 +70,7 @@ export const weeklyPgVectorReindex = inngest.createFunction(
       try {
         // 1. Measure size before
         const sizeBeforeQuery = await db.execute(
-          sql`SELECT pg_relation_size(${indexName}) as size`
+          sql`SELECT pg_relation_size(${indexName}) as size`,
         );
         sizeBefore = Number(sizeBeforeQuery[0]?.size) || 0;
 
@@ -74,7 +80,7 @@ export const weeklyPgVectorReindex = inngest.createFunction(
           const start = performance.now();
           // Sample similarity search using an existing embedding
           await db.execute(
-            sql`SELECT "painPointId" FROM ${painPointEmbedding} ORDER BY embedding <=> (SELECT embedding FROM ${painPointEmbedding} LIMIT 1) LIMIT 10`
+            sql`SELECT "painPointId" FROM ${painPointEmbedding} ORDER BY embedding <=> (SELECT embedding FROM ${painPointEmbedding} LIMIT 1) LIMIT 10`,
           );
           latencyBeforeTotal += performance.now() - start;
         }
@@ -87,7 +93,7 @@ export const weeklyPgVectorReindex = inngest.createFunction(
 
         // 4. Measure size after
         const sizeAfterQuery = await db.execute(
-          sql`SELECT pg_relation_size(${indexName}) as size`
+          sql`SELECT pg_relation_size(${indexName}) as size`,
         );
         sizeAfter = Number(sizeAfterQuery[0]?.size) || 0;
 
@@ -96,12 +102,11 @@ export const weeklyPgVectorReindex = inngest.createFunction(
         for (let i = 0; i < 5; i++) {
           const start = performance.now();
           await db.execute(
-            sql`SELECT "painPointId" FROM ${painPointEmbedding} ORDER BY embedding <=> (SELECT embedding FROM ${painPointEmbedding} LIMIT 1) LIMIT 10`
+            sql`SELECT "painPointId" FROM ${painPointEmbedding} ORDER BY embedding <=> (SELECT embedding FROM ${painPointEmbedding} LIMIT 1) LIMIT 10`,
           );
           latencyAfterTotal += performance.now() - start;
         }
         latencyAfter = latencyAfterTotal / 5;
-
       } catch (e: any) {
         error = e.message;
         console.error(`[DB MAINTENANCE ERROR] ${error}`);
@@ -116,13 +121,15 @@ export const weeklyPgVectorReindex = inngest.createFunction(
         .where(eq(dbMaintenanceLog.taskName, taskName))
         .orderBy(desc(dbMaintenanceLog.createdAt))
         .limit(1);
-      
+
       let alertTriggered = false;
       if (prevRuns.length > 0 && prevRuns[0].sizeAfterBytes && sizeAfter > 0) {
         const prevSize = prevRuns[0].sizeAfterBytes;
         if (sizeAfter > prevSize * 1.2) {
           alertTriggered = true;
-          console.warn(`🚨 [DB MAINTENANCE] Index ${indexName} grew by >20% week-over-week! Current: ${sizeAfter}, Previous: ${prevSize}`);
+          console.warn(
+            `🚨 [DB MAINTENANCE] Index ${indexName} grew by >20% week-over-week! Current: ${sizeAfter}, Previous: ${prevSize}`,
+          );
         }
       }
 
@@ -148,13 +155,15 @@ export const weeklyPgVectorReindex = inngest.createFunction(
         latencyAfter,
         durationMs,
         alertTriggered,
-        error
+        error,
       };
     });
 
     return {
-      message: results.error ? "Maintenance failed" : "Maintenance completed successfully",
+      message: results.error
+        ? "Maintenance failed"
+        : "Maintenance completed successfully",
       metrics: results,
     };
-  }
+  },
 );

@@ -142,7 +142,8 @@ describe("extractPainPoints", () => {
       targetUser: "enterprise IT manager",
       competingProducts: ["Jenkins", "CircleCI"],
       willingnessToPay: "paid_signal",
-      featureRequested: "Automated timeout alerts and dead-letter queue retries",
+      featureRequested:
+        "Automated timeout alerts and dead-letter queue retries",
       sentiment: "frustrated",
       triedSolutions: ["GitHub Actions"],
       budget: [],
@@ -302,13 +303,21 @@ describe("getModelForDepth", () => {
   });
 
   it("respects a valid modelOverride regardless of depth", () => {
-    expect(getModelForDepth("basic", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
-    expect(getModelForDepth("deep", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
-    expect(getModelForDepth("ultra", AI_MODELS.GEMINI_FLASH)).toBe(AI_MODELS.GEMINI_FLASH);
+    expect(getModelForDepth("basic", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
+    expect(getModelForDepth("deep", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
+    expect(getModelForDepth("ultra", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
   });
 
   it("ignores an invalid modelOverride and falls back to Gemini Flash", () => {
-    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(AI_MODELS.GEMINI_FLASH);
+    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
   });
 
   it("AI_MODEL_LABELS has a human-readable label for every model", () => {

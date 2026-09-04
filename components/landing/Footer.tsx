@@ -1,127 +1,126 @@
 "use client";
 
 import Link from "next/link";
+import { LogoIcon } from "@/components/Logo";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-zinc-200/60 bg-transparent px-4 pt-16 pb-8 sm:px-6">
-      <div className="mx-auto mb-20 grid max-w-[1240px] flex-col justify-between gap-12 md:flex-row md:gap-8 lg:grid-cols-12">
-        
-        {/* Left Col: Brand & Socials (col-span-4) */}
-        <div className="flex flex-col items-start lg:col-span-4">
-          <Link href="/" className="group mb-4 flex items-center gap-2">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-[#ff4500]"
-            >
-              <path d="M12 2L2 22h20L12 2z" fill="currentColor" />
-              <circle cx="12" cy="15" r="3" fill="#ffffff" />
-            </svg>
-            <span className="text-[15px] font-extrabold tracking-wide text-zinc-900">
-              ThreddIQ
-            </span>
-          </Link>
-          <p className="mb-6 text-[14px] leading-relaxed font-medium text-zinc-650 max-w-[280px]">
-            Find validated SaaS opportunities on Reddit with automated monitoring.
-          </p>
-        </div>
-
-        {/* Center Cols: Navigation Links (col-span-8) */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-3 lg:col-span-8">
-          <div className="flex flex-col gap-4">
-            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Features</p>
-            <Link
-              href="/features/pain-point-mining"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Pain Point Mining
-            </Link>
-            <Link
-              href="/features/idea-validation"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Idea Validation
-            </Link>
-            <Link
-              href="/features/market-discovery"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Market Discovery
-            </Link>
-            <Link
-              href="/features/keyword-monitoring"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Keyword Monitoring
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Tools</p>
-            <Link
-              href="/#faq"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              FAQ
-            </Link>
-            <Link
-              href="/free-tools/pain-point-miner"
-              className="flex items-center gap-1.5 text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Scanner{" "}
-              <span className="rounded bg-[#ff4500]/10 px-1.5 py-0.5 text-[8px] font-black tracking-tighter text-[#ff4500] uppercase">
-                Free
+    <footer className="w-full border-t border-black/10 bg-white/40 px-4 pt-16 pb-12 backdrop-blur-xl sm:px-6 dark:border-white/10 dark:bg-zinc-950/40">
+      <div className="mx-auto max-w-[1240px]">
+        <div className="mb-16 grid grid-cols-1 gap-10 md:grid-cols-12">
+          {/* Brand Col */}
+          <div className="flex flex-col items-start md:col-span-4">
+            <Link href="/" className="group mb-4 flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ff4500] text-white">
+                <LogoIcon className="h-3.5 w-3.5" />
+              </div>
+              <span className="text-base font-bold text-zinc-950 dark:text-white">
+                ThreddIQ
               </span>
             </Link>
-            <Link
-              href="/free-tools/opportunity-scoreboard"
-              className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Scoreboard
-            </Link>
+            <p className="mb-6 max-w-[300px] text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              AI powered Reddit market research engine. Uncover validated
+              customer complaints and buyer demand before writing software.
+            </p>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+              <span>All extraction workers operational</span>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <p className="text-[12px] font-extrabold text-zinc-850 uppercase tracking-widest">Resources</p>
-            <Link
-              href="/blog"
-              className="text-[13px] leading-relaxed font-bold text-[#ff4500] transition-colors hover:text-[#e03d00]"
-            >
-              Blog & Articles
-            </Link>
-            <Link
-              href="/blog/why-saas-founders-cant-stop-bleeding-users"
-              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              SaaS Retention Study
-            </Link>
-            <Link
-              href="/resources/best-subreddits-by-industry"
-              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Best Subreddits
-            </Link>
-            <Link
-              href="/resources/reddit-tools"
-              className="text-[13px] leading-relaxed font-medium text-zinc-500 transition-colors hover:text-zinc-900"
-            >
-              Reddit Tools
-            </Link>
+          {/* Navigation Columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8">
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-bold tracking-wider text-zinc-950 uppercase dark:text-white">
+                Product
+              </p>
+              <Link
+                href="/#features"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Semantic Mining
+              </Link>
+              <Link
+                href="/niches"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Pre Mined Niches
+              </Link>
+              <Link
+                href="/#pricing"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Pricing Plans
+              </Link>
+              <Link
+                href="/#faq"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                FAQ & Support
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-bold tracking-wider text-zinc-950 uppercase dark:text-white">
+                Free Tools
+              </p>
+              <Link
+                href="/free-tools/pain-point-miner"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Reddit Niche Scanner
+              </Link>
+              <Link
+                href="/free-tools/opportunity-scoreboard"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Opportunity Scoreboard
+              </Link>
+              <Link
+                href="/blog"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Research Blog
+              </Link>
+              <Link
+                href="/resources"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Founder Guides
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-bold tracking-wider text-zinc-950 uppercase dark:text-white">
+                Legal & Trust
+              </p>
+              <Link
+                href="/privacy"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/terms"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Terms of Service
+              </Link>
+              <Link
+                href="/sitemap.xml"
+                className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Sitemap
+              </Link>
+            </div>
           </div>
         </div>
 
-      </div>
-
-      {/* Copyright Base */}
-      <div className="mx-auto flex max-w-[1240px] flex-col items-center justify-between gap-2 border-t border-zinc-200/60 pt-8 pb-4 text-center text-[12px] text-zinc-500 md:flex-row md:text-left">
-        <p>© 2026 ThreddIQ. All rights reserved.</p>
-        <div className="flex items-center gap-1.5">
-          Built with <span className="text-[#a8a8a8]">☕</span> by{" "}
-          <span className="ml-1 font-bold text-zinc-800">Alex</span>
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-black/5 pt-8 text-xs text-zinc-500 sm:flex-row dark:border-white/5">
+          <p>© {new Date().getFullYear()} ThreddIQ. All rights reserved.</p>
+          <p className="flex items-center gap-1 text-zinc-400">
+            Validated intelligence for high growth SaaS builders
+          </p>
         </div>
       </div>
     </footer>

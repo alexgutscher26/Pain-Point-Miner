@@ -2,7 +2,12 @@ import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { painPointFeedback, scraper, scraperRun, userPreferences } from "@/lib/db/schema";
+import {
+  painPointFeedback,
+  scraper,
+  scraperRun,
+  userPreferences,
+} from "@/lib/db/schema";
 import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import {
   TrendingUp,
@@ -271,20 +276,21 @@ export default async function DashboardPage({
     : null;
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-8 p-4 duration-500 sm:p-6 lg:p-8">
       {planContext.planPurchaseRequired ? (
-        <div className="flex items-center justify-between gap-4 border border-[#ff4500]/25 bg-[#ff4500]/5 px-5 py-4 rounded-2xl">
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#ff4500]/25 bg-[#ff4500]/5 px-5 py-4">
           <div>
             <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-[#ff4500] uppercase">
               Action Required
             </p>
             <p className="text-sm font-semibold text-[#ff4500]/95">
-              Upgrade to a paid plan to unlock new scans, deep mining, and AI suggestions.
+              Upgrade to a paid plan to unlock new scans, deep mining, and AI
+              suggestions.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 rounded-full bg-[#ff4500] hover:bg-[#e03d00] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase shadow-xs transition-colors"
+            className="shrink-0 rounded-full bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
           >
             Upgrade Now
           </Link>
@@ -304,13 +310,17 @@ export default async function DashboardPage({
             Welcome, {userFirstName}
           </h2>
           <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
-            Your semantic insights engine has analyzed <strong className="text-zinc-850">{reportsSaved} investigations</strong>.
+            Your semantic insights engine has analyzed{" "}
+            <strong className="text-zinc-850">
+              {reportsSaved} investigations
+            </strong>
+            .
           </p>
         </div>
-        <div className="hidden items-center gap-1.5 border border-black/[0.05] bg-white/50 p-1 rounded-full lg:flex shadow-xs backdrop-blur-md">
+        <div className="hidden items-center gap-1.5 rounded-full border border-black/[0.05] bg-white/50 p-1 shadow-xs backdrop-blur-md lg:flex">
           <Link
             href="/dashboard?window=realtime"
-            className={`px-4 py-2 rounded-full font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
+            className={`rounded-full px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
               selectedWindow === "realtime"
                 ? "bg-[#ff4500] text-white shadow-xs"
                 : "text-zinc-500 hover:text-zinc-800"
@@ -320,7 +330,7 @@ export default async function DashboardPage({
           </Link>
           <Link
             href="/dashboard?window=30d"
-            className={`px-4 py-2 rounded-full font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
+            className={`rounded-full px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
               selectedWindow === "30d"
                 ? "bg-[#ff4500] text-white shadow-xs"
                 : "text-zinc-500 hover:text-zinc-800"
@@ -371,7 +381,7 @@ export default async function DashboardPage({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Recent Reports Table */}
-        <div className="overflow-hidden rounded-2xl border border-black/[0.05] bg-white/60 backdrop-blur-md shadow-xs lg:col-span-2">
+        <div className="overflow-hidden rounded-2xl border border-black/[0.05] bg-white/60 shadow-xs backdrop-blur-md lg:col-span-2">
           {reports.length === 0 ? (
             <EmptyState
               title="Start Your First Investigation"
@@ -392,7 +402,7 @@ export default async function DashboardPage({
                   </h4>
                 </div>
                 <Link
-                  className="font-mono text-[11px] font-bold tracking-widest text-zinc-550 uppercase transition-colors hover:text-[#ff4500]"
+                  className="text-zinc-550 font-mono text-[11px] font-bold tracking-widest uppercase transition-colors hover:text-[#ff4500]"
                   href="/dashboard/reports"
                 >
                   View All
@@ -401,7 +411,7 @@ export default async function DashboardPage({
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
                   <thead>
-                    <tr className="bg-black/[0.01] text-zinc-400 border-b border-black/[0.03]">
+                    <tr className="border-b border-black/[0.03] bg-black/[0.01] text-zinc-400">
                       <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
                         Investigation
                       </th>
@@ -435,25 +445,25 @@ export default async function DashboardPage({
 
                       return (
                         <ReportRow
-                           key={report.id}
-                           id={report.id}
-                           keyword={
-                             report.keywords?.[0] || "Unknown Investigation"
-                           }
-                           date={new Date(report.createdAt).toLocaleDateString(
-                             "en-US",
-                             {
-                               month: "short",
-                               day: "numeric",
-                             },
-                           )}
-                           painPoint={
-                             report.painPoints[0]?.title ||
-                             "No pain points extracted yet"
-                           }
-                           score={reportScore}
-                           status={statusLabel}
-                           explanation={report.painPoints[0]?.scoreExplanation}
+                          key={report.id}
+                          id={report.id}
+                          keyword={
+                            report.keywords?.[0] || "Unknown Investigation"
+                          }
+                          date={new Date(report.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                          painPoint={
+                            report.painPoints[0]?.title ||
+                            "No pain points extracted yet"
+                          }
+                          score={reportScore}
+                          status={statusLabel}
+                          explanation={report.painPoints[0]?.scoreExplanation}
                         />
                       );
                     })}
@@ -466,7 +476,7 @@ export default async function DashboardPage({
 
         {/* Insight Panel */}
         <div className="flex flex-col gap-8">
-          <div className="glass-card relative overflow-hidden p-8 rounded-2xl shadow-xs">
+          <div className="glass-card relative overflow-hidden rounded-2xl p-8 shadow-xs">
             <h4 className="mb-8 flex items-center gap-3 text-lg font-black text-zinc-900">
               <TrendingUp className="h-6 w-6 text-[#ff4500]" />
               Market Pulse
@@ -482,16 +492,16 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${trendingReport.id}`
                       : `/dashboard/search?keyword=${encodeURIComponent(trendingInsight?.key || "")}`
                   }
-                  className="group/item flex items-center gap-4 border border-black/[0.05] bg-white/50 p-4 rounded-2xl transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-2xs duration-300"
+                  className="group/item flex items-center gap-4 rounded-2xl border border-black/[0.05] bg-white/50 p-4 transition-all duration-300 hover:border-[#ff4500]/15 hover:bg-white hover:shadow-2xs"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#ff4500]/15 bg-[#ff4500]/5 text-[#ff4500] transition-colors duration-300 group-hover/item:bg-[#ff4500] group-hover/item:text-white">
                     <Sparkles className="h-5 w-5" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-extrabold text-zinc-900 group-hover/item:text-[#ff4500] transition-colors truncate">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-extrabold text-zinc-900 transition-colors group-hover/item:text-[#ff4500]">
                       {trendingInsight?.key || "No trend yet"}
                     </p>
-                    <p className="text-[11px] font-medium text-zinc-400 mt-0.5">
+                    <p className="mt-0.5 text-[11px] font-medium text-zinc-400">
                       {trendingInsight
                         ? trendingInsight.direction === "new"
                           ? "New trend detected"
@@ -511,21 +521,26 @@ export default async function DashboardPage({
                       ? `/dashboard/reports/${urgentPainPointReport.id}`
                       : "/dashboard/reports"
                   }
-                  className="group/item block border border-black/[0.05] bg-white/50 p-5 rounded-2xl transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-2xs duration-300"
+                  className="group/item block rounded-2xl border border-black/[0.05] bg-white/50 p-5 transition-all duration-300 hover:border-[#ff4500]/15 hover:bg-white hover:shadow-2xs"
                 >
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-black/[0.03]">
+                  <div className="mb-3 flex items-center justify-between border-b border-black/[0.03] pb-3">
                     <div className="flex items-center gap-2">
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff4500]/10 text-[#ff4500]">
                         <AlertCircle className="h-3.5 w-3.5" />
                       </div>
-                      <span className="text-[11px] font-extrabold text-zinc-900">Urgent Signal</span>
+                      <span className="text-[11px] font-extrabold text-zinc-900">
+                        Urgent Signal
+                      </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#ff4500] uppercase bg-[#ff4500]/5 px-2 py-0.5 rounded-full">
+                    <span className="rounded-full bg-[#ff4500]/5 px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
                       Mined
                     </span>
                   </div>
-                  <p className="text-[12px] font-medium leading-relaxed text-zinc-650 italic group-hover/item:text-zinc-900 transition-colors">
-                    &ldquo;{urgentPainPoint?.title || "No high-urgency pain point detected yet."}&rdquo;
+                  <p className="text-zinc-650 text-[12px] leading-relaxed font-medium italic transition-colors group-hover/item:text-zinc-900">
+                    &ldquo;
+                    {urgentPainPoint?.title ||
+                      "No high-urgency pain point detected yet."}
+                    &rdquo;
                   </p>
                 </Link>
                 <p className="mt-4 flex items-center gap-2 font-mono text-[11px] font-bold tracking-wide text-zinc-400 uppercase">
@@ -564,7 +579,7 @@ function MetricCard({
 }) {
   return (
     <div
-      className={`p-5 rounded-2xl relative overflow-hidden group transition-all duration-400 ${
+      className={`group relative overflow-hidden rounded-2xl p-5 transition-all duration-400 ${
         isHighlight
           ? "border border-[#ff4500]/25 bg-gradient-to-br from-white/95 to-orange-50/20 hover:scale-[1.01] hover:border-[#ff4500]/40 hover:shadow-md"
           : "glass-card glass-card-hover"
@@ -574,15 +589,17 @@ function MetricCard({
         <div className="pointer-events-none absolute top-0 right-0 h-24 w-24 rounded-full bg-[#ff4500] opacity-[0.03] blur-[40px]"></div>
       )}
       <div className="mb-4 flex items-start justify-between">
-        <div className={`p-2 rounded-xl transition-all duration-300 group-hover:scale-105 ${
-          isHighlight 
-            ? "bg-[#ff4500]/10 text-[#ff4500]" 
-            : "bg-black/[0.02] border border-black/[0.04] text-zinc-700"
-        }`}>
+        <div
+          className={`rounded-xl p-2 transition-all duration-300 group-hover:scale-105 ${
+            isHighlight
+              ? "bg-[#ff4500]/10 text-[#ff4500]"
+              : "border border-black/[0.04] bg-black/[0.02] text-zinc-700"
+          }`}
+        >
           {icon}
         </div>
         {badge && (
-          <span className="border border-[#ff4500]/10 bg-[#ff4500]/5 px-2.5 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase rounded-full">
+          <span className="rounded-full border border-[#ff4500]/10 bg-[#ff4500]/5 px-2.5 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase">
             {badge}
           </span>
         )}
@@ -593,7 +610,7 @@ function MetricCard({
         </p>
         <div className="flex items-baseline gap-2">
           <p
-            className={`font-extrabold tracking-tight text-[28px] leading-none ${isHighlight ? "text-[#ff4500]" : "text-zinc-950"}`}
+            className={`text-[28px] leading-none font-extrabold tracking-tight ${isHighlight ? "text-[#ff4500]" : "text-zinc-950"}`}
           >
             {value}
           </p>
@@ -605,9 +622,9 @@ function MetricCard({
         </div>
         {progress !== undefined && (
           <div className="mt-3">
-            <div className="h-1.5 w-full overflow-hidden bg-zinc-200/80 rounded-full">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/80">
               <div
-                className="h-full bg-[#ff4500] rounded-full"
+                className="h-full rounded-full bg-[#ff4500]"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
@@ -647,7 +664,7 @@ function ReportRow({
     <tr className="group cursor-pointer transition-all duration-300 hover:bg-zinc-50/50">
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="mb-1 text-[15px] font-extrabold break-words text-zinc-850 transition-colors group-hover:text-[#ff4500]">
+          <p className="text-zinc-850 mb-1 text-[15px] font-extrabold break-words transition-colors group-hover:text-[#ff4500]">
             {keyword}
           </p>
           <p className="font-mono text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
@@ -657,7 +674,7 @@ function ReportRow({
       </td>
       <td className="px-8 py-6">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="mb-1 max-w-[250px] truncate text-[14px] font-medium text-zinc-650">
+          <p className="text-zinc-650 mb-1 max-w-[250px] truncate text-[14px] font-medium">
             {painPoint}
           </p>
           {explanation && (
@@ -669,7 +686,7 @@ function ReportRow({
       </td>
       <td className="px-8 py-6 text-center">
         <Link href={`/dashboard/reports/${id}`} className="block">
-          <span className="border border-zinc-200/60 bg-white/80 px-2.5 py-1 rounded-lg text-[14px] font-extrabold text-zinc-800 shadow-3xs">
+          <span className="shadow-3xs rounded-lg border border-zinc-200/60 bg-white/80 px-2.5 py-1 text-[14px] font-extrabold text-zinc-800">
             {score}
           </span>
         </Link>
@@ -694,7 +711,7 @@ function ReportRow({
             ></span>
           </div>
           <span
-            className={`border px-2 py-0.5 rounded-full font-mono text-[10px] font-black tracking-widest uppercase ${
+            className={`rounded-full border px-2 py-0.5 font-mono text-[10px] font-black tracking-widest uppercase ${
               status === "Live"
                 ? "border-amber-500/20 bg-amber-500/5 text-amber-700"
                 : status === "Failed"

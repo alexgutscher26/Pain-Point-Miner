@@ -60,7 +60,8 @@ export const MINING_PRESETS: Record<
     postsPerSub: 500,
     analyzeLimit: 100,
     estimatedCredits: 10,
-    description: "Exhaustive comment tree traversal + full recursive context analysis.",
+    description:
+      "Exhaustive comment tree traversal + full recursive context analysis.",
     timeEstimate: "~45+ mins",
   },
 };

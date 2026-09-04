@@ -15,8 +15,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Automating User Research: From 20 Hours of Calls to 2 Minutes of AI Mining | ThreddIQ Blog",
-  description: "How modern founders and product managers use automated semantic intelligence to validate customer pain points without cold outreach.",
+  title:
+    "Automating User Research: From 20 Hours of Calls to 2 Minutes of AI Mining | ThreddIQ Blog",
+  description:
+    "How modern founders and product managers use automated semantic intelligence to validate customer pain points without cold outreach.",
 };
 
 const comparison = [
@@ -44,13 +46,13 @@ const comparison = [
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
         {/* Breadcrumb */}
-        <div className="mb-8 flex items-center gap-2 text-xs font-bold text-zinc-600 uppercase tracking-widest">
-          <Link href="/blog" className="hover:text-[#ff4500] transition-colors">
+        <div className="mb-8 flex items-center gap-2 text-xs font-bold tracking-widest text-zinc-600 uppercase">
+          <Link href="/blog" className="transition-colors hover:text-[#ff4500]">
             Blog
           </Link>
           <span>/</span>
@@ -59,17 +61,20 @@ export default function BlogPost() {
 
         {/* Header */}
         <header className="mb-16">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black text-[#ff4500] uppercase tracking-widest">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black tracking-widest text-[#ff4500] uppercase">
             <Sparkles className="h-3.5 w-3.5" />
             Continuous Customer Discovery
           </div>
           <h1 className="mb-6 text-[40px] leading-[1.1] font-black tracking-tight text-zinc-900 md:text-[52px]">
-            Automating User Research: From 20 Hours of Calls to 2 Minutes of AI Mining
+            Automating User Research: From 20 Hours of Calls to 2 Minutes of AI
+            Mining
           </h1>
-          <p className="text-xl font-medium text-zinc-600 leading-relaxed">
-            Why product teams are replacing slow, biased customer discovery calls with real-time semantic mining across thousands of Reddit discussions.
+          <p className="text-xl leading-relaxed font-medium text-zinc-600">
+            Why product teams are replacing slow, biased customer discovery
+            calls with real-time semantic mining across thousands of Reddit
+            discussions.
           </p>
-          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold text-zinc-600 uppercase tracking-widest">
+          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold tracking-widest text-zinc-600 uppercase">
             <span>By ThreddIQ Research</span>
             <span>&bull;</span>
             <span>August 2026</span>
@@ -85,10 +90,17 @@ export default function BlogPost() {
               The 'Mom Test' Problem on Zoom
             </h2>
             <p>
-              Traditional user research tells you to get on 20 Zoom calls. But every founder who has done this knows the trap: people are naturally agreeable. When you ask if they would use your app, they say "Yes, that looks amazing!"—and then never convert when you launch.
+              Traditional user research tells you to get on 20 Zoom calls. But
+              every founder who has done this knows the trap: people are
+              naturally agreeable. When you ask if they would use your app, they
+              say "Yes, that looks amazing!"—and then never convert when you
+              launch.
             </p>
             <p>
-              When people post on Reddit, they are not trying to be polite. They are angry, exhausted, and desperately asking their peers for recommendations. That is where raw, unfiltered product truth lives.
+              When people post on Reddit, they are not trying to be polite. They
+              are angry, exhausted, and desperately asking their peers for
+              recommendations. That is where raw, unfiltered product truth
+              lives.
             </p>
           </section>
 
@@ -113,7 +125,7 @@ export default function BlogPost() {
                         {row.feature}
                       </td>
                       <td className="p-4 text-zinc-600">{row.manual}</td>
-                      <td className="p-4 font-semibold text-zinc-900 bg-[#ff4500]/5">
+                      <td className="bg-[#ff4500]/5 p-4 font-semibold text-zinc-900">
                         {row.automated}
                       </td>
                     </tr>
@@ -128,8 +140,11 @@ export default function BlogPost() {
             <h3 className="mb-3 text-xl font-black text-zinc-900">
               The Hybrid Discovery Engine
             </h3>
-            <p className="text-sm font-medium text-zinc-700 leading-relaxed">
-              Use automated semantic mining first to detect recurring clusters, exact competitor frustrations, and market urgency. Then, if needed, reach out to authors of high-signal comments with questions tailored to their exact situation.
+            <p className="text-sm leading-relaxed font-medium text-zinc-700">
+              Use automated semantic mining first to detect recurring clusters,
+              exact competitor frustrations, and market urgency. Then, if
+              needed, reach out to authors of high-signal comments with
+              questions tailored to their exact situation.
             </p>
           </section>
         </div>
@@ -140,7 +155,8 @@ export default function BlogPost() {
             Run your first semantic customer search
           </h3>
           <p className="mx-auto mb-8 max-w-xl text-sm font-medium text-zinc-400">
-            Enter your niche or competitor name and extract structured pain points in seconds.
+            Enter your niche or competitor name and extract structured pain
+            points in seconds.
           </p>
           <Button
             asChild

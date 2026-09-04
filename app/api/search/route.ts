@@ -499,11 +499,7 @@ export async function POST(req: Request) {
         userId,
         workspaceId,
         maxPostsPerSubreddit:
-          miningDepth === "advanced"
-            ? 400
-            : miningDepth === "deep"
-              ? 250
-              : 120, // Keep these high for actual results
+          miningDepth === "advanced" ? 400 : miningDepth === "deep" ? 250 : 120, // Keep these high for actual results
         processingLimit:
           miningDepth === "advanced" ? 50 : miningDepth === "deep" ? 25 : 6,
       }).catch((error) => {

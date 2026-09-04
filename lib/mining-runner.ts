@@ -261,7 +261,6 @@ export async function executeMiningRun({
       // 2. Score threshold dropped (originally required score >=2 or comments >=3)
       // We now prioritize matching quality over raw popularity to find emerging pain points.
 
-
       // 3. Skip link posts unless no self-posts exist
       if (post.is_self === false && hasSelfPosts) {
         return false;
@@ -409,10 +408,13 @@ export async function executeMiningRun({
       .where(eq(scraperRun.id, runId));
 
     if (userRecord?.email) {
-      console.log(`[Mining] Generating and sending report_ready email for ${userRecord.email}...`);
+      console.log(
+        `[Mining] Generating and sending report_ready email for ${userRecord.email}...`,
+      );
       try {
-        const { sendReportReadyEmailProgrammatically } = await import("./loops/service");
-        
+        const { sendReportReadyEmailProgrammatically } =
+          await import("./loops/service");
+
         // Fetch top 3 pain points for this report to include in email
         const topPts = await db.query.painPoint.findMany({
           where: eq(painPoint.scraperId, scraperId),
@@ -426,8 +428,8 @@ export async function executeMiningRun({
           score: Number(pt.score || 0),
         }));
 
-        const reportUrl = process.env.NEXT_PUBLIC_APP_URL 
-          ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/reports/${scraperId}` 
+        const reportUrl = process.env.NEXT_PUBLIC_APP_URL
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/reports/${scraperId}`
           : `https://painpointminer.com/dashboard/reports/${scraperId}`;
 
         await sendReportReadyEmailProgrammatically(
@@ -435,7 +437,7 @@ export async function executeMiningRun({
           keyword,
           newPainPoints,
           reportUrl,
-          topPainPoints
+          topPainPoints,
         );
       } catch (e) {
         console.error("[Mining] Failed to send report ready email:", e);
@@ -518,13 +520,14 @@ export async function executeMiningRun({
         lastError: errorMessage,
       })
       .where(eq(scraper.id, scraperId));
-      
+
     // Trigger Loops scan_failed notification if we have an email
     const userOnErr = await db.query.user.findFirst({
       where: eq(user.id, userId),
     });
     if (userOnErr?.email) {
-      const { sendScanFailedNotification } = await import("@/lib/loops/service");
+      const { sendScanFailedNotification } =
+        await import("@/lib/loops/service");
       await sendScanFailedNotification(userOnErr.email, keyword, errorMessage);
     }
 
@@ -606,12 +609,17 @@ export async function processSinglePost({
     }
 
     const mergedTriedSolutions = Array.from(
-      new Set([...(point.triedSolutions || []), ...(point.competingProducts || [])]),
+      new Set([
+        ...(point.triedSolutions || []),
+        ...(point.competingProducts || []),
+      ]),
     );
 
     const explanationParts: string[] = [];
     if (point.confidenceScore !== undefined) {
-      explanationParts.push(`Confidence: ${(point.confidenceScore * 100).toFixed(0)}%`);
+      explanationParts.push(
+        `Confidence: ${(point.confidenceScore * 100).toFixed(0)}%`,
+      );
     }
     if (point.targetUser) {
       explanationParts.push(`Persona: ${point.targetUser}`);
@@ -644,7 +652,8 @@ export async function processSinglePost({
       commentCount: comments.length,
       mentionCount: 1,
       tags,
-      scoreExplanation: explanationParts.length > 0 ? explanationParts.join(" | ") : undefined,
+      scoreExplanation:
+        explanationParts.length > 0 ? explanationParts.join(" | ") : undefined,
       workspaceId,
       updatedAt: new Date(),
     });
@@ -684,8 +693,9 @@ export async function processSinglePost({
   }
 
   for (const painPointId of clusterJobs) {
-    void clusterPainPoint(painPointId, userId, workspaceId, customApiKey).catch((err) =>
-      console.error(`Embedding/clustering failed for ${painPointId}:`, err),
+    void clusterPainPoint(painPointId, userId, workspaceId, customApiKey).catch(
+      (err) =>
+        console.error(`Embedding/clustering failed for ${painPointId}:`, err),
     );
   }
 

@@ -19,8 +19,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Reddit vs. Customer Interviews vs. Surveys: Which Validation Method Actually Predicts Revenue | ThreddIQ Blog",
-  description: "A data-backed comparison of three validation methods — Reddit analysis, customer interviews, and surveys — and why Reddit is the most underrated signal source for revenue prediction.",
+  title:
+    "Reddit vs. Customer Interviews vs. Surveys: Which Validation Method Actually Predicts Revenue | ThreddIQ Blog",
+  description:
+    "A data-backed comparison of three validation methods — Reddit analysis, customer interviews, and surveys — and why Reddit is the most underrated signal source for revenue prediction.",
 };
 
 const comparisonData = [
@@ -143,7 +145,7 @@ const hybridOrder = [
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto flex w-full max-w-5xl flex-col px-6 pt-32 pb-24">
@@ -164,33 +166,59 @@ export default function BlogPost() {
         <header className="mb-20">
           <h1 className="mb-8 text-[40px] leading-tight font-black tracking-tight text-zinc-900 md:text-[72px]">
             Reddit vs. Interviews <br className="hidden md:block" />
-            vs.{" "}
-            <span className="text-[#ff4500]">Surveys</span>
+            vs. <span className="text-[#ff4500]">Surveys</span>
           </h1>
           <em className="mb-6 block text-lg font-medium text-zinc-500 md:text-xl">
             Which validation method actually predicts revenue?
           </em>
           <p className="max-w-3xl text-xl leading-relaxed font-medium text-zinc-500 md:text-2xl">
-            Most founders pick one validation method and stick with it. Interviews if they&apos;re
-            well-connected. Surveys if they have an email list. Reddit if they&apos;re scrappy. But
-            which one actually predicts whether people will pay? We compared all three head-to-head.
+            Most founders pick one validation method and stick with it.
+            Interviews if they&apos;re well-connected. Surveys if they have an
+            email list. Reddit if they&apos;re scrappy. But which one actually
+            predicts whether people will pay? We compared all three
+            head-to-head.
           </p>
         </header>
 
         {/* Stats */}
         <section className="mb-24 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
           {[
-            { label: "Validation Methods Analyzed", value: "3", sub: "Reddit, interviews, surveys" },
-            { label: "Buying Signal Accuracy", value: "87%", sub: "Automated Reddit analysis" },
-            { label: "Intent-Action Gap", value: "60–80%", sub: "Surveys overstate purchase intent" },
-            { label: "Signals per Hour", value: "500+", sub: "Reddit vs. 2–3 interviews" },
+            {
+              label: "Validation Methods Analyzed",
+              value: "3",
+              sub: "Reddit, interviews, surveys",
+            },
+            {
+              label: "Buying Signal Accuracy",
+              value: "87%",
+              sub: "Automated Reddit analysis",
+            },
+            {
+              label: "Intent-Action Gap",
+              value: "60–80%",
+              sub: "Surveys overstate purchase intent",
+            },
+            {
+              label: "Signals per Hour",
+              value: "500+",
+              sub: "Reddit vs. 2–3 interviews",
+            },
           ].map((stat) => (
-            <div key={stat.label} className="group relative overflow-hidden rounded-[32px] glass-card p-8 transition-all">
+            <div
+              key={stat.label}
+              className="group glass-card relative overflow-hidden rounded-[32px] p-8 transition-all"
+            >
               <div className="absolute top-0 right-0 h-24 w-24 bg-[#ff4500]/5 opacity-0 blur-3xl transition-opacity group-hover:opacity-100" />
               <div className="relative z-10">
-                <div className="mb-2 text-4xl font-black text-zinc-900">{stat.value}</div>
-                <div className="mb-1 text-sm font-bold text-zinc-700 uppercase tracking-wide">{stat.label}</div>
-                <div className="text-[11px] font-medium text-zinc-500">{stat.sub}</div>
+                <div className="mb-2 text-4xl font-black text-zinc-900">
+                  {stat.value}
+                </div>
+                <div className="mb-1 text-sm font-bold tracking-wide text-zinc-700 uppercase">
+                  {stat.label}
+                </div>
+                <div className="text-[11px] font-medium text-zinc-500">
+                  {stat.sub}
+                </div>
               </div>
             </div>
           ))}
@@ -198,72 +226,131 @@ export default function BlogPost() {
 
         {/* Comparison Table */}
         <section className="mb-32">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">Head-to-head: how the methods stack up</h2>
-          <div className="overflow-hidden rounded-[32px] glass-card">
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            Head-to-head: how the methods stack up
+          </h2>
+          <div className="glass-card overflow-hidden rounded-[32px]">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-black/10">
-                    <th className="p-6 font-black text-zinc-900 uppercase tracking-wider">Dimension</th>
+                    <th className="p-6 font-black tracking-wider text-zinc-900 uppercase">
+                      Dimension
+                    </th>
                     {comparisonData.map((c) => (
-                      <th key={c.method} className="p-6 font-black text-zinc-900 uppercase tracking-wider">{c.method}</th>
+                      <th
+                        key={c.method}
+                        className="p-6 font-black tracking-wider text-zinc-900 uppercase"
+                      >
+                        {c.method}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-black/5">
-                    <td className="p-6 font-bold text-zinc-700">Honesty of Responses</td>
+                    <td className="p-6 font-bold text-zinc-700">
+                      Honesty of Responses
+                    </td>
                     {comparisonData.map((c) => (
                       <td key={c.method} className="p-6">
-                        <span className={`font-black ${
-                          c.honesty === "High" ? "text-green-600" : c.honesty === "Medium" ? "text-amber-600" : "text-red-500"
-                        }`}>{c.honesty}</span>
-                        <span className="block text-zinc-500 text-xs mt-1">{c.honestyNote}</span>
+                        <span
+                          className={`font-black ${
+                            c.honesty === "High"
+                              ? "text-green-600"
+                              : c.honesty === "Medium"
+                                ? "text-amber-600"
+                                : "text-red-500"
+                          }`}
+                        >
+                          {c.honesty}
+                        </span>
+                        <span className="mt-1 block text-xs text-zinc-500">
+                          {c.honestyNote}
+                        </span>
                       </td>
                     ))}
                   </tr>
                   <tr className="border-b border-black/5">
                     <td className="p-6 font-bold text-zinc-700">Speed</td>
                     {comparisonData.map((c) => (
-                      <td key={c.method} className="p-6 text-sm font-medium text-zinc-700">{c.speed}</td>
+                      <td
+                        key={c.method}
+                        className="p-6 text-sm font-medium text-zinc-700"
+                      >
+                        {c.speed}
+                      </td>
                     ))}
                   </tr>
                   <tr className="border-b border-black/5">
                     <td className="p-6 font-bold text-zinc-700">Sample Size</td>
                     {comparisonData.map((c) => (
-                      <td key={c.method} className="p-6 text-sm font-medium text-zinc-700">{c.sample}</td>
+                      <td
+                        key={c.method}
+                        className="p-6 text-sm font-medium text-zinc-700"
+                      >
+                        {c.sample}
+                      </td>
                     ))}
                   </tr>
                   <tr className="border-b border-black/5">
                     <td className="p-6 font-bold text-zinc-700">Cost</td>
                     {comparisonData.map((c) => (
-                      <td key={c.method} className="p-6 text-sm font-medium text-zinc-700">{c.cost}</td>
+                      <td
+                        key={c.method}
+                        className="p-6 text-sm font-medium text-zinc-700"
+                      >
+                        {c.cost}
+                      </td>
                     ))}
                   </tr>
                   <tr className="border-b border-black/5">
                     <td className="p-6 font-bold text-zinc-700">Bias Risk</td>
                     {comparisonData.map((c) => (
-                      <td className="p-6">
-                        <span className={`font-black ${
-                          c.bias === "Low (unsolicited)" ? "text-green-600" : c.bias.startsWith("High") ? "text-red-500" : "text-amber-600"
-                        }`}>{c.bias}</span>
+                      <td key={c.method} className="p-6">
+                        <span
+                          className={`font-black ${
+                            c.bias === "Low (unsolicited)"
+                              ? "text-green-600"
+                              : c.bias.startsWith("High")
+                                ? "text-red-500"
+                                : "text-amber-600"
+                          }`}
+                        >
+                          {c.bias}
+                        </span>
                       </td>
                     ))}
                   </tr>
                   <tr className="border-b border-black/5">
-                    <td className="p-6 font-bold text-zinc-700">Revenue Prediction</td>
+                    <td className="p-6 font-bold text-zinc-700">
+                      Revenue Prediction
+                    </td>
                     {comparisonData.map((c) => (
-                      <td className="p-6">
-                        <span className={`font-black ${
-                          c.revenuePrediction.startsWith("Strong") ? "text-green-600" : c.revenuePrediction.startsWith("Moderate") ? "text-amber-600" : "text-red-500"
-                        }`}>{c.revenuePrediction}</span>
+                      <td key={c.method} className="p-6">
+                        <span
+                          className={`font-black ${
+                            c.revenuePrediction.startsWith("Strong")
+                              ? "text-green-600"
+                              : c.revenuePrediction.startsWith("Moderate")
+                                ? "text-amber-600"
+                                : "text-red-500"
+                          }`}
+                        >
+                          {c.revenuePrediction}
+                        </span>
                       </td>
                     ))}
                   </tr>
                   <tr>
                     <td className="p-6 font-bold text-zinc-700">Best For</td>
                     {comparisonData.map((c) => (
-                      <td key={c.method} className="p-6 text-sm font-black text-[#ff4500]">{c.tier}</td>
+                      <td
+                        key={c.method}
+                        className="p-6 text-sm font-black text-[#ff4500]"
+                      >
+                        {c.tier}
+                      </td>
                     ))}
                   </tr>
                 </tbody>
@@ -274,46 +361,60 @@ export default function BlogPost() {
 
         {/* The Problem with Interviews */}
         <section className="mb-32">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">The problem with customer interviews</h2>
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            The problem with customer interviews
+          </h2>
           <div className="grid gap-6 md:grid-cols-2">
             {interviewPitfalls.map((pitfall, i) => (
-              <div key={i} className="rounded-[24px] glass-card p-8">
+              <div key={i} className="glass-card rounded-[24px] p-8">
                 <div className="mb-3 flex items-center gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  <h3 className="text-lg font-black text-zinc-900">{pitfall.title}</h3>
+                  <h3 className="text-lg font-black text-zinc-900">
+                    {pitfall.title}
+                  </h3>
                 </div>
-                <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">{pitfall.desc}</p>
+                <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                  {pitfall.desc}
+                </p>
               </div>
             ))}
           </div>
           <div className="mt-8 rounded-[24px] border border-[#ff4500]/10 bg-[#ff4500]/2 p-8">
-            <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-              <span className="font-bold text-zinc-800">Bottom line:</span> Interviews are essential for
-              depth but terrible for breadth. They tell you the "why" behind a problem, but they
-              can't tell you if enough people have that problem to build a business.
+            <p className="text-lg leading-relaxed font-medium text-zinc-500">
+              <span className="font-bold text-zinc-800">Bottom line:</span>{" "}
+              Interviews are essential for depth but terrible for breadth. They
+              tell you the "why" behind a problem, but they can't tell you if
+              enough people have that problem to build a business.
             </p>
           </div>
         </section>
 
         {/* The Problem with Surveys */}
         <section className="mb-32">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">The problem with surveys</h2>
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            The problem with surveys
+          </h2>
           <div className="grid gap-6 md:grid-cols-2">
             {surveyPitfalls.map((pitfall, i) => (
-              <div key={i} className="rounded-[24px] glass-card p-8">
+              <div key={i} className="glass-card rounded-[24px] p-8">
                 <div className="mb-3 flex items-center gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  <h3 className="text-lg font-black text-zinc-900">{pitfall.title}</h3>
+                  <h3 className="text-lg font-black text-zinc-900">
+                    {pitfall.title}
+                  </h3>
                 </div>
-                <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">{pitfall.desc}</p>
+                <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                  {pitfall.desc}
+                </p>
               </div>
             ))}
           </div>
           <div className="mt-8 rounded-[24px] border border-[#ff4500]/10 bg-[#ff4500]/2 p-8">
-            <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-              <span className="font-bold text-zinc-800">Bottom line:</span> Surveys are useful for
-              quantifying known problems across a large population. They&apos;re dangerous for discovery
-              and terrible for predicting actual purchase behavior.
+            <p className="text-lg leading-relaxed font-medium text-zinc-500">
+              <span className="font-bold text-zinc-800">Bottom line:</span>{" "}
+              Surveys are useful for quantifying known problems across a large
+              population. They&apos;re dangerous for discovery and terrible for
+              predicting actual purchase behavior.
             </p>
           </div>
         </section>
@@ -321,18 +422,28 @@ export default function BlogPost() {
         {/* Why Reddit Wins for Signal Detection */}
         <section className="mb-32">
           <div className="mb-16 text-center">
-            <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-5xl">Why Reddit is the most underrated validation tool</h2>
-            <p className="mx-auto max-w-2xl text-lg font-medium text-zinc-500 md:text-xl leading-relaxed">
-              The method most founders ignore is the one that solves the core problems of the other two.
+            <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-5xl">
+              Why Reddit is the most underrated validation tool
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-zinc-500 md:text-xl">
+              The method most founders ignore is the one that solves the core
+              problems of the other two.
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2">
             {redditStrengths.map((strength, i) => (
-              <div key={i} className="group relative overflow-hidden rounded-[24px] glass-card p-10 transition-all">
+              <div
+                key={i}
+                className="group glass-card relative overflow-hidden rounded-[24px] p-10 transition-all"
+              >
                 <div className="absolute top-0 right-0 h-24 w-24 bg-[#ff4500]/5 opacity-0 blur-3xl transition-opacity group-hover:opacity-100" />
                 <div className="relative z-10">
-                  <h3 className="mb-3 text-xl font-black text-zinc-900">{strength.title}</h3>
-                  <p className="text-lg font-medium text-zinc-500 leading-relaxed">{strength.desc}</p>
+                  <h3 className="mb-3 text-xl font-black text-zinc-900">
+                    {strength.title}
+                  </h3>
+                  <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                    {strength.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -341,27 +452,42 @@ export default function BlogPost() {
 
         {/* The real answer: hybrid */}
         <section className="mb-32">
-          <div className="relative overflow-hidden rounded-[48px] glass-card p-12 md:p-20">
+          <div className="glass-card relative overflow-hidden rounded-[48px] p-12 md:p-20">
             <div className="absolute top-0 right-0 h-64 w-64 bg-[#ff4500]/5 blur-[120px]" />
             <div className="relative z-10">
-              <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-4xl">The real answer: use all three, in order</h2>
-              <p className="mb-12 text-lg font-medium text-zinc-500 leading-relaxed md:text-xl">
-                The strongest validation pipeline uses each method for what it does best. Here&apos;s the order that maximizes signal and minimizes bias:
+              <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-4xl">
+                The real answer: use all three, in order
+              </h2>
+              <p className="mb-12 text-lg leading-relaxed font-medium text-zinc-500 md:text-xl">
+                The strongest validation pipeline uses each method for what it
+                does best. Here&apos;s the order that maximizes signal and
+                minimizes bias:
               </p>
               <div className="space-y-8">
                 {hybridOrder.map((phase, i) => (
-                  <div key={i} className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
+                  <div
+                    key={i}
+                    className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8"
+                  >
                     <div className="flex shrink-0 items-center gap-4">
                       <div className="flex h-14 w-14 items-center justify-center rounded-full border border-black/10 bg-black/5 text-2xl font-black text-zinc-800">
                         {i + 1}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="mb-2 text-2xl font-black text-zinc-900">{phase.step}</h3>
-                      <p className="mb-3 text-lg leading-relaxed font-medium text-zinc-500">{phase.desc}</p>
-                      <div className="flex gap-4 text-xs font-bold uppercase tracking-widest">
-                        <span className="rounded-full bg-[#ff4500]/10 px-3 py-1 text-[#ff4500]">{phase.who}</span>
-                        <span className="rounded-full bg-zinc-500/10 px-3 py-1 text-zinc-600">{phase.timing}</span>
+                      <h3 className="mb-2 text-2xl font-black text-zinc-900">
+                        {phase.step}
+                      </h3>
+                      <p className="mb-3 text-lg leading-relaxed font-medium text-zinc-500">
+                        {phase.desc}
+                      </p>
+                      <div className="flex gap-4 text-xs font-bold tracking-widest uppercase">
+                        <span className="rounded-full bg-[#ff4500]/10 px-3 py-1 text-[#ff4500]">
+                          {phase.who}
+                        </span>
+                        <span className="rounded-full bg-zinc-500/10 px-3 py-1 text-zinc-600">
+                          {phase.timing}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -372,41 +498,58 @@ export default function BlogPost() {
         </section>
 
         {/* Quote */}
-        <section className="mb-32 border-l-4 border-[#ff4500] glass-card py-12 px-10 rounded-r-[32px]">
-          <blockquote className="text-3xl font-black italic leading-tight text-zinc-900 md:text-4xl">
-            &ldquo;The best validation isn&apos;t one method. It&apos;s a funnel. Start wide with Reddit to find the signal. Go deep with interviews to understand it. Use surveys to size it. Most founders do it backward — or skip the wide end entirely.&rdquo;
+        <section className="glass-card mb-32 rounded-r-[32px] border-l-4 border-[#ff4500] px-10 py-12">
+          <blockquote className="text-3xl leading-tight font-black text-zinc-900 italic md:text-4xl">
+            &ldquo;The best validation isn&apos;t one method. It&apos;s a
+            funnel. Start wide with Reddit to find the signal. Go deep with
+            interviews to understand it. Use surveys to size it. Most founders
+            do it backward — or skip the wide end entirely.&rdquo;
           </blockquote>
         </section>
 
         {/* ThreddIQ Fit */}
         <section className="mb-32">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">Where ThreddIQ fits in this pipeline</h2>
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            Where ThreddIQ fits in this pipeline
+          </h2>
           <div className="grid gap-8 md:grid-cols-3">
-            <div className="rounded-[32px] glass-card p-10">
+            <div className="glass-card rounded-[32px] p-10">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ff4500]/20 bg-[#ff4500]/5">
                 <Search className="h-6 w-6 text-[#ff4500]" />
               </div>
-              <h3 className="mb-3 text-xl font-black text-zinc-900">Phase 1: Discovery</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                ThreddIQ replaces weeks of manual Reddit scrolling. It surfaces every pain point, budget signal, and competitor mention across your niche — ranked by buying intent.
+              <h3 className="mb-3 text-xl font-black text-zinc-900">
+                Phase 1: Discovery
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                ThreddIQ replaces weeks of manual Reddit scrolling. It surfaces
+                every pain point, budget signal, and competitor mention across
+                your niche — ranked by buying intent.
               </p>
             </div>
-            <div className="rounded-[32px] glass-card p-10">
+            <div className="glass-card rounded-[32px] p-10">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ff4500]/20 bg-[#ff4500]/5">
                 <Target className="h-6 w-6 text-[#ff4500]" />
               </div>
-              <h3 className="mb-3 text-xl font-black text-zinc-900">Phase 2: Targeting</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Our scoring tells you which pain points to take to interviews. You walk in knowing the problem is real — you just need the depth. That&apos;s where your time is best spent.
+              <h3 className="mb-3 text-xl font-black text-zinc-900">
+                Phase 2: Targeting
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Our scoring tells you which pain points to take to interviews.
+                You walk in knowing the problem is real — you just need the
+                depth. That&apos;s where your time is best spent.
               </p>
             </div>
-            <div className="rounded-[32px] glass-card p-10">
+            <div className="glass-card rounded-[32px] p-10">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#ff4500]/20 bg-[#ff4500]/5">
                 <Lightbulb className="h-6 w-6 text-[#ff4500]" />
               </div>
-              <h3 className="mb-3 text-xl font-black text-zinc-900">Phase 3: Survey Design</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Use the exact language from Reddit threads to write survey questions that don&apos;t lead. Real customer words, not founder assumptions. Your survey data will thank you.
+              <h3 className="mb-3 text-xl font-black text-zinc-900">
+                Phase 3: Survey Design
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Use the exact language from Reddit threads to write survey
+                questions that don&apos;t lead. Real customer words, not founder
+                assumptions. Your survey data will thank you.
               </p>
             </div>
           </div>
@@ -414,18 +557,20 @@ export default function BlogPost() {
 
         {/* Conclusion */}
         <section className="mb-32 border-t border-black/10 py-16 text-center">
-          <p className="mx-auto max-w-2xl text-xl font-medium text-zinc-500 italic md:text-2xl leading-relaxed">
-            Interviews give you depth. Surveys give you breadth. Reddit gives you the truth. The
-            smartest founding teams don&apos;t pick one — they build a pipeline that starts with the
-            widest, most honest signal source available, then narrows from there.
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-medium text-zinc-500 italic md:text-2xl">
+            Interviews give you depth. Surveys give you breadth. Reddit gives
+            you the truth. The smartest founding teams don&apos;t pick one —
+            they build a pipeline that starts with the widest, most honest
+            signal source available, then narrows from there.
           </p>
-          <div className="mt-12 text-xs font-bold text-zinc-500 uppercase tracking-widest">
-            Data sourced from ThreddIQ&apos;s Reddit intelligence engine. 24,000+ signals analyzed across 1,400+ subreddits.
+          <div className="mt-12 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+            Data sourced from ThreddIQ&apos;s Reddit intelligence engine.
+            24,000+ signals analyzed across 1,400+ subreddits.
           </div>
         </section>
 
         {/* CTA */}
-        <div className="relative mt-24 flex flex-col items-center overflow-hidden rounded-[48px] glass-card p-16">
+        <div className="glass-card relative mt-24 flex flex-col items-center overflow-hidden rounded-[48px] p-16">
           <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#ff4500]/50 to-transparent opacity-50" />
           <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/10">
             <Search className="h-8 w-8 text-[#ff4500]" />
@@ -435,8 +580,9 @@ export default function BlogPost() {
             <span className="text-[#ff4500]">Reddit</span>
           </h2>
           <p className="mb-12 max-w-2xl text-center text-xl leading-relaxed font-medium text-zinc-500">
-            ThreddIQ automates the wide end of the funnel. Pain point detection, signal scoring, and
-            competitive intelligence — from Reddit to your dashboard in minutes.
+            ThreddIQ automates the wide end of the funnel. Pain point detection,
+            signal scoring, and competitive intelligence — from Reddit to your
+            dashboard in minutes.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button
@@ -444,7 +590,9 @@ export default function BlogPost() {
               size="lg"
               className="rounded-2xl bg-linear-to-b from-[#ff5100] to-[#e63e00] px-12 py-7 text-xl font-black text-white shadow-xl shadow-[#ff4500]/20 transition-all hover:from-[#ff621a] hover:to-[#ff4500]"
             >
-              <Link href="/sign-up">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/sign-up">
+                Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </div>
         </div>

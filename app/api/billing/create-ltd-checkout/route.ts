@@ -45,31 +45,41 @@ export async function POST(req: Request) {
     }
 
     if (!priceId) {
-      const missing = tier === "founder"
-        ? "STRIPE_PRICE_LTD_FOUNDER"
-        : currentUser?.ltdTier === "founder"
-        ? "STRIPE_PRICE_LTD_UPGRADE"
-        : "STRIPE_PRICE_LTD_PROFESSIONAL";
+      const missing =
+        tier === "founder"
+          ? "STRIPE_PRICE_LTD_FOUNDER"
+          : currentUser?.ltdTier === "founder"
+            ? "STRIPE_PRICE_LTD_UPGRADE"
+            : "STRIPE_PRICE_LTD_PROFESSIONAL";
       console.error(`[LTD Checkout] Missing env var: ${missing}`);
       return NextResponse.json(
-        { message: `Server misconfiguration: ${missing} is not set in .env.local` },
-        { status: 500 }
+        {
+          message: `Server misconfiguration: ${missing} is not set in .env.local`,
+        },
+        { status: 500 },
       );
     }
 
-    const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST";
-    console.log(`[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`);
+    const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_")
+      ? "LIVE"
+      : "TEST";
+    console.log(
+      `[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`,
+    );
 
     // Validate the stored customer ID against the current Stripe environment.
     // It may be a stale Test-mode ID when running in Live mode (or vice versa).
-    let validCustomerId: string | undefined = session.user.stripeCustomerId || undefined;
+    let validCustomerId: string | undefined =
+      session.user.stripeCustomerId || undefined;
     if (validCustomerId) {
       try {
         const existing = await stripe.customers.retrieve(validCustomerId);
         if ((existing as any).deleted) validCustomerId = undefined;
       } catch (err: any) {
         if (err.code === "resource_missing") {
-          console.warn(`[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`);
+          console.warn(
+            `[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`,
+          );
           validCustomerId = undefined;
         } else {
           throw err;

@@ -9,7 +9,11 @@ interface SpotlightCardProps {
   active?: boolean;
 }
 
-export function SpotlightCard({ children, className, active = true }: SpotlightCardProps) {
+export function SpotlightCard({
+  children,
+  className,
+  active = true,
+}: SpotlightCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -17,7 +21,8 @@ export function SpotlightCard({ children, className, active = true }: SpotlightC
 
   useEffect(() => {
     // Check for touch device once
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
     setIsTouch(isTouchDevice);
   }, []);
 
@@ -39,7 +44,7 @@ export function SpotlightCard({ children, className, active = true }: SpotlightC
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "relative overflow-hidden transition-all duration-300",
-        className
+        className,
       )}
     >
       {isHovered && !isTouch && active && (

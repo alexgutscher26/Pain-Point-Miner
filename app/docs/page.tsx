@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { siteConfig } from "@/lib/seo";
+import { constructMetadata, siteConfig, siteUrl } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import {
   Search,
   Zap,
@@ -12,6 +13,14 @@ import {
   Terminal,
 } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = constructMetadata({
+  title: `Documentation - ${siteConfig.name}`,
+  description:
+    "Explore developer documentation, API references, scoring algorithms, and guides for ThreddIQ Reddit intelligence.",
+  path: "/docs",
+  ogImage: `${siteUrl}/api/og?title=Documentation&description=API+References%2C+Mining+Engine+Specs%2C+and+Guides&badge=Docs&category=Developer+Center`,
+});
 
 const docSections = [
   {
@@ -84,7 +93,13 @@ export const metadata: Metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen overflow-x-hidden font-sans text-zinc-900 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", item: "/" },
+          { name: "Documentation", item: "/docs" },
+        ]}
+      />
       <Header />
 
       <main className="flex flex-col items-center px-6 pt-32 pb-24">
@@ -113,7 +128,7 @@ export default function DocsPage() {
             {docSections.map((section) => (
               <div
                 key={section.title}
-                className="group relative flex flex-col items-start overflow-hidden rounded-[32px] glass-card p-8 transition-all hover:border-black/10"
+                className="group glass-card relative flex flex-col items-start overflow-hidden rounded-[32px] p-8 transition-all hover:border-black/10"
               >
                 <div className="mb-8 flex items-center gap-4">
                   <div className="rounded-2xl border border-black/10 bg-black/5 p-3 transition-transform duration-500 group-hover:scale-110">

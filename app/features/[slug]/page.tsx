@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { siteConfig } from "@/lib/seo";
+import { constructMetadata, siteConfig, siteUrl } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import {
   Target,
   Bot,
@@ -38,7 +39,8 @@ interface Feature {
 const features: Record<string, Feature> = {
   "pain-point-mining": {
     title: "AI Pain Point Mining",
-    subtitle: "Stop guessing. Find the real problems your customers are already venting about.",
+    subtitle:
+      "Stop guessing. Find the real problems your customers are already venting about.",
     description:
       "Our AI engine doesn't just scrape Reddit; it understands it. We scan thousands of horizontal and vertical communities to extract the underlying frustrations, manual workarounds, and unmet needs that represent your next big opportunity.",
     icon: <Bot className="h-12 w-12 text-[#ff4500]" />,
@@ -82,7 +84,8 @@ const features: Record<string, Feature> = {
       type: "Pain Point Analysis",
       target: "r/SaaS",
       intensity: "Critical (9.4/10)",
-      insight: "Users are reporting 2+ hours wasted daily on manual spreadsheet reconciliation between Stripe and QuickBooks.",
+      insight:
+        "Users are reporting 2+ hours wasted daily on manual spreadsheet reconciliation between Stripe and QuickBooks.",
       score: 88,
     },
     gradient: "from-orange-500/20 to-transparent",
@@ -168,10 +171,12 @@ export async function generateMetadata({
   const feature = features[slug as keyof typeof features];
   if (!feature) return {};
 
-  return {
-    title: `${feature.title} - ${siteConfig.name}`,
+  return constructMetadata({
+    title: feature.title,
     description: feature.description,
-  };
+    path: `/features/${slug}`,
+    ogImage: `${siteUrl}/api/og?title=${encodeURIComponent(feature.title)}&description=${encodeURIComponent(feature.description)}&badge=Feature&category=ThreddIQ+Features`,
+  });
 }
 
 export default async function FeaturePage({
@@ -186,8 +191,28 @@ export default async function FeaturePage({
     notFound();
   }
 
+  const featureSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: `${feature.title} — ${siteConfig.name}`,
+    description: feature.description,
+    applicationCategory: "BusinessApplication",
+    url: `${siteUrl}/features/${slug}`,
+  };
+
   return (
-    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen overflow-x-hidden font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", item: "/" },
+          { name: "Features", item: "/#features" },
+          { name: feature.title, item: `/features/${slug}` },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(featureSchema) }}
+      />
       <Header />
 
       <main className="flex flex-col items-center px-6 pt-32 pb-24">
@@ -234,13 +259,13 @@ export default async function FeaturePage({
             </div>
           </div>
 
-          <div className="group relative flex aspect-square items-center justify-center overflow-hidden rounded-[32px] glass-card p-8">
+          <div className="group glass-card relative flex aspect-square items-center justify-center overflow-hidden rounded-[32px] p-8">
             <div className="absolute inset-0 bg-[#ff4500]/5 opacity-0 transition-opacity group-hover:opacity-100" />
-            
+
             {feature.preview ? (
               <div className="relative z-10 w-full space-y-4 rounded-2xl border border-black/10 bg-white/80 p-6 backdrop-blur-md">
                 <div className="flex items-center justify-between border-b border-black/10 pb-4">
-                  <span className="text-xs font-black uppercase tracking-widest text-[#ff4500]">
+                  <span className="text-xs font-black tracking-widest text-[#ff4500] uppercase">
                     Live Analysis
                   </span>
                   <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
@@ -248,23 +273,29 @@ export default async function FeaturePage({
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-zinc-500">Source:</span>
-                    <span className="font-bold text-zinc-900">{feature.preview.target}</span>
+                    <span className="font-bold text-zinc-900">
+                      {feature.preview.target}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-zinc-500">Intensity:</span>
-                    <span className="font-bold text-red-500">{feature.preview.intensity}</span>
+                    <span className="font-bold text-red-500">
+                      {feature.preview.intensity}
+                    </span>
                   </div>
-                  <div className="rounded-lg bg-black/5 p-4 text-xs italic leading-relaxed text-zinc-600">
-                    "{feature.preview.insight}"
+                  <div className="rounded-lg bg-black/5 p-4 text-xs leading-relaxed text-zinc-600 italic">
+                    &ldquo;{feature.preview.insight}&rdquo;
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="h-1.5 flex-1 rounded-full bg-black/10">
-                      <div 
-                        className="h-full rounded-full bg-[#ff4500]" 
-                        style={{ width: `${feature.preview.score}%` }} 
+                      <div
+                        className="h-full rounded-full bg-[#ff4500]"
+                        style={{ width: `${feature.preview.score}%` }}
                       />
                     </div>
-                    <span className="text-xs font-bold text-zinc-900">Score: {feature.preview.score}</span>
+                    <span className="text-xs font-bold text-zinc-900">
+                      Score: {feature.preview.score}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -294,7 +325,7 @@ export default async function FeaturePage({
               {feature.howItWorks.map((step, idx) => (
                 <div
                   key={step.title}
-                  className="group relative rounded-[32px] glass-card p-8 transition-all"
+                  className="group glass-card relative rounded-[32px] p-8 transition-all"
                 >
                   <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-[#ff4500]/10 text-xl font-black text-[#ff4500]">
                     {idx + 1}
@@ -321,7 +352,7 @@ export default async function FeaturePage({
               {feature.useCases.map((useCase) => (
                 <div
                   key={useCase.title}
-                  className="rounded-[32px] glass-card p-8"
+                  className="glass-card rounded-[32px] p-8"
                 >
                   <h3 className="mb-4 text-lg font-bold text-zinc-900">
                     {useCase.title}
@@ -334,7 +365,6 @@ export default async function FeaturePage({
             </div>
           </section>
         )}
-
 
         {/* Call to Action */}
         <section className="relative w-full max-w-4xl overflow-hidden rounded-[40px] border border-[#ff4500]/10 bg-linear-to-b from-[#ff4500]/5 to-[#f59e0b]/5 p-12 text-center md:p-16">

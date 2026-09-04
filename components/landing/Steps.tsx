@@ -1,95 +1,129 @@
-import { Target } from "lucide-react";
+"use client";
+
+import { Search, Brain, Target, Sparkles } from "lucide-react";
 
 export function Steps() {
+  const steps = [
+    {
+      num: "1",
+      title: "Select your target niche",
+      description:
+        "Enter keywords or communities like r/SaaS, r/smallbusiness, or r/webdev to pinpoint active buyer conversations.",
+      badge: "Targeting",
+    },
+    {
+      num: "2",
+      title: "AI extracts and clusters pain points",
+      description:
+        "Our semantic pipeline filters out spam, isolates repeated workflow hurdles, and quantifies willingness to pay.",
+      badge: "Extraction",
+    },
+    {
+      num: "3",
+      title: "Ship with confirmed demand",
+      description:
+        "Review structured opportunity dossiers, export direct buyer leads, and build what customers are already asking for.",
+      badge: "Validation",
+    },
+  ];
+
   return (
-    <section className="flex w-full flex-col items-center px-6 py-32">
-      <div className="mb-20 max-w-2xl text-center">
-        <h2 className="mb-6 text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-          HOW IT WORKS
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-20 sm:px-6 sm:py-28">
+      <div className="mb-16 flex max-w-[680px] flex-col items-center text-center">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-xs font-semibold text-[#ff4500] dark:border-white/10 dark:bg-zinc-900/60">
+          Execution process
+        </div>
+        <h2 className="mb-4 text-3xl font-bold tracking-tight text-balance text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          Validate your SaaS ideas in three simple steps
         </h2>
-        <h3 className="mb-6 text-[40px] leading-tight font-extrabold tracking-tight text-zinc-900 md:text-[56px]">
-          Validate your <span className="text-[#ff4500]">SaaS ideas</span>
-          <br /> in 3 simple steps
-        </h3>
-        <p className="text-[18px] font-medium text-zinc-500">
-          Enter a niche, and we&apos;ll do the deep research to extract the real
-          problems your potential users are actively trying to solve.
+        <p className="text-base leading-relaxed font-normal text-pretty text-zinc-600 sm:text-lg dark:text-zinc-400">
+          Go from an unproven concept to a backed list of paying customer
+          demands in minutes instead of weeks.
         </p>
       </div>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-3">
         {/* Step 1 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-black/5 bg-white/60 p-8 shadow-sm transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-md">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded-full bg-[#ff4500] text-[13px] font-bold text-white shadow-xs">
-            1
+        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
+          <div className="mb-6 flex w-full items-center justify-between">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
+              1
+            </div>
+            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
+              Targeting
+            </span>
           </div>
 
-          <div className="mb-8 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border border-black/5 bg-zinc-50 shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            {/* Search text box mockup */}
-            <div className="flex w-[80%] items-center gap-2 rounded-full border border-black/5 bg-white px-5 py-3 shadow-sm">
-              <span className="text-[15px] font-bold text-[#ff4500]">#</span>
-              <span className="animate-pulse border-r-2 border-[#ff4500] pr-1.5 text-[15px] font-medium tracking-wide text-zinc-900">
-                SaaS marketing
+          <div className="mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
+            <div className="flex w-full max-w-[220px] items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2.5 shadow-xs dark:border-white/10 dark:bg-zinc-900">
+              <Search className="h-4 w-4 text-[#ff4500]" />
+              <span className="text-xs font-semibold text-zinc-900 dark:text-white">
+                r/productivity, r/SaaS
               </span>
             </div>
           </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-zinc-900">
-            1. Define your niche
+
+          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
+            {steps[0].title}
           </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
-            Enter a keyword like &quot;SEO tools&quot; or &quot;property
-            management&quot; to target the exact subreddits relevant to your
-            SaaS.
+          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
+            {steps[0].description}
           </p>
         </div>
 
         {/* Step 2 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-black/5 bg-white/60 p-8 shadow-sm transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-md">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded-full bg-[#ff4500] text-[13px] font-bold text-white shadow-xs">
-            2
+        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
+          <div className="mb-6 flex w-full items-center justify-between">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
+              2
+            </div>
+            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
+              Extraction
+            </span>
           </div>
 
-          <div className="relative mb-8 flex h-40 w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-black/5 bg-zinc-50 shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-[#ff4500]/5"></div>
-            {/* Feed mockup */}
-            <div className="w-[75%] translate-x-4 rounded-lg border border-black/5 bg-white p-3 shadow-xs">
-              <div className="mb-1.5 h-1.5 w-[60%] rounded bg-zinc-200 animate-pulse"></div>
-              <div className="h-1.5 w-full rounded bg-zinc-100"></div>
+          <div className="mb-6 flex h-40 w-full flex-col justify-center gap-2 overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
+            <div className="rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              High willingness to pay signal detected
             </div>
-            <div className="w-[75%] -translate-x-4 rounded-lg border border-black/5 bg-white p-3 opacity-60 shadow-xs">
-              <div className="mb-1.5 h-1.5 w-[40%] rounded bg-zinc-200"></div>
-              <div className="h-1.5 w-[90%] rounded bg-zinc-100"></div>
+            <div className="rounded-md border border-[#ff4500]/20 bg-[#ff4500]/10 p-2 text-xs font-medium text-[#ff4500]">
+              Competitor churn reason: Pricing & complexity
             </div>
           </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-zinc-900">
-            2. We analyze discussions
+
+          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
+            {steps[1].title}
           </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
-            Our system scans recent discussions, identifies repeated
-            frustrations, and clusters similar complaints automatically.
+          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
+            {steps[1].description}
           </p>
         </div>
 
         {/* Step 3 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-black/5 bg-white/60 p-8 shadow-sm transition-all hover:bg-white hover:border-[#ff4500]/15 hover:shadow-md">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded-full bg-[#ff4500] text-[13px] font-bold text-white shadow-xs">
-            3
+        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
+          <div className="mb-6 flex w-full items-center justify-between">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
+              3
+            </div>
+            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
+              Validation
+            </span>
           </div>
 
-          <div className="relative mb-8 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border border-black/5 bg-zinc-50 shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-[#ff4500]/10"></div>
-            {/* Ping mockup */}
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#ff4500]/20 bg-white shadow-xs">
-              <Target className="h-8 w-8 text-[#ff4500]" />
-              <div className="absolute top-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-red-500"></div>
+          <div className="mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
+            <div className="flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-2.5 shadow-xs dark:border-white/10 dark:bg-zinc-900">
+              <Target className="h-5 w-5 text-emerald-500" />
+              <span className="text-xs font-bold text-zinc-900 dark:text-white">
+                Opportunity Score: 92/100
+              </span>
             </div>
           </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-zinc-900">
-            3. Review Pain Points
+
+          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
+            {steps[2].title}
           </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
-            Get structured reports detailing common pain points, demand signals,
-            and user language to validate your next feature.
+          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
+            {steps[2].description}
           </p>
         </div>
       </div>

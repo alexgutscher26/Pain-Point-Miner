@@ -27,7 +27,7 @@ class SlowQueryLogger {
         await baseClient`
           INSERT INTO slow_query_log (id, query, "durationMs", "createdAt")
           VALUES (${crypto.randomUUID()}, ${query}, ${duration}, ${new Date()})
-        `.catch(err => console.error("Failed to log slow query:", err));
+        `.catch((err) => console.error("Failed to log slow query:", err));
       } catch (err) {
         console.error("Critical error in slow query logger:", err);
       }
@@ -43,11 +43,14 @@ export const client = new Proxy(baseClient, {
     const start = Date.now();
     // Use Reflect.apply to safely call the client with any arguments
     const result = Reflect.apply(target as any, thisArg, argArray);
-    
+
     if (result instanceof Promise) {
       return result.finally(() => {
         const duration = Date.now() - start;
-        const query = typeof argArray[0] === 'string' ? argArray[0] : (argArray[0] as any)?.strings?.join('?') || 'unknown';
+        const query =
+          typeof argArray[0] === "string"
+            ? argArray[0]
+            : (argArray[0] as any)?.strings?.join("?") || "unknown";
         slowLogger.logQuery(query, duration);
       });
     }
@@ -56,11 +59,11 @@ export const client = new Proxy(baseClient, {
   // Ensure we also handle the template literal tag usage
   get(target, prop, receiver) {
     const value = Reflect.get(target, prop, receiver);
-    if (typeof value === 'function') {
+    if (typeof value === "function") {
       return value.bind(target);
     }
     return value;
-  }
+  },
 }) as typeof baseClient;
 
 export const db = drizzle(client, {

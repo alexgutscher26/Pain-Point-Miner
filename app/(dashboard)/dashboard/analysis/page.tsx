@@ -16,6 +16,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useMiningStream, type MiningPhase } from "@/hooks/use-mining-stream";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { LiveScanCounter } from "@/components/dashboard/live-scan-counter";
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
@@ -28,6 +29,8 @@ export default function AnalysisPage() {
     progress,
     painPointCount,
     postsFetched,
+    postsSkipped,
+    commentsFetched,
     subreddits,
     timeWindow,
     customPatterns,
@@ -239,6 +242,17 @@ export default function AnalysisPage() {
               {statusText}
             </div>
           </div>
+
+          {/* Live Stream Ingestion & Extraction Counters */}
+          <LiveScanCounter
+            postsFetched={postsFetched}
+            postsSkipped={postsSkipped}
+            commentsFetched={commentsFetched}
+            painPointCount={painPointCount}
+            subreddits={subreddits}
+            phase={phase}
+            progress={progress}
+          />
 
           {/* Timeline Steps */}
           <div className="relative space-y-0">

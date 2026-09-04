@@ -61,4 +61,3 @@ describe("plan-resolver", () => {
     expect(result.planPurchaseRequired).toBe(false);
   });
 });
-

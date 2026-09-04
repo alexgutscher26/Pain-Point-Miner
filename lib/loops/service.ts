@@ -23,11 +23,18 @@ export async function syncUserToLoops(
     if (!response.success) {
       console.error("[Loops] Failed to sync user to Loops:", response);
     } else {
-      console.log(`[Loops] Successfully synced user to Loops audience: ${email}`);
+      console.log(
+        `[Loops] Successfully synced user to Loops audience: ${email}`,
+      );
     }
   } catch (error: any) {
-    if (error?.statusCode === 409 || error?.json?.message?.includes("already in your audience")) {
-      console.log(`[Loops] User ${email} is already in your audience. Sync complete.`);
+    if (
+      error?.statusCode === 409 ||
+      error?.json?.message?.includes("already in your audience")
+    ) {
+      console.log(
+        `[Loops] User ${email} is already in your audience. Sync complete.`,
+      );
       return;
     }
     console.error("[Loops] Error syncing user to Loops:", error);
@@ -99,13 +106,13 @@ export async function sendWelcomeEmailProgrammatically(
   try {
     const { render } = await import("@react-email/components");
     const { WelcomeEmail } = await import("../../emails/WelcomeEmail");
-    
+
     const htmlBody = await render(WelcomeEmail({ firstName, scanUrl }));
 
     // Note: You must configure a Transactional Email in Loops.so and grab its ID.
     // Add an 'html' variable in the template.
     const response = await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_WELCOME_TRANSACTIONAL_ID || "cm2xxxx", 
+      transactionalId: process.env.LOOPS_WELCOME_TRANSACTIONAL_ID || "cm2xxxx",
       email,
       dataVariables: {
         html: htmlBody,
@@ -114,12 +121,20 @@ export async function sendWelcomeEmailProgrammatically(
     });
 
     if (!response.success) {
-      console.error("[Loops] Failed to send welcome email programmatically:", response);
+      console.error(
+        "[Loops] Failed to send welcome email programmatically:",
+        response,
+      );
     } else {
-      console.log(`[Loops] Successfully sent programmatic welcome email to ${email}`);
+      console.log(
+        `[Loops] Successfully sent programmatic welcome email to ${email}`,
+      );
     }
   } catch (error) {
-    console.error("[Loops] Error sending welcome email programmatically:", error);
+    console.error(
+      "[Loops] Error sending welcome email programmatically:",
+      error,
+    );
   }
 }
 
@@ -131,25 +146,26 @@ export async function sendReportReadyEmailProgrammatically(
   keyword: string,
   painPointsFound: number,
   reportUrl: string,
-  topPainPoints: { title: string; excerpt: string; score: number }[]
+  topPainPoints: { title: string; excerpt: string; score: number }[],
 ) {
   if (!process.env.LOOPS_API_KEY) return;
 
   try {
     const { render } = await import("@react-email/components");
     const { ReportReadyEmail } = await import("../../emails/ReportReadyEmail");
-    
+
     const htmlBody = await render(
       ReportReadyEmail({
         keyword,
         painPointsFound,
         reportUrl,
         topPainPoints,
-      })
+      }),
     );
 
     const response = await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_REPORT_READY_TRANSACTIONAL_ID || "cm2xxxy", 
+      transactionalId:
+        process.env.LOOPS_REPORT_READY_TRANSACTIONAL_ID || "cm2xxxy",
       email,
       dataVariables: {
         html: htmlBody,
@@ -181,7 +197,8 @@ export async function sendWeeklyDigestEmailProgrammatically(
 
   try {
     const { render } = await import("@react-email/components");
-    const { WeeklyDigestEmail } = await import("../../emails/WeeklyDigestEmail");
+    const { WeeklyDigestEmail } =
+      await import("../../emails/WeeklyDigestEmail");
 
     const htmlBody = await render(
       WeeklyDigestEmail({
@@ -213,8 +230,8 @@ export async function sendWeeklyDigestEmailProgrammatically(
 }
 
 /**
-  * Sends a Reset Password email programmatically with built HTML
-  */
+ * Sends a Reset Password email programmatically with built HTML
+ */
 export async function sendResetPasswordEmailProgrammatically(
   email: string,
   resetLink: string,
@@ -223,13 +240,17 @@ export async function sendResetPasswordEmailProgrammatically(
 
   try {
     const { render } = await import("@react-email/components");
-    const { ResetPasswordEmail } = await import("../../emails/ResetPasswordEmail");
-    
-    const htmlBody = await render(ResetPasswordEmail({ userEmail: email, resetLink }));
+    const { ResetPasswordEmail } =
+      await import("../../emails/ResetPasswordEmail");
+
+    const htmlBody = await render(
+      ResetPasswordEmail({ userEmail: email, resetLink }),
+    );
 
     // Use the Reset Password Transactional ID
     const response = await loops.sendTransactionalEmail({
-      transactionalId: process.env.LOOPS_RESET_PASSWORD_TRANSACTIONAL_ID || "cm2xxxx", 
+      transactionalId:
+        process.env.LOOPS_RESET_PASSWORD_TRANSACTIONAL_ID || "cm2xxxx",
       email,
       dataVariables: {
         html: htmlBody,

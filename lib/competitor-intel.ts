@@ -13,7 +13,10 @@ export function normalizeToolName(name: string): string {
 
   // Common suffixes to remove
   const cleaned = n
-    .replace(/\s+(crm|software|app|platform|tool|service|c\.r\.m\.?|solutions|inc|corp|co|limited|ltd)$/i, "")
+    .replace(
+      /\s+(crm|software|app|platform|tool|service|c\.r\.m\.?|solutions|inc|corp|co|limited|ltd)$/i,
+      "",
+    )
     .trim();
 
   // Title Case
@@ -38,7 +41,9 @@ function slugify(name: string): string {
  * Attempts to resolve metadata (URL, description) for a tool.
  * Uses a cached "tool" record if available, otherwise attempts to fetch.
  */
-export async function resolveToolMetadata(name: string): Promise<Partial<CompetitorIntel>> {
+export async function resolveToolMetadata(
+  name: string,
+): Promise<Partial<CompetitorIntel>> {
   const normalized = normalizeToolName(name);
   if (!normalized) return { name: "Unknown" };
 
@@ -50,7 +55,10 @@ export async function resolveToolMetadata(name: string): Promise<Partial<Competi
   });
 
   if (existing && existing.lastCrawledAt) {
-    if (Date.now() - existing.lastCrawledAt.getTime() < 1000 * 60 * 60 * 24 * 7 && existing.description) {
+    if (
+      Date.now() - existing.lastCrawledAt.getTime() < 1000 * 60 * 60 * 24 * 7 &&
+      existing.description
+    ) {
       // Less than 7 days old AND contains description
       return {
         name: existing.name,
@@ -64,7 +72,7 @@ export async function resolveToolMetadata(name: string): Promise<Partial<Competi
 
   // 2. Fallback: Simple guess and fetch
   const aiMeta = await resolveCompetitorMetadata(normalized);
-  
+
   const result: Partial<CompetitorIntel> = {
     name: normalized,
     url: aiMeta.url || existing?.url || null,
@@ -87,10 +95,13 @@ export async function resolveToolMetadata(name: string): Promise<Partial<Competi
   if (existing) {
     await db.update(tool).set(upsertValues).where(eq(tool.id, existing.id));
   } else {
-    await db.insert(tool).values({
-      id: crypto.randomUUID(),
-      ...upsertValues,
-    }).onConflictDoNothing();
+    await db
+      .insert(tool)
+      .values({
+        id: crypto.randomUUID(),
+        ...upsertValues,
+      })
+      .onConflictDoNothing();
   }
 
   return result;
@@ -99,9 +110,11 @@ export async function resolveToolMetadata(name: string): Promise<Partial<Competi
 /**
  * Aggregates tried solutions from a list of pain points into CompetitorIntel.
  */
-export async function aggregateCompetitorIntel(triedSolutions: string[][]): Promise<CompetitorIntel[]> {
+export async function aggregateCompetitorIntel(
+  triedSolutions: string[][],
+): Promise<CompetitorIntel[]> {
   const mentions = new Map<string, number>();
-  
+
   for (const solutions of triedSolutions) {
     if (!Array.isArray(solutions)) continue;
     for (const sol of solutions) {

@@ -4,7 +4,14 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Key, Loader2, Shield, SlidersHorizontal, User2 } from "lucide-react";
+import {
+  Bell,
+  Key,
+  Loader2,
+  Shield,
+  SlidersHorizontal,
+  User2,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -322,7 +329,7 @@ export function SettingsPageClient({
           type="submit"
           form="settings-form"
           disabled={isSaving}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#ff4500] hover:bg-[#e63e00] px-6 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#ff4500] px-6 py-2.5 font-mono text-[12px] font-black tracking-[0.15em] text-white uppercase shadow-sm transition-all hover:bg-[#e63e00] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           {isSaving ? "Saving..." : "Save Changes"}
@@ -337,7 +344,7 @@ export function SettingsPageClient({
 
       <form id="settings-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8 xl:col-span-2">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8 xl:col-span-2">
             <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <User2 className="h-5 w-5 text-[#ff4500]" />
               Profile
@@ -375,7 +382,7 @@ export function SettingsPageClient({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8">
             <h3 className="mb-5 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <Shield className="h-5 w-5 text-[#ff4500]" />
               Security
@@ -397,8 +404,8 @@ export function SettingsPageClient({
         </div>
 
         {/* BYOK (Bring Your Own Key) Card */}
-        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
               <div className="flex items-center gap-2">
                 <Key className="h-5 w-5 text-[#ff4500]" />
@@ -410,7 +417,8 @@ export function SettingsPageClient({
                 </span>
               </div>
               <p className="mt-2 max-w-3xl text-sm text-zinc-500">
-                Want unlimited mining without a monthly subscription? Add your personal{" "}
+                Want unlimited mining without a monthly subscription? Add your
+                personal{" "}
                 <a
                   href="https://openrouter.ai/keys"
                   target="_blank"
@@ -419,7 +427,9 @@ export function SettingsPageClient({
                 >
                   OpenRouter API key
                 </a>
-                . All AI extraction and embedding costs will be billed directly to your OpenRouter account at cost (fractions of a cent per scan).
+                . All AI extraction and embedding costs will be billed directly
+                to your OpenRouter account at cost (fractions of a cent per
+                scan).
               </p>
             </div>
           </div>
@@ -434,14 +444,19 @@ export function SettingsPageClient({
                 placeholder="sk-or-v1-..."
                 value={values.customApiKey}
                 onChange={(e) =>
-                  setValues((prev) => ({ ...prev, customApiKey: e.target.value }))
+                  setValues((prev) => ({
+                    ...prev,
+                    customApiKey: e.target.value,
+                  }))
                 }
                 className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 font-mono text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-1 focus:ring-[#ff4500] focus:outline-none"
               />
               {values.customApiKey && (
                 <button
                   type="button"
-                  onClick={() => setValues((prev) => ({ ...prev, customApiKey: "" }))}
+                  onClick={() =>
+                    setValues((prev) => ({ ...prev, customApiKey: "" }))
+                  }
                   className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 font-mono text-xs text-zinc-600 hover:bg-zinc-100"
                 >
                   Clear
@@ -449,12 +464,13 @@ export function SettingsPageClient({
               )}
             </div>
             <p className="mt-2 text-xs text-zinc-400">
-              Your key is encrypted in your personal settings and used strictly for your own mining runs.
+              Your key is encrypted in your personal settings and used strictly
+              for your own mining runs.
             </p>
           </div>
         </section>
 
-        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+        <section className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8">
           <div className="absolute top-0 right-0 p-4">
             <span className="rounded-full border border-[#ff4500]/25 bg-[#ff4500]/5 px-2.5 py-1 font-mono text-[10px] font-black tracking-[0.15em] text-[#ff4500] uppercase">
               Pro Feature
@@ -570,7 +586,7 @@ export function SettingsPageClient({
                     return (
                       <div
                         key={opp.id}
-                        className="space-y-3 rounded-xl border border-zinc-150/40 bg-white/50 p-4 transition-all hover:bg-white/80 shadow-sm"
+                        className="border-zinc-150/40 space-y-3 rounded-xl border bg-white/50 p-4 shadow-sm transition-all hover:bg-white/80"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <p className="text-sm leading-tight font-bold text-zinc-800">
@@ -593,7 +609,7 @@ export function SettingsPageClient({
         </section>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8">
             <div className="mb-6 flex items-center justify-between gap-3">
               <h3 className="flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
                 <Bell className="h-5 w-5 text-[#ff4500]" />
@@ -640,7 +656,7 @@ export function SettingsPageClient({
             </fieldset>
           </section>
 
-          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-6 shadow-sm md:p-8">
+          <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm backdrop-blur-md md:p-8">
             <h3 className="mb-6 flex items-center gap-2.5 text-lg font-black tracking-tight text-zinc-900">
               <SlidersHorizontal className="h-5 w-5 text-[#ff4500]" />
               Scan Defaults
@@ -721,7 +737,7 @@ export function SettingsPageClient({
               Delete Account
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl max-w-md">
+          <AlertDialogContent className="max-w-md rounded-2xl border border-zinc-200/50 bg-white/95 text-zinc-900 shadow-xl backdrop-blur-md">
             <AlertDialogHeader className="place-items-start text-left">
               <AlertDialogTitle className="font-black text-rose-600">
                 Delete your account?
@@ -738,7 +754,7 @@ export function SettingsPageClient({
               value={deleteConfirmation}
               onChange={(event) => setDeleteConfirmation(event.target.value)}
               placeholder="Type DELETE"
-              className="h-11 w-full rounded-xl border border-zinc-200 bg-white/50 px-3 font-mono text-sm text-zinc-900 outline-none transition-all focus:border-rose-500"
+              className="h-11 w-full rounded-xl border border-zinc-200 bg-white/50 px-3 font-mono text-sm text-zinc-900 transition-all outline-none focus:border-rose-500"
             />
             <AlertDialogFooter>
               <AlertDialogCancel
@@ -766,7 +782,7 @@ export function SettingsPageClient({
         open={isChangePasswordOpen}
         onOpenChange={setIsChangePasswordOpen}
       >
-        <DialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl max-w-md">
+        <DialogContent className="max-w-md rounded-2xl border border-zinc-200/50 bg-white/95 text-zinc-900 shadow-xl backdrop-blur-md">
           <DialogHeader>
             <DialogTitle className="font-black text-zinc-900">
               Change Password
@@ -794,7 +810,7 @@ export function SettingsPageClient({
               value={confirmNewPassword}
               onChange={setConfirmNewPassword}
             />
-            <label className="flex items-center gap-3 text-sm text-zinc-650 cursor-pointer">
+            <label className="text-zinc-650 flex cursor-pointer items-center gap-3 text-sm">
               <input
                 type="checkbox"
                 checked={revokeOtherSessions}
@@ -827,7 +843,7 @@ export function SettingsPageClient({
       </Dialog>
 
       <Dialog open={isSessionsOpen} onOpenChange={setIsSessionsOpen}>
-        <DialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-900 shadow-xl sm:max-w-2xl">
+        <DialogContent className="rounded-2xl border border-zinc-200/50 bg-white/95 text-zinc-900 shadow-xl backdrop-blur-md sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-black text-zinc-900">
               Active Sessions
@@ -838,11 +854,11 @@ export function SettingsPageClient({
           </DialogHeader>
           <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
             {isLoadingSessions ? (
-              <div className="py-8 text-center text-sm text-zinc-550">
+              <div className="text-zinc-550 py-8 text-center text-sm">
                 Loading sessions...
               </div>
             ) : sessions.length === 0 ? (
-              <div className="py-8 text-center text-sm text-zinc-550">
+              <div className="text-zinc-550 py-8 text-center text-sm">
                 No active sessions found.
               </div>
             ) : (
@@ -934,7 +950,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="font-mono text-[11px] font-bold tracking-[0.14em] text-zinc-550 uppercase">
+      <span className="text-zinc-550 font-mono text-[11px] font-bold tracking-[0.14em] uppercase">
         {label}
       </span>
       <input
@@ -943,7 +959,7 @@ function Field({
         min={min}
         max={max}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-11 w-full rounded-xl border border-zinc-200/50 bg-white/40 px-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10"
+        className="mt-2 h-11 w-full rounded-xl border border-zinc-200/50 bg-white/40 px-3 text-sm text-zinc-900 transition-all outline-none placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10"
       />
     </label>
   );
@@ -1028,4 +1044,3 @@ function WeightSlider({
     </div>
   );
 }
-

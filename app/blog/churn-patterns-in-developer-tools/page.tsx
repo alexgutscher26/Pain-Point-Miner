@@ -16,8 +16,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "The 4 Hidden Churn Patterns in Developer Tools (Based on 450+ Reddit Complaints) | ThreddIQ Blog",
-  description: "Why software engineers abandon developer tools and infrastructure platforms, and the non-obvious product mistakes that drive tech churn.",
+  title:
+    "The 4 Hidden Churn Patterns in Developer Tools (Based on 450+ Reddit Complaints) | ThreddIQ Blog",
+  description:
+    "Why software engineers abandon developer tools and infrastructure platforms, and the non-obvious product mistakes that drive tech churn.",
 };
 
 const churnPatterns = [
@@ -49,24 +51,26 @@ const churnPatterns = [
 
 const quotes = [
   {
-    quote: "We loved their managed database until our bill tripled due to egress fees nobody warned us about. Migrated back to a simple VPS in two days.",
+    quote:
+      "We loved their managed database until our bill tripled due to egress fees nobody warned us about. Migrated back to a simple VPS in two days.",
     sub: "r/devops",
   },
   {
-    quote: "If I cannot test it offline on my laptop without connecting to your cloud sandbox, it is not getting approved by our security team.",
+    quote:
+      "If I cannot test it offline on my laptop without connecting to your cloud sandbox, it is not getting approved by our security team.",
     sub: "r/programming",
   },
 ];
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
         {/* Breadcrumb */}
-        <div className="mb-8 flex items-center gap-2 text-xs font-bold text-zinc-600 uppercase tracking-widest">
-          <Link href="/blog" className="hover:text-[#ff4500] transition-colors">
+        <div className="mb-8 flex items-center gap-2 text-xs font-bold tracking-widest text-zinc-600 uppercase">
+          <Link href="/blog" className="transition-colors hover:text-[#ff4500]">
             Blog
           </Link>
           <span>/</span>
@@ -75,17 +79,19 @@ export default function BlogPost() {
 
         {/* Header */}
         <header className="mb-16">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black text-[#ff4500] uppercase tracking-widest">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black tracking-widest text-[#ff4500] uppercase">
             <Code className="h-3.5 w-3.5" />
             Developer Sentiment Research
           </div>
           <h1 className="mb-6 text-[40px] leading-[1.1] font-black tracking-tight text-zinc-900 md:text-[52px]">
             The 4 Hidden Churn Patterns in Developer Tools
           </h1>
-          <p className="text-xl font-medium text-zinc-600 leading-relaxed">
-            We mined 450+ developer threads across r/programming, r/devops, and r/webdev to understand why technical buyers abandon infrastructure tools.
+          <p className="text-xl leading-relaxed font-medium text-zinc-600">
+            We mined 450+ developer threads across r/programming, r/devops, and
+            r/webdev to understand why technical buyers abandon infrastructure
+            tools.
           </p>
-          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold text-zinc-600 uppercase tracking-widest">
+          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold tracking-widest text-zinc-600 uppercase">
             <span>By ThreddIQ Research</span>
             <span>&bull;</span>
             <span>August 2026</span>
@@ -101,10 +107,16 @@ export default function BlogPost() {
               Why Developer Churn is Different
             </h2>
             <p>
-              Developers are notoriously hard to sell to, but once integrated, they represent some of the highest-retention B2B customers in tech. When they do churn, however, it is rarely due to aesthetic preferences or lack of sales follow-up.
+              Developers are notoriously hard to sell to, but once integrated,
+              they represent some of the highest-retention B2B customers in
+              tech. When they do churn, however, it is rarely due to aesthetic
+              preferences or lack of sales follow-up.
             </p>
             <p>
-              Developer churn happens when a tool violates the fundamental engineering pact: predictability, control, and zero unnecessary friction. When that pact is broken, engineers do not just cancel; they write post-mortems and warn the entire community on Reddit.
+              Developer churn happens when a tool violates the fundamental
+              engineering pact: predictability, control, and zero unnecessary
+              friction. When that pact is broken, engineers do not just cancel;
+              they write post-mortems and warn the entire community on Reddit.
             </p>
           </section>
 
@@ -123,14 +135,14 @@ export default function BlogPost() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff4500]/10">
                       {pattern.icon}
                     </div>
-                    <span className="text-[11px] font-black text-[#ff4500] uppercase tracking-wider">
+                    <span className="text-[11px] font-black tracking-wider text-[#ff4500] uppercase">
                       {pattern.stat}
                     </span>
                   </div>
                   <h3 className="mb-2 text-lg font-black text-zinc-900">
                     {pattern.title}
                   </h3>
-                  <p className="text-sm font-medium text-zinc-600 leading-relaxed">
+                  <p className="text-sm leading-relaxed font-medium text-zinc-600">
                     {pattern.desc}
                   </p>
                 </div>
@@ -149,7 +161,7 @@ export default function BlogPost() {
                   key={idx}
                   className="rounded-2xl border-l-4 border-[#ff4500] bg-zinc-50 p-6 shadow-xs"
                 >
-                  <p className="mb-2 text-base font-serif italic text-zinc-800">
+                  <p className="mb-2 font-serif text-base text-zinc-800 italic">
                     "{q.quote}"
                   </p>
                   <span className="font-mono text-xs font-bold text-[#ff4500]">
@@ -165,8 +177,11 @@ export default function BlogPost() {
             <h3 className="mb-3 text-xl font-black text-zinc-900">
               The Playbook for Developer Tool Builders
             </h3>
-            <p className="text-sm font-medium text-zinc-700 leading-relaxed">
-              If you are building for software engineers, make your pricing deterministic with spending guards, deliver first-class local development workflows, and treat backward compatibility as a non-negotiable feature.
+            <p className="text-sm leading-relaxed font-medium text-zinc-700">
+              If you are building for software engineers, make your pricing
+              deterministic with spending guards, deliver first-class local
+              development workflows, and treat backward compatibility as a
+              non-negotiable feature.
             </p>
           </section>
         </div>
@@ -177,7 +192,9 @@ export default function BlogPost() {
             Want to mine developer complaints before building?
           </h3>
           <p className="mx-auto mb-8 max-w-xl text-sm font-medium text-zinc-400">
-            ThreddIQ scans technical subreddits 24/7 to discover validated infrastructure gaps, developer frustrations, and willingness-to-pay signals.
+            ThreddIQ scans technical subreddits 24/7 to discover validated
+            infrastructure gaps, developer frustrations, and willingness-to-pay
+            signals.
           </p>
           <Button
             asChild

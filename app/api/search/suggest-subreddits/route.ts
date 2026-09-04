@@ -136,19 +136,22 @@ export async function POST(req: Request) {
     }));
 
     if (recordValues.length > 0) {
-      Promise.all(recordValues.map(record =>
-        db.insert(subredditCache)
-          .values(record)
-          .onConflictDoUpdate({
-            target: subredditCache.name,
-            set: {
-              subscriberCount: record.subscriberCount,
-              description: record.description,
-              activeUsers: record.activeUsers,
-              cachedAt: record.cachedAt,
-            }
-          })
-      )).catch(err => console.error("Failed to populate subredditCache", err));
+      Promise.all(
+        recordValues.map((record) =>
+          db
+            .insert(subredditCache)
+            .values(record)
+            .onConflictDoUpdate({
+              target: subredditCache.name,
+              set: {
+                subscriberCount: record.subscriberCount,
+                description: record.description,
+                activeUsers: record.activeUsers,
+                cachedAt: record.cachedAt,
+              },
+            }),
+        ),
+      ).catch((err) => console.error("Failed to populate subredditCache", err));
     }
 
     return apiJson(

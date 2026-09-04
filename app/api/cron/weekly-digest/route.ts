@@ -32,7 +32,9 @@ export async function GET(req: Request) {
       .innerJoin(userPreferences, eq(user.id, userPreferences.userId))
       .where(eq(userPreferences.emailNotifications, true));
 
-    console.log(`[Weekly-Digest] Found ${targetUsers.length} users to process.`);
+    console.log(
+      `[Weekly-Digest] Found ${targetUsers.length} users to process.`,
+    );
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -52,8 +54,8 @@ export async function GET(req: Request) {
           .where(
             and(
               eq(painPoint.userId, u.id),
-              gte(painPoint.createdAt, sevenDaysAgo)
-            )
+              gte(painPoint.createdAt, sevenDaysAgo),
+            ),
           )
           .orderBy(desc(sql`score`))
           .limit(3);
@@ -65,7 +67,10 @@ export async function GET(req: Request) {
           })
           .from(keywordStat)
           .where(eq(keywordStat.userId, u.id))
-          .orderBy(desc(keywordStat.painPointsFound), desc(keywordStat.updatedAt))
+          .orderBy(
+            desc(keywordStat.painPointsFound),
+            desc(keywordStat.updatedAt),
+          )
           .limit(1);
 
         const trendingKeyword = topKeywordRaw[0]?.keyword || "";
@@ -73,11 +78,11 @@ export async function GET(req: Request) {
         // 4. Resolve plan and get usage summary
         // Mocking headers for resolvePlanSince its a CRON job
         const plan = resolvePlanForIdentity({
-           userId: u.id,
-           email: u.email,
-           ltdTier: u.ltdTier
+          userId: u.id,
+          email: u.email,
+          ltdTier: u.ltdTier,
         });
-        
+
         const usage = await getCreditSummary(u.id, plan);
         const scansRemaining = usage.totalRemaining;
 
@@ -86,10 +91,10 @@ export async function GET(req: Request) {
         const unsubscribeUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://threddiq.com"}/dashboard/settings`;
 
         // Normalize opportunities to ensure niche is a string
-        const topOpportunities = topOppsRaw.map(opp => ({
+        const topOpportunities = topOppsRaw.map((opp) => ({
           title: opp.title,
           score: Number(opp.score),
-          niche: opp.niche || "general"
+          niche: opp.niche || "general",
         })) as { title: string; score: number; niche: string }[];
 
         await sendWeeklyDigestEmailProgrammatically(
@@ -98,22 +103,28 @@ export async function GET(req: Request) {
           topOpportunities,
           trendingKeyword,
           scansRemaining,
-          unsubscribeUrl
+          unsubscribeUrl,
         );
 
         results.push({ email: u.email, success: true });
       } catch (err) {
-        console.error(`[Weekly-Digest] Failed to process user ${u.email}:`, err);
+        console.error(
+          `[Weekly-Digest] Failed to process user ${u.email}:`,
+          err,
+        );
         results.push({ email: u.email, success: false });
       }
     }
 
     return NextResponse.json({
       processed: targetUsers.length,
-      results
+      results,
     });
   } catch (error) {
     console.error("[Weekly-Digest] Global error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

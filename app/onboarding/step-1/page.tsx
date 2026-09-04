@@ -1,14 +1,14 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { 
-  Briefcase, 
-  Cpu, 
-  ShoppingCart, 
-  Users, 
-  Banknote, 
-  ArrowRight, 
-  SkipForward 
+import {
+  Briefcase,
+  Cpu,
+  ShoppingCart,
+  Users,
+  Banknote,
+  ArrowRight,
+  SkipForward,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,17 +17,25 @@ export const ONBOARDING_NICHES = [
     id: "saas",
     name: "SaaS & B2B",
     icon: Briefcase,
-    description: "Software as a service, enterprise tools, and business solutions.",
+    description:
+      "Software as a service, enterprise tools, and business solutions.",
     color: "#ff4500",
-    subreddits: ["saas", "entrepreneur", "startups", "smallbusiness", "sales"]
+    subreddits: ["saas", "entrepreneur", "startups", "smallbusiness", "sales"],
   },
   {
     id: "ai",
     name: "AI & Automation",
     icon: Cpu,
-    description: "LLMs, AI agents, specialized automation, and productivity tools.",
+    description:
+      "LLMs, AI agents, specialized automation, and productivity tools.",
     color: "#4a90e2",
-    subreddits: ["artificialintelligence", "openai", "automation", "chatgpt", "futureology"]
+    subreddits: [
+      "artificialintelligence",
+      "openai",
+      "automation",
+      "chatgpt",
+      "futureology",
+    ],
   },
   {
     id: "ecommerce",
@@ -35,24 +43,44 @@ export const ONBOARDING_NICHES = [
     icon: ShoppingCart,
     description: "Online stores, supply chain, Shopify apps, and logistics.",
     color: "#50e3c2",
-    subreddits: ["ecommerce", "shopify", "dropshipping", "amazonfba", "marketing"]
+    subreddits: [
+      "ecommerce",
+      "shopify",
+      "dropshipping",
+      "amazonfba",
+      "marketing",
+    ],
   },
   {
     id: "agency",
     name: "Agencies & Freelancing",
     icon: Users,
-    description: "Service-based businesses, agency workflows, and client management.",
+    description:
+      "Service-based businesses, agency workflows, and client management.",
     color: "#f5a623",
-    subreddits: ["freelance", "marketing", "digitalmarketing", "agency", "upwork"]
+    subreddits: [
+      "freelance",
+      "marketing",
+      "digitalmarketing",
+      "agency",
+      "upwork",
+    ],
   },
   {
     id: "finance",
     name: "FinTech & Money",
     icon: Banknote,
-    description: "Personal finance tools, crypto, investing, and wealth management.",
+    description:
+      "Personal finance tools, crypto, investing, and wealth management.",
     color: "#7ed321",
-    subreddits: ["personalfinance", "fintech", "investing", "cryptocurrency", "wealth"]
-  }
+    subreddits: [
+      "personalfinance",
+      "fintech",
+      "investing",
+      "cryptocurrency",
+      "wealth",
+    ],
+  },
 ];
 
 export default function OnboardingStep1() {
@@ -79,7 +107,8 @@ export default function OnboardingStep1() {
           What niche are you targeting?
         </h2>
         <p className="text-lg text-zinc-500">
-          We'll suggest the best subreddits where your audience is venting their pain points.
+          We'll suggest the best subreddits where your audience is venting their
+          pain points.
         </p>
       </div>
 
@@ -91,19 +120,28 @@ export default function OnboardingStep1() {
           return (
             <button
               key={niche.id}
-              onClick={() => router.push(`/onboarding/step-1?niche=${niche.id}`)}
+              onClick={() =>
+                router.push(`/onboarding/step-1?niche=${niche.id}`)
+              }
               className={cn(
                 "group relative flex flex-col items-start gap-4 rounded-[24px] border border-zinc-200/60 bg-white/60 p-6 text-left backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ff4500]/30 hover:bg-white/80 hover:shadow-md",
-                isSelected && "border-[#ff4500] bg-white/85 ring-2 ring-[#ff4500]/20"
+                isSelected &&
+                  "border-[#ff4500] bg-white/85 ring-2 ring-[#ff4500]/20",
               )}
             >
-              <div 
+              <div
                 className={cn(
                   "flex h-12 w-12 items-center justify-center rounded-xl border border-black/[0.04] bg-white/80 transition-all group-hover:scale-110 group-hover:border-[#ff4500]/30",
-                  isSelected && "border-[#ff4500]/30 bg-[#ff4500]/10 text-[#ff4500]"
+                  isSelected &&
+                    "border-[#ff4500]/30 bg-[#ff4500]/10 text-[#ff4500]",
                 )}
               >
-                <Icon className={cn("h-6 w-6 text-zinc-600", isSelected && "text-[#ff4500]")} />
+                <Icon
+                  className={cn(
+                    "h-6 w-6 text-zinc-600",
+                    isSelected && "text-[#ff4500]",
+                  )}
+                />
               </div>
 
               <div>
@@ -116,9 +154,9 @@ export default function OnboardingStep1() {
               </div>
 
               {isSelected && (
-                <div className="absolute right-4 top-4">
+                <div className="absolute top-4 right-4">
                   <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff4500]">
-                    <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-white" />
                   </div>
                 </div>
               )}
@@ -141,9 +179,9 @@ export default function OnboardingStep1() {
           onClick={handleNext}
           className={cn(
             "flex w-full items-center justify-center gap-3 rounded-full border shadow-lg transition-all duration-300 sm:w-auto",
-            selectedNicheId 
-              ? "border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white animate-in zoom-in-95 shadow-[0_4px_20px_rgba(255,69,0,0.3)] hover:bg-[#e63e00] hover:scale-105 active:scale-95" 
-              : "cursor-not-allowed border-zinc-200/60 bg-zinc-100/50 px-8 py-3.5 text-zinc-400"
+            selectedNicheId
+              ? "animate-in zoom-in-95 border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white shadow-[0_4px_20px_rgba(255,69,0,0.3)] hover:scale-105 hover:bg-[#e63e00] active:scale-95"
+              : "cursor-not-allowed border-zinc-200/60 bg-zinc-100/50 px-8 py-3.5 text-zinc-400",
           )}
         >
           <span className="font-mono text-[13px] font-black tracking-widest uppercase">

@@ -127,7 +127,9 @@ describe("Subreddit Existence Validation", () => {
     global.fetch = fetchSpy;
 
     const res1 = await validateSubredditExists("ab");
-    const res2 = await validateSubredditExists("this_subreddit_name_is_way_too_long_and_invalid");
+    const res2 = await validateSubredditExists(
+      "this_subreddit_name_is_way_too_long_and_invalid",
+    );
     const res3 = await validateSubredditExists("bad-chars!");
 
     expect(res1.exists).toBe(false);

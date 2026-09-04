@@ -109,7 +109,7 @@ export default function ReportsPage() {
         </div>
         <Link
           href="/dashboard/search"
-          className="group flex items-center justify-center gap-2 rounded-xl border border-[#ff8a57] bg-[#ff4500] px-6 py-3 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-all shadow-sm hover:shadow-md active:scale-95"
+          className="group flex items-center justify-center gap-2 rounded-xl border border-[#ff8a57] bg-[#ff4500] px-6 py-3 font-mono text-[12px] font-black tracking-wider text-white uppercase shadow-sm transition-all hover:shadow-md active:scale-95"
         >
           <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
           New Search
@@ -117,7 +117,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200/50 bg-white/60 backdrop-blur-md p-3 shadow-sm">
+      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200/50 bg-white/60 p-3 shadow-sm backdrop-blur-md">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
@@ -126,7 +126,7 @@ export default function ReportsPage() {
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+          <DropdownMenuContent className="min-w-[180px] rounded-xl border border-zinc-200/50 bg-white/95 text-zinc-700 shadow-lg backdrop-blur-md">
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Date Range
             </DropdownMenuLabel>
@@ -134,25 +134,25 @@ export default function ReportsPage() {
             <DropdownMenuRadioGroup value={days} onValueChange={setDays}>
               <DropdownMenuRadioItem
                 value="7"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Last 7 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="30"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Last 30 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="90"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Last 90 Days
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="all"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 All Time
               </DropdownMenuRadioItem>
@@ -171,7 +171,7 @@ export default function ReportsPage() {
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+          <DropdownMenuContent className="min-w-[180px] rounded-xl border border-zinc-200/50 bg-white/95 text-zinc-700 shadow-lg backdrop-blur-md">
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Scraper Status
             </DropdownMenuLabel>
@@ -179,19 +179,19 @@ export default function ReportsPage() {
             <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
               <DropdownMenuRadioItem
                 value="all"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 All Statuses
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="completed"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Completed
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="in-progress"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 In Progress
               </DropdownMenuRadioItem>
@@ -202,12 +202,12 @@ export default function ReportsPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
-              <Star className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
+              <Star className="text-zinc-555 h-4 w-4 transition-colors group-hover:text-[#ff4500]" />
               Min Score: {minScore}+
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+          <DropdownMenuContent className="min-w-[180px] rounded-xl border border-zinc-200/50 bg-white/95 text-zinc-700 shadow-lg backdrop-blur-md">
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Minimum Opportunity Score
             </DropdownMenuLabel>
@@ -218,25 +218,25 @@ export default function ReportsPage() {
             >
               <DropdownMenuRadioItem
                 value="0"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Any Score
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="50"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 50+
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="70"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 70+
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="85"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 85+ (High Potential)
               </DropdownMenuRadioItem>
@@ -247,12 +247,12 @@ export default function ReportsPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
-              <Star className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
+              <Star className="text-zinc-555 h-4 w-4 transition-colors group-hover:text-[#ff4500]" />
               {savedOnly === "true" ? "Saved Only" : "All Reports"}
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+          <DropdownMenuContent className="min-w-[180px] rounded-xl border border-zinc-200/50 bg-white/95 text-zinc-700 shadow-lg backdrop-blur-md">
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Saved Filter
             </DropdownMenuLabel>
@@ -263,13 +263,13 @@ export default function ReportsPage() {
             >
               <DropdownMenuRadioItem
                 value="false"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 All Reports
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="true"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Saved Only
               </DropdownMenuRadioItem>
@@ -280,12 +280,12 @@ export default function ReportsPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex items-center gap-2 rounded-xl border border-zinc-200/50 bg-white/40 px-4 py-2.5 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white/80 hover:text-zinc-900">
-              <Filter className="h-4 w-4 text-zinc-555 transition-colors group-hover:text-[#ff4500]" />
+              <Filter className="text-zinc-555 h-4 w-4 transition-colors group-hover:text-[#ff4500]" />
               Category: {category === "all" ? "All" : category}
               <ChevronRight className="ml-1 h-3.5 w-3.5 rotate-90 opacity-40 transition-opacity group-hover:opacity-100" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="rounded-xl border border-zinc-200/50 bg-white/95 backdrop-blur-md text-zinc-700 shadow-lg min-w-[180px]">
+          <DropdownMenuContent className="min-w-[180px] rounded-xl border border-zinc-200/50 bg-white/95 text-zinc-700 shadow-lg backdrop-blur-md">
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Category
             </DropdownMenuLabel>
@@ -296,43 +296,43 @@ export default function ReportsPage() {
             >
               <DropdownMenuRadioItem
                 value="all"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 All Categories
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Uncategorized"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Uncategorized
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Product"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Product
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Marketing"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Marketing
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Growth"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Growth
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Operations"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Operations
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem
                 value="Customer Success"
-                className="rounded-lg cursor-pointer focus:bg-[#ff4500]/10 focus:text-zinc-900 text-zinc-800"
+                className="cursor-pointer rounded-lg text-zinc-800 focus:bg-[#ff4500]/10 focus:text-zinc-900"
               >
                 Customer Success
               </DropdownMenuRadioItem>
@@ -341,7 +341,7 @@ export default function ReportsPage() {
         </DropdownMenu>
 
         <div className="ml-auto hidden px-4 sm:block">
-          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-450 uppercase">
+          <p className="text-zinc-450 font-mono text-[11px] font-bold tracking-widest uppercase">
             {isInitialLoading
               ? "Counting records..."
               : isLoading
@@ -352,25 +352,27 @@ export default function ReportsPage() {
       </div>
 
       {/* Reports Table Card */}
-      <div className="rounded-2xl overflow-hidden border border-zinc-200/50 bg-white/60 backdrop-blur-md shadow-sm">
-        <div className="min-h-[300px] overflow-x-hidden">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 shadow-sm backdrop-blur-md">
+        <div className="scrollbar-thin min-h-[300px] overflow-x-auto">
           {isInitialLoading ? (
             <ReportsTableSkeleton />
           ) : reports.length === 0 ? (
             <EmptyState
               title="No Investigations Found"
-              description="You haven't run any mining sessions yet. Start a scan to uncover SaaS opportunities from Reddit."
-              actionLabel="Run a scan"
+              description="You haven't run any mining sessions yet. Start a scan to uncover SaaS opportunities from Reddit, or explore a preloaded sample report."
+              actionLabel="Run First Scan"
               actionHref="/dashboard/search"
+              secondaryActionLabel="Explore Sample Demo"
+              secondaryActionHref="/dashboard/reports/demo-sample-report-v1"
               icon="reports"
               variant="card"
-              className="border-none py-24 bg-transparent"
+              className="border-none bg-transparent py-24"
             />
           ) : (
-            <table className="w-full table-fixed border-collapse text-left">
+            <table className="w-full min-w-[880px] table-fixed border-collapse text-left">
               <thead>
                 <tr className="border-b border-zinc-200/50 bg-white/30">
-                  <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
+                  <th className="sticky left-0 z-10 bg-white/95 px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] backdrop-blur-sm">
                     Keyword / Niche
                   </th>
                   <th className="px-8 py-5 font-mono text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">
@@ -399,14 +401,12 @@ export default function ReportsPage() {
                     key={report.id}
                     className="group transition-all duration-200 hover:bg-white/45"
                   >
-                    <td className="px-8 py-6">
+                    <td className="sticky left-0 z-10 bg-white/95 px-8 py-6 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] backdrop-blur-sm group-hover:bg-white/95">
                       <div className="flex min-w-0 items-center gap-4">
-                        <div
-                          className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200/50 bg-white/50 text-[#ff4500] shadow-sm"
-                        >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200/50 bg-white/50 text-[#ff4500] shadow-sm">
                           <Search className="h-4 w-4" />
                         </div>
-                        <p className="min-w-0 text-[15px] font-black tracking-tight break-words text-zinc-850 uppercase transition-all duration-200 group-hover:text-[#ff4500]">
+                        <p className="text-zinc-850 min-w-0 text-[15px] font-black tracking-tight break-words uppercase transition-all duration-200 group-hover:text-[#ff4500]">
                           {report.niche}
                         </p>
                       </div>
@@ -426,7 +426,7 @@ export default function ReportsPage() {
                     </td>
                     <td className="px-8 py-6">
                       <div
-                        className={`inline-flex items-center border px-2.5 py-1 font-mono text-[12px] font-black tracking-tighter rounded-full ${
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[12px] font-black tracking-tighter ${
                           report.score >= 90
                             ? "border-emerald-250 bg-emerald-50 text-emerald-600"
                             : "border-amber-250 bg-amber-50 text-amber-600"
@@ -437,11 +437,11 @@ export default function ReportsPage() {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2.5">
-                        <span className="font-mono text-[11px] font-black tracking-widest text-zinc-655 uppercase">
+                        <span className="text-zinc-655 font-mono text-[11px] font-black tracking-widest uppercase">
                           {report.category}
                         </span>
                         {report.saved && (
-                          <span className="inline-flex items-center border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-emerald-600 uppercase rounded-full">
+                          <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] font-black tracking-widest text-emerald-600 uppercase">
                             Saved
                           </span>
                         )}
@@ -477,7 +477,7 @@ export default function ReportsPage() {
                       <div className="flex items-center justify-end gap-3">
                         <Link
                           href={`/dashboard/reports/${report.id}`}
-                          className="group/btn rounded-xl border border-zinc-200 bg-white hover:border-[#ff4500]/60 hover:bg-[#ff4500] px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-zinc-700 hover:text-white uppercase transition-all duration-300 active:scale-95 shadow-sm"
+                          className="group/btn rounded-xl border border-zinc-200 bg-white px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-zinc-700 uppercase shadow-sm transition-all duration-300 hover:border-[#ff4500]/60 hover:bg-[#ff4500] hover:text-white active:scale-95"
                         >
                           <span className="flex items-center gap-2">
                             View Report
@@ -495,7 +495,7 @@ export default function ReportsPage() {
 
         {/* Pagination */}
         <div className="flex items-center justify-between border-t border-zinc-200/50 bg-white/20 px-8 py-6">
-          <p className="font-mono text-[11px] font-bold tracking-widest text-zinc-450 uppercase">
+          <p className="text-zinc-450 font-mono text-[11px] font-bold tracking-widest uppercase">
             Showing {reports.length} of {reports.length} reports
           </p>
           <div className="flex items-center gap-1.5">
@@ -602,8 +602,8 @@ function PaginationButton({
         active
           ? "rounded-xl border border-[#ff8a57] bg-[#ff4500] text-white shadow-sm"
           : disabled
-            ? "rounded-xl cursor-not-allowed border-zinc-200/40 text-zinc-350 opacity-40"
-            : "rounded-xl border border-zinc-200/60 bg-white text-zinc-500 hover:border-[#ff4500]/40 hover:bg-white hover:text-zinc-800 shadow-sm"
+            ? "text-zinc-350 cursor-not-allowed rounded-xl border-zinc-200/40 opacity-40"
+            : "rounded-xl border border-zinc-200/60 bg-white text-zinc-500 shadow-sm hover:border-[#ff4500]/40 hover:bg-white hover:text-zinc-800"
       }`}
     >
       {icon || label}

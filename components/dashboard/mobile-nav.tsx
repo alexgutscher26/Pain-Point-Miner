@@ -26,7 +26,7 @@ export function DashboardMobileNav({
       <SheetTrigger asChild>
         <button
           type="button"
-          className="inline-flex h-9 w-9 items-center justify-center border border-black/[0.08] bg-white/60 text-zinc-700 hover:bg-white rounded-full lg:hidden shadow-xs"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white/60 text-zinc-700 shadow-xs hover:bg-white lg:hidden"
           aria-label="Open navigation menu"
         >
           <Menu className="h-4 w-4" />
@@ -34,14 +34,13 @@ export function DashboardMobileNav({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[88%] max-w-xs border-r border-black/[0.06] bg-white/95 backdrop-blur-lg p-0 text-zinc-800"
+        className="w-[88%] max-w-xs border-r border-black/[0.06] bg-white/95 p-0 text-zinc-800 backdrop-blur-lg"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <SheetDescription className="sr-only">
           Access your dashboard, reports, and settings.
         </SheetDescription>
         <div className="flex h-full flex-col">
-
           <div className="border-b border-black/[0.06] px-5 py-5">
             <Link href="/dashboard" className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33] p-2 text-white shadow-[0_2px_8px_rgba(255,69,0,0.15)]">

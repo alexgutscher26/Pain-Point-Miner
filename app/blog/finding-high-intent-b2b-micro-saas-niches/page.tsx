@@ -15,8 +15,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "How to Spot $10k/mo Micro-SaaS Niches Hiding in Plain Sight | ThreddIQ Blog",
-  description: "A proven playbook for finding boring, high-margin B2B software ideas in professional subreddits with low churn and zero VC competition.",
+  title:
+    "How to Spot $10k/mo Micro-SaaS Niches Hiding in Plain Sight | ThreddIQ Blog",
+  description:
+    "A proven playbook for finding boring, high-margin B2B software ideas in professional subreddits with low churn and zero VC competition.",
 };
 
 const nicheCriteria = [
@@ -39,13 +41,13 @@ const nicheCriteria = [
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
         {/* Breadcrumb */}
-        <div className="mb-8 flex items-center gap-2 text-xs font-bold text-zinc-600 uppercase tracking-widest">
-          <Link href="/blog" className="hover:text-[#ff4500] transition-colors">
+        <div className="mb-8 flex items-center gap-2 text-xs font-bold tracking-widest text-zinc-600 uppercase">
+          <Link href="/blog" className="transition-colors hover:text-[#ff4500]">
             Blog
           </Link>
           <span>/</span>
@@ -54,17 +56,19 @@ export default function BlogPost() {
 
         {/* Header */}
         <header className="mb-16">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black text-[#ff4500] uppercase tracking-widest">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black tracking-widest text-[#ff4500] uppercase">
             <Compass className="h-3.5 w-3.5" />
             Niche Discovery Playbook
           </div>
           <h1 className="mb-6 text-[40px] leading-[1.1] font-black tracking-tight text-zinc-900 md:text-[52px]">
             How to Spot $10k/mo Micro-SaaS Niches Hiding in Plain Sight
           </h1>
-          <p className="text-xl font-medium text-zinc-600 leading-relaxed">
-            The most profitable indie software businesses are rarely flashy consumer apps. They are boring B2B workflow automations discovered in niche professional communities.
+          <p className="text-xl leading-relaxed font-medium text-zinc-600">
+            The most profitable indie software businesses are rarely flashy
+            consumer apps. They are boring B2B workflow automations discovered
+            in niche professional communities.
           </p>
-          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold text-zinc-600 uppercase tracking-widest">
+          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold tracking-widest text-zinc-600 uppercase">
             <span>By ThreddIQ Research</span>
             <span>&bull;</span>
             <span>August 2026</span>
@@ -80,10 +84,16 @@ export default function BlogPost() {
               Why 'Boring' Is Where Bootstrappers Win
             </h2>
             <p>
-              Venture-backed startups compete for billion-dollar TAMs like CRM, email marketing, and general project management. Indie founders, on the other hand, build sustainable wealth by dominating narrow, underserved verticals with 500 to 2,000 potential customers who eagerly pay $49–$199/month.
+              Venture-backed startups compete for billion-dollar TAMs like CRM,
+              email marketing, and general project management. Indie founders,
+              on the other hand, build sustainable wealth by dominating narrow,
+              underserved verticals with 500 to 2,000 potential customers who
+              eagerly pay $49–$199/month.
             </p>
             <p>
-              The best place to find these verticals is not TechCrunch or Product Hunt—it is in subreddits where professionals vent about the everyday clunkiness of their operational tools.
+              The best place to find these verticals is not TechCrunch or
+              Product Hunt—it is in subreddits where professionals vent about
+              the everyday clunkiness of their operational tools.
             </p>
           </section>
 
@@ -96,12 +106,12 @@ export default function BlogPost() {
               {nicheCriteria.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-black/5 bg-white p-6 shadow-xs space-y-3"
+                  className="space-y-3 rounded-2xl border border-black/5 bg-white p-6 shadow-xs"
                 >
                   <h3 className="text-lg font-black text-zinc-900">
                     {item.title}
                   </h3>
-                  <p className="text-sm font-medium text-zinc-600 leading-relaxed">
+                  <p className="text-sm leading-relaxed font-medium text-zinc-600">
                     {item.desc}
                   </p>
                   <div className="flex items-center gap-2 pt-2 text-xs font-bold text-[#ff4500]">
@@ -120,20 +130,31 @@ export default function BlogPost() {
             </h3>
             <ul className="space-y-3 text-sm font-medium text-zinc-700">
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-[#ff4500] shrink-0" />
-                <span>Can users quantify the money or hours this problem costs them?</span>
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#ff4500]" />
+                <span>
+                  Can users quantify the money or hours this problem costs them?
+                </span>
               </li>
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-[#ff4500] shrink-0" />
-                <span>Are they already paying for imperfect software or manual workarounds?</span>
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#ff4500]" />
+                <span>
+                  Are they already paying for imperfect software or manual
+                  workarounds?
+                </span>
               </li>
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-[#ff4500] shrink-0" />
-                <span>Can you reach 50 potential buyers directly in public communities?</span>
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#ff4500]" />
+                <span>
+                  Can you reach 50 potential buyers directly in public
+                  communities?
+                </span>
               </li>
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-[#ff4500] shrink-0" />
-                <span>Is the market size large enough for $10k MRR but too small for Salesforce or Oracle?</span>
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#ff4500]" />
+                <span>
+                  Is the market size large enough for $10k MRR but too small for
+                  Salesforce or Oracle?
+                </span>
               </li>
             </ul>
           </section>
@@ -145,7 +166,8 @@ export default function BlogPost() {
             Find your next micro-SaaS in minutes
           </h3>
           <p className="mx-auto mb-8 max-w-xl text-sm font-medium text-zinc-400">
-            ThreddIQ mines 1,400+ specialized subreddits to surface high-converting B2B software ideas backed by real demand.
+            ThreddIQ mines 1,400+ specialized subreddits to surface
+            high-converting B2B software ideas backed by real demand.
           </p>
           <Button
             asChild

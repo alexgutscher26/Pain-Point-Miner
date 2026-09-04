@@ -370,7 +370,9 @@ async function fetchWithRetry(
 
 function getOAuthCredentials() {
   const clientId = (process.env.REDDIT_CLIENT_ID ?? REDDIT_CLIENT_ID)?.trim();
-  const clientSecret = (process.env.REDDIT_CLIENT_SECRET ?? REDDIT_CLIENT_SECRET)?.trim();
+  const clientSecret = (
+    process.env.REDDIT_CLIENT_SECRET ?? REDDIT_CLIENT_SECRET
+  )?.trim();
   if (clientId && clientSecret) {
     return { clientId, clientSecret };
   }
@@ -449,7 +451,9 @@ export async function getRedditAccessToken(
       const payload = (await tokenResponse.json()) as RedditTokenResponse;
       if (!payload.access_token) {
         cachedToken = null;
-        throw new Error("Failed to obtain Reddit access token: missing token in response");
+        throw new Error(
+          "Failed to obtain Reddit access token: missing token in response",
+        );
       }
 
       const expiresIn = payload.expires_in ?? 3_600;
@@ -752,7 +756,9 @@ function parseRedditRss(xml: string, subreddit: string): RedditPost[] {
   while ((match = entryRegex.exec(xml)) !== null) {
     const entryXml = match[1];
     const titleMatch = entryXml.match(/<title>([\s\S]*?)<\/title>/);
-    const contentMatch = entryXml.match(/<content type="html">([\s\S]*?)<\/content>/);
+    const contentMatch = entryXml.match(
+      /<content type="html">([\s\S]*?)<\/content>/,
+    );
     const idMatch = entryXml.match(/<id>([\s\S]*?)<\/id>/);
     const linkMatch = entryXml.match(/<link href="([\s\S]*?)"/);
     const authorMatch = entryXml.match(/<author><name>([\s\S]*?)<\/name>/);
@@ -774,7 +780,9 @@ function parseRedditRss(xml: string, subreddit: string): RedditPost[] {
     if (t3Match) {
       id = t3Match[1];
     } else {
-      const commentMatch = (linkMatch ? linkMatch[1] : "").match(/\/comments\/([a-z0-9]+)\//i);
+      const commentMatch = (linkMatch ? linkMatch[1] : "").match(
+        /\/comments\/([a-z0-9]+)\//i,
+      );
       id = commentMatch ? commentMatch[1] : crypto.randomUUID();
     }
 
@@ -824,7 +832,9 @@ async function fetchFromRedditRSS(
   });
 
   if (!response.ok) {
-    throw new Error(`Reddit RSS returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `Reddit RSS returned ${response.status}: ${response.statusText}`,
+    );
   }
 
   const xml = await response.text();
@@ -842,7 +852,9 @@ async function fetchFromArcticShiftSubmissions(
   });
 
   if (!response.ok) {
-    throw new Error(`Arctic Shift returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `Arctic Shift returned ${response.status}: ${response.statusText}`,
+    );
   }
 
   const json = (await response.json()) as { data?: any[] };
@@ -855,7 +867,7 @@ async function fetchFromArcticShiftSubmissions(
     author: r.author || "unknown",
     score: r.score ?? 1,
     subreddit: r.subreddit || subreddit,
-    url: r.permalink ? `https://www.reddit.com${r.permalink}` : (r.url || ""),
+    url: r.permalink ? `https://www.reddit.com${r.permalink}` : r.url || "",
     num_comments: r.num_comments ?? 0,
     created_utc: r.created_utc ?? Math.floor(Date.now() / 1000),
     is_self: r.is_self ?? true,
@@ -871,7 +883,9 @@ async function fetchFromArcticShiftComments(
   });
 
   if (!response.ok) {
-    throw new Error(`Arctic Shift comments returned ${response.status}: ${response.statusText}`);
+    throw new Error(
+      `Arctic Shift comments returned ${response.status}: ${response.statusText}`,
+    );
   }
 
   const json = (await response.json()) as { data?: any[] };
@@ -931,7 +945,9 @@ export async function fetchFromPullPushSubmissions(
       const rows = data.data ?? [];
       return rows
         .filter(
-          (row): row is NonNullable<typeof row> & { id: string; title: string } =>
+          (
+            row,
+          ): row is NonNullable<typeof row> & { id: string; title: string } =>
             Boolean(row?.id && row?.title),
         )
         .map((row) => ({
@@ -995,7 +1011,9 @@ export async function fetchFromPullPushComments(
       const rows = data.data ?? [];
       return rows
         .filter(
-          (row): row is NonNullable<typeof row> & { id: string; body: string } =>
+          (
+            row,
+          ): row is NonNullable<typeof row> & { id: string; body: string } =>
             Boolean(row?.id && row?.body),
         )
         .map((row) => ({
@@ -1003,7 +1021,9 @@ export async function fetchFromPullPushComments(
           body: row.body,
           author: row.author ?? "unknown",
           score: row.score ?? 0,
-          permalink: row.permalink ? `https://www.reddit.com${row.permalink}` : "",
+          permalink: row.permalink
+            ? `https://www.reddit.com${row.permalink}`
+            : "",
           created_utc:
             row.created_utc ?? row.created ?? Math.floor(Date.now() / 1000),
         }));
@@ -1135,9 +1155,7 @@ export async function fetchMultiRedditPostsBatched(
 ): Promise<RedditPost[]> {
   const uniqueSubs = Array.from(
     new Set(
-      subreddits
-        .map((s) => s.replace(/^r\//i, "").trim())
-        .filter(Boolean),
+      subreddits.map((s) => s.replace(/^r\//i, "").trim()).filter(Boolean),
     ),
   );
 
@@ -1182,9 +1200,7 @@ export async function fetchMultiRedditPostsMultiSort(
 ): Promise<RedditPostWithMeta[]> {
   const uniqueSubs = Array.from(
     new Set(
-      subreddits
-        .map((s) => s.replace(/^r\//i, "").trim())
-        .filter(Boolean),
+      subreddits.map((s) => s.replace(/^r\//i, "").trim()).filter(Boolean),
     ),
   );
 
@@ -1243,7 +1259,10 @@ export async function fetchSubredditPostsPaginated(
   keyword: string,
   options?: FetchSubredditPostsOptions,
 ): Promise<RedditPagedPostsResult> {
-  const limit = Math.max(1, Math.min(100, options?.requestLimit ?? options?.maxPosts ?? 25));
+  const limit = Math.max(
+    1,
+    Math.min(100, options?.requestLimit ?? options?.maxPosts ?? 25),
+  );
   const time = options?.time ?? "all";
   const params = new URLSearchParams({
     q: keyword,
@@ -1554,7 +1573,7 @@ export async function getSubredditMetadataBulk(
       const url = `https://www.reddit.com/r/${sub}/about.json`;
       const response = await fetchRedditResponse(url);
       const data = (await response.json()) as any;
-      
+
       if (data?.data) {
         results.push({
           name: data.data.display_name ?? sub,
@@ -1655,7 +1674,10 @@ export async function validateSubredditExists(
     }
 
     const data = (await response.json()) as any;
-    if (data?.error === 404 || (data?.data?.name === undefined && data?.data?.display_name === undefined)) {
+    if (
+      data?.error === 404 ||
+      (data?.data?.name === undefined && data?.data?.display_name === undefined)
+    ) {
       if (data?.reason === "banned") {
         return { exists: false, name: cleanSub, reason: "banned" };
       }
@@ -1684,11 +1706,18 @@ export async function validateSubredditExists(
       subscribers,
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+    const message =
+      err instanceof Error
+        ? err.message.toLowerCase()
+        : String(err).toLowerCase();
     if (message.includes("404") || message.includes("not found")) {
       return { exists: false, name: cleanSub, reason: "not_found" };
     }
-    if (message.includes("403") || message.includes("private") || message.includes("forbidden")) {
+    if (
+      message.includes("403") ||
+      message.includes("private") ||
+      message.includes("forbidden")
+    ) {
       return { exists: false, name: cleanSub, reason: "private" };
     }
     if (message.includes("banned")) {
@@ -1710,7 +1739,9 @@ export async function validateSubredditsBulk(
   invalid: Array<{ name: string; reason?: string; subscribers?: number }>;
 }> {
   const uniqueSubs = Array.from(
-    new Set(subreddits.map((s) => s.replace(/^r\//i, "").trim()).filter(Boolean)),
+    new Set(
+      subreddits.map((s) => s.replace(/^r\//i, "").trim()).filter(Boolean),
+    ),
   );
 
   const results = await Promise.all(
@@ -1718,7 +1749,11 @@ export async function validateSubredditsBulk(
   );
 
   const valid: string[] = [];
-  const invalid: Array<{ name: string; reason?: string; subscribers?: number }> = [];
+  const invalid: Array<{
+    name: string;
+    reason?: string;
+    subscribers?: number;
+  }> = [];
 
   for (const res of results) {
     if (res.exists) {

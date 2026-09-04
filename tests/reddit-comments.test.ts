@@ -151,7 +151,9 @@ describe("fetchComments", () => {
           ok: true,
           json: () =>
             Promise.resolve({
-              data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+              data: [
+                { id: "pp1", author: "pp_user", body: "PullPush comment" },
+              ],
             }),
         }),
       )
@@ -160,7 +162,9 @@ describe("fetchComments", () => {
           ok: true,
           json: () =>
             Promise.resolve({
-              data: [{ id: "pp1", author: "pp_user", body: "PullPush comment" }],
+              data: [
+                { id: "pp1", author: "pp_user", body: "PullPush comment" },
+              ],
             }),
         }),
       );

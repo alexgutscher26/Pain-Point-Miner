@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
-import { scraper, scraperRun, workspace, workspaceMember } from "@/lib/db/schema";
+import {
+  scraper,
+  scraperRun,
+  workspace,
+  workspaceMember,
+} from "@/lib/db/schema";
 import { and, eq, desc, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
@@ -21,9 +26,10 @@ import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
 import { getModelForDepth, AI_MODEL_LABELS } from "@/lib/ai";
 import type { MiningDepth } from "@/lib/mining-presets";
+import { isDemoReportId, getDemoReport } from "@/lib/demo-data";
 
 const reportParamsSchema = z.object({
-  id: z.string().uuid("Invalid report id"),
+  id: z.string().trim().min(1, "Invalid report id"),
 });
 const updateReportSchema = z.object({
   saved: z.boolean(),
@@ -198,6 +204,59 @@ export async function GET(
   const { id } = parsedParams.data;
 
   try {
+    if (isDemoReportId(id)) {
+      const demo = getDemoReport();
+      return apiJson(
+        {
+          id: demo.id,
+          title: demo.title,
+          subreddits: demo.subreddits,
+          createdAt: demo.createdAt,
+          reportId: demo.id,
+          saved: demo.saved,
+          category: demo.category,
+          customPatterns: [],
+          miningDepth: demo.miningDepth,
+          aiModel: "OpenAI GPT-4o",
+          timeWindow: "90d",
+          timeWindowLabel: "Last 90d",
+          trend: null,
+          metrics: [
+            {
+              label: "Pain Points",
+              value: "2",
+              sub: "Extracted by AI",
+              icon: "AlertTriangle",
+              color: "text-blue-500",
+              bg: "bg-blue-500/10",
+            },
+            {
+              label: "Posts Analyzed",
+              value: "142",
+              sub: `Across ${demo.subreddits.length} subreddits`,
+              icon: "MessageSquare",
+              color: "text-amber-500",
+              bg: "bg-amber-500/10",
+            },
+            {
+              label: "Opportunity Score",
+              value: "84/100",
+              sub: "High Viability",
+              icon: "Flame",
+              color: "text-emerald-500",
+              bg: "bg-emerald-500/10",
+            },
+          ],
+          saasOpportunities: [],
+          topPainPoints: demo.topPainPoints,
+          isTeaser: false,
+          isDemo: true,
+        },
+        200,
+        correlationId,
+      );
+    }
+
     const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
@@ -213,10 +272,7 @@ export async function GET(
 
     let targetScraperId = id;
     let currentScraper = await db.query.scraper.findFirst({
-      where: and(
-        eq(scraper.id, targetScraperId),
-        isNull(scraper.deletedAt),
-      ),
+      where: and(eq(scraper.id, targetScraperId), isNull(scraper.deletedAt)),
       with: {
         scraperRuns: {
           orderBy: [desc(scraperRun.startedAt)],
@@ -350,10 +406,7 @@ export async function GET(
     const painPoints = currentScraper.painPoints as unknown as DBPainPoint[];
 
     const trendHistoryRows = await db.query.scraper.findMany({
-      where: and(
-        eq(scraper.userId, userId),
-        isNull(scraper.deletedAt),
-      ),
+      where: and(eq(scraper.userId, userId), isNull(scraper.deletedAt)),
       orderBy: [desc(scraper.createdAt)],
       with: {
         painPoints: {
@@ -459,7 +512,8 @@ export async function GET(
       .slice(0, 5);
 
     // Format the response to match what the frontend expects
-    const scraperMiningDepth = (currentScraper.miningDepth ?? "basic") as MiningDepth;
+    const scraperMiningDepth = (currentScraper.miningDepth ??
+      "basic") as MiningDepth;
     const aiModelId = getModelForDepth(scraperMiningDepth);
     const response = {
       isTeaser,
@@ -559,7 +613,8 @@ export async function GET(
               monetization: 0,
               maturity: 0,
               mentions: 0,
-              description: "Upgrade to a paid plan to unlock full AI description, intensity/urgency breakdown, and Golden Quotes.",
+              description:
+                "Upgrade to a paid plan to unlock full AI description, intensity/urgency breakdown, and Golden Quotes.",
               subreddits: pp.subreddit ? [pp.subreddit] : [],
               sentiment: "Neutral",
               budgetSignals: [],
@@ -569,7 +624,9 @@ export async function GET(
               switchingCosts: "Locked",
               triedSolutions: [],
               difficulty: "side_project",
-              communityVoices: ["Upgrade to a paid plan to unlock user comments and golden quotes."],
+              communityVoices: [
+                "Upgrade to a paid plan to unlock user comments and golden quotes.",
+              ],
               language: [],
               postUrl: null,
               angles: [],
@@ -580,7 +637,9 @@ export async function GET(
               title: pp.title,
               body: pp.body,
               triedSolutions: pp.triedSolutions,
-              quotes: (pp.painPointComments ?? []).map((comment) => comment.body),
+              quotes: (pp.painPointComments ?? []).map(
+                (comment) => comment.body,
+              ),
             }),
             id: pp.id,
             title: pp.title,
@@ -610,7 +669,9 @@ export async function GET(
                   estimatedTamUsdAnnual:
                     pp.painPointCluster.estimatedTamUsdAnnual ?? null,
                   budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
-                  competitorIntel: isTeaser ? [] : (pp.painPointCluster.competitorIntel ?? []),
+                  competitorIntel: isTeaser
+                    ? []
+                    : (pp.painPointCluster.competitorIntel ?? []),
                 }
               : null,
             switchingCosts: pp.switchingCosts,
@@ -710,10 +771,7 @@ export async function PATCH(
 
     let targetScraperId = id;
     let existingScraper = await db.query.scraper.findFirst({
-      where: and(
-        eq(scraper.id, targetScraperId),
-        isNull(scraper.deletedAt),
-      ),
+      where: and(eq(scraper.id, targetScraperId), isNull(scraper.deletedAt)),
     });
 
     if (!existingScraper) {

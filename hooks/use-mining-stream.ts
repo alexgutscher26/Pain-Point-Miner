@@ -18,6 +18,7 @@ export type MiningStreamState = {
   progress: number;
   painPointCount: number;
   postsFetched: number;
+  postsSkipped: number;
   commentsFetched: number;
   status: MiningPhase;
   subreddits: string[];
@@ -32,6 +33,7 @@ const INITIAL_STATE: MiningStreamState = {
   progress: 10,
   painPointCount: 0,
   postsFetched: 0,
+  postsSkipped: 0,
   commentsFetched: 0,
   status: "running",
   subreddits: [],
@@ -84,6 +86,7 @@ export function useMiningStream(scraperId: string | null) {
               phase === "completed" ? 100 : phase === "failed" ? 100 : 50,
             painPointCount: data.painPointCount ?? 0,
             postsFetched: data.latestRun?.postsFetched ?? 0,
+            postsSkipped: data.latestRun?.postsSkipped ?? 0,
             commentsFetched: data.latestRun?.commentsFetched ?? 0,
             status: phase,
             subreddits: data.scraper?.subreddits ?? [],

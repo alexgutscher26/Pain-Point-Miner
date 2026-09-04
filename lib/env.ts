@@ -7,7 +7,7 @@ export function requireEnv(name: string): string {
   if (!val) {
     throw new Error(
       `Missing required environment variable: ${name}\n` +
-      `Set it in .env or .env.local. See .env.example for documentation.`,
+        `Set it in .env or .env.local. See .env.example for documentation.`,
     );
   }
   return val;
@@ -19,7 +19,7 @@ export function str(name: string, fallback: string): string {
 
 export function num(name: string, fallback: number): number {
   const raw = process.env[name];
-  if (raw === undefined || raw === '') return fallback;
+  if (raw === undefined || raw === "") return fallback;
   const n = Number(raw);
   if (isNaN(n)) {
     throw new Error(
@@ -31,8 +31,8 @@ export function num(name: string, fallback: number): number {
 
 export function boolean(name: string, fallback: boolean): boolean {
   const raw = process.env[name];
-  if (raw === undefined || raw === '') return fallback;
-  return raw === 'true' || raw === '1';
+  if (raw === undefined || raw === "") return fallback;
+  return raw === "true" || raw === "1";
 }
 
 export function json<T>(name: string, fallback: T): T {
@@ -71,26 +71,26 @@ export function validateEnv(): EnvShape {
   const errors: string[] = [];
 
   const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) errors.push('DATABASE_URL');
+  if (!dbUrl) errors.push("DATABASE_URL");
 
   const authSecret = process.env.BETTER_AUTH_SECRET;
-  if (!authSecret) errors.push('BETTER_AUTH_SECRET');
+  if (!authSecret) errors.push("BETTER_AUTH_SECRET");
 
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) errors.push('OPENROUTER_API_KEY');
+  if (!apiKey) errors.push("OPENROUTER_API_KEY");
 
   if (errors.length > 0) {
     throw new Error(
-      `Missing required environment variables:\n  - ${errors.join('\n  - ')}\n\n` +
-      `Set them in .env or .env.local. See .env.example for documentation.`,
+      `Missing required environment variables:\n  - ${errors.join("\n  - ")}\n\n` +
+        `Set them in .env or .env.local. See .env.example for documentation.`,
     );
   }
 
-  if (boolean('STRIPE_PLUGIN_ENABLED', false)) {
+  if (boolean("STRIPE_PLUGIN_ENABLED", false)) {
     if (!process.env.STRIPE_WEBHOOK_SECRET) {
       throw new Error(
-        'STRIPE_WEBHOOK_SECRET is required when STRIPE_PLUGIN_ENABLED=true.\n' +
-        'Set it in .env or .env.local.',
+        "STRIPE_WEBHOOK_SECRET is required when STRIPE_PLUGIN_ENABLED=true.\n" +
+          "Set it in .env or .env.local.",
       );
     }
   }
@@ -98,9 +98,9 @@ export function validateEnv(): EnvShape {
   return {
     DATABASE_URL: dbUrl!,
     BETTER_AUTH_SECRET: authSecret!,
-    BETTER_AUTH_URL: str('BETTER_AUTH_URL', 'http://localhost:3000'),
+    BETTER_AUTH_URL: str("BETTER_AUTH_URL", "http://localhost:3000"),
     OPENROUTER_API_KEY: apiKey!,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
-    CRON_SECRET: process.env.CRON_SECRET || '',
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || "",
+    CRON_SECRET: process.env.CRON_SECRET || "",
   };
 }

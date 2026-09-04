@@ -12,7 +12,9 @@ describe("buildRedditSearchUrl", () => {
   it("constructs single subreddit search URL with restrict_sr=1", () => {
     const params = new URLSearchParams({ q: "pain" });
     const url = buildRedditSearchUrl("saas", params);
-    expect(url).toBe("https://www.reddit.com/r/saas/search.json?q=pain&restrict_sr=1");
+    expect(url).toBe(
+      "https://www.reddit.com/r/saas/search.json?q=pain&restrict_sr=1",
+    );
   });
 
   it("constructs multi-reddit search URL with combined subreddits", () => {

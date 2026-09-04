@@ -8,26 +8,27 @@
 
 ## Legend
 
-| Symbol | Status |
-|--------|--------|
-| `[ ]`  | Not started |
-| `[/]`  | In progress |
-| `[x]`  | Completed |
+| Symbol | Status                   |
+| ------ | ------------------------ |
+| `[ ]`  | Not started              |
+| `[/]`  | In progress              |
+| `[x]`  | Completed                |
 | `[!]`  | Blocked / needs decision |
-| `[~]`  | Deferred / backlog |
+| `[~]`  | Deferred / backlog       |
 
 ---
 
 ## 🏗️ 1. Core Infrastructure & Architecture
 
 ### 1.1 Database & Schema
+
 - [z] Add `HNSW` index tuning parameters (`m`, `ef_construction`) to `pain_point_embedding` for better ANN recall at scale
 - [x] Add a composite GIN index on `pain_point.tags` array column for fast tag filtering
 - [x] Create a materialized view for the dashboard opportunity scoring query (avoids full scans on every page load)
 - [x] Add `pain_point.upvoteCount` column (currently using `score` which conflates upvotes + downvotes)
 - [x] Add `scraper.lastSuccessfulRunAt` column separate from `lastRunAt` (currently ambiguous if last run errored)
 - [x] Implement soft-delete cascade: when `scraper.deletedAt` is set, also set `pain_point.deletedAt` in a trigger/job
-- [x] Add `pain_point_cluster.memberCount` denormalized column (avoid COUNT(*) on every cluster render)
+- [x] Add `pain_point_cluster.memberCount` denormalized column (avoid COUNT(\*) on every cluster render)
 - [x] Add `workspace.plan` column so workspace-level entitlements can override user-level plan
 - [x] Add a `changelog` table to track schema migrations with description + applied_at for ops visibility
 - [x] Create `user_notification_preferences` table (email digest, scan complete alerts, threshold notifications)
@@ -38,6 +39,7 @@
 - [x] Add `ai_usage.runId` FK to `scraper_run` for complete cost-per-run attribution
 
 ### 1.2 Environment & Configuration
+
 - [x] Validate all required env vars at startup (throw descriptive errors, not cryptic runtime failures)
 - [x] Add `OPENROUTER_BASE_URL` override env var for self-hosted or proxy setups
 - [x] Add `MAX_CONCURRENT_AI_EXTRACTIONS` env var to throttle parallelism (currently hardcoded)
@@ -48,6 +50,7 @@
 - [x] Add `FEATURE_FLAGS` JSON env var for runtime feature toggling without deploys
 
 ### 1.3 Error Handling & Observability
+
 - [ ] Implement structured logging with `pino` or `winston` (replace scattered `console.log/error`)
 - [ ] Add OpenTelemetry traces to the mining pipeline phases (SCANNING → EXTRACTING → CLUSTERING)
 - [ ] Set up Sentry error monitoring for both server-side and client-side errors
@@ -64,6 +67,7 @@
 ## 🤖 2. Mining Pipeline
 
 ### 2.1 Reddit API & Scraping
+
 - [x] Add Reddit OAuth token refresh logic with automatic retry (currently token can expire mid-run)
 - [x] Implement subreddit existence validation before starting a scan (avoid silent 404s)
 - [x] Add support for Reddit's `after`/`before` pagination cursors to fetch more than 100 posts per subreddit
@@ -79,6 +83,7 @@
 - [x] Add `miningDepth` = `"ultra"` tier for exhaustive comment tree traversal (Pro plan only)
 
 ### 2.2 AI Extraction
+
 - [ ] Batch multiple posts into a single OpenRouter request to reduce API call overhead and latency
 - [x] Add a confidence score to each AI extraction (0–1) and filter out low-confidence results
 - [ ] Implement fallback model chain: if primary model fails, retry with a cheaper/faster model
@@ -94,6 +99,7 @@
 - [ ] Store raw LLM response alongside structured extraction for debugging and prompt improvement
 
 ### 2.3 Embedding & Clustering
+
 - [ ] Batch embedding API calls (currently one call per pain point — very expensive at scale)
 - [ ] Add a HNSW index rebuild job when `m` or `ef_construction` parameters change
 - [ ] Implement hierarchical clustering: micro-clusters → macro-themes for report generation
@@ -106,6 +112,7 @@
 - [ ] Add `orphan detection` job: pain points not assigned to any cluster after 24h should be re-clustered
 
 ### 2.4 Pipeline Reliability
+
 - [ ] Implement `circuitBreaker` for OpenRouter calls (open after 5 consecutive failures, half-open after 60s)
 - [ ] Add per-run timeout: if the pipeline exceeds 15 minutes, mark as `timeout` and clean up
 - [ ] Implement idempotent run creation: calling start-scan twice for the same config returns the existing run
@@ -120,6 +127,7 @@
 ## 📊 3. Dashboard & Analytics
 
 ### 3.1 Main Dashboard
+
 - [ ] Add a global "active scans" indicator in the nav showing live scan count across all scrapers
 - [ ] Implement dashboard card drag-to-reorder with persisted layout in `userPreferences.dashboardLayout`
 - [ ] Add "Top Opportunities This Week" summary card showing highest-scored pain points
@@ -132,6 +140,7 @@
 - [ ] Implement "Saved Filters" — save complex filter combinations and switch between them instantly
 
 ### 3.2 Pain Point Analytics
+
 - [ ] Build a pain point detail view: full post body, comments, AI extraction scores, cluster membership
 - [ ] Add pain point timeline view: show how many pain points per keyword were found per day
 - [ ] Implement pain point tagging UX: let users add custom tags on top of AI-extracted tags
@@ -144,6 +153,7 @@
 - [ ] Add "Ignore" action: flag a pain point as irrelevant so it's excluded from future scoring
 
 ### 3.3 Opportunity Scoring & Reports
+
 - [ ] Add a "Score Explanation" modal showing exactly how the weighted score was computed for each pain point
 - [ ] Implement custom scoring weights UI (sliders for painIntensity/urgency/monetization weights — stored in `scoringWeights`)
 - [ ] Add "Validation Signals" breakdown: show upvotes, comments, and mention count contributions separately
@@ -156,6 +166,7 @@
 - [ ] Implement scheduled report emails: weekly digest of top opportunities in a watch-list
 
 ### 3.4 Trend Detection
+
 - [ ] Build a trend detection dashboard page showing keyword momentum (rising / falling / stable)
 - [ ] Add "New vs Recurring" split: distinguish freshly discovered pain points vs. those seen in previous runs
 - [ ] Implement velocity metrics: pain points found per hour during a scan (mining efficiency)
@@ -169,6 +180,7 @@
 ## 🔐 4. Authentication & Authorization
 
 ### 4.1 Auth System (Better Auth)
+
 - [ ] Add Google OAuth provider (currently email/password only based on schema)
 - [ ] Add GitHub OAuth provider (relevant for developer-focused niches)
 - [ ] Implement magic-link email authentication as a lower-friction alternative to password
@@ -181,6 +193,7 @@
 - [ ] Add password strength enforcement on registration (zxcvbn or similar)
 
 ### 4.2 Authorization & Multi-tenancy
+
 - [ ] Implement workspace role-based access control: `owner | admin | member | viewer`
 - [ ] Add workspace invitation flow: invite by email, pending invitations list, accept/reject
 - [ ] Implement workspace transfer of ownership
@@ -195,9 +208,10 @@
 ## 💳 5. Billing & Monetization
 
 ### 5.1 Stripe Integration
-- [ ] Wire Stripe webhook handler to update subscription status on `customer.subscription.updated` events
+
+- [x] Wire Stripe webhook handler to update subscription status on `customer.subscription.updated` events
 - [ ] Handle `invoice.payment_failed` webhook: send email, show banner, grace period before downgrade
-- [ ] Handle `customer.subscription.deleted` webhook: immediately revoke plan access
+- [x] Handle `customer.subscription.deleted` webhook: immediately revoke plan access
 - [ ] Implement Stripe Customer Portal link for self-serve plan changes and cancellation
 - [ ] Add proration handling when users upgrade mid-cycle
 - [ ] Implement annual billing option (20% discount) with correct proration
@@ -207,6 +221,7 @@
 - [ ] Add dunning automation: email sequence for failed payments (day 1, 3, 7 before cancellation)
 
 ### 5.2 Credits & Usage
+
 - [ ] Build a credits purchase flow: user can buy top-up credits without changing their plan
 - [ ] Add real-time credit balance display in the dashboard header
 - [ ] Implement credit expiry: purchased credits expire after 12 months
@@ -218,6 +233,7 @@
 - [ ] Create automated monthly usage report email with cost breakdown
 
 ### 5.3 Plan Management
+
 - [ ] Add a clear plan comparison page in billing section (features matrix table)
 - [ ] Implement plan downgrade protection: warn about data/feature loss before confirming downgrade
 - [ ] Add trial period support (7-day Pro trial for new signups)
@@ -232,49 +248,54 @@
 ## 🎨 6. UI/UX & Frontend
 
 ### 6.1 Design System & Components
+
 - [ ] Audit all color usages — ensure full dark mode support with no hardcoded light-mode values
-- [ ] Add skeleton loading states to all data-fetching components (replace spinner with content-shaped skeletons)
-- [ ] Implement consistent empty state components with actionable CTAs (e.g., "Start your first scan")
+- [x] Add skeleton loading states to all data-fetching components (replace spinner with content-shaped skeletons)
+- [x] Implement consistent empty state components with actionable CTAs (e.g., "Start your first scan")
 - [ ] Add `ErrorBoundary` components around all major dashboard sections
 - [ ] Create a unified toast notification system (success, error, warning, info) with queue management
 - [ ] Audit and fix all Radix/Shadcn accessibility attributes (aria-labels, focus traps, keyboard navigation)
 - [ ] Add keyboard shortcuts for common actions (e.g., `Cmd+K` for command palette, `Cmd+N` for new scan)
 - [ ] Build a command palette (`Cmd+K`) for quick navigation and action execution
-- [ ] Create `<PlanGate>` React component that wraps features with upgrade prompts
-- [ ] Add a `<Tooltip>` component with feature explanations on all score/metric labels
+- [x] Create `<PlanGate>` React component that wraps features with upgrade prompts
+- [x] Add a `<Tooltip>` component with feature explanations on all score/metric labels
 
 ### 6.2 Mining & Analysis UX
-- [ ] Add a scan wizard UX: step-by-step guided scan setup for new users
-- [ ] Implement live post counter during scanning phase (WebSocket or SSE update)
+
+- [x] Add a scan wizard UX: step-by-step guided scan setup for new users
+- [x] Implement live post counter during scanning phase (WebSocket or SSE update)
 - [ ] Add "Pause" and "Cancel" buttons during an active scan
 - [ ] Show per-subreddit progress during scanning (how many posts found in each sub)
 - [ ] Add a pain point preview during extraction phase (show results as they come in, not just at the end)
 - [ ] Build a subreddit search/autocomplete component that fetches suggestions from `subredditCache`
 - [ ] Add a keyword suggestion panel: when user types a keyword, suggest related terms from `discoveryCache`
-- [ ] Implement scan presets (quick-start templates for popular niches: "SaaS tools", "Developer tools", "E-commerce")
+- [x] Implement scan presets (quick-start templates for popular niches: "SaaS tools", "Developer tools", "E-commerce")
 - [ ] Add a "Clone Scan" button to duplicate an existing scraper configuration
 - [ ] Show scan history per scraper: list of all `scraperRun` records with status, post count, pain points found
 
 ### 6.3 Onboarding
-- [ ] Build a multi-step onboarding flow (currently `onboardingComplete` flag exists but flow is minimal)
-- [ ] Add an interactive product tour using `driver.js` or similar (highlight key features on first login)
-- [ ] Create sample/demo data for new accounts (show what results look like before first scan)
+
+- [x] Build a multi-step onboarding flow (currently `onboardingComplete` flag exists but flow is minimal)
+- [x] Add an interactive product tour using `driver.js` or similar (highlight key features on first login)
+- [x] Create sample/demo data for new accounts (show what results look like before first scan)
 - [ ] Add contextual help tooltips throughout the app (linked to docs)
 - [ ] Implement `checklist` onboarding widget: "Complete your profile", "Run your first scan", "Save your first report"
 - [ ] Add a "Welcome" email sequence via Loops/Postmark for new signups
 
 ### 6.4 Mobile & Responsive Design
-- [ ] Audit all dashboard pages for mobile responsiveness (currently primarily desktop-focused)
-- [ ] Make the data tables horizontally scrollable with fixed first column on mobile
-- [ ] Add a mobile-optimized bottom tab navigation for dashboard sections
-- [ ] Ensure all modals/dialogs have proper mobile keyboard-aware scroll behavior
-- [ ] Test and fix chart rendering on small screen sizes (Recharts responsive containers)
+
+- [x] Audit all dashboard pages for mobile responsiveness (currently primarily desktop-focused)
+- [x] Make the data tables horizontally scrollable with fixed first column on mobile
+- [x] Add a mobile-optimized bottom tab navigation for dashboard sections
+- [x] Ensure all modals/dialogs have proper mobile keyboard-aware scroll behavior
+- [x] Test and fix chart rendering on small screen sizes (Recharts responsive containers)
 
 ---
 
 ## 🧪 7. Testing & Quality
 
 ### 7.1 Unit Tests
+
 - [ ] Write unit tests for `lib/dashboard-metrics.ts` (score formula edge cases)
 - [ ] Write unit tests for `lib/plan-gating.ts` (all plan entitlement checks, credit calculations)
 - [ ] Write unit tests for `lib/trend-detection.ts` (rising, falling, stable logic)
@@ -287,6 +308,7 @@
 - [ ] Reach 80%+ coverage on all `lib/` files
 
 ### 7.2 Integration Tests
+
 - [ ] Write integration tests for `POST /api/search` (create scan, verify DB record creation)
 - [ ] Write integration tests for `GET /api/search/stream` SSE endpoint (verify event sequence)
 - [ ] Write integration tests for `/api/billing/` Stripe webhook handler (mock Stripe events)
@@ -296,6 +318,7 @@
 - [ ] Write integration tests for workspace creation, member invitation, and role enforcement
 
 ### 7.3 End-to-End Tests (Playwright)
+
 - [ ] E2E: Full sign-up → onboarding → first scan → view results flow
 - [ ] E2E: Billing upgrade flow (Stripe test mode)
 - [ ] E2E: Report save → share → view via public URL
@@ -305,6 +328,7 @@
 - [ ] Set up CI Playwright runs against a staging environment with seeded test data
 
 ### 7.4 AI Evaluation
+
 - [ ] Expand `ai_golden_dataset` to at least 100 labeled examples across 10 niches
 - [ ] Automate golden dataset eval on every PR (fail if F1 drops > 2%)
 - [ ] Add per-niche F1 score breakdown (model may perform differently in B2B vs. consumer niches)
@@ -317,28 +341,31 @@
 ## 🔒 8. Security
 
 ### 8.1 API Security
+
 - [ ] Implement rate limiting on all public API routes (currently `lib/rate-limit.ts` exists — verify coverage)
 - [ ] Add CSRF protection for all state-mutating API routes
 - [ ] Validate and sanitize all user-supplied inputs before DB insertion (especially `keywords`, `customPatterns`)
 - [ ] Ensure Reddit post `author` field is anonymized when `anonymizeRedditUsernames` is true at query time
-- [ ] Add Content-Security-Policy headers to all pages
+- [x] Add Content-Security-Policy headers to all pages
 - [ ] Implement request size limits (prevent large payload DOS on `/api/search`)
 - [ ] Audit all API routes: ensure every route checks authentication before proceeding
-- [ ] Add SQL injection protection audit: verify all DB queries use parameterized Drizzle ORM calls
+- [x] Add SQL injection protection audit: verify all DB queries use parameterized Drizzle ORM calls
 - [ ] Implement API key hashing (store only hash of API key, never the plaintext)
 
 ### 8.2 Data Privacy
+
 - [ ] Implement GDPR-compliant data export: "Download My Data" button exports all user data as JSON/ZIP
 - [ ] Implement account deletion: cascade delete all user data (pain points, scrapers, runs, embeddings)
 - [ ] Add data retention policy: auto-delete scraper runs older than 1 year (configurable)
 - [ ] Implement `Right to Erasure` for Reddit author data: wipe `author` fields on request
 - [ ] Add a privacy settings page: data retention preferences, anonymization settings
 - [ ] Ensure all S3/storage URLs are signed with short expiry (if file storage is added in future)
-- [ ] Add cookie consent banner (GDPR/CCPA compliance)
-- [ ] Review third-party scripts (analytics, support widgets) for data transfer compliance
+- [x] Add cookie consent banner (GDPR/CCPA compliance)
+- [x] Review third-party scripts (analytics, support widgets) for data transfer compliance
 
 ### 8.3 Dependency Security
-- [ ] Set up `npm audit` or `bun audit` in CI pipeline (fail on high severity)
+
+- [x] Set up `npm audit` or `bun audit` in CI pipeline (fail on high severity)
 - [ ] Enable Dependabot or Renovate for automated dependency update PRs
 - [ ] Pin all production dependencies to exact versions in `package.json`
 - [ ] Audit OpenRouter SDK usage: ensure API keys are never logged or exposed in error messages
@@ -349,6 +376,7 @@
 ## 🚀 9. Performance
 
 ### 9.1 Database Performance
+
 - [ ] Add `EXPLAIN ANALYZE` logging for queries taking > 100ms in development
 - [ ] Add PGVector HNSW index with optimized `ef_search` for `findSimilarPainPoints` queries
 - [ ] Implement query result caching with Redis for dashboard metrics (5-minute TTL)
@@ -359,6 +387,7 @@
 - [ ] Add a slow query detection hook that logs to `slow_query_log` table
 
 ### 9.2 API & Server Performance
+
 - [ ] Implement React Server Component streaming for the dashboard main page
 - [ ] Add `unstable_cache` / `next/cache` for expensive server-side data fetches
 - [ ] Configure `staleWhileRevalidate` for public-facing pages (landing, blog, docs)
@@ -368,6 +397,7 @@
 - [ ] Implement API response compression (gzip/brotli) for large pain point list responses
 
 ### 9.3 Frontend Performance
+
 - [ ] Virtualize long lists: use `@tanstack/react-virtual` for pain point tables > 100 rows
 - [ ] Debounce search/filter inputs to reduce unnecessary API calls
 - [ ] Implement optimistic UI updates for common actions (save report, tag pain point)
@@ -381,17 +411,19 @@
 ## 📈 10. Growth & SEO
 
 ### 10.1 SEO & Content
-- [ ] Generate dynamic `sitemap.ts` to include all public blog posts, docs, and feature pages
-- [ ] Add structured data (JSON-LD) to landing page, blog posts, and feature pages
-- [ ] Implement OG image generation for blog posts and report share pages (`@vercel/og`)
+
+- [x] Generate dynamic `sitemap.ts` to include all public blog posts, docs, and feature pages
+- [x] Add structured data (JSON-LD) to landing page, blog posts, and feature pages
+- [x] Implement OG image generation for blog posts and report share pages (`@vercel/og`)
 - [ ] Write and publish 10 SEO-targeted blog posts around "Reddit market research", "SaaS idea validation", etc.
 - [ ] Create landing pages for high-intent keywords ("Reddit pain point finder", "SaaS opportunity discovery tool")
-- [ ] Add `robots.txt` with correct crawl directives for dashboard (noindex) vs. public pages (index)
-- [ ] Implement canonical tags on all pages to prevent duplicate content
-- [ ] Add a `llms.txt` file for AI crawler context (already exists — review and update quarterly)
-- [ ] Implement breadcrumb structured data for blog and docs navigation
+- [x] Add `robots.txt` with correct crawl directives for dashboard (noindex) vs. public pages (index)
+- [x] Implement canonical tags on all pages to prevent duplicate content
+- [x] Add a `llms.txt` file for AI crawler context (already exists — review and update quarterly)
+- [x] Implement breadcrumb structured data for blog and docs navigation
 
 ### 10.2 Referral & Growth Loops
+
 - [ ] Build referral program UI: generate unique referral link, track signups, reward credits
 - [ ] Implement `referralCode` generation on user registration (column already exists in schema)
 - [ ] Award bonus credits when a referred user completes their first scan
@@ -401,6 +433,7 @@
 - [ ] Create an affiliate program with unique tracking codes and payout via Stripe
 
 ### 10.3 Analytics & Product Intelligence
+
 - [ ] Integrate PostHog for product analytics (feature flags, session recording, funnel analysis)
 - [ ] Track key conversion events: sign-up → first scan, scan → saved report, report → upgrade
 - [ ] Add funnel tracking for billing upgrade flow (where do users drop off?)
@@ -413,6 +446,7 @@
 ## 🛠️ 11. Admin & Ops
 
 ### 11.1 Admin Dashboard
+
 - [ ] Build admin user listing: search users by email, view plan, usage, last login
 - [ ] Add admin impersonation: log in as any user for support debugging
 - [ ] Build admin scan monitoring: view all active scans across all users with ability to cancel
@@ -423,6 +457,7 @@
 - [ ] Implement admin "golden dataset" management: add/edit labeled examples for AI evaluation
 
 ### 11.2 Scheduled Jobs & Cron
+
 - [ ] Migrate cron from GitHub Actions to Vercel Cron Jobs for simpler orchestration
 - [ ] Add a `database maintenance` cron: run `VACUUM`, rebuild HNSW indexes, purge old rate limit logs
 - [ ] Add a `stale scraper cleanup` cron: delete scrapers not run in 6+ months (with user email warning)
@@ -433,6 +468,7 @@
 - [ ] Create a cron health monitoring page in admin: last run time, success/failure for each job
 
 ### 11.3 Inngest Background Jobs
+
 - [ ] Wire all mining pipeline phases to Inngest functions (currently `mining-runner.ts` is fire-and-forget)
 - [ ] Add Inngest function for batch embedding (run nightly for any un-embedded pain points)
 - [ ] Create Inngest fan-out pattern for large scans (> 500 posts) to avoid serverless timeouts
@@ -445,6 +481,7 @@
 ## 📧 12. Email & Notifications
 
 ### 12.1 Transactional Emails (Loops/Resend)
+
 - [ ] Design and send "Scan Complete" email with top 3 pain points found
 - [ ] Design and send "Weekly Digest" email with new opportunities since last login
 - [ ] Send "Credits Running Low" warning email at 20% remaining
@@ -455,6 +492,7 @@
 - [ ] Implement email preview in admin (send test email to admin email address)
 
 ### 12.2 In-App Notifications
+
 - [ ] Build notification center in dashboard header (bell icon with badge count)
 - [ ] Add real-time notifications via SSE for completed scans (not just email)
 - [ ] Add notification for when a monitored keyword hits a new high pain score
@@ -466,6 +504,7 @@
 ## 🌐 13. Integrations & APIs
 
 ### 13.1 Export & Integrations
+
 - [ ] Add CSV export for pain point lists (currently no export functionality)
 - [ ] Add JSON export for raw pain point data (for API consumers)
 - [ ] Build Notion integration: push clusters and opportunities to a Notion database
@@ -476,6 +515,7 @@
 - [ ] Build a Chrome extension that shows RPP insights when browsing Reddit
 
 ### 13.2 Public API
+
 - [ ] Design and document v1 public API spec (OpenAPI 3.1)
 - [ ] Implement API versioning strategy (`/api/v1/`, `/api/v2/`)
 - [ ] Add API key management UI: create, rotate, revoke keys
@@ -489,6 +529,7 @@
 ## 📚 14. Documentation & Content
 
 ### 14.1 Technical Docs
+
 - [ ] Write comprehensive API documentation for all endpoints
 - [ ] Document the mining pipeline architecture with sequence diagrams
 - [ ] Write a "How Scoring Works" explainer for users (link from dashboard score labels)
@@ -499,6 +540,7 @@
 - [ ] Document all database tables and their relationships (`docs/schema.md`)
 
 ### 14.2 User-Facing Help
+
 - [ ] Build a searchable help center (FAQ, tutorials, troubleshooting)
 - [ ] Create video tutorials for core workflows (scan setup, interpreting results, creating reports)
 - [ ] Add contextual help tooltips throughout the app with links to relevant docs
@@ -510,6 +552,7 @@
 ## 🔧 15. Developer Experience
 
 ### 15.1 Local Development
+
 - [ ] Add `docker-compose.yml` with Postgres + PGVector for local development (no need for Neon in dev)
 - [ ] Create a database seed script with realistic sample data for local development
 - [ ] Add `Makefile` with common dev commands: `make setup`, `make dev`, `make test`, `make db:reset`
@@ -519,6 +562,7 @@
 - [ ] Add pre-commit hooks (lint, type-check, unit tests) via `husky` + `lint-staged`
 
 ### 15.2 CI/CD Pipeline
+
 - [ ] Add GitHub Actions workflow for: lint → type-check → unit tests → integration tests → deploy
 - [ ] Add type-check step (`tsc --noEmit`) to CI to catch TypeScript errors before merge
 - [ ] Set up preview deployments on Vercel for every PR
@@ -529,6 +573,7 @@
 - [ ] Add bundle size tracking: fail CI if bundle increases > 10KB unexpectedly
 
 ### 15.3 Code Quality
+
 - [ ] Enforce strict TypeScript (`"strict": true` in `tsconfig.json`) — fix any resulting errors
 - [ ] Add `eslint-plugin-react-hooks` rules (exhaustive-deps) to catch stale closure bugs
 - [ ] Configure `prettier` to enforce consistent import ordering
@@ -543,6 +588,7 @@
 ## 🗺️ 16. Product Roadmap (Planned Features)
 
 ### 16.1 Multi-Source Mining (Beyond Reddit)
+
 - [ ] Add Hacker News mining (HN Algolia API) — especially for dev-tool and B2B SaaS niches
 - [ ] Add Twitter/X mining (v2 API academic access) for real-time pain signal detection
 - [ ] Add Product Hunt comment mining for product validation signals
@@ -551,6 +597,7 @@
 - [ ] Add YouTube comment mining using the YouTube Data API
 
 ### 16.2 AI & ML Enhancements
+
 - [ ] Fine-tune a custom embedding model on pain-point-specific text for better clustering accuracy
 - [ ] Build an opportunity-to-MVP feature generator: given a cluster, auto-generate feature specs
 - [ ] Implement real-time competitive intelligence updates: monitor competitor mentions across sources
@@ -560,6 +607,7 @@
 - [ ] Add a pain point classifier trained on labeled data (not just LLM zero-shot)
 
 ### 16.3 Collaboration Features
+
 - [ ] Add real-time collaborative annotation (multiple team members can annotate simultaneously)
 - [ ] Build a `comments` system on pain points and reports (internal team discussions)
 - [ ] Implement `@mention` notifications within workspace (tag a teammate in a comment)
@@ -567,6 +615,7 @@
 - [ ] Create workspace-level shared saved searches and filter presets
 
 ### 16.4 Marketplace & Ecosystem
+
 - [ ] Build a "Research Marketplace" where users can sell anonymized research reports
 - [ ] Create a public community showcase of validated opportunities (opt-in)
 - [ ] Build partner integrations with popular no-code tools (Webflow, Bubble, Softr)
@@ -578,6 +627,7 @@
 ## 🐛 17. Known Bugs & Technical Debt
 
 ### High Priority Bugs
+
 - [ ] SSE stream sometimes disconnects without sending `completed` event — investigate and add reconnect logic
 - [ ] `resolvePlanForIdentity` doesn't handle `founder`/`professional` plans from Stripe subscriptions (only LTD tier)
 - [ ] `planFromString` returns `null` for "founder" and "professional" plan strings from Stripe — add mapping
@@ -587,6 +637,7 @@
 - [ ] `community-map.ts` and `competitor-intel.ts` are likely unused after AI extraction redesign — audit and remove if so
 
 ### Medium Priority Technical Debt
+
 - [ ] `mining-runner.ts` (19KB) is too large — split into separate modules per pipeline phase
 - [ ] `reddit.ts` (31KB) has mixed concerns: API client + parsing + filtering — split into separate files
 - [ ] `app/(dashboard)/dashboard/page.tsx` (27KB) is doing too much — extract server actions and sub-components
@@ -599,6 +650,7 @@
 - [ ] Remove the `tool` table if unused — it appears to be for competitive intel crawling but has no references
 
 ### Low Priority Cleanup
+
 - [ ] Consolidate `idempotency.ts` and `reddit-idempotency.ts` into a single unified idempotency module
 - [ ] Add a barrel `index.ts` to `lib/` to clean up import paths in consuming files
 - [ ] Remove `llms.txt` duplicated content if it's auto-generated from sitemap
@@ -610,6 +662,7 @@
 ## 📅 Sprint Planning Reference
 
 ### Sprint 1 — Fix & Stabilize (Immediate)
+
 1. Fix `planFromString` to handle founder/professional from Stripe
 2. Fix `scraperRun.finishedAt` null constraint issue
 3. Add env var validation at startup
@@ -619,6 +672,7 @@
 7. Write unit tests for `plan-gating.ts` and `dashboard-metrics.ts`
 
 ### Sprint 2 — Core UX (Short Term)
+
 1. Add pain point detail view
 2. Add scan wizard for new users
 3. Implement pain point bookmarking
@@ -628,6 +682,7 @@
 7. Add custom scoring weights UI
 
 ### Sprint 3 — Growth (Medium Term)
+
 1. Google OAuth integration
 2. Referral program implementation
 3. Add Hacker News mining source
@@ -637,6 +692,7 @@
 7. Write 5 SEO blog posts
 
 ### Sprint 4 — Scale (Longer Term)
+
 1. Migrate pipeline to Inngest fan-out
 2. Add Redis caching for dashboard queries
 3. Build public REST API v1
@@ -647,4 +703,4 @@
 
 ---
 
-*Generated: 2026-07-14 | Version: 1.0 | Review quarterly and update as features ship.*
+_Generated: 2026-07-14 | Version: 1.0 | Review quarterly and update as features ship._

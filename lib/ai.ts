@@ -18,7 +18,8 @@ export const AI_MODELS = {
 
 export type AiModelId = (typeof AI_MODELS)[keyof typeof AI_MODELS];
 
-export const DEFAULT_AI_MODEL: AiModelId = (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.GEMINI_FLASH;
+export const DEFAULT_AI_MODEL: AiModelId =
+  (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.GEMINI_FLASH;
 
 /** Human-readable display label for each model, used in report metadata. */
 export const AI_MODEL_LABELS: Record<AiModelId, string> = {
@@ -32,10 +33,10 @@ export const AI_MODEL_LABELS: Record<AiModelId, string> = {
 // Per-model cost rates (USD per 1 token)
 // ---------------------------------------------------------------------------
 const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
-  [AI_MODELS.FREE]:         { input: 0, output: 0 },                  // 100% Free
-  [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 },  // $0.10 / $0.40 per 1M
-  [AI_MODELS.GPT4O]:        { input: 0.0000025, output: 0.00001 },    // $2.50 / $10.00 per 1M
-  [AI_MODELS.CLAUDE_SONNET]:{ input: 0.000003,  output: 0.000015 },   // $3.00 / $15.00 per 1M
+  [AI_MODELS.FREE]: { input: 0, output: 0 }, // 100% Free
+  [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 }, // $0.10 / $0.40 per 1M
+  [AI_MODELS.GPT4O]: { input: 0.0000025, output: 0.00001 }, // $2.50 / $10.00 per 1M
+  [AI_MODELS.CLAUDE_SONNET]: { input: 0.000003, output: 0.000015 }, // $3.00 / $15.00 per 1M
 };
 
 /**
@@ -46,7 +47,10 @@ export function getModelForDepth(
   _depth: MiningDepth,
   modelOverride?: string,
 ): AiModelId {
-  if (modelOverride && Object.values(AI_MODELS).includes(modelOverride as AiModelId)) {
+  if (
+    modelOverride &&
+    Object.values(AI_MODELS).includes(modelOverride as AiModelId)
+  ) {
     return modelOverride as AiModelId;
   }
   return AI_MODELS.GEMINI_FLASH;
@@ -344,25 +348,22 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 
   try {
     let activeModel = model;
-    let response = await fetch(
-      `${baseUrl}/api/v1/chat/completions`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "ThreddIQ - Reddit Intelligence Engine",
-        },
-        body: JSON.stringify({
-          model: activeModel,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        }),
+    let response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:3000",
+        "X-Title": "ThreddIQ - Reddit Intelligence Engine",
       },
-    );
+      body: JSON.stringify({
+        model: activeModel,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    });
 
     // Free models cascade pool to handle 402 (no credits) and 429 (temporary rate limit)
     const FREE_MODELS_POOL = [
@@ -373,32 +374,34 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
     ];
 
-    if (!response.ok && (response.status === 402 || response.status === 404 || response.status === 429)) {
+    if (
+      !response.ok &&
+      (response.status === 402 ||
+        response.status === 404 ||
+        response.status === 429)
+    ) {
       for (const fallbackModel of FREE_MODELS_POOL) {
         if (fallbackModel === activeModel) continue;
         console.warn(
           `[AI] Model ${activeModel} failed (${response.status}). Retrying with free fallback: ${fallbackModel}...`,
         );
         activeModel = fallbackModel as AiModelId;
-        response = await fetch(
-          `${baseUrl}/api/v1/chat/completions`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-              "HTTP-Referer": "http://localhost:3000",
-              "X-Title": "ThreddIQ - Reddit Intelligence Engine",
-            },
-            body: JSON.stringify({
-              model: activeModel,
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
-              ],
-            }),
+        response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "ThreddIQ - Reddit Intelligence Engine",
           },
-        );
+          body: JSON.stringify({
+            model: activeModel,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        });
 
         if (response.ok) break;
       }
@@ -477,31 +480,49 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 
     return rawPainPoints
       .map((pp: RawPainPoint) => {
-        const rawConf = typeof pp.confidenceScore === "number" && !isNaN(pp.confidenceScore)
-          ? pp.confidenceScore
-          : 0.7;
-        const confidenceScore = Number(Math.max(0, Math.min(1, rawConf)).toFixed(2));
+        const rawConf =
+          typeof pp.confidenceScore === "number" && !isNaN(pp.confidenceScore)
+            ? pp.confidenceScore
+            : 0.7;
+        const confidenceScore = Number(
+          Math.max(0, Math.min(1, rawConf)).toFixed(2),
+        );
 
-        const targetUser = typeof pp.targetUser === "string" && pp.targetUser.trim().length > 0
-          ? pp.targetUser.trim()
-          : undefined;
+        const targetUser =
+          typeof pp.targetUser === "string" && pp.targetUser.trim().length > 0
+            ? pp.targetUser.trim()
+            : undefined;
 
         const competingProducts = Array.isArray(pp.competingProducts)
           ? pp.competingProducts
-              .filter((p): p is string => typeof p === "string" && p.trim().length > 0)
+              .filter(
+                (p): p is string =>
+                  typeof p === "string" && p.trim().length > 0,
+              )
               .map((p) => p.trim())
           : [];
 
-        const rawWtp = typeof pp.willingnessToPay === "string" ? pp.willingnessToPay.trim().toLowerCase() : "";
-        const validWtpList: WillingnessToPaySignal[] = ["free_only", "paid_signal", "explicit_budget", "unknown"];
-        const willingnessToPay: WillingnessToPaySignal = validWtpList.includes(rawWtp as WillingnessToPaySignal)
+        const rawWtp =
+          typeof pp.willingnessToPay === "string"
+            ? pp.willingnessToPay.trim().toLowerCase()
+            : "";
+        const validWtpList: WillingnessToPaySignal[] = [
+          "free_only",
+          "paid_signal",
+          "explicit_budget",
+          "unknown",
+        ];
+        const willingnessToPay: WillingnessToPaySignal = validWtpList.includes(
+          rawWtp as WillingnessToPaySignal,
+        )
           ? (rawWtp as WillingnessToPaySignal)
           : pp.budget && Array.isArray(pp.budget) && pp.budget.length > 0
             ? "explicit_budget"
             : "unknown";
 
         const featureRequested =
-          typeof pp.featureRequested === "string" && pp.featureRequested.trim().length > 0
+          typeof pp.featureRequested === "string" &&
+          pp.featureRequested.trim().length > 0
             ? pp.featureRequested.trim()
             : undefined;
 
@@ -519,7 +540,9 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
           triedSolutions: pp.triedSolutions || [],
         };
       })
-      .filter((pp) => (pp.confidenceScore ?? 0.7) >= MIN_AI_CONFIDENCE_SCORE) as PainPointData[];
+      .filter(
+        (pp) => (pp.confidenceScore ?? 0.7) >= MIN_AI_CONFIDENCE_SCORE,
+      ) as PainPointData[];
   } catch (error) {
     console.error("Error in AI extraction:", error);
     return [];
@@ -555,31 +578,30 @@ Return ONLY valid JSON:
   const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
 
   try {
-    const response = await fetch(
-      `${baseUrl}/api/v1/chat/completions`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "http://localhost:3000",
-          "X-Title": "ThreddIQ - Competitor Intel Engine",
-        },
-        body: JSON.stringify({
-          model: DEFAULT_AI_MODEL,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: `Tool name: "${name}"` },
-          ],
-          response_format: { type: "json_object" },
-        }),
+    const response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:3000",
+        "X-Title": "ThreddIQ - Competitor Intel Engine",
       },
-    );
+      body: JSON.stringify({
+        model: DEFAULT_AI_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Tool name: "${name}"` },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
 
     if (!response.ok) return { description: null, url: null, category: null };
 
     const data = await response.json();
-    const rawContent = extractMessageContent(data?.choices?.[0]?.message?.content);
+    const rawContent = extractMessageContent(
+      data?.choices?.[0]?.message?.content,
+    );
     const parsed = JSON.parse(rawContent);
 
     return {

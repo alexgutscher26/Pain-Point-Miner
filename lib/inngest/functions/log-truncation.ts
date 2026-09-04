@@ -1,23 +1,27 @@
 import { inngest } from "../client";
 import { db } from "@/lib/db";
-import { scraperRun, scraperRunSummary, dbMaintenanceLog } from "@/lib/db/schema";
+import {
+  scraperRun,
+  scraperRunSummary,
+  dbMaintenanceLog,
+} from "@/lib/db/schema";
 import { sql, lt } from "drizzle-orm";
 import crypto from "node:crypto";
 import { subDays, format } from "date-fns";
 
 /**
  * Monthly Log Truncation
- * 
+ *
  * 1. Identify scraper_run records older than 60 days.
  * 2. Aggregate metrics by scraperId and month.
  * 3. Upsert into scraper_run_summary.
  * 4. Delete old records.
  */
 export const monthlyLogTruncation = inngest.createFunction(
-  { 
+  {
     id: "monthly-log-truncation",
     name: "Monthly Log Truncation",
-    triggers: [{ cron: "0 0 * * 0" }] // Every Sunday at midnight
+    triggers: [{ cron: "0 0 * * 0" }], // Every Sunday at midnight
   },
   async ({ step }) => {
     // Check if it's the first Sunday of the month
@@ -80,8 +84,9 @@ export const monthlyLogTruncation = inngest.createFunction(
         // 3. Upsert into summary table
         for (const key in aggregations) {
           const agg = aggregations[key];
-          
-          await db.insert(scraperRunSummary)
+
+          await db
+            .insert(scraperRunSummary)
             .values({
               id: crypto.randomUUID(),
               scraperId: agg.scraperId,
@@ -110,12 +115,12 @@ export const monthlyLogTruncation = inngest.createFunction(
         }
 
         // 4. Delete old records
-        const deleteResult = await db.delete(scraperRun)
+        const deleteResult = await db
+          .delete(scraperRun)
           .where(lt(scraperRun.createdAt, sixtyDaysAgo))
           .returning({ id: scraperRun.id });
-        
-        recordsProcessed = deleteResult.length;
 
+        recordsProcessed = deleteResult.length;
       } catch (e: any) {
         error = e.message;
         console.error(`[LOG TRUNCATION ERROR] ${error}`);
@@ -139,5 +144,5 @@ export const monthlyLogTruncation = inngest.createFunction(
       message: results.error ? "Truncation failed" : "Truncation completed",
       stats: results,
     };
-  }
+  },
 );

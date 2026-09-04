@@ -77,8 +77,7 @@ import { fetchSubredditPostsMultiSort } from "@/lib/reddit";
 /** Minimal Reddit OAuth token response */
 const FAKE_TOKEN_RESPONSE = {
   ok: true,
-  json: () =>
-    Promise.resolve({ access_token: "fake-token", expires_in: 3600 }),
+  json: () => Promise.resolve({ access_token: "fake-token", expires_in: 3600 }),
 };
 
 /** Minimal Reddit listing API response */

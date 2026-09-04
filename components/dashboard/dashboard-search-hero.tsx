@@ -86,14 +86,14 @@ export function DashboardSearchHero({
             />
             <button
               type="submit"
-              className="flex shrink-0 items-center gap-2.5 bg-[#ff4500] px-7 py-3.5 rounded-full font-mono text-[12px] font-black tracking-wider whitespace-nowrap text-white uppercase transition-colors hover:bg-[#e03d00] shadow-xs"
+              className="flex shrink-0 items-center gap-2.5 rounded-full bg-[#ff4500] px-7 py-3.5 font-mono text-[12px] font-black tracking-wider whitespace-nowrap text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
             >
               Begin Analysis{" "}
               <ArrowRight className="h-4 w-4 transition-transform group-hover/search:translate-x-1" />
             </button>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-3 flex-wrap">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Trending:
             </p>
@@ -101,7 +101,7 @@ export function DashboardSearchHero({
               <button
                 key={tag}
                 type="button"
-                className="border border-black/[0.06] bg-white/50 px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase transition-colors hover:border-[#ff4500]/25 hover:bg-[#ff4500]/5 hover:text-[#ff4500]"
+                className="rounded-full border border-black/[0.06] bg-white/50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase transition-colors hover:border-[#ff4500]/25 hover:bg-[#ff4500]/5 hover:text-[#ff4500]"
                 onClick={() => setKeyword(normalizeTagToKeyword(tag))}
               >
                 {tag}

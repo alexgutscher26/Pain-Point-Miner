@@ -43,13 +43,15 @@ export function OnboardingProgressBar() {
                     ? "border-[#ff4500] bg-[#ff4500] text-white"
                     : isActive
                       ? "border-[#ff4500] bg-[#ff4500]/10 text-[#ff4500]"
-                      : "border-zinc-200/60 bg-white/60 text-zinc-400"
+                      : "border-zinc-200/60 bg-white/60 text-zinc-400",
                 )}
               >
                 {isCompleted ? (
                   <Check className="h-4 w-4" />
                 ) : (
-                  <span className="font-mono text-xs font-black">{step.id}</span>
+                  <span className="font-mono text-xs font-black">
+                    {step.id}
+                  </span>
                 )}
               </div>
 
@@ -59,18 +61,20 @@ export function OnboardingProgressBar() {
                   <div
                     className={cn(
                       "h-full bg-[#ff4500] transition-all duration-700 ease-in-out",
-                      currentStep > step.id ? "w-full" : "w-0"
+                      currentStep > step.id ? "w-full" : "w-0",
                     )}
                   />
                 </div>
               )}
             </div>
-            
-            <p className={cn(
+
+            <p
+              className={cn(
                 "mt-2 hidden truncate font-mono text-[9px] font-bold tracking-widest text-zinc-400 uppercase md:block",
-                isActive && "text-[#ff4500]"
-            )}>
-                {step.label}
+                isActive && "text-[#ff4500]",
+              )}
+            >
+              {step.label}
             </p>
           </div>
         );

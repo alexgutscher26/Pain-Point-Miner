@@ -27,7 +27,11 @@ export const dynamic = "force-dynamic";
 export default async function BillingPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ success?: string; session_id?: string; canceled?: string }>;
+  searchParams?: Promise<{
+    success?: string;
+    session_id?: string;
+    canceled?: string;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const requestHeaders = await headers();
@@ -105,7 +109,7 @@ export default async function BillingPage({
     try {
       const Stripe = (await import("stripe")).default;
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-      
+
       // Look up existing customer by email to prevent duplicates in Stripe dashboard
       const existing = await stripe.customers.list({
         email: session.user.email,

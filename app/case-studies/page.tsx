@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function CaseStudiesPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen overflow-x-hidden font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="flex flex-col items-center px-6 pt-32 pb-24">
@@ -66,7 +66,7 @@ export default function CaseStudiesPage() {
             {caseStudies.map((cs) => (
               <div
                 key={cs.slug}
-                className="group relative flex flex-col items-start overflow-hidden rounded-[32px] glass-card p-10 text-left transition-all"
+                className="group glass-card relative flex flex-col items-start overflow-hidden rounded-[32px] p-10 text-left transition-all"
               >
                 <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 bg-[#ff4500]/5 opacity-50 blur-[80px] transition-opacity" />
 
@@ -105,7 +105,7 @@ export default function CaseStudiesPage() {
             ))}
           </div>
 
-          <div className="relative mt-32 flex flex-col items-center overflow-hidden rounded-[48px] glass-card p-16">
+          <div className="glass-card relative mt-32 flex flex-col items-center overflow-hidden rounded-[48px] p-16">
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#ff4500]/30 to-transparent opacity-80" />
             <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/5">
               <Users className="h-8 w-8 text-[#ff4500]" />

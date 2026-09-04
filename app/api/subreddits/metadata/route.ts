@@ -40,10 +40,10 @@ export async function GET(req: Request) {
   if (missing.length > 0) {
     // 2. Fetch from reddit
     const freshData = await getSubredditMetadataBulk(missing);
-    
+
     for (const data of freshData) {
       const normalizedName = data.name.toLowerCase();
-      
+
       const record = {
         name: normalizedName,
         subscriberCount: data.subscribers,
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
         category: null, // could extract from metadata if reddit provides it
         cachedAt: new Date(),
       };
-      
+
       validCache.set(normalizedName, record);
 
       try {

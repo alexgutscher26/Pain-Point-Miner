@@ -224,7 +224,9 @@ export async function PATCH(req: Request) {
             emailNotifications: payload.weeklyDigest,
             dashboardLayout: nextDashboardLayout,
             scoringWeights: payload.scoringWeights,
-            ...(sanitizedApiKey !== undefined ? { customApiKey: sanitizedApiKey } : {}),
+            ...(sanitizedApiKey !== undefined
+              ? { customApiKey: sanitizedApiKey }
+              : {}),
           })
           .where(eq(userPreferences.id, existingPreferences.id));
       } else {

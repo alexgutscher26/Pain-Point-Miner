@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { getPreminedNiche, getAllPreminedNiches } from "@/lib/premined-niches";
+import { constructMetadata, siteConfig, siteUrl } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,10 +43,12 @@ export async function generateMetadata({
     };
   }
 
-  return {
-    title: `${niche.title} - Reddit Pain Points & Opportunity Teardown | ThreddIQ`,
+  return constructMetadata({
+    title: `${niche.title} - Reddit Pain Points & Opportunity Teardown`,
     description: niche.tagline,
-  };
+    path: `/niches/${resolvedParams.slug}`,
+    ogImage: `${siteUrl}/api/og?title=${encodeURIComponent(niche.title)}&description=${encodeURIComponent(niche.tagline)}&badge=${encodeURIComponent(niche.category)}&category=Niche+Intelligence`,
+  });
 }
 
 export default async function NicheDetailPage({ params }: NichePageProps) {
@@ -55,8 +59,35 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
     notFound();
   }
 
+  const nicheSchema = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: niche.title,
+    description: niche.tagline,
+    url: `${siteUrl}/niches/${resolvedParams.slug}`,
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/icon.png`,
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", item: "/" },
+          { name: "Pre-Mined Niches", item: "/niches" },
+          { name: niche.title, item: `/niches/${resolvedParams.slug}` },
+        ]}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(nicheSchema) }}
+      />
       <Header />
 
       <main className="pt-28 pb-20">
@@ -78,15 +109,19 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
                   {niche.category}
                 </span>
                 <span className="text-xs text-zinc-500">
-                  Target Subreddits: {niche.subreddits.map((s) => `r/${s}`).join(", ")}
+                  Target Subreddits:{" "}
+                  {niche.subreddits.map((s) => `r/${s}`).join(", ")}
                 </span>
               </div>
-              <Badge variant="outline" className="border-orange-300 bg-orange-50 text-[#ff4500] font-semibold text-xs">
+              <Badge
+                variant="outline"
+                className="border-orange-300 bg-orange-50 text-xs font-semibold text-[#ff4500]"
+              >
                 Opportunity Score: {niche.opportunityScore}/100
               </Badge>
             </div>
 
-            <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-4xl text-zinc-900">
+            <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
               {niche.title}
             </h1>
             <p className="mt-3 text-base leading-relaxed text-zinc-600 sm:text-lg">
@@ -94,28 +129,36 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
             </p>
 
             {/* Metrics Row */}
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-2xl bg-zinc-50 p-4 border border-zinc-100 text-center">
+            <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-4 text-center sm:grid-cols-4">
               <div>
-                <div className="text-xs font-medium text-zinc-500">Opportunity</div>
+                <div className="text-xs font-medium text-zinc-500">
+                  Opportunity
+                </div>
                 <div className="mt-1 flex items-center justify-center gap-1 text-xl font-extrabold text-[#ff4500]">
                   <Flame className="h-4 w-4 fill-[#ff4500]" />
                   {niche.opportunityScore}
                 </div>
               </div>
               <div>
-                <div className="text-xs font-medium text-zinc-500">Urgency Level</div>
+                <div className="text-xs font-medium text-zinc-500">
+                  Urgency Level
+                </div>
                 <div className="mt-1 text-xl font-extrabold text-zinc-800">
                   {niche.urgencyScore}%
                 </div>
               </div>
               <div>
-                <div className="text-xs font-medium text-zinc-500">Monetization</div>
+                <div className="text-xs font-medium text-zinc-500">
+                  Monetization
+                </div>
                 <div className="mt-1 text-xl font-extrabold text-emerald-600">
                   {niche.monetizationScore}%
                 </div>
               </div>
               <div>
-                <div className="text-xs font-medium text-zinc-500">Estimated TAM</div>
+                <div className="text-xs font-medium text-zinc-500">
+                  Estimated TAM
+                </div>
                 <div className="mt-1 text-base font-bold text-zinc-900">
                   {niche.estimatedTam}
                 </div>
@@ -140,7 +183,7 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
                 <Sparkles className="h-5 w-5 text-[#ff4500]" />
                 Recommended SaaS Blueprint
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-orange-950/90 font-medium">
+              <p className="mt-3 text-sm leading-relaxed font-medium text-orange-950/90">
                 {niche.solutionBlueprint}
               </p>
             </div>
@@ -177,16 +220,17 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
                   </p>
 
                   {/* Quote from Reddit */}
-                  <div className="mt-4 rounded-xl bg-zinc-50 p-3 border-l-4 border-[#ff4500] text-xs text-zinc-700 italic">
+                  <div className="mt-4 rounded-xl border-l-4 border-[#ff4500] bg-zinc-50 p-3 text-xs text-zinc-700 italic">
                     "{pt.sampleQuote}"
                   </div>
 
                   {/* Willingness to pay quote */}
                   {pt.willingnessToPayQuote && (
-                    <div className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-50 p-3 border border-emerald-200 text-xs text-emerald-900 font-medium">
-                      <DollarSign className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-900">
+                      <DollarSign className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                       <span>
-                        <strong>Budget Signal:</strong> "{pt.willingnessToPayQuote}"
+                        <strong>Budget Signal:</strong> "
+                        {pt.willingnessToPayQuote}"
                       </span>
                     </div>
                   )}
@@ -194,7 +238,9 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
                   {/* Solutions tried */}
                   {pt.triedSolutions.length > 0 && (
                     <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-                      <span className="font-semibold text-zinc-700">Failed / Incomplete Workarounds:</span>
+                      <span className="font-semibold text-zinc-700">
+                        Failed / Incomplete Workarounds:
+                      </span>
                       {pt.triedSolutions.map((sol, sIdx) => (
                         <span
                           key={sIdx}
@@ -216,7 +262,8 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
               Ready to Mine Your Specific SaaS Idea?
             </h3>
             <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-300">
-              Run a live scan across Reddit in seconds. New free accounts get 2 free starter scans every month.
+              Run a live scan across Reddit in seconds. New free accounts get 2
+              free starter scans every month.
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Link href="/dashboard/search">

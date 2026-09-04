@@ -93,12 +93,8 @@
           "name": "account_userId_fkey",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -481,12 +477,8 @@
           "name": "keyword_stat_scraperId_fkey",
           "tableFrom": "keyword_stat",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -494,12 +486,8 @@
           "name": "keyword_stat_userId_fkey",
           "tableFrom": "keyword_stat",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -820,12 +808,8 @@
           "name": "pain_point_scraperId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -833,12 +817,8 @@
           "name": "pain_point_userId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -846,12 +826,8 @@
           "name": "pain_point_workspaceId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -859,12 +835,8 @@
           "name": "pain_point_clusterId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "pain_point_cluster",
-          "columnsFrom": [
-            "clusterId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["clusterId"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "cascade"
         }
@@ -1034,12 +1006,8 @@
           "name": "pain_point_cluster_userId_fkey",
           "tableFrom": "pain_point_cluster",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1047,12 +1015,8 @@
           "name": "pain_point_cluster_workspaceId_fkey",
           "tableFrom": "pain_point_cluster",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1125,12 +1089,8 @@
           "name": "pain_point_comment_painPointId_fkey",
           "tableFrom": "pain_point_comment",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1277,12 +1237,8 @@
           "name": "pain_point_embedding_painPointId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1290,12 +1246,8 @@
           "name": "pain_point_embedding_userId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1303,12 +1255,8 @@
           "name": "pain_point_embedding_workspaceId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1383,12 +1331,8 @@
           "name": "pain_point_feedback_painPointId_fkey",
           "tableFrom": "pain_point_feedback",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1396,12 +1340,8 @@
           "name": "pain_point_feedback_userId_fkey",
           "tableFrom": "pain_point_feedback",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1472,12 +1412,8 @@
           "name": "purchased_credits_userId_fkey",
           "tableFrom": "purchased_credits",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1818,12 +1754,8 @@
           "name": "scraper_userId_fkey",
           "tableFrom": "scraper",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1831,12 +1763,8 @@
           "name": "scraper_workspaceId_fkey",
           "tableFrom": "scraper",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1934,12 +1862,8 @@
           "name": "scraper_post_runId_fkey",
           "tableFrom": "scraper_post",
           "tableTo": "scraper_run",
-          "columnsFrom": [
-            "runId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["runId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2116,12 +2040,8 @@
           "name": "scraper_run_scraperId_fkey",
           "tableFrom": "scraper_run",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2238,12 +2158,8 @@
           "name": "scraper_run_summary_scraperId_fkey",
           "tableFrom": "scraper_run_summary",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2330,12 +2246,8 @@
           "name": "session_userId_fkey",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2700,9 +2612,7 @@
         "tool_slug_unique": {
           "name": "tool_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -2942,12 +2852,8 @@
           "name": "user_preferences_userId_fkey",
           "tableFrom": "user_preferences",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -3078,12 +2984,8 @@
           "name": "workspace_ownerId_fkey",
           "tableFrom": "workspace",
           "tableTo": "user",
-          "columnsFrom": [
-            "ownerId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ownerId"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
@@ -3167,12 +3069,8 @@
           "name": "workspace_member_workspaceId_fkey",
           "tableFrom": "workspace_member",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -3180,12 +3078,8 @@
           "name": "workspace_member_userId_fkey",
           "tableFrom": "workspace_member",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -3201,11 +3095,7 @@
     "public.LtdTier": {
       "name": "LtdTier",
       "schema": "public",
-      "values": [
-        "none",
-        "founder",
-        "professional"
-      ]
+      "values": ["none", "founder", "professional"]
     },
     "public.PainPointDifficulty": {
       "name": "PainPointDifficulty",
@@ -3220,11 +3110,7 @@
     "public.ScraperStatus": {
       "name": "ScraperStatus",
       "schema": "public",
-      "values": [
-        "running",
-        "paused",
-        "error"
-      ]
+      "values": ["running", "paused", "error"]
     }
   },
   "schemas": {},

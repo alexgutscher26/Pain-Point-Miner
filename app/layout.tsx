@@ -10,6 +10,7 @@ import { getServerSession } from "@/lib/auth";
 
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
+import { CookieConsentBanner } from "@/components/ui/cookie-consent-banner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -47,6 +48,7 @@ export default async function RootLayout({
         <UserJotWidget user={session?.user ?? null} />
         <Toaster />
         <Analytics />
+        <CookieConsentBanner />
         {children}
       </body>
     </html>

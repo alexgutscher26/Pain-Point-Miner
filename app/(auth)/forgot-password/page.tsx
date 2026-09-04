@@ -123,7 +123,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Insight panel */}
-          <div className="hidden border-t border-black/[0.04] p-8 sm:p-10 lg:block lg:w-1/2 lg:border-l lg:border-t-0">
+          <div className="hidden border-t border-black/[0.04] p-8 sm:p-10 lg:block lg:w-1/2 lg:border-t-0 lg:border-l">
             <div className="flex h-full flex-col justify-center">
               <p className="mb-6 text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
                 Security Tip

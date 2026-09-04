@@ -16,8 +16,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "How to Validate a SaaS Idea Using Reddit Before You Write a Line of Code | ThreddIQ Blog",
-  description: "Stop building in the dark. Learn how to mine Reddit for real pain points, budget signals, and market demand — before you write a single line of code.",
+  title:
+    "How to Validate a SaaS Idea Using Reddit Before You Write a Line of Code | ThreddIQ Blog",
+  description:
+    "Stop building in the dark. Learn how to mine Reddit for real pain points, budget signals, and market demand — before you write a single line of code.",
 };
 
 const stats = [
@@ -58,7 +60,7 @@ const steps = [
 const signals = [
   {
     title: "Users mention specific dollar amounts",
-    desc: "\"I'd pay $50/month for this\" is a stronger signal than \"I wish this existed.\"",
+    desc: '"I\'d pay $50/month for this" is a stronger signal than "I wish this existed."',
   },
   {
     title: "They've tried existing workarounds",
@@ -76,7 +78,7 @@ const signals = [
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto flex w-full max-w-5xl flex-col px-6 pt-32 pb-24">
@@ -86,7 +88,10 @@ export default function BlogPost() {
             Home
           </Link>
           <span className="text-zinc-300">/</span>
-          <Link href="/resources" className="transition-colors hover:text-zinc-900">
+          <Link
+            href="/resources"
+            className="transition-colors hover:text-zinc-900"
+          >
             Resources
           </Link>
           <span className="text-zinc-300">/</span>
@@ -97,26 +102,37 @@ export default function BlogPost() {
         <header className="mb-20">
           <h1 className="mb-8 text-[40px] leading-tight font-black tracking-tight text-zinc-900 md:text-[72px]">
             How to validate a <br className="hidden md:block" />
-            SaaS idea using{" "}
-            <span className="text-[#ff4500]">Reddit</span>
+            SaaS idea using <span className="text-[#ff4500]">Reddit</span>
           </h1>
-          <em className="block mb-10 text-lg font-medium text-zinc-500 md:text-xl">
+          <em className="mb-10 block text-lg font-medium text-zinc-500 md:text-xl">
             Before you write a single line of code
           </em>
           <p className="max-w-3xl text-xl leading-relaxed font-medium text-zinc-500 md:text-2xl">
-            Every failed SaaS product has one thing in common: nobody asked if the problem was real. Reddit is the world's largest focus group — 430 million monthly active users, organized by interest, actively venting about what's broken. Here's how to mine it systematically.
+            Every failed SaaS product has one thing in common: nobody asked if
+            the problem was real. Reddit is the world's largest focus group —
+            430 million monthly active users, organized by interest, actively
+            venting about what's broken. Here's how to mine it systematically.
           </p>
         </header>
 
         {/* Stats Grid */}
         <section className="mb-24 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
           {stats.map((stat) => (
-            <div key={stat.label} className="group relative overflow-hidden rounded-[32px] glass-card p-8 transition-all">
+            <div
+              key={stat.label}
+              className="group glass-card relative overflow-hidden rounded-[32px] p-8 transition-all"
+            >
               <div className="absolute top-0 right-0 h-24 w-24 bg-[#ff4500]/5 opacity-0 blur-3xl transition-opacity group-hover:opacity-100" />
               <div className="relative z-10">
-                <div className="mb-2 text-4xl font-black text-zinc-900">{stat.value}</div>
-                <div className="mb-1 text-sm font-bold text-zinc-700 uppercase tracking-wide">{stat.label}</div>
-                <div className="text-[11px] font-medium text-zinc-500">{stat.sub}</div>
+                <div className="mb-2 text-4xl font-black text-zinc-900">
+                  {stat.value}
+                </div>
+                <div className="mb-1 text-sm font-bold tracking-wide text-zinc-700 uppercase">
+                  {stat.label}
+                </div>
+                <div className="text-[11px] font-medium text-zinc-500">
+                  {stat.sub}
+                </div>
               </div>
             </div>
           ))}
@@ -124,30 +140,52 @@ export default function BlogPost() {
 
         {/* Why Reddit */}
         <section className="mb-24">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">Why Reddit is the best customer research platform</h2>
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            Why Reddit is the best customer research platform
+          </h2>
           <div className="grid gap-8 md:grid-cols-2">
-            <div className="rounded-[32px] glass-card p-10">
-              <h3 className="mb-4 text-xl font-black text-zinc-900">Unfiltered honesty</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Redditors are anonymous. They don't sugarcoat. A user who says "this tool is garbage and I hate paying for it" in a Reddit thread would never say that in a survey. The signal is raw and real.
+            <div className="glass-card rounded-[32px] p-10">
+              <h3 className="mb-4 text-xl font-black text-zinc-900">
+                Unfiltered honesty
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Redditors are anonymous. They don't sugarcoat. A user who says
+                "this tool is garbage and I hate paying for it" in a Reddit
+                thread would never say that in a survey. The signal is raw and
+                real.
               </p>
             </div>
-            <div className="rounded-[32px] glass-card p-10">
-              <h3 className="mb-4 text-xl font-black text-zinc-900">Pre-segmented by interest</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Subreddits are built-in audience segments. r/smallbusiness, r/webdev, r/legaladvice — each one is a self-selected group of people with shared needs. You don't need a marketing list; you need the right subreddit.
+            <div className="glass-card rounded-[32px] p-10">
+              <h3 className="mb-4 text-xl font-black text-zinc-900">
+                Pre-segmented by interest
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Subreddits are built-in audience segments. r/smallbusiness,
+                r/webdev, r/legaladvice — each one is a self-selected group of
+                people with shared needs. You don't need a marketing list; you
+                need the right subreddit.
               </p>
             </div>
-            <div className="rounded-[32px] glass-card p-10">
-              <h3 className="mb-4 text-xl font-black text-zinc-900">Real budget signals</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Founders and professionals openly discuss what they spend. Monthly budgets, tool stacks, pricing complaints — the data is there if you know where to look. ThreddIQ extracts these signals automatically.
+            <div className="glass-card rounded-[32px] p-10">
+              <h3 className="mb-4 text-xl font-black text-zinc-900">
+                Real budget signals
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Founders and professionals openly discuss what they spend.
+                Monthly budgets, tool stacks, pricing complaints — the data is
+                there if you know where to look. ThreddIQ extracts these signals
+                automatically.
               </p>
             </div>
-            <div className="rounded-[32px] glass-card p-10">
-              <h3 className="mb-4 text-xl font-black text-zinc-900">Competitive intelligence, for free</h3>
-              <p className="text-lg font-medium text-zinc-500 leading-relaxed">
-                Every mention of a competitor is a data point. Users explain exactly why they switched, what's missing, and what they wish existed. That's product roadmap research you can't get from a landing page A/B test.
+            <div className="glass-card rounded-[32px] p-10">
+              <h3 className="mb-4 text-xl font-black text-zinc-900">
+                Competitive intelligence, for free
+              </h3>
+              <p className="text-lg leading-relaxed font-medium text-zinc-500">
+                Every mention of a competitor is a data point. Users explain
+                exactly why they switched, what's missing, and what they wish
+                existed. That's product roadmap research you can't get from a
+                landing page A/B test.
               </p>
             </div>
           </div>
@@ -156,15 +194,21 @@ export default function BlogPost() {
         {/* The five steps */}
         <section className="mb-32">
           <div className="mb-16 text-center">
-            <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-5xl">The five-step validation pipeline</h2>
-            <p className="mx-auto max-w-2xl text-lg font-medium text-zinc-500 leading-relaxed md:text-xl">
-              Here's how to go from a vague idea to a data-backed product decision — without leaving your terminal.
+            <h2 className="mb-6 text-3xl font-black text-zinc-900 md:text-5xl">
+              The five-step validation pipeline
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-zinc-500 md:text-xl">
+              Here's how to go from a vague idea to a data-backed product
+              decision — without leaving your terminal.
             </p>
           </div>
 
           <div className="space-y-16">
             {steps.map((step, i) => (
-              <div key={i} className="flex flex-col gap-6 md:flex-row md:items-start md:gap-12">
+              <div
+                key={i}
+                className="flex flex-col gap-6 md:flex-row md:items-start md:gap-12"
+              >
                 {/* Number + Icon */}
                 <div className="flex shrink-0 items-center gap-4 md:flex-col md:items-center">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full border border-black/10 bg-black/5 text-2xl font-black text-zinc-800">
@@ -176,7 +220,9 @@ export default function BlogPost() {
                 </div>
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="mb-4 text-2xl font-black text-zinc-900 md:text-3xl">{step.title}</h3>
+                  <h3 className="mb-4 text-2xl font-black text-zinc-900 md:text-3xl">
+                    {step.title}
+                  </h3>
                   <p className="text-lg leading-relaxed font-medium text-zinc-500 md:text-xl">
                     {step.body}
                   </p>
@@ -188,16 +234,22 @@ export default function BlogPost() {
 
         {/* Key Signals Section */}
         <section className="mb-32">
-          <div className="rounded-[48px] glass-card p-12 md:p-20">
-            <h2 className="mb-12 text-3xl font-black text-zinc-900 md:text-4xl">Four signals that separate real SaaS ideas from wishful thinking</h2>
+          <div className="glass-card rounded-[48px] p-12 md:p-20">
+            <h2 className="mb-12 text-3xl font-black text-zinc-900 md:text-4xl">
+              Four signals that separate real SaaS ideas from wishful thinking
+            </h2>
             <div className="grid gap-6 md:grid-cols-2">
               {signals.map((signal, i) => (
-                <div key={i} className="rounded-[24px] glass-card p-8">
+                <div key={i} className="glass-card rounded-[24px] p-8">
                   <div className="mb-3 flex items-center gap-3">
                     <div className="h-2 w-2 rounded-full bg-[#ff4500]" />
-                    <h3 className="text-lg font-black text-zinc-900">{signal.title}</h3>
+                    <h3 className="text-lg font-black text-zinc-900">
+                      {signal.title}
+                    </h3>
                   </div>
-                  <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">{signal.desc}</p>
+                  <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                    {signal.desc}
+                  </p>
                 </div>
               ))}
             </div>
@@ -206,57 +258,80 @@ export default function BlogPost() {
 
         {/* Red Flag Section */}
         <section className="mb-32">
-          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">When Reddit data can mislead you</h2>
+          <h2 className="mb-10 text-3xl font-black text-zinc-900 md:text-4xl">
+            When Reddit data can mislead you
+          </h2>
           <div className="grid gap-6 md:grid-cols-3">
             <div className="rounded-[24px] border border-red-500/10 bg-red-500/2 p-8">
-              <h3 className="mb-3 text-lg font-black text-zinc-900">Vocal minority</h3>
-              <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">
-                A 200-upvote thread doesn't mean a market. Power users are loud but small. Cross-reference thread volume with subreddit size and post frequency.
+              <h3 className="mb-3 text-lg font-black text-zinc-900">
+                Vocal minority
+              </h3>
+              <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                A 200-upvote thread doesn't mean a market. Power users are loud
+                but small. Cross-reference thread volume with subreddit size and
+                post frequency.
               </p>
             </div>
             <div className="rounded-[24px] border border-red-500/10 bg-red-500/2 p-8">
-              <h3 className="mb-3 text-lg font-black text-zinc-900">Selection bias</h3>
-              <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">
-                Reddit skews technical, young, and male. A validated pain point on r/SaaS may not replicate in an enterprise boardroom. Know your audience's audience.
+              <h3 className="mb-3 text-lg font-black text-zinc-900">
+                Selection bias
+              </h3>
+              <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                Reddit skews technical, young, and male. A validated pain point
+                on r/SaaS may not replicate in an enterprise boardroom. Know
+                your audience's audience.
               </p>
             </div>
             <div className="rounded-[24px] border border-red-500/10 bg-red-500/2 p-8">
-              <h3 className="mb-3 text-lg font-black text-zinc-900">Complaints aren't contracts</h3>
-              <p className="text-[15px] font-medium text-zinc-500 leading-relaxed">
-                Someone who vents about a problem isn't guaranteed to buy your solution. Budget signals and explicit "I would pay X" quotes are far stronger than general frustration.
+              <h3 className="mb-3 text-lg font-black text-zinc-900">
+                Complaints aren't contracts
+              </h3>
+              <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
+                Someone who vents about a problem isn't guaranteed to buy your
+                solution. Budget signals and explicit "I would pay X" quotes are
+                far stronger than general frustration.
               </p>
             </div>
           </div>
         </section>
 
         {/* The bigger point */}
-        <section className="mb-32 border-l-4 border-[#ff4500] glass-card py-12 px-10 rounded-r-[32px]">
-          <blockquote className="text-3xl font-black italic leading-tight text-zinc-900 md:text-4xl">
-            &ldquo;The best startup advice I can give: Don't build for a problem you invented. Find a problem people are already shouting about — and listen.&rdquo;
+        <section className="glass-card mb-32 rounded-r-[32px] border-l-4 border-[#ff4500] px-10 py-12">
+          <blockquote className="text-3xl leading-tight font-black text-zinc-900 italic md:text-4xl">
+            &ldquo;The best startup advice I can give: Don't build for a problem
+            you invented. Find a problem people are already shouting about — and
+            listen.&rdquo;
           </blockquote>
         </section>
 
         {/* Conclusion */}
-        <section className="mb-32 py-16 text-center border-t border-black/10">
-          <p className="mx-auto max-w-2xl text-xl font-medium text-zinc-500 italic md:text-2xl leading-relaxed">
-            Idea validation isn't a one-time checkbox. It's a continuous feedback loop. The founders who win aren't the ones with the best intuition — they're the ones who build in public, listen in public, and let their market tell them what to ship next.
+        <section className="mb-32 border-t border-black/10 py-16 text-center">
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-medium text-zinc-500 italic md:text-2xl">
+            Idea validation isn't a one-time checkbox. It's a continuous
+            feedback loop. The founders who win aren't the ones with the best
+            intuition — they're the ones who build in public, listen in public,
+            and let their market tell them what to ship next.
           </p>
-          <div className="mt-12 text-xs font-bold text-zinc-500 uppercase tracking-widest">
-            Data sourced from ThreddIQ's Reddit intelligence engine. 15,000+ pain points analyzed across 1,400+ subreddits.
+          <div className="mt-12 text-xs font-bold tracking-widest text-zinc-500 uppercase">
+            Data sourced from ThreddIQ's Reddit intelligence engine. 15,000+
+            pain points analyzed across 1,400+ subreddits.
           </div>
         </section>
 
         {/* CTA */}
-        <div className="relative mt-24 flex flex-col items-center overflow-hidden rounded-[48px] glass-card p-16">
+        <div className="glass-card relative mt-24 flex flex-col items-center overflow-hidden rounded-[48px] p-16">
           <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#ff4500]/50 to-transparent opacity-50" />
           <div className="mb-10 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#ff4500]/30 bg-[#ff4500]/10">
             <Search className="h-8 w-8 text-[#ff4500]" />
           </div>
           <h2 className="mb-6 text-center text-3xl font-extrabold text-zinc-900 md:text-5xl">
-            Find your next <span className="text-[#ff4500]">validated idea</span>
+            Find your next{" "}
+            <span className="text-[#ff4500]">validated idea</span>
           </h2>
           <p className="mb-12 max-w-2xl text-center text-xl leading-relaxed font-medium text-zinc-500">
-            Stop guessing. Start shipping. ThreddIQ mines Reddit for real pain points, budget signals, and competitive gaps — so you can build something people actually need.
+            Stop guessing. Start shipping. ThreddIQ mines Reddit for real pain
+            points, budget signals, and competitive gaps — so you can build
+            something people actually need.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button
@@ -264,7 +339,9 @@ export default function BlogPost() {
               size="lg"
               className="rounded-2xl bg-linear-to-b from-[#ff5100] to-[#e63e00] px-12 py-7 text-xl font-black text-white shadow-xl shadow-[#ff4500]/20 transition-all hover:from-[#ff621a] hover:to-[#ff4500]"
             >
-              <Link href="/sign-up">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/sign-up">
+                Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </div>
         </div>

@@ -2,13 +2,13 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Target, 
-  Lightbulb, 
+import {
+  ArrowRight,
+  Sparkles,
+  Target,
+  Lightbulb,
   TrendingUp,
-  Zap
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { completeOnboardingAction } from "../actions";
@@ -36,10 +36,22 @@ export default function OnboardingCelebration() {
   };
 
   const benefits = [
-    { icon: Target, label: "Your subreddits are being monitored for pain points" },
-    { icon: Lightbulb, label: "AI will surface the most common frustrations and needs" },
-    { icon: TrendingUp, label: "Get weekly digests with actionable product insights" },
-    { icon: Zap, label: "Build what your audience actually wants — no more guessing" },
+    {
+      icon: Target,
+      label: "Your subreddits are being monitored for pain points",
+    },
+    {
+      icon: Lightbulb,
+      label: "AI will surface the most common frustrations and needs",
+    },
+    {
+      icon: TrendingUp,
+      label: "Get weekly digests with actionable product insights",
+    },
+    {
+      icon: Zap,
+      label: "Build what your audience actually wants — no more guessing",
+    },
   ];
 
   return (
@@ -58,7 +70,8 @@ export default function OnboardingCelebration() {
             You're all set{niche ? ` for ${niche}` : ""}!
           </h2>
           <p className="mx-auto max-w-md text-lg leading-relaxed text-zinc-500">
-            We're already scanning Reddit for pain points your future customers are sharing right now.
+            We're already scanning Reddit for pain points your future customers
+            are sharing right now.
           </p>
         </div>
       </div>
@@ -75,7 +88,7 @@ export default function OnboardingCelebration() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-black/[0.04] bg-white/80">
                 <Icon className="h-5 w-5 text-zinc-600" />
               </div>
-              <p className="text-sm font-semibold leading-relaxed text-zinc-700">
+              <p className="text-sm leading-relaxed font-semibold text-zinc-700">
                 {benefit.label}
               </p>
             </div>
@@ -87,7 +100,7 @@ export default function OnboardingCelebration() {
       <div className="flex flex-col items-center gap-6 pt-6">
         <button
           onClick={handleDashNow}
-          className="flex items-center gap-3 rounded-full border border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white shadow-[0_4px_20px_rgba(255,69,0,0.3)] transition-all duration-300 hover:bg-[#e63e00] hover:scale-105 active:scale-95"
+          className="flex items-center gap-3 rounded-full border border-[#ff4500] bg-[#ff4500] px-8 py-3.5 text-white shadow-[0_4px_20px_rgba(255,69,0,0.3)] transition-all duration-300 hover:scale-105 hover:bg-[#e63e00] active:scale-95"
         >
           <span className="font-mono text-[13px] font-black tracking-widest uppercase">
             Go to dashboard

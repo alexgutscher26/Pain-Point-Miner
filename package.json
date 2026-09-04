@@ -28,7 +28,7 @@
     "@react-email/components": "^1.0.10",
     "@types/pg": "8.20.0",
     "@vercel/analytics": "^2.0.1",
-    "better-auth": "1.6.11",
+    "better-auth": "1.6.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -40,7 +40,7 @@
     "input-otp": "^1.4.2",
     "loops": "^6.2.1",
     "lucide-react": "^1.7.0",
-    "next": "16.2.6",
+    "next": "16.2.11",
     "next-themes": "^0.4.6",
     "p-map": "^7.0.4",
     "pg": "^8.20.0",
@@ -85,5 +85,16 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "overrides": {
+    "@opentelemetry/core": "^2.8.0",
+    "@opentelemetry/propagator-jaeger": "^2.9.0",
+    "protobufjs": "^8.6.6",
+    "samlify": "^2.13.0",
+    "sharp": "^0.35.0",
+    "ws": "^8.21.0",
+    "ip-address": "^10.3.1",
+    "postcss": "^8.5.23",
+    "esbuild": "^0.28.1"
+  }
 }

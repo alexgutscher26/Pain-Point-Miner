@@ -15,8 +15,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "AI Wrapper Fatigue: How Reddit Sentiment Shifted in 2026 | ThreddIQ Blog",
-  description: "What customers actually want from AI tools in 2026 after the wrapper hype cycle, and how to build defensible AI software with real user demand.",
+  title:
+    "AI Wrapper Fatigue: How Reddit Sentiment Shifted in 2026 | ThreddIQ Blog",
+  description:
+    "What customers actually want from AI tools in 2026 after the wrapper hype cycle, and how to build defensible AI software with real user demand.",
 };
 
 const insights = [
@@ -42,13 +44,13 @@ const insights = [
 
 export default function BlogPost() {
   return (
-    <div className="min-h-screen landing-gradient font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient min-h-screen font-sans text-zinc-800 selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       <Header />
 
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
         {/* Breadcrumb */}
-        <div className="mb-8 flex items-center gap-2 text-xs font-bold text-zinc-600 uppercase tracking-widest">
-          <Link href="/blog" className="hover:text-[#ff4500] transition-colors">
+        <div className="mb-8 flex items-center gap-2 text-xs font-bold tracking-widest text-zinc-600 uppercase">
+          <Link href="/blog" className="transition-colors hover:text-[#ff4500]">
             Blog
           </Link>
           <span>/</span>
@@ -57,17 +59,19 @@ export default function BlogPost() {
 
         {/* Header */}
         <header className="mb-16">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black text-[#ff4500] uppercase tracking-widest">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff4500]/10 px-3.5 py-1 text-xs font-black tracking-widest text-[#ff4500] uppercase">
             <Brain className="h-3.5 w-3.5" />
             AI Market Intelligence
           </div>
           <h1 className="mb-6 text-[40px] leading-[1.1] font-black tracking-tight text-zinc-900 md:text-[52px]">
             AI Wrapper Fatigue: How Reddit Sentiment Shifted in 2026
           </h1>
-          <p className="text-xl font-medium text-zinc-600 leading-relaxed">
-            Reddit discussions in r/SaaS and r/ArtificialIntelligence reveal that the era of simple prompt wrappers is over. Here is what users are actually willing to pay for now.
+          <p className="text-xl leading-relaxed font-medium text-zinc-600">
+            Reddit discussions in r/SaaS and r/ArtificialIntelligence reveal
+            that the era of simple prompt wrappers is over. Here is what users
+            are actually willing to pay for now.
           </p>
-          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold text-zinc-600 uppercase tracking-widest">
+          <div className="mt-8 flex items-center gap-4 border-y border-black/5 py-4 text-xs font-bold tracking-widest text-zinc-600 uppercase">
             <span>By ThreddIQ Research</span>
             <span>&bull;</span>
             <span>August 2026</span>
@@ -83,10 +87,17 @@ export default function BlogPost() {
               The Post-Wrapper Reality
             </h2>
             <p>
-              In 2023 and 2024, founders could launch a UI around the OpenAI API and generate quick MRR. In 2026, buyers are sophisticated. They recognize standard model outputs and actively cancel subscriptions that fail to provide proprietary workflow integration.
+              In 2023 and 2024, founders could launch a UI around the OpenAI API
+              and generate quick MRR. In 2026, buyers are sophisticated. They
+              recognize standard model outputs and actively cancel subscriptions
+              that fail to provide proprietary workflow integration.
             </p>
             <p>
-              By tracking sentiment across 30+ AI-focused subreddits, ThreddIQ detected a 74% increase in the phrase "I could just do this in ChatGPT" on posts reviewing new SaaS products. But alongside the fatigue, there is a massive surge in demand for specialized, vertically integrated AI tooling.
+              By tracking sentiment across 30+ AI-focused subreddits, ThreddIQ
+              detected a 74% increase in the phrase "I could just do this in
+              ChatGPT" on posts reviewing new SaaS products. But alongside the
+              fatigue, there is a massive surge in demand for specialized,
+              vertically integrated AI tooling.
             </p>
           </section>
 
@@ -99,13 +110,13 @@ export default function BlogPost() {
               {insights.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-black/5 bg-white p-6 shadow-xs flex flex-col md:flex-row gap-6 items-start"
+                  className="flex flex-col items-start gap-6 rounded-2xl border border-black/5 bg-white p-6 shadow-xs md:flex-row"
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#ff4500]/10">
                     {item.icon}
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <h3 className="text-lg font-black text-zinc-900">
                         {item.title}
                       </h3>
@@ -113,7 +124,7 @@ export default function BlogPost() {
                         {item.highlight}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-zinc-600 leading-relaxed">
+                    <p className="text-sm leading-relaxed font-medium text-zinc-600">
                       {item.desc}
                     </p>
                   </div>
@@ -127,8 +138,9 @@ export default function BlogPost() {
             <h3 className="mb-3 text-xl font-black text-zinc-900">
               The Bottom Line for 2026 Builders
             </h3>
-            <p className="text-sm font-medium text-zinc-700 leading-relaxed">
-              Do not sell "AI features". Sell solved business problems where AI handles the heavy lifting invisibly behind the scenes.
+            <p className="text-sm leading-relaxed font-medium text-zinc-700">
+              Do not sell "AI features". Sell solved business problems where AI
+              handles the heavy lifting invisibly behind the scenes.
             </p>
           </section>
         </div>
@@ -139,7 +151,8 @@ export default function BlogPost() {
             Find the AI gaps customers are begging for
           </h3>
           <p className="mx-auto mb-8 max-w-xl text-sm font-medium text-zinc-400">
-            ThreddIQ scans thousands of organic conversations every day to pinpoint unfulfilled software requests.
+            ThreddIQ scans thousands of organic conversations every day to
+            pinpoint unfulfilled software requests.
           </p>
           <Button
             asChild

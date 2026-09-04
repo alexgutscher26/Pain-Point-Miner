@@ -194,7 +194,10 @@ export default async function ResourcePage({
               Home
             </Link>
             <span>/</span>
-            <Link href="/resources" className="transition-colors hover:text-white">
+            <Link
+              href="/resources"
+              className="transition-colors hover:text-white"
+            >
               Resources
             </Link>
           </div>
@@ -231,8 +234,8 @@ export default async function ResourcePage({
               Ready to find your next idea?
             </h3>
             <p className="mx-auto mb-10 max-w-xl text-lg font-medium text-zinc-500">
-              Stop guessing and start mining. Join founders using ThreddIQ
-              to build products people actually want.
+              Stop guessing and start mining. Join founders using ThreddIQ to
+              build products people actually want.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button

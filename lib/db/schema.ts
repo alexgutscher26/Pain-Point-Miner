@@ -66,9 +66,17 @@ export const user = pgTable(
     displayUsername: text("display_username"),
     stripeCustomerId: text("stripe_customer_id"),
     image: text("image"),
-    createdAt: timestamp("created_at", { precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }).notNull(),
-    anonymizeRedditUsernames: boolean("anonymize_reddit_usernames").default(false).notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    anonymizeRedditUsernames: boolean("anonymize_reddit_usernames")
+      .default(false)
+      .notNull(),
     deletedAt: timestamp("deleted_at", { precision: 3, mode: "date" }),
     role: text("role").default("user").notNull(),
     ltdTier: ltdTier("ltd_tier").default("none").notNull(),
@@ -77,7 +85,10 @@ export const user = pgTable(
     plan: text("plan"),
     referralCode: text("referral_code"),
     referredById: text("referred_by_id"),
-    referralActivatedAt: timestamp("referral_activated_at", { precision: 3, mode: "date" }),
+    referralActivatedAt: timestamp("referral_activated_at", {
+      precision: 3,
+      mode: "date",
+    }),
   },
   (table) => [
     uniqueIndex("user_email_key").using(
@@ -95,10 +106,19 @@ export const session = pgTable(
   "session",
   {
     id: text().primaryKey().notNull(),
-    expiresAt: timestamp("expires_at", { precision: 3, mode: "date" }).notNull(),
+    expiresAt: timestamp("expires_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
     token: text("token").notNull(),
-    createdAt: timestamp("created_at", { precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
     userId: text("user_id").notNull(),
@@ -128,12 +148,24 @@ export const account = pgTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at", { precision: 3, mode: "date" }),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { precision: 3, mode: "date" }),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      precision: 3,
+      mode: "date",
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      precision: 3,
+      mode: "date",
+    }),
     scope: text("scope"),
     password: text("password"),
-    createdAt: timestamp("created_at", { precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
   },
   (table) => [
     foreignKey({
@@ -709,10 +741,9 @@ export const painPointEmbedding = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-    index("pain_point_embedding_hnsw_idx").using(
-      "hnsw",
-      table.embedding.op("vector_cosine_ops"),
-    ).with({ m: 24, ef_construction: 200 }),
+    index("pain_point_embedding_hnsw_idx")
+      .using("hnsw", table.embedding.op("vector_cosine_ops"))
+      .with({ m: 24, ef_construction: 200 }),
   ],
 );
 
@@ -1022,13 +1053,22 @@ export const dashboardOpportunityMv = pgMaterializedView(
     userId: text("user_id").notNull(),
     workspaceId: text("workspace_id"),
     keywords: text("keywords").array(),
-    createdAt: timestamp("created_at", { precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
     reportSaved: boolean("report_saved").notNull(),
     reportCategory: text("report_category").notNull(),
     reportSavedAt: timestamp("report_saved_at", { precision: 3, mode: "date" }),
     latestRunStatus: text("latest_run_status"),
-    latestRunStartedAt: timestamp("latest_run_started_at", { precision: 3, mode: "date" }),
+    latestRunStartedAt: timestamp("latest_run_started_at", {
+      precision: 3,
+      mode: "date",
+    }),
     latestPostsFetched: integer("latest_posts_fetched"),
     painPointCount: integer("pain_point_count").notNull(),
     painPoints: jsonb("pain_points").notNull(),

@@ -90,8 +90,10 @@ export async function resolvePlanContext(input: {
     subscriptions,
     ltdTier: currentUser?.ltdTier,
   });
-  
-  const hasActiveSub = subscriptions.some((s) => isSubscriptionActive(s.status));
+
+  const hasActiveSub = subscriptions.some((s) =>
+    isSubscriptionActive(s.status),
+  );
 
   return resolvePlanAccessState({
     userId: input.userId,

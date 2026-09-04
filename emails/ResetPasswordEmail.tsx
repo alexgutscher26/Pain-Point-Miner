@@ -38,18 +38,44 @@ export const ResetPasswordEmail = ({
         <Head />
         <Preview>Reset your ThreddIQ password</Preview>
 
-        <Body className="m-0 bg-[#f3f4f6] py-[48px]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+        <Body
+          className="m-0 bg-[#f3f4f6] py-[48px]"
+          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
           <Container className="mx-auto w-full max-w-[600px]">
-            <Section style={{ backgroundColor: "#f97316", height: "4px", lineHeight: "4px", fontSize: "1px" }}>&#8203;</Section>
+            <Section
+              style={{
+                backgroundColor: "#f97316",
+                height: "4px",
+                lineHeight: "4px",
+                fontSize: "1px",
+              }}
+            >
+              &#8203;
+            </Section>
           </Container>
 
-          <Container className="mx-auto w-full max-w-[600px] overflow-hidden bg-white" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
+          <Container
+            className="mx-auto w-full max-w-[600px] overflow-hidden bg-white"
+            style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}
+          >
             {/* Nav */}
             <Section className="px-[40px] pt-[32px] pb-[24px]">
-              <table width="100%" cellPadding="0" cellSpacing="0" style={{ borderCollapse: "collapse" }}>
+              <table
+                width="100%"
+                cellPadding="0"
+                cellSpacing="0"
+                style={{ borderCollapse: "collapse" }}
+              >
                 <tr>
                   <td>
-                    <Text className="m-0 text-[26px] font-bold text-[#0f0f0f]" style={{ fontFamily: "Georgia, 'Times New Roman', serif", letterSpacing: "-0.5px" }}>
+                    <Text
+                      className="m-0 text-[26px] font-bold text-[#0f0f0f]"
+                      style={{
+                        fontFamily: "Georgia, 'Times New Roman', serif",
+                        letterSpacing: "-0.5px",
+                      }}
+                    >
                       Thredd<span style={{ color: "#f97316" }}>IQ</span>
                     </Text>
                   </td>
@@ -75,9 +101,13 @@ export const ResetPasswordEmail = ({
               </Heading>
               <Text
                 className="m-0 mt-[16px] text-[16px] leading-[26px] text-[#6b7280]"
-                style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic" }}
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                }}
               >
-                We received a request to reset the password for your account associated with {userEmail}.
+                We received a request to reset the password for your account
+                associated with {userEmail}.
               </Text>
             </Section>
 
@@ -85,14 +115,29 @@ export const ResetPasswordEmail = ({
 
             {/* Body copy */}
             <Section className="px-[40px] pt-[32px] pb-0">
-              <Text className="m-0 text-[15px] text-[#374151] leading-[26px]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-                To reset your password, click the button below. This link will expire in 1 hour. If you did not request a password reset, please ignore this email.
+              <Text
+                className="m-0 text-[15px] leading-[26px] text-[#374151]"
+                style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+              >
+                To reset your password, click the button below. This link will
+                expire in 1 hour. If you did not request a password reset,
+                please ignore this email.
               </Text>
             </Section>
 
             {/* CTA */}
             <Section className="px-[40px] py-[40px]">
-              <table width="100%" cellPadding="0" cellSpacing="0" style={{ borderCollapse: "collapse", backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "6px" }}>
+              <table
+                width="100%"
+                cellPadding="0"
+                cellSpacing="0"
+                style={{
+                  borderCollapse: "collapse",
+                  backgroundColor: "#fff7ed",
+                  border: "1px solid #fed7aa",
+                  borderRadius: "6px",
+                }}
+              >
                 <tr>
                   <td style={{ padding: "28px 24px", textAlign: "center" }}>
                     <Button
@@ -117,24 +162,44 @@ export const ResetPasswordEmail = ({
                 </tr>
               </table>
               <Text className="m-0 mt-[16px] text-center text-[12px] text-[#9ca3af]">
-                Or copy and paste this URL into your browser:<br />
-                <Link href={resetLink} className="text-[#f97316] break-all">
+                Or copy and paste this URL into your browser:
+                <br />
+                <Link href={resetLink} className="break-all text-[#f97316]">
                   {resetLink}
                 </Link>
               </Text>
             </Section>
 
             {/* Footer */}
-            <Section className="px-[40px] py-[28px]" style={{ backgroundColor: "#f9fafb", borderTop: "1px solid #e5e7eb" }}>
-              <table width="100%" cellPadding="0" cellSpacing="0" style={{ borderCollapse: "collapse" }}>
+            <Section
+              className="px-[40px] py-[28px]"
+              style={{
+                backgroundColor: "#f9fafb",
+                borderTop: "1px solid #e5e7eb",
+              }}
+            >
+              <table
+                width="100%"
+                cellPadding="0"
+                cellSpacing="0"
+                style={{ borderCollapse: "collapse" }}
+              >
                 <tr>
                   <td>
-                    <Text className="m-0 text-[14px] font-bold text-[#0f0f0f]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                    <Text
+                      className="m-0 text-[14px] font-bold text-[#0f0f0f]"
+                      style={{
+                        fontFamily: "Georgia, 'Times New Roman', serif",
+                      }}
+                    >
                       Thredd<span style={{ color: "#f97316" }}>IQ</span>
                     </Text>
                   </td>
                   <td align="right">
-                    <Text className="m-0 text-[12px] text-[#9ca3af]" style={{ fontFamily: "monospace" }}>
+                    <Text
+                      className="m-0 text-[12px] text-[#9ca3af]"
+                      style={{ fontFamily: "monospace" }}
+                    >
                       © {String(new Date().getFullYear())}
                     </Text>
                   </td>

@@ -81,4 +81,3 @@ const faqs = [
 export default function HelpSupportPage() {
   return <HelpSupportClient quickActions={quickActions} faqs={faqs} />;
 }
-

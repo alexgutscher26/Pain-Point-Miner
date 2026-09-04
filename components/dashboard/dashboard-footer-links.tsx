@@ -13,9 +13,9 @@ export function DashboardFooterLinks() {
     <div className="flex flex-col gap-1 border-t border-black/[0.06] pt-4">
       <Link
         href="/dashboard/help-support"
-        className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-left font-mono text-[11px] tracking-wide uppercase transition-colors rounded-lg ${
+        className={`flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-left font-mono text-[11px] tracking-wide uppercase transition-colors ${
           isHelpActive
-            ? "border border-[#ff4500]/10 bg-[#ff4500]/5 text-[#ff4500] font-bold"
+            ? "border border-[#ff4500]/10 bg-[#ff4500]/5 font-bold text-[#ff4500]"
             : "border-transparent text-zinc-500 hover:bg-[#ff4500]/5 hover:text-[#ff4500]"
         }`}
       >
@@ -30,15 +30,17 @@ export function DashboardFooterLinks() {
       {/* Command Palette Trigger Hint */}
       <div className="mt-1 flex w-full items-center justify-between px-3.5 py-2 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px]">terminal</span>
+          <span className="material-symbols-outlined text-[16px]">
+            terminal
+          </span>
           <span>Commands</span>
         </div>
-        <div className="flex items-center gap-1 border border-black/[0.08] bg-black/[0.02] px-1.5 py-0.5 rounded text-zinc-500">
+        <div className="flex items-center gap-1 rounded border border-black/[0.08] bg-black/[0.02] px-1.5 py-0.5 text-zinc-500">
           <span className="text-[9px]">⌘</span>
           <span>K</span>
         </div>
       </div>
-      
+
       <SignOutButton />
     </div>
   );

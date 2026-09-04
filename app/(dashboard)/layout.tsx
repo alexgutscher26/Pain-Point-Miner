@@ -15,7 +15,8 @@ import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { LogoIcon } from "@/components/Logo";
-
+import { ProductTour } from "@/components/dashboard/product-tour";
+import { MobileBottomNav } from "@/components/dashboard/mobile-bottom-nav";
 
 export const metadata: Metadata = {
   title: {
@@ -71,14 +72,13 @@ export default async function DashboardLayout({
   const { monthlyScansLimit } = getMonthlyUsageSummary(plan, monthlyScansUsed);
 
   return (
-    <div className="flex min-h-screen landing-gradient font-sans text-zinc-800 antialiased selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
+    <div className="landing-gradient flex min-h-screen font-sans text-zinc-800 antialiased selection:bg-[#ff4500]/10 selection:text-[#ff4500]">
       {/* Command Palette */}
       <CommandPalette />
 
       {/* Sidebar */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start border-r border-black/[0.06] bg-white/40 backdrop-blur-xl lg:flex lg:flex-col">
         <div className="p-6">
-
           <div className="mb-8 flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-full bg-linear-to-tr from-[#ff4500] to-[#ff6b33] p-2 text-white shadow-[0_4px_12px_rgba(255,69,0,0.15)]">
               <LogoIcon className="h-6 w-6" />
@@ -121,9 +121,9 @@ export default async function DashboardLayout({
                   )}
                 </p>
               </div>
-              <div className="h-1 w-full overflow-hidden bg-zinc-200/80 rounded-full">
+              <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-200/80">
                 <div
-                  className="h-full bg-[#ff4500] rounded-full"
+                  className="h-full rounded-full bg-[#ff4500]"
                   style={{
                     width: `${
                       monthlyScansLimit === null
@@ -143,7 +143,7 @@ export default async function DashboardLayout({
             </p>
             <Link
               href="/dashboard/billing"
-              className="relative z-10 block w-full rounded-full bg-[#ff4500] py-2 text-center font-mono text-[11px] font-bold tracking-widest text-white uppercase transition-colors hover:bg-[#e03d00] shadow-xs"
+              className="relative z-10 block w-full rounded-full bg-[#ff4500] py-2 text-center font-mono text-[11px] font-bold tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
             >
               Upgrade Now
             </Link>
@@ -155,13 +155,13 @@ export default async function DashboardLayout({
       {/* Main Content */}
       <main className="relative flex min-h-screen flex-1 flex-col overflow-x-hidden">
         {/* Topbar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-black/[0.06] bg-white/40 backdrop-blur-md px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-black/[0.06] bg-white/40 px-4 backdrop-blur-md sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <DashboardMobileNav
               userName={session.user.name ?? "Founder"}
               planLabel={planLabel}
             />
-            <div className="flex items-center gap-2 border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 rounded-full font-mono text-[10px] font-bold tracking-widest text-emerald-700 uppercase max-sm:hidden">
+            <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-emerald-700 uppercase max-sm:hidden">
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
               System Active
             </div>
@@ -173,7 +173,7 @@ export default async function DashboardLayout({
           <div className="flex items-center gap-3 sm:gap-6">
             <Link
               href="/dashboard/search"
-              className="flex items-center gap-2 bg-[#ff4500] hover:bg-[#e03d00] px-4 py-2 rounded-full font-mono text-[12px] font-bold tracking-wide whitespace-nowrap text-white uppercase transition-colors shadow-xs"
+              className="flex items-center gap-2 rounded-full bg-[#ff4500] px-4 py-2 font-mono text-[12px] font-bold tracking-wide whitespace-nowrap text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New Scan</span>
@@ -209,7 +209,13 @@ export default async function DashboardLayout({
         />
 
         {/* Dynamic Content */}
-        <div className="relative flex-1">{children}</div>
+        <div className="relative flex-1 pb-20 lg:pb-0">{children}</div>
+
+        {/* Interactive Product Tour */}
+        <ProductTour />
+
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
       </main>
     </div>
   );

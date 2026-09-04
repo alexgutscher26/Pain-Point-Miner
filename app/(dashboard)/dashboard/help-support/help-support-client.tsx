@@ -41,7 +41,10 @@ const iconMap = {
   settings: Settings,
 };
 
-export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps) {
+export function HelpSupportClient({
+  quickActions,
+  faqs,
+}: HelpSupportClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
@@ -68,7 +71,12 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
 
   // Count matches per category for pill indicators
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: 0, search: 0, billing: 0, technical: 0 };
+    const counts: Record<string, number> = {
+      all: 0,
+      search: 0,
+      billing: 0,
+      technical: 0,
+    };
     faqs.forEach((faq) => {
       const matchesSearch =
         faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -96,10 +104,9 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
+    <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-8 p-4 duration-500 sm:p-6 lg:p-8">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2">
             <span className="relative flex h-2 w-2">
@@ -110,11 +117,12 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
               Help Desk
             </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-955">
+          <h2 className="text-zinc-955 text-3xl font-extrabold tracking-tight sm:text-4xl">
             Help & Support
           </h2>
-          <p className="mt-3 max-w-2xl text-[15px] font-medium leading-relaxed text-zinc-550">
-            Find quick answers to common questions, view troubleshooting checklists, or manage your subscription preferences.
+          <p className="text-zinc-550 mt-3 max-w-2xl text-[15px] leading-relaxed font-medium">
+            Find quick answers to common questions, view troubleshooting
+            checklists, or manage your subscription preferences.
           </p>
         </div>
       </div>
@@ -122,7 +130,6 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
       {/* Main Grid: Search & Actions + Sidebar */}
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         <div className="space-y-8">
-          
           <section className="grid gap-4 sm:grid-cols-3">
             {quickActions.map(({ title, description, href, iconName, cta }) => {
               const Icon = iconMap[iconName];
@@ -130,13 +137,13 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                 <Link
                   key={href}
                   href={href}
-                  className="group glass-card glass-card-hover flex flex-col justify-between p-6 rounded-2xl cursor-pointer"
+                  className="group glass-card glass-card-hover flex cursor-pointer flex-col justify-between rounded-2xl p-6"
                 >
                   <div>
                     <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-[#ff4500]/15 bg-[#ff4500]/5 text-[#ff4500] transition-colors duration-300 group-hover:bg-[#ff4500] group-hover:text-white">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="text-base font-extrabold text-zinc-900 group-hover:text-[#ff4500] transition-colors">
+                    <h3 className="text-base font-extrabold text-zinc-900 transition-colors group-hover:text-[#ff4500]">
                       {title}
                     </h3>
                     <p className="mt-2 text-xs leading-relaxed text-zinc-500">
@@ -153,13 +160,13 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
           </section>
 
           {/* Interactive Search Section */}
-          <section className="glass-card p-6 sm:p-8 rounded-2xl space-y-6">
+          <section className="glass-card space-y-6 rounded-2xl p-6 sm:p-8">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-extrabold text-zinc-900 flex items-center gap-2.5">
+              <h3 className="flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
                 <HelpCircle className="h-5 w-5 text-[#ff4500]" />
                 Browse FAQs
               </h3>
-              
+
               {/* Search input with icons */}
               <div className="relative">
                 <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-zinc-400" />
@@ -168,12 +175,12 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                   placeholder="Search questions, settings, plan details..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-full border border-black/[0.06] bg-white/70 py-3.5 pr-12 pl-12 font-sans text-sm text-zinc-900 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-[#ff4500]/30 focus:bg-white focus:ring-4 focus:ring-[#ff4500]/5"
+                  className="w-full rounded-full border border-black/[0.06] bg-white/70 py-3.5 pr-12 pl-12 font-sans text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#ff4500]/30 focus:bg-white focus:ring-4 focus:ring-[#ff4500]/5"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-650"
+                    className="hover:text-zinc-650 absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 text-zinc-400 hover:bg-zinc-100"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -208,10 +215,13 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                       className={`cursor-pointer rounded-full px-4 py-2 font-mono text-[10px] font-bold tracking-wider uppercase transition-all duration-300 ${
                         isActive
                           ? "bg-[#ff4500] text-white shadow-xs"
-                          : "bg-white/40 text-zinc-550 border border-black/[0.04] hover:bg-white hover:text-zinc-800"
+                          : "text-zinc-550 border border-black/[0.04] bg-white/40 hover:bg-white hover:text-zinc-800"
                       }`}
                     >
-                      {label} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
+                      {label}{" "}
+                      {count > 0 && (
+                        <span className="ml-1 opacity-70">({count})</span>
+                      )}
                     </button>
                   );
                 })}
@@ -224,27 +234,34 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                 filteredFaqs.map((faq) => {
                   const isOpen = expandedFaq === faq.question;
                   return (
-                    <div key={faq.question} className="py-4.5 first:pt-0 last:pb-0">
+                    <div
+                      key={faq.question}
+                      className="py-4.5 first:pt-0 last:pb-0"
+                    >
                       <button
                         onClick={() => handleToggleFaq(faq.question)}
-                        className="flex w-full cursor-pointer items-start justify-between text-left gap-4 group"
+                        className="group flex w-full cursor-pointer items-start justify-between gap-4 text-left"
                       >
                         <span className="text-[14px] font-extrabold text-zinc-900 transition-colors group-hover:text-[#ff4500]">
                           {faq.question}
                         </span>
                         <ChevronDown
                           className={`mt-0.5 h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-300 ${
-                            isOpen ? "rotate-180 text-[#ff4500]" : "group-hover:text-zinc-650"
+                            isOpen
+                              ? "rotate-180 text-[#ff4500]"
+                              : "group-hover:text-zinc-650"
                           }`}
                         />
                       </button>
                       <div
                         className={`grid transition-all duration-300 ease-in-out ${
-                          isOpen ? "grid-rows-[1fr] opacity-100 mt-2.5" : "grid-rows-[0fr] opacity-0"
+                          isOpen
+                            ? "mt-2.5 grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
                         }`}
                       >
                         <div className="overflow-hidden">
-                          <p className="text-[13px] leading-relaxed text-zinc-550 font-medium">
+                          <p className="text-zinc-550 text-[13px] leading-relaxed font-medium">
                             {faq.answer}
                           </p>
                         </div>
@@ -274,10 +291,9 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
 
         {/* Sidebar panels */}
         <aside className="space-y-6">
-          
           {/* Support Checklist */}
-          <section className="glass-card p-6 rounded-2xl space-y-6">
-            <h3 className="flex items-center gap-2.5 text-base font-extrabold text-zinc-900 border-b border-black/[0.04] pb-4">
+          <section className="glass-card space-y-6 rounded-2xl p-6">
+            <h3 className="flex items-center gap-2.5 border-b border-black/[0.04] pb-4 text-base font-extrabold text-zinc-900">
               <LifeBuoy className="h-4.5 w-4.5 text-[#ff4500]" />
               Support Checklist
             </h3>
@@ -286,9 +302,12 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                 <div className="absolute top-1 left-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff4500]/10 font-mono text-[9px] font-bold text-[#ff4500]">
                   1
                 </div>
-                <h4 className="text-xs font-extrabold text-zinc-900">Double Check Scope</h4>
+                <h4 className="text-xs font-extrabold text-zinc-900">
+                  Double Check Scope
+                </h4>
                 <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
-                  Verify your keyword limits, active filters, and scan depth parameters.
+                  Verify your keyword limits, active filters, and scan depth
+                  parameters.
                 </p>
               </div>
 
@@ -296,7 +315,9 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                 <div className="absolute top-1 left-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff4500]/10 font-mono text-[9px] font-bold text-[#ff4500]">
                   2
                 </div>
-                <h4 className="text-xs font-extrabold text-zinc-900">Check Subscription Limits</h4>
+                <h4 className="text-xs font-extrabold text-zinc-900">
+                  Check Subscription Limits
+                </h4>
                 <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
                   Ensure you have enough remaining scans on your monthly quota.
                 </p>
@@ -306,29 +327,33 @@ export function HelpSupportClient({ quickActions, faqs }: HelpSupportClientProps
                 <div className="absolute top-1 left-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff4500]/10 font-mono text-[9px] font-bold text-[#ff4500]">
                   3
                 </div>
-                <h4 className="text-xs font-extrabold text-zinc-900">Review Error Status</h4>
+                <h4 className="text-xs font-extrabold text-zinc-900">
+                  Review Error Status
+                </h4>
                 <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
-                  Check status logs in Reports for explicit scraper warning details.
+                  Check status logs in Reports for explicit scraper warning
+                  details.
                 </p>
               </div>
             </div>
           </section>
 
           {/* Need Deeper Troubleshooting? */}
-          <section className="glass-card p-6 rounded-2xl relative overflow-hidden group">
+          <section className="glass-card group relative overflow-hidden rounded-2xl p-6">
             <div className="pointer-events-none absolute top-0 right-0 h-16 w-16 rounded-full bg-[#ff4500] opacity-[0.02] blur-[24px]"></div>
-            
+
             <h3 className="flex items-center gap-2.5 text-base font-extrabold text-zinc-900">
               <MessageSquareWarning className="h-4.5 w-4.5 text-[#ff4500]" />
               Need Help Mined?
             </h3>
             <p className="mt-3 text-xs leading-relaxed text-zinc-500">
-              Check the detailed execution logs of your runs. Most issues are related to narrow subreddits or generic query scopes.
+              Check the detailed execution logs of your runs. Most issues are
+              related to narrow subreddits or generic query scopes.
             </p>
             <div className="mt-6 flex gap-2">
               <Link
                 href="/dashboard/reports"
-                className="flex flex-1 items-center justify-center gap-2 bg-[#ff4500] hover:bg-[#e03d00] py-2.5 rounded-full font-mono text-[11px] font-bold tracking-wider text-white uppercase transition-colors shadow-xs"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#ff4500] py-2.5 font-mono text-[11px] font-bold tracking-wider text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
               >
                 Open Reports
                 <ArrowRight className="h-3 w-3" />
