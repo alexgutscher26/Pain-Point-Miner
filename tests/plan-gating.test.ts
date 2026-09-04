@@ -12,6 +12,8 @@ describe("plan-gating", () => {
     expect(normalizeBillingPlan("starter")).toBe("starter");
     expect(normalizeBillingPlan("Growth Monthly")).toBe("growth");
     expect(normalizeBillingPlan("PRO")).toBe("pro");
+    expect(normalizeBillingPlan("founder")).toBe("founder");
+    expect(normalizeBillingPlan("Professional Annual")).toBe("professional");
     expect(normalizeBillingPlan("unknown")).toBe("starter");
   });
 
@@ -24,6 +26,18 @@ describe("plan-gating", () => {
       ],
     });
     expect(resolved).toBe("pro");
+
+    const resolvedFounder = resolvePlanForIdentity({
+      userId: "user-2",
+      subscriptions: [{ plan: "founder", status: "active" }],
+    });
+    expect(resolvedFounder).toBe("founder");
+
+    const resolvedProfessional = resolvePlanForIdentity({
+      userId: "user-3",
+      subscriptions: [{ plan: "professional", status: "active" }],
+    });
+    expect(resolvedProfessional).toBe("professional");
   });
 
   it("blocks inactive subscriptions from plan resolution", () => {

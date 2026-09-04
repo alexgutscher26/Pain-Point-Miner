@@ -99,10 +99,12 @@ function planFromString(input: string | null | undefined): BillingPlan | null {
   const normalized = input?.trim().toLowerCase();
   if (!normalized) return null;
 
-  if (normalized.includes("pro")) return "pro";
+  if (normalized.includes("professional")) return "professional";
+  if (normalized.includes("founder")) return "founder";
   if (normalized.includes("growth")) return "growth";
-  if (normalized.includes("starter")) return "starter";
-  if (normalized.includes("free")) return "starter";
+  if (normalized.includes("starter") || normalized.includes("free"))
+    return "starter";
+  if (normalized.includes("pro")) return "pro";
 
   return null;
 }

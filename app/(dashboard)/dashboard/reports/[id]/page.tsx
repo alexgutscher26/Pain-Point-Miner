@@ -10,6 +10,7 @@ import {
   Copy,
   Check,
   Bookmark,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 import { ReportDetailSkeleton } from "@/components/dashboard/report-detail-skeleton";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { MetricTooltip } from "@/components/ui/metric-tooltip";
+import { ReportShareModal } from "@/components/dashboard/report-share-modal";
 import {
   Dialog,
   DialogContent,
@@ -248,7 +250,6 @@ function formatNarrativeIdea(pain: PainPoint): string[] {
   }
 
   // Create deep rich narrative storytelling if only 1 short string is returned
-  const target = deriveCustomer(pain);
   const competitor = deriveCompetition(pain);
   const pricing = derivePricing(pain);
 
@@ -276,7 +277,6 @@ function deriveWhyNowSection(pain: PainPoint): {
 
 export default function ReportDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
 
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -288,6 +288,7 @@ export default function ReportDetailPage() {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [agentPromptCopied, setAgentPromptCopied] = useState(false);
   const [agentModalOpen, setAgentModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const [subredditMetadata, setSubredditMetadata] = useState<
     Record<string, number>
@@ -301,15 +302,6 @@ export default function ReportDetailPage() {
   const [planDialogMessage, setPlanDialogMessage] = useState(
     "A paid plan is required to continue. Please upgrade your account.",
   );
-
-  const categoryOptions = [
-    "Uncategorized",
-    "Product",
-    "Marketing",
-    "Growth",
-    "Operations",
-    "Customer Success",
-  ];
 
   useEffect(() => {
     async function fetchReportDetail() {
@@ -645,6 +637,16 @@ Please generate the schema, API routes, and main dashboard screen.`;
         </DialogContent>
       </Dialog>
 
+      {/* Share & Embed Badge Modal */}
+      <ReportShareModal
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        reportTitle={reportData.title}
+        ideaTitle={ideaTitle}
+        validationScore={scoreFormatted}
+        reportId={id}
+      />
+
       <div className="mx-auto w-full max-w-[1340px] space-y-6 px-4 py-4 sm:px-6 lg:px-8">
         {/* Top Breadcrumb & Actions Bar (IdeaBrowser Exact Top Bar) */}
         <div className="border-zinc-150 flex flex-col gap-3 border-b pb-3 text-xs sm:flex-row sm:items-center sm:justify-between">
@@ -669,9 +671,16 @@ Please generate the schema, API routes, and main dashboard screen.`;
               </span>
             </div>
             <button
+              onClick={() => setShareModalOpen(true)}
+              className="flex cursor-pointer items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+            >
+              <Share2 className="h-3.5 w-3.5 text-zinc-500" />
+              <span>Share</span>
+            </button>
+            <button
               onClick={() => handleSaveToggle(!reportData.saved)}
               disabled={isSaving}
-              className="flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+              className="flex cursor-pointer items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
             >
               <Bookmark className="h-3.5 w-3.5" />
               <span>{reportData.saved ? "Saved" : "Bookmark"}</span>
@@ -887,6 +896,15 @@ Please generate the schema, API routes, and main dashboard screen.`;
                         <span>Copy Spec</span>
                       </>
                     )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShareModalOpen(true)}
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-3 font-sans text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-zinc-400" />
+                    <span>Share Opportunity</span>
                   </button>
                 </div>
               </div>

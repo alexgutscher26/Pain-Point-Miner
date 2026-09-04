@@ -88,8 +88,15 @@ export async function generateEmbedding(
   });
 
   if (!response.ok) {
+    let errorDetail = response.statusText || "";
+    try {
+      const errBody = await response.text();
+      if (errBody && errBody !== errorDetail) {
+        errorDetail = errorDetail ? `${errorDetail} - ${errBody}` : errBody;
+      }
+    } catch {}
     throw new Error(
-      `Embedding API error: ${response.status} ${response.statusText}`,
+      `Embedding API error: ${response.status}${errorDetail ? ` ${errorDetail}` : ""}`,
     );
   }
 

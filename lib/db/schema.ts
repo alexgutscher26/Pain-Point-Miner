@@ -384,7 +384,7 @@ export const scraperRun = pgTable(
     scraperId: text().notNull(),
     status: text().default("success").notNull(),
     startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    finishedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    finishedAt: timestamp({ precision: 3, mode: "date" }),
     postsFetched: integer().default(0).notNull(),
     postsMatched: integer().default(0).notNull(),
     commentsFetched: integer().default(0).notNull(),
@@ -526,7 +526,7 @@ export const painPointCluster = pgTable(
     workspaceId: text(),
     embeddingProvider: text().notNull(),
     embeddingModel: text().notNull(),
-    embedding: doublePrecision().array(),
+    embedding: vector({ dimensions: 1536 }),
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
@@ -570,6 +570,9 @@ export const painPointCluster = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    index("pain_point_cluster_hnsw_idx")
+      .using("hnsw", table.embedding.op("vector_cosine_ops"))
+      .with({ m: 24, ef_construction: 200 }),
   ],
 );
 
@@ -849,23 +852,6 @@ export const purchasedCredits = pgTable(
     index("purchased_credits_userId_idx").on(table.userId),
   ],
 );
-
-export const tool = pgTable("tool", {
-  id: text().primaryKey().notNull(),
-  name: text().notNull(),
-  slug: text().unique().notNull(),
-  url: text(),
-  description: text(),
-  category: text(),
-  iconUrl: text(),
-  lastCrawledAt: timestamp({ precision: 3, mode: "date" }),
-  createdAt: timestamp({ precision: 3, mode: "date" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: "date" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
 
 export const slowQueryLog = pgTable("slow_query_log", {
   id: text().primaryKey().notNull(),

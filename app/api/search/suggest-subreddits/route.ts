@@ -4,11 +4,16 @@ import { z } from "zod";
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
 import { db } from "@/lib/db";
-import { discoveryCache, subredditCache, scraper } from "@/lib/db/schema";
+import { subredditCache, scraper } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { searchSubreddits, type SubredditSuggestion } from "@/lib/reddit";
 
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const suggestionMemoryCache = new Map<
+  string,
+  { suggestions: SubredditSuggestion[]; cachedAt: number }
+>();
 
 const suggestPayloadSchema = z.object({
   keyword: z.string().trim().min(3).max(120),
@@ -75,22 +80,15 @@ export async function POST(req: Request) {
         ? count
         : Math.min(count, entitlements.maxSubredditsPerSearch);
 
-    // 1. Check Discovery Cache
-    const cached = await db.query.discoveryCache.findFirst({
-      where: eq(discoveryCache.keyword, normalizedKeyword),
-    });
-
+    // 1. Check in-memory suggestion cache
+    const cached = suggestionMemoryCache.get(normalizedKeyword);
     const isCacheValid =
-      cached &&
-      Date.now() - new Date(cached.cachedAt).getTime() < CACHE_DURATION_MS;
+      cached && Date.now() - cached.cachedAt < CACHE_DURATION_MS;
 
-    if (isCacheValid) {
+    if (isCacheValid && cached) {
       return apiJson(
         {
-          subreddits: (cached.suggestions as SubredditSuggestion[]).slice(
-            0,
-            cappedCount,
-          ),
+          subreddits: cached.suggestions.slice(0, cappedCount),
           cached: true,
         },
         200,
@@ -110,22 +108,13 @@ export async function POST(req: Request) {
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, 15); // Store top 15 in cache
 
-    // 4. Update Cache
-    await db
-      .insert(discoveryCache)
-      .values({
-        keyword: normalizedKeyword,
-        suggestions: scoredSuggestions,
-        cachedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: [discoveryCache.keyword],
-        set: {
-          suggestions: scoredSuggestions,
-          cachedAt: new Date(),
-        },
-      });
+    // 4. Update in-memory suggestions cache
+    suggestionMemoryCache.set(normalizedKeyword, {
+      suggestions: scoredSuggestions,
+      cachedAt: Date.now(),
+    });
 
+    // 5. Populate subredditCache table with discovered metadata
     const recordValues = scoredSuggestions.map((s) => ({
       name: s.name.toLowerCase(),
       subscriberCount: s.subscribers,

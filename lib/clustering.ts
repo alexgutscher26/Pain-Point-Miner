@@ -64,9 +64,7 @@ type ClusterCandidate = {
 
 /**
  * Find cluster centroids close to the given embedding using raw SQL
- * against the painPointCluster.embedding column (stored as double precision[]).
- *
- * We convert the double[] to vector on-the-fly so we can use the <=> operator.
+ * against the painPointCluster.embedding vector(1536) column using the <=> operator.
  */
 async function findSimilarClusterCentroids(
   embedding: number[],
@@ -85,12 +83,12 @@ async function findSimilarClusterCentroids(
   }>(
     sql`SELECT
           c.id AS "clusterId",
-          1 - (c.embedding::vector(1536) <=> ${vectorLiteral}::vector) AS similarity
+          1 - (c.embedding <=> ${vectorLiteral}::vector) AS similarity
         FROM pain_point_cluster c
         WHERE c."userId" = ${userId}
           ${workspaceClause}
           AND c.embedding IS NOT NULL
-          AND 1 - (c.embedding::vector(1536) <=> ${vectorLiteral}::vector) >= ${CLUSTER_SIMILARITY_THRESHOLD}
+          AND 1 - (c.embedding <=> ${vectorLiteral}::vector) >= ${CLUSTER_SIMILARITY_THRESHOLD}
         ORDER BY similarity DESC
         LIMIT 1`,
   );

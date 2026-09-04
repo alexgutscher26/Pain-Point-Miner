@@ -415,8 +415,8 @@
 - [x] Generate dynamic `sitemap.ts` to include all public blog posts, docs, and feature pages
 - [x] Add structured data (JSON-LD) to landing page, blog posts, and feature pages
 - [x] Implement OG image generation for blog posts and report share pages (`@vercel/og`)
-- [ ] Write and publish 10 SEO-targeted blog posts around "Reddit market research", "SaaS idea validation", etc.
-- [ ] Create landing pages for high-intent keywords ("Reddit pain point finder", "SaaS opportunity discovery tool")
+- [x] Write and publish 10 SEO-targeted blog posts around "Reddit market research", "SaaS idea validation", etc.
+- [x] Create landing pages for high-intent keywords ("Reddit pain point finder", "SaaS opportunity discovery tool")
 - [x] Add `robots.txt` with correct crawl directives for dashboard (noindex) vs. public pages (index)
 - [x] Implement canonical tags on all pages to prevent duplicate content
 - [x] Add a `llms.txt` file for AI crawler context (already exists — review and update quarterly)
@@ -427,8 +427,9 @@
 - [ ] Build referral program UI: generate unique referral link, track signups, reward credits
 - [ ] Implement `referralCode` generation on user registration (column already exists in schema)
 - [ ] Award bonus credits when a referred user completes their first scan
-- [ ] Add social sharing buttons to report pages ("Share this opportunity on Twitter/X")
-- [ ] Implement "Made with RPP" public showcase (opt-in embeddable badge on user reports)
+- [x] Add social sharing buttons to report pages ("Share this opportunity on Twitter/X")
+- [x] Implement "Made with RPP" public showcase (opt-in embeddable badge on user reports)
+
 - [ ] Add a product hunt / launch integration helper (count-down timer, launch announcement modal)
 - [ ] Create an affiliate program with unique tracking codes and payout via Stripe
 
@@ -628,26 +629,27 @@
 
 ### High Priority Bugs
 
-- [ ] SSE stream sometimes disconnects without sending `completed` event — investigate and add reconnect logic
-- [ ] `resolvePlanForIdentity` doesn't handle `founder`/`professional` plans from Stripe subscriptions (only LTD tier)
-- [ ] `planFromString` returns `null` for "founder" and "professional" plan strings from Stripe — add mapping
-- [ ] Cluster centroid stored as `double_precision[]` not `vector(1536)` — prevents cosine distance operations on clusters
-- [ ] `scraperRun.finishedAt` is marked `notNull` but runs that error out may not set it — potential null constraint violations
-- [ ] `workspaceId` filtering is not consistently applied on all pain point queries — potential workspace data leakage
-- [ ] `community-map.ts` and `competitor-intel.ts` are likely unused after AI extraction redesign — audit and remove if so
+- [x] SSE stream sometimes disconnects without sending `completed` event — investigate and add reconnect logic
+- [x] `resolvePlanForIdentity` doesn't handle `founder`/`professional` plans from Stripe subscriptions (only LTD tier)
+- [x] `planFromString` returns `null` for "founder" and "professional" plan strings from Stripe — add mapping
+- [x] Cluster centroid stored as `double_precision[]` not `vector(1536)` — prevents cosine distance operations on clusters
+
+- [x] `scraperRun.finishedAt` is marked `notNull` but runs that error out may not set it — fixed in `lib/db/schema.ts` by making `finishedAt` nullable with clean completion/error updates
+- [x] `workspaceId` filtering is not consistently applied on all pain point queries — standardized with `workspaceScope` in `/api/reports`, `/api/feedback`, and dashboard caching
+- [x] `community-map.ts` and `competitor-intel.ts` are likely unused after AI extraction redesign — audited: verified actively used in `LazyCommunityMapPanel` and cluster competitor intel aggregation
 
 ### Medium Priority Technical Debt
 
-- [ ] `mining-runner.ts` (19KB) is too large — split into separate modules per pipeline phase
-- [ ] `reddit.ts` (31KB) has mixed concerns: API client + parsing + filtering — split into separate files
-- [ ] `app/(dashboard)/dashboard/page.tsx` (27KB) is doing too much — extract server actions and sub-components
-- [ ] Remove unused `re-score-job.ts` if it's not called anywhere in the pipeline
+- [x] `mining-runner.ts` (19KB) is too large — split into modular pipeline stages under `lib/mining/` (`discovery.ts`, `extraction.ts`, `runner.ts`)
+- [x] `reddit.ts` (31KB) has mixed concerns: API client + parsing + filtering — split into modular sub-packages under `lib/reddit/` (`types`, `patterns`, `ranking`, `throttle`, `oauth`, `client`)
+- [x] `app/(dashboard)/dashboard/page.tsx` (27KB) is doing too much — extracted `MetricCard`, `ReportRow`, and `DashboardMarketPulse` sub-components with workspace scoping
+- [x] Remove unused `re-score-job.ts` if it's not called anywhere in the pipeline — audited: actively utilized by `app/api/settings/route.ts` when updating custom scoring weights
 - [ ] Replace all `console.log` in production code with structured logger calls
 - [ ] `ai.ts` uses `any` types in several places — add proper TypeScript interfaces for OpenRouter responses
-- [ ] `embeddings.ts` has no error handling for when the embedding API returns a non-200 — silent failures
-- [ ] Dedup `discoveryCache` vs `subredditCache` — they serve similar purposes and could be merged
-- [ ] `health-metrics.ts` (3KB) — audit whether this is used in the health dashboard or is dead code
-- [ ] Remove the `tool` table if unused — it appears to be for competitive intel crawling but has no references
+- [x] `embeddings.ts` has no error handling for when the embedding API returns a non-200 — fixed: added robust error detail and text extraction to `generateEmbedding`
+- [x] Dedup `discoveryCache` vs `subredditCache` — merged and unified in `app/api/search/suggest-subreddits/route.ts` using in-memory TTL cache and canonical `subredditCache`
+- [x] `health-metrics.ts` (3KB) — audit whether this is used in the health dashboard or is dead code — audited: actively powers `/api/stats/health` endpoint for diagnostics
+- [x] Remove the `tool` table if unused — removed unused draft table from `lib/db/schema.ts`
 
 ### Low Priority Cleanup
 

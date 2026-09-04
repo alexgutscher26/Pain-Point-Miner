@@ -9,7 +9,7 @@ import {
 } from "@/lib/db/schema";
 import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
-import { requireApiContext } from "@/lib/api-auth";
+import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
 import {
   buildLatestTrendInsights,
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail } = authContext.context;
+  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
   const { searchParams } = new URL(req.url);
 
   const days = searchParams.get("days");
@@ -50,10 +50,11 @@ export async function GET(req: Request) {
           })()
         : null;
 
-    // Fetch scrapers for the current user
+    // Fetch scrapers for the current user and workspace
     const scraperRows = await db.query.scraper.findMany({
       where: and(
         eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId),
         isNull(scraper.deletedAt),
         fromDate ? gte(scraper.createdAt, fromDate) : undefined,
       ),

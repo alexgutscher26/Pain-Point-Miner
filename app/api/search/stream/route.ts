@@ -167,27 +167,41 @@ export async function GET(req: Request) {
             phase === "canceled"
           ) {
             isTerminal = true;
+            if (interval) clearInterval(interval);
+            try {
+              controller.close();
+            } catch {
+              // already closed
+            }
           }
         } catch (err) {
           console.error("SSE poll error:", err);
         }
       };
 
+      let interval: ReturnType<typeof setInterval> | null = null;
+
       // Initial send
       await poll();
 
-      const interval = setInterval(async () => {
-        if (isTerminal || Date.now() - startedAt > MAX_DURATION_MS) {
-          clearInterval(interval);
-          controller.close();
-          return;
-        }
-        await poll();
-      }, POLL_INTERVAL_MS);
+      if (!isTerminal) {
+        interval = setInterval(async () => {
+          if (isTerminal || Date.now() - startedAt > MAX_DURATION_MS) {
+            if (interval) clearInterval(interval);
+            try {
+              controller.close();
+            } catch {
+              // already closed
+            }
+            return;
+          }
+          await poll();
+        }, POLL_INTERVAL_MS);
+      }
 
       // Cleanup if client disconnects
       req.signal.addEventListener("abort", () => {
-        clearInterval(interval);
+        if (interval) clearInterval(interval);
         try {
           controller.close();
         } catch {

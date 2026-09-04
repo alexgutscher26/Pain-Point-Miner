@@ -9,15 +9,7 @@ import {
   userPreferences,
 } from "@/lib/db/schema";
 import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
-import {
-  TrendingUp,
-  Search,
-  Sparkles,
-  Database,
-  BarChart3,
-  AlertCircle,
-  Zap,
-} from "lucide-react";
+import { Search, BarChart3, AlertCircle, Zap } from "lucide-react";
 import Link from "next/link";
 import { z } from "zod";
 import { normalizeRunStatus } from "@/lib/run-status";
@@ -27,10 +19,7 @@ import {
   DEFAULT_WEIGHTS,
   ScoringWeights,
 } from "@/lib/dashboard-metrics";
-import {
-  buildLatestTrendInsights,
-  formatTrendChangePercent,
-} from "@/lib/trend-detection";
+import { buildLatestTrendInsights } from "@/lib/trend-detection";
 import { DashboardSearchHero } from "@/components/dashboard/dashboard-search-hero";
 import { getMonthlyScanUsage, getMonthlyUsageSummary } from "@/lib/plan-gating";
 import { resolvePlanContext } from "@/lib/plan-resolver";
@@ -38,6 +27,10 @@ import { buildCommunityMapNodes } from "@/lib/community-map";
 import { unstable_cache } from "next/cache";
 import dynamicLoader from "next/dynamic";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { workspaceScope } from "@/lib/api-auth";
+import { MetricCard } from "@/components/dashboard/dashboard-metric-card";
+import { ReportRow } from "@/components/dashboard/dashboard-report-row";
+import { DashboardMarketPulse } from "@/components/dashboard/dashboard-market-pulse";
 
 const LazyCommunityMapPanel = dynamicLoader(
   () =>
@@ -59,6 +52,7 @@ const getCachedDashboardData = unstable_cache(
     const scraperRows = await db.query.scraper.findMany({
       where: and(
         eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId),
         isNull(scraper.deletedAt),
         gte(scraper.createdAt, fromDate),
       ),
@@ -476,253 +470,15 @@ export default async function DashboardPage({
 
         {/* Insight Panel */}
         <div className="flex flex-col gap-8">
-          <div className="glass-card relative overflow-hidden rounded-2xl p-8 shadow-xs">
-            <h4 className="mb-8 flex items-center gap-3 text-lg font-black text-zinc-900">
-              <TrendingUp className="h-6 w-6 text-[#ff4500]" />
-              Market Pulse
-            </h4>
-            <div className="space-y-8">
-              <div>
-                <p className="mb-4 font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
-                  Trending Niche
-                </p>
-                <Link
-                  href={
-                    trendingReport
-                      ? `/dashboard/reports/${trendingReport.id}`
-                      : `/dashboard/search?keyword=${encodeURIComponent(trendingInsight?.key || "")}`
-                  }
-                  className="group/item flex items-center gap-4 rounded-2xl border border-black/[0.05] bg-white/50 p-4 transition-all duration-300 hover:border-[#ff4500]/15 hover:bg-white hover:shadow-2xs"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#ff4500]/15 bg-[#ff4500]/5 text-[#ff4500] transition-colors duration-300 group-hover/item:bg-[#ff4500] group-hover/item:text-white">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-extrabold text-zinc-900 transition-colors group-hover/item:text-[#ff4500]">
-                      {trendingInsight?.key || "No trend yet"}
-                    </p>
-                    <p className="mt-0.5 text-[11px] font-medium text-zinc-400">
-                      {trendingInsight
-                        ? trendingInsight.direction === "new"
-                          ? "New trend detected"
-                          : `${formatTrendChangePercent(trendingInsight.percentChange)} mention volume`
-                        : "Run searches to detect trend"}
-                    </p>
-                  </div>
-                </Link>
-              </div>
-              <div className="border-t border-black/[0.05] pt-6">
-                <p className="mb-4 font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
-                  Urgent Pain Point
-                </p>
-                <Link
-                  href={
-                    urgentPainPointReport
-                      ? `/dashboard/reports/${urgentPainPointReport.id}`
-                      : "/dashboard/reports"
-                  }
-                  className="group/item block rounded-2xl border border-black/[0.05] bg-white/50 p-5 transition-all duration-300 hover:border-[#ff4500]/15 hover:bg-white hover:shadow-2xs"
-                >
-                  <div className="mb-3 flex items-center justify-between border-b border-black/[0.03] pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff4500]/10 text-[#ff4500]">
-                        <AlertCircle className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="text-[11px] font-extrabold text-zinc-900">
-                        Urgent Signal
-                      </span>
-                    </div>
-                    <span className="rounded-full bg-[#ff4500]/5 px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
-                      Mined
-                    </span>
-                  </div>
-                  <p className="text-zinc-650 text-[12px] leading-relaxed font-medium italic transition-colors group-hover/item:text-zinc-900">
-                    &ldquo;
-                    {urgentPainPoint?.title ||
-                      "No high-urgency pain point detected yet."}
-                    &rdquo;
-                  </p>
-                </Link>
-                <p className="mt-4 flex items-center gap-2 font-mono text-[11px] font-bold tracking-wide text-zinc-400 uppercase">
-                  <Database className="h-3.5 w-3.5" /> Found in{" "}
-                  {urgentPainPointMentions || 0} investigations
-                </p>
-              </div>
-            </div>
-          </div>
+          <DashboardMarketPulse
+            trendingInsight={trendingInsight}
+            trendingReportId={trendingReport?.id}
+            urgentPainPoint={urgentPainPoint}
+            urgentPainPointReportId={urgentPainPointReport?.id}
+            urgentPainPointMentions={urgentPainPointMentions}
+          />
         </div>
       </div>
     </div>
-  );
-}
-
-function MetricCard({
-  title,
-  value,
-  icon,
-  progress,
-  subtext,
-  trend,
-  trendSub,
-  badge,
-  isHighlight,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  progress?: number;
-  subtext?: string;
-  trend?: string;
-  trendSub?: string;
-  badge?: string;
-  isHighlight?: boolean;
-}) {
-  return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl p-5 transition-all duration-400 ${
-        isHighlight
-          ? "border border-[#ff4500]/25 bg-gradient-to-br from-white/95 to-orange-50/20 hover:scale-[1.01] hover:border-[#ff4500]/40 hover:shadow-md"
-          : "glass-card glass-card-hover"
-      }`}
-    >
-      {isHighlight && (
-        <div className="pointer-events-none absolute top-0 right-0 h-24 w-24 rounded-full bg-[#ff4500] opacity-[0.03] blur-[40px]"></div>
-      )}
-      <div className="mb-4 flex items-start justify-between">
-        <div
-          className={`rounded-xl p-2 transition-all duration-300 group-hover:scale-105 ${
-            isHighlight
-              ? "bg-[#ff4500]/10 text-[#ff4500]"
-              : "border border-black/[0.04] bg-black/[0.02] text-zinc-700"
-          }`}
-        >
-          {icon}
-        </div>
-        {badge && (
-          <span className="rounded-full border border-[#ff4500]/10 bg-[#ff4500]/5 px-2.5 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase">
-            {badge}
-          </span>
-        )}
-      </div>
-      <div>
-        <p className="mb-1 font-mono text-[10px] font-extrabold tracking-widest text-zinc-400 uppercase">
-          {title}
-        </p>
-        <div className="flex items-baseline gap-2">
-          <p
-            className={`text-[28px] leading-none font-extrabold tracking-tight ${isHighlight ? "text-[#ff4500]" : "text-zinc-950"}`}
-          >
-            {value}
-          </p>
-          {trend && (
-            <p className="flex items-center gap-0.5 text-[12px] font-black text-emerald-600">
-              <TrendingUp className="h-3 w-3" /> {trend}
-            </p>
-          )}
-        </div>
-        {progress !== undefined && (
-          <div className="mt-3">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/80">
-              <div
-                className="h-full rounded-full bg-[#ff4500]"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <p className="mt-2 font-mono text-[9px] font-extrabold tracking-widest text-zinc-400 uppercase">
-              {subtext}
-            </p>
-          </div>
-        )}
-        {trendSub && (
-          <p className="mt-1.5 font-mono text-[9px] font-extrabold tracking-widest text-zinc-400 uppercase">
-            {trendSub}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ReportRow({
-  id,
-  keyword,
-  date,
-  painPoint,
-  score,
-  status,
-  explanation,
-}: {
-  id: string;
-  keyword: string;
-  date: string;
-  painPoint: string;
-  score: number;
-  status: string;
-  explanation?: string | null;
-}) {
-  return (
-    <tr className="group cursor-pointer transition-all duration-300 hover:bg-zinc-50/50">
-      <td className="px-8 py-6">
-        <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-zinc-850 mb-1 text-[15px] font-extrabold break-words transition-colors group-hover:text-[#ff4500]">
-            {keyword}
-          </p>
-          <p className="font-mono text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-            {date}
-          </p>
-        </Link>
-      </td>
-      <td className="px-8 py-6">
-        <Link href={`/dashboard/reports/${id}`} className="block">
-          <p className="text-zinc-650 mb-1 max-w-[250px] truncate text-[14px] font-medium">
-            {painPoint}
-          </p>
-          {explanation && (
-            <p className="max-w-[250px] truncate text-[11px] font-medium text-zinc-400 italic">
-              {explanation}
-            </p>
-          )}
-        </Link>
-      </td>
-      <td className="px-8 py-6 text-center">
-        <Link href={`/dashboard/reports/${id}`} className="block">
-          <span className="shadow-3xs rounded-lg border border-zinc-200/60 bg-white/80 px-2.5 py-1 text-[14px] font-extrabold text-zinc-800">
-            {score}
-          </span>
-        </Link>
-      </td>
-      <td className="px-8 py-6">
-        <Link
-          href={`/dashboard/reports/${id}`}
-          className="flex items-center gap-2.5"
-        >
-          <div className="relative flex h-2 w-2">
-            {status === "Live" && (
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-            )}
-            <span
-              className={`relative inline-flex h-2 w-2 rounded-full ${
-                status === "Live"
-                  ? "bg-amber-400"
-                  : status === "Failed"
-                    ? "bg-rose-500"
-                    : "bg-emerald-500"
-              }`}
-            ></span>
-          </div>
-          <span
-            className={`rounded-full border px-2 py-0.5 font-mono text-[10px] font-black tracking-widest uppercase ${
-              status === "Live"
-                ? "border-amber-500/20 bg-amber-500/5 text-amber-700"
-                : status === "Failed"
-                  ? "border-rose-500/20 bg-rose-500/5 text-rose-700"
-                  : "border-emerald-500/20 bg-emerald-500/5 text-emerald-700"
-            }`}
-          >
-            {status}
-          </span>
-        </Link>
-      </td>
-    </tr>
   );
 }
