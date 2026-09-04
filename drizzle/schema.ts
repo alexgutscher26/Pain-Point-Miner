@@ -896,7 +896,7 @@ export const painPointCluster = pgTable(
     workspaceId: text(),
     embeddingProvider: text().notNull(),
     embeddingModel: text().notNull(),
-    embedding: doublePrecision().array(),
+    embedding: vector({ dimensions: 1536 }),
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
