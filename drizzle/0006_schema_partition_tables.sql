@@ -94,7 +94,7 @@ CREATE TABLE "scraper_run" (
   "scraperId" text NOT NULL,
   "status" text DEFAULT 'success' NOT NULL,
   "startedAt" timestamp (3) NOT NULL,
-  "finishedAt" timestamp (3) NOT NULL,
+  "finishedAt" timestamp (3),
   "postsFetched" integer DEFAULT 0 NOT NULL,
   "postsMatched" integer DEFAULT 0 NOT NULL,
   "commentsFetched" integer DEFAULT 0 NOT NULL,
