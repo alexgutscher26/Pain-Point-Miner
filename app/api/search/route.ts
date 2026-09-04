@@ -108,9 +108,7 @@ const customPatternItemSchema = z
   )
   .refine(
     (pattern) => validateCustomPatternRegex(pattern).valid,
-    (pattern) => ({
-      message: `Invalid regex pattern "${pattern}": ${validateCustomPatternRegex(pattern).error ?? "Syntax error"}`,
-    }),
+    "Invalid regex pattern syntax",
   );
 
 const searchPayloadSchema = z.object({

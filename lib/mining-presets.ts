@@ -4,6 +4,7 @@ export const MINING_PRESETS: Record<
   MiningDepth,
   {
     name: string;
+    label: string;
     subreddits: number;
     sortModes: number;
     maxDepth: number;
@@ -17,6 +18,7 @@ export const MINING_PRESETS: Record<
 > = {
   basic: {
     name: "Basic Scan",
+    label: "Basic Scan",
     subreddits: 3,
     sortModes: 1,
     maxDepth: 1, // Added depth even to basic to catch some replies
@@ -29,6 +31,7 @@ export const MINING_PRESETS: Record<
   },
   deep: {
     name: "Deep Mine",
+    label: "Deep Mine",
     subreddits: 6,
     sortModes: 2,
     maxDepth: 2,
@@ -41,6 +44,7 @@ export const MINING_PRESETS: Record<
   },
   advanced: {
     name: "Advanced Clustering",
+    label: "Advanced Clustering",
     subreddits: 10,
     sortModes: 4,
     maxDepth: 10,
@@ -53,6 +57,7 @@ export const MINING_PRESETS: Record<
   },
   ultra: {
     name: "Ultra Deep Dive",
+    label: "Ultra Deep Dive",
     subreddits: 15,
     sortModes: 4,
     maxDepth: 100, // Exhaustive comment tree traversal

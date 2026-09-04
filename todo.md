@@ -649,7 +649,7 @@
 - [x] `embeddings.ts` has no error handling for when the embedding API returns a non-200 — fixed: added robust error detail and text extraction to `generateEmbedding`
 - [x] Dedup `discoveryCache` vs `subredditCache` — merged and unified in `app/api/search/suggest-subreddits/route.ts` using in-memory TTL cache and canonical `subredditCache`
 - [x] `health-metrics.ts` (3KB) — audit whether this is used in the health dashboard or is dead code — audited: actively powers `/api/stats/health` endpoint for diagnostics
-- [x] Remove the `tool` table if unused — removed unused draft table from `lib/db/schema.ts`
+- [x] Remove the `tool` table if unused — audited: retained and typed in `lib/db/schema.ts` for competitor intelligence caching in `lib/competitor-intel.ts`
 
 ### Low Priority Cleanup
 
