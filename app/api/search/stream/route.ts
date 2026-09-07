@@ -12,7 +12,8 @@ const querySchema = z.object({
 });
 
 const POLL_INTERVAL_MS = 2_000;
-const MAX_DURATION_MS = 5 * 60 * 1_000; // 5 minutes max
+const MAX_DURATION_MS = 5 * 60 * 1_000; // 5 minutes max SSE connection
+const STALE_RUN_THRESHOLD_MS = 30 * 60 * 1_000; // 30 min → treat as failed
 
 type StreamEvent = {
   phase: RunStatus;
@@ -131,7 +132,20 @@ export async function GET(req: Request) {
             columns: { id: true },
           });
 
-          const phase = normalizeRunStatus(latestRun?.status);
+          let phase = normalizeRunStatus(latestRun?.status);
+
+          // Detect stale runs: non-terminal for > 30 minutes → treat as failed
+          const isNonTerminal =
+            phase !== "completed" &&
+            phase !== "failed" &&
+            phase !== "canceled";
+          const runAgeMs = latestRun?.startedAt
+            ? Date.now() - latestRun.startedAt.getTime()
+            : 0;
+          if (isNonTerminal && runAgeMs > STALE_RUN_THRESHOLD_MS) {
+            phase = "failed";
+          }
+
           const painPointCount = results.length;
           const subreddits = scraperRecord.subreddits ?? [];
           const timeWindow = getTimeWindowLabel(

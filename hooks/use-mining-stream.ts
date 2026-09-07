@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -59,6 +60,11 @@ export function useMiningStream(scraperId: string | null) {
     null,
   );
   const retryCountRef = useRef(0);
+  const startedAtRef = useRef<number>(Date.now());
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Client-side 35-minute watchdog: if still non-terminal, force fail
+  const CLIENT_STALE_THRESHOLD_MS = 35 * 60 * 1_000;
 
   const cleanup = useCallback(() => {
     if (eventSourceRef.current) {
@@ -72,6 +78,10 @@ export function useMiningStream(scraperId: string | null) {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
+    }
+    if (watchdogRef.current) {
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
     }
   }, []);
 
@@ -124,6 +134,20 @@ export function useMiningStream(scraperId: string | null) {
 
     cleanup();
     retryCountRef.current = 0;
+    startedAtRef.current = Date.now();
+
+    // Start client-side stale-job watchdog
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    watchdogRef.current = setTimeout(() => {
+      setHasFailed((prev) => {
+        if (!prev) {
+          setIsDone(false);
+          return true;
+        }
+        return prev;
+      });
+      cleanup();
+    }, CLIENT_STALE_THRESHOLD_MS);
 
     const handleEvent = (data: MiningStreamState) => {
       setState(data);

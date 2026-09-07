@@ -66,6 +66,22 @@ export async function GET(req: Request) {
       ),
     });
 
+    const rawStatus = normalizeRunStatus(latestRun?.status);
+
+    // Detect stale runs: non-terminal for > 30 minutes → surface as failed
+    const STALE_RUN_THRESHOLD_MS = 30 * 60 * 1_000;
+    const isNonTerminal =
+      rawStatus !== "completed" &&
+      rawStatus !== "failed" &&
+      rawStatus !== "canceled";
+    const runAgeMs = latestRun?.startedAt
+      ? Date.now() - latestRun.startedAt.getTime()
+      : 0;
+    const status =
+      isNonTerminal && runAgeMs > STALE_RUN_THRESHOLD_MS
+        ? "failed"
+        : rawStatus;
+
     return apiJson(
       {
         scraper: currentScraper,
@@ -74,7 +90,7 @@ export async function GET(req: Request) {
         ),
         latestRun,
         painPointCount: results.length,
-        status: normalizeRunStatus(latestRun?.status),
+        status,
       },
       200,
       correlationId,
