@@ -152,61 +152,117 @@ function deriveIdeaTitle(pain: PainPoint, reportTitle: string): string {
   return toTitleCase(title);
 }
 
+const SUBREDDIT_PERSONA_MAP: Record<string, string> = {
+  reactjs: "React & Next.js Developers",
+  webdev: "Full-Stack Web Developers",
+  javascript: "Frontend & Full-Stack Engineers",
+  python: "Python Developers & Data Engineers",
+  programming: "Software Engineers & Tech Teams",
+  startups: "Startup Founders & Operators",
+  entrepreneur: "Small Business Owners & Founders",
+  indiehackers: "Solo Founders & Indie Builders",
+  saas: "B2B SaaS Founders & Product Teams",
+  smallbusiness: "Small Business Owners",
+  shopify: "Shopify & E-Commerce Merchants",
+  ecommerce: "Online Brand Operators & Merchants",
+  marketing: "Digital Marketers & Growth Leads",
+  seo: "SEO Specialists & Content Strategists",
+  copywriting: "Copywriters & Content Agencies",
+  devops: "DevOps & Cloud Engineers",
+  sysadmin: "Systems & Infrastructure Admins",
+  cybersecurity: "Security Engineers & Analysts",
+  freelance: "Independent Freelancers & Consultants",
+  notion: "Knowledge Workers & Notion Power Users",
+  sales: "B2B Sales Reps & Account Execs",
+};
+
 function deriveCustomer(pain: PainPoint): string {
   if (pain.subreddits && pain.subreddits.length > 0) {
-    const mainSub = pain.subreddits[0].replace(/^r\//i, "");
-    return `Solo And Near-Solo ${toTitleCase(mainSub)} Operators`;
+    const rawSub = pain.subreddits[0].replace(/^r\//i, "").toLowerCase();
+    if (SUBREDDIT_PERSONA_MAP[rawSub]) {
+      return SUBREDDIT_PERSONA_MAP[rawSub];
+    }
+    return `${toTitleCase(rawSub)} Practitioners & Teams`;
   }
-  return "Solo Founders & Small Business Teams";
+  return "Operators & Specialized Teams";
 }
 
 function deriveMarket(pain: PainPoint, reportCategory?: string): string {
   if (reportCategory && reportCategory !== "Uncategorized") {
-    return `B2B - ${reportCategory} SaaS`;
+    return `B2B • ${reportCategory} Software`;
   }
-  return "B2B - SaaS";
+  if (pain.subreddits && pain.subreddits.length > 0) {
+    const sub = pain.subreddits[0].replace(/^r\//i, "").toLowerCase();
+    if (
+      [
+        "reactjs",
+        "webdev",
+        "javascript",
+        "python",
+        "programming",
+        "devops",
+        "sysadmin",
+      ].includes(sub)
+    ) {
+      return "B2B • Developer Tools";
+    }
+    if (["shopify", "ecommerce"].includes(sub)) {
+      return "B2B • E-commerce Tech";
+    }
+    if (["marketing", "seo", "copywriting", "growth"].includes(sub)) {
+      return "B2B • Growth & Marketing";
+    }
+    return `B2B • ${toTitleCase(sub)} SaaS`;
+  }
+  return "B2B • Micro-SaaS";
 }
 
 function deriveRevenueCeiling(pain: PainPoint): string {
   const tam = pain.cluster?.estimatedTamUsdAnnual;
   if (tam && tam > 1_000_000) {
-    const low = Math.round((tam * 0.4) / 1_000_000);
-    const high = Math.round(tam / 1_000_000);
+    const low = Math.max(1, Math.round((tam * 0.3) / 1_000_000));
+    const high = Math.max(low + 2, Math.round(tam / 1_000_000));
     return `$${low}M-$${high}M ARR`;
   }
-  const factor = Math.max(5, pain.intensity);
-  const low = factor * 10;
-  const high = low + 20;
+  const mon = Math.max(3, pain.monetization || 5);
+  const low = mon <= 5 ? 2 : mon <= 7 ? 5 : 10;
+  const high = low * 3;
   return `$${low}M-$${high}M ARR`;
 }
 
 function deriveCompetition(pain: PainPoint): string {
   if (pain.triedSolutions && pain.triedSolutions.length > 0) {
-    return pain.triedSolutions[0];
+    const filtered = pain.triedSolutions.filter(
+      (s) =>
+        s &&
+        !s.toLowerCase().includes("none") &&
+        !s.toLowerCase().includes("n/a"),
+    );
+    if (filtered.length > 0) {
+      return filtered.slice(0, 2).join(" & ");
+    }
   }
   if (
     pain.cluster?.competitorIntel &&
     pain.cluster.competitorIntel.length > 0
   ) {
-    return pain.cluster.competitorIntel[0].name;
+    return pain.cluster.competitorIntel
+      .map((c) => c.name)
+      .slice(0, 2)
+      .join(" & ");
   }
-  return "Manual Spreadsheets & Email";
+  return "Manual Workarounds & Ad-hoc Scripts";
 }
 
 function deriveDemand(pain: PainPoint): string {
-  const base = Math.max(15, pain.mentions * 620);
-  if (base >= 1000) {
-    return `${(base / 1000).toFixed(1)}K /mo`;
-  }
-  return `${base} /mo`;
+  const mentions = Math.max(1, pain.mentions || 1);
+  if (mentions >= 100) return `${mentions} thread signals`;
+  return `${mentions} verified mentions`;
 }
 
 function deriveDemandNumeric(pain: PainPoint): string {
-  const base = Math.max(15, pain.mentions * 620);
-  if (base >= 1000) {
-    return `${(base / 1000).toFixed(1)}K/mo`;
-  }
-  return `${base}/mo`;
+  const mentions = Math.max(1, pain.mentions || 1);
+  return `${mentions} Citations`;
 }
 
 function derivePricing(pain: PainPoint): string {
@@ -216,16 +272,17 @@ function derivePricing(pain: PainPoint): string {
       return `$${s.amountMinUsd}-$${s.amountMaxUsd}/mo`;
     if (s.amountMinUsd) return `$${s.amountMinUsd}/mo`;
   }
-  if (pain.monetization >= 8) return "$49-$149/mo";
-  if (pain.monetization >= 5) return "$29-$99/mo";
-  return "$19-$49/mo";
+  const mon = pain.monetization || 5;
+  if (mon >= 8) return "$49-$149/mo";
+  if (mon >= 5) return "$29-$79/mo";
+  return "$19-$39/mo";
 }
 
 function deriveYear1ARR(pain: PainPoint): string {
   const mon = pain.monetization || 6;
-  if (mon >= 8) return "$100K-$250K ARR";
-  if (mon >= 6) return "$75K-$150K ARR";
-  return "$40K-$90K ARR";
+  if (mon >= 8) return "$120K-$250K ARR";
+  if (mon >= 6) return "$60K-$120K ARR";
+  return "$30K-$75K ARR";
 }
 
 function deriveDifficultyLabel(difficulty: PainPoint["difficulty"]): string {
@@ -243,33 +300,47 @@ function formatNarrativeIdea(pain: PainPoint): string[] {
   const rawParts = desc
     .split(/\n{2,}/)
     .map((p) => p.trim())
-    .filter(Boolean);
+    .filter((p) => p.length > 30);
 
   if (rawParts.length >= 2) {
     return rawParts;
   }
 
-  // Create deep rich narrative storytelling if only 1 short string is returned
+  const cleanSub = pain.subreddits?.[0]
+    ? `r/${pain.subreddits[0].replace(/^r\//i, "")}`
+    : "online communities";
+  const customer = deriveCustomer(pain);
   const competitor = deriveCompetition(pain);
   const pricing = derivePricing(pain);
+  const title = pain.title.trim();
 
-  return [
-    `A solo operator is in the middle of a high-friction workflow when an urgent request hits. It gets delayed or missed. The customer reaches out to the next provider on Google, and a high-ticket job walks. Buyers already treat this as normal; users surveyed in relevant communities report severe frustration when existing tools fail to deliver on basic responsiveness.`,
-    `An operator on Reddit frames the math cleanly: it costs pennies for automated AI agents to resolve intake friction in real-time, whereas a missed or mishandled lead costs hundreds in lost revenue. Search demand and community complaints back it up: operators are actively searching for dedicated alternatives to ${competitor} at brutal subscription rates.`,
-    `The product is a purpose-built AI copilot priced for the nimble operator, ${pricing}, month to month. It intercepts requests instantly, categorizes customer intent, and executes resolution playbooks without manual overhead.`,
-  ];
+  const p1 = `Across ${cleanSub}, ${customer.toLowerCase()} report recurring friction with ${title.toLowerCase()}. As highlighted in community threads: "${desc || pain.communityVoices?.[0] || title}".`;
+
+  const p2 = `Existing options like ${competitor} fail to address the core requirements, forcing teams into complex manual steps or patchwork workarounds. When these workflows break down, operators face compounding delays and operational overhead.`;
+
+  const p3 = `The opportunity is a streamlined, purpose-built SaaS solution designed specifically for ${customer}, priced around ${pricing}. By directly resolving this bottleneck, it provides immediate time savings and positive ROI without enterprise bloat.`;
+
+  return [p1, p2, p3];
 }
 
 function deriveWhyNowSection(pain: PainPoint): {
   headline: string;
   paragraphs: string[];
 } {
+  const cleanSub = pain.subreddits?.[0]
+    ? `r/${pain.subreddits[0].replace(/^r\//i, "")}`
+    : "target communities";
   const competitor = deriveCompetition(pain);
-  const headline = `Voice & Workflow AI cost fell 5x since late 2024, and buyer search jumped 10x in May`;
+  const pricing = derivePricing(pain);
+  const title = pain.title.trim();
+  const customer = deriveCustomer(pain);
+
+  const headline = `Market demand for solving "${title}" is surging while legacy tools remain high-friction`;
+
   const paragraphs = [
-    `Three curves crossed in 2026 for the first time. Real-time AI turn latency now sits at 600 to 750 ms in production, which the industry calls the "feels natural" range. Anything under 800 ms reads as smooth; above 1,500 ms the user notices the machine. Voice and workflow automation platforms cleared that bar this year.`,
-    `The unit cost dropped just as fast: OpenAI and Anthropic reasoning APIs reduced token costs by over 75%, and realtime mini models now run at a fraction of a cent per conversation minute. A multi-step intake or workflow resolution now costs about $0.02 in raw compute, while the job on the other end is worth $400 to $2,800.`,
-    `Meanwhile, legacy alternatives like ${competitor} remain bloated with enterprise seat minimums, creating an enormous open window for lightweight, modern micro-SaaS solutions.`,
+    `Community sentiment across ${cleanSub} indicates an inflection point. Users are increasingly vocal about the limitations of existing approaches like ${competitor}, where dissatisfaction and urgency (rated ${pain.urgency || 7}/10) are driving active search for modern alternatives.`,
+    `Modern developer tooling and API integrations now make it feasible to build a hyper-focused micro-SaaS in weeks rather than months. Lightweight architectures can deliver 10x faster setup and superior UX compared to legacy incumbents with bloated feature sets.`,
+    `With strong willingness-to-pay indicators in the ${pricing} bracket, ${customer.toLowerCase()} are eager to adopt dedicated utilities that deliver fast, measurable workflow improvements.`,
   ];
 
   return { headline, paragraphs };
@@ -913,76 +984,87 @@ Please generate the schema, API routes, and main dashboard screen.`;
               <div className="space-y-5 lg:col-span-5">
                 {/* Concept Mockup Card */}
                 <div className="space-y-4 rounded-2xl border border-zinc-200/90 bg-[#f8f9fa] p-4.5 shadow-2xs">
-                  {/* Dual Phone Concept Mockup UI */}
+                  {/* Dynamic Concept Mockup UI */}
                   <div className="grid grid-cols-2 gap-3">
-                    {/* Phone 1: Dark Intake App Screen */}
-                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-[#0f2327] p-3 text-white shadow-sm">
+                    {/* Phone 1: Detection / Resolver App Screen */}
+                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-[#0f172a] p-3 text-white shadow-sm">
                       <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 rounded-full bg-emerald-400"></div>
-                          <span className="font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase">
-                            RingMaster
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="h-2 w-2 rounded-full bg-emerald-400 shrink-0"></div>
+                          <span className="font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase truncate">
+                            {ideaTitle.split(" ")[0]} Flow
                           </span>
                         </div>
-                        <span className="py-0.2 rounded bg-white/10 px-1.5 text-[8px] text-zinc-300">
-                          Live AI
+                        <span className="shrink-0 py-0.2 rounded bg-white/10 px-1.5 font-mono text-[8px] text-zinc-300">
+                          {currentPain.subreddits[0]
+                            ? `r/${currentPain.subreddits[0].replace(/^r\//i, "")}`
+                            : "Active"}
                         </span>
                       </div>
 
                       <div className="space-y-1.5">
                         <div className="space-y-1 rounded-lg border border-white/5 bg-white/5 p-2">
                           <p className="font-mono text-[8px] text-zinc-400">
-                            Incoming Job
+                            Problem Detected
                           </p>
-                          <p className="truncate text-[10px] font-bold text-white">
-                            Emergency Pipe Leak
+                          <p className="line-clamp-2 text-[10px] font-bold text-white leading-tight">
+                            {currentPain.title}
                           </p>
                           <p className="text-[9px] font-semibold text-emerald-400">
-                            $450 estimate
+                            {pricing} • {difficultyLabel}
                           </p>
                         </div>
                         <div className="flex gap-1">
-                          <span className="flex-1 rounded bg-white/10 py-1 text-center font-mono text-[8px]">
-                            Scripts
+                          <span className="flex-1 rounded bg-white/10 py-1 text-center font-mono text-[8px] text-zinc-300 truncate px-1">
+                            {currentPain.sentiment || "Frustrated"}
                           </span>
-                          <span className="flex-1 rounded bg-amber-500/20 py-1 text-center font-mono text-[8px] text-amber-300">
-                            Rules
+                          <span className="flex-1 rounded bg-blue-500/20 py-1 text-center font-mono text-[8px] text-blue-300 truncate px-1">
+                            Urgency {currentPain.urgency || 7}/10
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Phone 2: White Operator Dashboard Screen */}
+                    {/* Phone 2: Resolution & Value Metrics Screen */}
                     <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-white p-3 text-zinc-900 shadow-sm">
                       <div className="flex items-center justify-between border-b border-zinc-100 pb-1.5">
                         <span className="font-mono text-[9px] font-bold text-zinc-800 uppercase">
-                          Dispatch
+                          Resolver Hub
                         </span>
                         <span className="py-0.2 rounded bg-emerald-50 px-1.5 text-[8px] font-bold text-emerald-600">
-                          98% Auto
+                          Validated
                         </span>
                       </div>
 
                       <div className="space-y-1.5">
                         <div className="space-y-1 rounded-lg border border-zinc-100 bg-zinc-50 p-2">
                           <div className="flex justify-between text-[8px] text-zinc-500">
-                            <span>Today</span>
+                            <span>Validation Score</span>
                             <span className="font-bold text-zinc-800">
-                              12 calls
+                              {scoreFormatted}/10
                             </span>
                           </div>
                           <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
-                            <div className="h-full w-4/5 rounded-full bg-[#2563eb]"></div>
+                            <div
+                              className="h-full rounded-full bg-[#2563eb]"
+                              style={{
+                                width: `${Math.min(100, Math.max(25, currentPain.validationScore || 70))}%`,
+                              }}
+                            ></div>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-1 text-center font-mono text-[8px]">
-                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1">
-                            <span className="text-zinc-400">Won:</span>{" "}
-                            <b>$2.8K</b>
+                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1 truncate">
+                            <span className="text-zinc-400">Target:</span>{" "}
+                            <b className="text-zinc-700">
+                              {customer.split(" ")[0]}
+                            </b>
                           </div>
-                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1">
-                            <span className="text-zinc-400">Cost:</span>{" "}
-                            <b>$3.20</b>
+                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1 truncate">
+                            <span className="text-zinc-400">Vs:</span>{" "}
+                            <b className="text-zinc-700">
+                              {competition.split(" ")[0]}
+                            </b>
                           </div>
                         </div>
                       </div>
@@ -1331,18 +1413,20 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <div className="flex items-start gap-2">
                       <span className="font-bold text-blue-600">•</span>
                       <span>
-                        Single-purpose intake dashboard for {customer}
+                        Single-purpose dashboard tailored for {customer}
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-bold text-blue-600">•</span>
                       <span>
-                        Instant SMS & webhook alerts to prevent lost deals
+                        Automated workflow resolving &quot;{currentPain.title}&quot;
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-bold text-blue-600">•</span>
-                      <span>One-click export to Google Sheets & CRM</span>
+                      <span>
+                        Direct displacement alternative to {competition} at {pricing}
+                      </span>
                     </div>
                   </div>
                 </div>

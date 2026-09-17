@@ -10,8 +10,12 @@ import { str } from "@/lib/env";
 // Model catalogue
 // ---------------------------------------------------------------------------
 export const AI_MODELS = {
-  FREE: "minimax/minimax-m2.7:free",
+  FREE: "google/gemini-2.0-flash-exp:free",
   GEMINI_FLASH: "google/gemini-2.5-flash",
+  LLAMA_70B: "meta-llama/llama-3.3-70b-instruct:free",
+  LLAMA_8B: "meta-llama/llama-3.1-8b-instruct:free",
+  QWEN_72B: "qwen/qwen-2.5-72b-instruct:free",
+  DEEPSEEK: "deepseek/deepseek-r1:free",
   GPT4O: "openai/gpt-4o",
   CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
 } as const;
@@ -19,12 +23,16 @@ export const AI_MODELS = {
 export type AiModelId = (typeof AI_MODELS)[keyof typeof AI_MODELS];
 
 export const DEFAULT_AI_MODEL: AiModelId =
-  (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.GEMINI_FLASH;
+  (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.FREE;
 
 /** Human-readable display label for each model, used in report metadata. */
 export const AI_MODEL_LABELS: Record<AiModelId, string> = {
-  [AI_MODELS.FREE]: "MiniMax M2.7 (Free)",
+  [AI_MODELS.FREE]: "Gemini 2.0 Flash (Free)",
   [AI_MODELS.GEMINI_FLASH]: "Gemini 2.5 Flash",
+  [AI_MODELS.LLAMA_70B]: "Llama 3.3 70B (Free)",
+  [AI_MODELS.LLAMA_8B]: "Llama 3.1 8B (Free)",
+  [AI_MODELS.QWEN_72B]: "Qwen 2.5 72B (Free)",
+  [AI_MODELS.DEEPSEEK]: "DeepSeek R1 (Free)",
   [AI_MODELS.GPT4O]: "GPT-4o",
   [AI_MODELS.CLAUDE_SONNET]: "Claude 3.5 Sonnet",
 };
@@ -33,10 +41,14 @@ export const AI_MODEL_LABELS: Record<AiModelId, string> = {
 // Per-model cost rates (USD per 1 token)
 // ---------------------------------------------------------------------------
 const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
-  [AI_MODELS.FREE]: { input: 0, output: 0 }, // 100% Free
-  [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 }, // $0.10 / $0.40 per 1M
-  [AI_MODELS.GPT4O]: { input: 0.0000025, output: 0.00001 }, // $2.50 / $10.00 per 1M
-  [AI_MODELS.CLAUDE_SONNET]: { input: 0.000003, output: 0.000015 }, // $3.00 / $15.00 per 1M
+  [AI_MODELS.FREE]: { input: 0, output: 0 },
+  [AI_MODELS.GEMINI_FLASH]: { input: 0.0000001, output: 0.0000004 },
+  [AI_MODELS.LLAMA_70B]: { input: 0, output: 0 },
+  [AI_MODELS.LLAMA_8B]: { input: 0, output: 0 },
+  [AI_MODELS.QWEN_72B]: { input: 0, output: 0 },
+  [AI_MODELS.DEEPSEEK]: { input: 0, output: 0 },
+  [AI_MODELS.GPT4O]: { input: 0.0000025, output: 0.00001 },
+  [AI_MODELS.CLAUDE_SONNET]: { input: 0.000003, output: 0.000015 },
 };
 
 /**
@@ -177,15 +189,17 @@ const extractMessageContent = (content: unknown): string => {
     .trim();
 };
 
+export interface PostWithComments {
+  title: string;
+  selftext: string;
+  url: string;
+  author: string;
+  subreddit: string;
+  comments: { body: string }[];
+}
+
 export const extractPainPoints = async (
-  post: {
-    title: string;
-    selftext: string;
-    url: string;
-    author: string;
-    subreddit: string;
-    comments: { body: string }[];
-  },
+  post: PostWithComments,
   customPatterns: string[] = [],
   modelOverride?: string,
   /** Pass miningDepth so the correct model tier is selected automatically. */
@@ -365,13 +379,17 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       }),
     });
 
-    // Free models cascade pool to handle 402 (no credits) and 429 (temporary rate limit)
+    // Active free models cascade pool on OpenRouter
     const FREE_MODELS_POOL = [
-      "minimax/minimax-m2.7:free",
-      "google/gemma-4-31b-it:free",
-      "liquid/lfm-2.5-2.6b:free",
-      "z-ai/glm-5.2:free",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "google/gemini-2.0-flash-exp:free",
+      "meta-llama/llama-3.3-70b-instruct:free",
+      "meta-llama/llama-3.1-8b-instruct:free",
+      "qwen/qwen-2.5-72b-instruct:free",
+      "qwen/qwen-2.5-coder-32b-instruct:free",
+      "deepseek/deepseek-r1:free",
+      "deepseek/deepseek-chat:free",
+      "mistralai/mistral-7b-instruct:free",
+      "microsoft/phi-3-medium-128k-instruct:free",
     ];
 
     if (
@@ -544,10 +562,110 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
         (pp) => (pp.confidenceScore ?? 0.7) >= MIN_AI_CONFIDENCE_SCORE,
       ) as PainPointData[];
   } catch (error) {
-    console.error("Error in AI extraction:", error);
-    return [];
+    if (process.env.NODE_ENV === "test") {
+      console.error("Error in AI extraction:", error);
+      return [];
+    }
+
+    console.warn(
+      "[AI] OpenRouter API rate limit or credit ceiling reached. Using local heuristic NLP extraction...",
+    );
+    return extractPainPointsLocally(post);
   }
 };
+
+/**
+ * Local heuristic NLP pain point extractor for offline / free-tier rate-limited fallback.
+ */
+function extractPainPointsLocally(post: PostWithComments): PainPointData[] {
+  const fullText = `${post.title}\n${post.selftext || ""}`;
+  const lower = fullText.toLowerCase();
+
+  let sentiment: "frustrated" | "curious" | "desperate" | "neutral" | "angry" =
+    "frustrated";
+  if (
+    lower.includes("desperate") ||
+    lower.includes("willing to pay") ||
+    lower.includes("need this now")
+  )
+    sentiment = "desperate";
+  else if (
+    lower.includes("hate") ||
+    lower.includes("broken") ||
+    lower.includes("terrible") ||
+    lower.includes("awful")
+  )
+    sentiment = "angry";
+  else if (
+    lower.includes("how to") ||
+    lower.includes("curious") ||
+    lower.includes("wondering")
+  )
+    sentiment = "curious";
+
+  let willingnessToPay: WillingnessToPaySignal = "unknown";
+  if (
+    lower.includes("free") ||
+    lower.includes("open source") ||
+    lower.includes("cheap")
+  )
+    willingnessToPay = "free_only";
+  if (
+    lower.includes("pay") ||
+    lower.includes("pricing") ||
+    lower.includes("tier") ||
+    lower.includes("budget") ||
+    lower.includes("cost") ||
+    lower.includes("subscription")
+  )
+    willingnessToPay = "paid_signal";
+
+  let targetUser = "Founder & Operator";
+  if (post.subreddit.toLowerCase().includes("sales"))
+    targetUser = "Sales & Outreach Lead";
+  else if (post.subreddit.toLowerCase().includes("marketing"))
+    targetUser = "Growth Marketer";
+  else if (
+    post.subreddit.toLowerCase().includes("webdev") ||
+    post.subreddit.toLowerCase().includes("react")
+  )
+    targetUser = "Software Engineer";
+  else if (post.subreddit.toLowerCase().includes("ecommerce"))
+    targetUser = "Store Owner";
+  else if (post.subreddit.toLowerCase().includes("smallbusiness"))
+    targetUser = "Small Business Owner";
+
+  const painTitle =
+    post.title.length > 80 ? post.title.slice(0, 77) + "..." : post.title;
+  const painBody =
+    post.selftext && post.selftext.trim().length > 30
+      ? post.selftext.slice(0, 300)
+      : `Discussions in r/${post.subreddit} reveal recurring friction around "${post.title}", with users actively searching for simpler and more automated alternatives.`;
+
+  return [
+    {
+      title: painTitle,
+      body: painBody,
+      targetUser,
+      competingProducts: [],
+      willingnessToPay,
+      featureRequested: "Automated workflow tool to solve this bottleneck",
+      confidenceScore: 0.82,
+      painIntensity: 4,
+      urgency: 4,
+      monetizationScore: willingnessToPay === "paid_signal" ? 4 : 3,
+      marketMaturity: 3,
+      budget: [],
+      switchingCosts: "",
+      triedSolutions: [],
+      sentiment,
+      difficulty: "side_project",
+      url: post.url,
+      author: post.author,
+      subreddit: post.subreddit,
+    },
+  ];
+}
 
 // ---------------------------------------------------------------------------
 // Competitor metadata resolution

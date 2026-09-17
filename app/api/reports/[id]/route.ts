@@ -690,8 +690,11 @@ export async function GET(
             language: pp.triedSolutions || [],
             postUrl: pp.postUrl,
             angles: [
-              "Solution for " + pp.title,
-              "Cost-effective alternative to existing tools",
+              pp.triedSolutions && pp.triedSolutions.length > 0
+                ? `Modern automated alternative to ${pp.triedSolutions[0]}`
+                : `Dedicated single-purpose solution for ${pp.title.toLowerCase()}`,
+              `Lightweight workflow tool tuned for r/${pp.subreddit} teams`,
+              `Self-serve micro-SaaS eliminating manual ${pp.title.toLowerCase()} overhead`,
             ],
           };
         }),

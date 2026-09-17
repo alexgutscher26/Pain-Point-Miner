@@ -110,12 +110,17 @@ export async function GET(req: Request) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (event: StreamEvent) => {
-        const data = `data: ${JSON.stringify(event)}\n\n`;
-        controller.enqueue(encoder.encode(data));
-      };
-
       let isTerminal = false;
+
+      const send = (event: StreamEvent) => {
+        if (isTerminal) return;
+        try {
+          const data = `data: ${JSON.stringify(event)}\n\n`;
+          controller.enqueue(encoder.encode(data));
+        } catch {
+          isTerminal = true;
+        }
+      };
 
       const poll = async () => {
         try {
