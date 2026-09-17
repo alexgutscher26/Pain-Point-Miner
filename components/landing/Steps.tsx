@@ -1,131 +1,81 @@
 "use client";
 
-import { Search, Brain, Target, Sparkles } from "lucide-react";
+import { Search, Brain, Target, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 export function Steps() {
   const steps = [
     {
-      num: "1",
-      title: "Select your target niche",
+      num: "01",
+      title: "Select niche or target competitor",
       description:
-        "Enter keywords or communities like r/SaaS, r/smallbusiness, or r/webdev to pinpoint active buyer conversations.",
+        "Enter a product category, specific incumbent (e.g. HubSpot, Notion, Stripe), or subreddits like r/SaaS and r/marketing.",
       badge: "Targeting",
+      detail: "1,240+ Subreddits Indexed",
     },
     {
-      num: "2",
-      title: "AI extracts and clusters pain points",
+      num: "02",
+      title: "AI isolates verified friction & budgets",
       description:
-        "Our semantic pipeline filters out spam, isolates repeated workflow hurdles, and quantifies willingness to pay.",
+        "Our semantic pipeline filters out spam and noise, extracting verbatim complaints, competitor vulnerabilities, and willingness to pay.",
       badge: "Extraction",
+      detail: "94.2% Signal Accuracy",
     },
     {
-      num: "3",
-      title: "Ship with confirmed demand",
+      num: "03",
+      title: "Build and market with unfair clarity",
       description:
-        "Review structured opportunity dossiers, export direct buyer leads, and build what customers are already asking for.",
-      badge: "Validation",
+        "Export opportunity dossiers, grab authentic copy hooks for your landing page, and build features users have already committed budget for.",
+      badge: "Execution",
+      detail: "Direct CSV / Notion Export",
     },
   ];
 
   return (
-    <section className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mb-16 flex max-w-[680px] flex-col items-center text-center">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-xs font-semibold text-[#ff4500] dark:border-white/10 dark:bg-zinc-900/60">
-          Execution process
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-16 sm:px-6 sm:py-24">
+      <div className="mb-14 flex max-w-[680px] flex-col items-center text-center">
+        <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1 text-xs font-semibold text-[#ff4500] shadow-2xs backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Execution Pipeline</span>
         </div>
-        <h2 className="mb-4 text-3xl font-bold tracking-tight text-balance text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
-          Validate your SaaS ideas in three simple steps
+        <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          From raw Reddit thread to validated roadmap in 3 steps
         </h2>
-        <p className="text-base leading-relaxed font-normal text-pretty text-zinc-600 sm:text-lg dark:text-zinc-400">
-          Go from an unproven concept to a backed list of paying customer
-          demands in minutes instead of weeks.
+        <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
+          Replace weeks of inconclusive customer interviews with hundreds of
+          unprompted, authentic buyer discussions.
         </p>
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-3">
-        {/* Step 1 */}
-        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
-          <div className="mb-6 flex w-full items-center justify-between">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
-              1
-            </div>
-            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
-              Targeting
-            </span>
-          </div>
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+        {steps.map((step) => (
+          <div
+            key={step.num}
+            className="group flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#ff4500]/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div>
+              <div className="mb-6 flex items-center justify-between">
+                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-zinc-100 font-mono text-xs font-bold text-zinc-900 group-hover:bg-[#ff4500] group-hover:text-white transition-colors dark:bg-zinc-800 dark:text-white">
+                  {step.num}
+                </span>
+                <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+                  {step.badge}
+                </span>
+              </div>
 
-          <div className="mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
-            <div className="flex w-full max-w-[220px] items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2.5 shadow-xs dark:border-white/10 dark:bg-zinc-900">
-              <Search className="h-4 w-4 text-[#ff4500]" />
-              <span className="text-xs font-semibold text-zinc-900 dark:text-white">
-                r/productivity, r/SaaS
-              </span>
+              <h3 className="mb-2 text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+                {step.title}
+              </h3>
+              <p className="text-xs leading-relaxed text-zinc-600 sm:text-sm dark:text-zinc-300">
+                {step.description}
+              </p>
             </div>
-          </div>
 
-          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
-            {steps[0].title}
-          </h3>
-          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
-            {steps[0].description}
-          </p>
-        </div>
-
-        {/* Step 2 */}
-        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
-          <div className="mb-6 flex w-full items-center justify-between">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
-              2
-            </div>
-            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
-              Extraction
-            </span>
-          </div>
-
-          <div className="mb-6 flex h-40 w-full flex-col justify-center gap-2 overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
-            <div className="rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-              High willingness to pay signal detected
-            </div>
-            <div className="rounded-md border border-[#ff4500]/20 bg-[#ff4500]/10 p-2 text-xs font-medium text-[#ff4500]">
-              Competitor churn reason: Pricing & complexity
+            <div className="mt-8 border-t border-zinc-100 pt-3 text-[11px] font-mono text-zinc-400 dark:border-zinc-800">
+              {step.detail}
             </div>
           </div>
-
-          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
-            {steps[1].title}
-          </h3>
-          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
-            {steps[1].description}
-          </p>
-        </div>
-
-        {/* Step 3 */}
-        <div className="group flex flex-col items-start rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xs backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/70">
-          <div className="mb-6 flex w-full items-center justify-between">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ff4500] text-sm font-bold text-white">
-              3
-            </div>
-            <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs font-semibold text-zinc-600 dark:bg-white/5 dark:text-zinc-400">
-              Validation
-            </span>
-          </div>
-
-          <div className="mb-6 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border border-black/5 bg-zinc-50 p-4 transition-transform duration-500 group-hover:scale-[1.02] dark:border-white/5 dark:bg-zinc-950">
-            <div className="flex items-center gap-3 rounded-full border border-black/10 bg-white px-4 py-2.5 shadow-xs dark:border-white/10 dark:bg-zinc-900">
-              <Target className="h-5 w-5 text-emerald-500" />
-              <span className="text-xs font-bold text-zinc-900 dark:text-white">
-                Opportunity Score: 92/100
-              </span>
-            </div>
-          </div>
-
-          <h3 className="mb-2 text-xl font-bold tracking-tight text-balance text-zinc-950 dark:text-white">
-            {steps[2].title}
-          </h3>
-          <p className="text-sm leading-relaxed text-pretty text-zinc-600 dark:text-zinc-400">
-            {steps[2].description}
-          </p>
-        </div>
+        ))}
       </div>
     </section>
   );
