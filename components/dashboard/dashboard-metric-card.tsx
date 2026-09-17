@@ -24,62 +24,71 @@ export function MetricCard({
 }) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl p-5 transition-all duration-400 ${
+      className={`group relative overflow-hidden rounded-2xl border p-5 transition-all duration-200 ${
         isHighlight
-          ? "border border-[#ff4500]/25 bg-gradient-to-br from-white/95 to-orange-50/20 hover:scale-[1.01] hover:border-[#ff4500]/40 hover:shadow-md"
-          : "glass-card glass-card-hover"
+          ? "border-[#ff4500]/40 bg-white shadow-sm ring-1 ring-[#ff4500]/10 dark:border-[#ff4500]/40 dark:bg-zinc-900"
+          : "border-zinc-200/90 bg-white shadow-2xs hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
       }`}
     >
       {isHighlight && (
-        <div className="pointer-events-none absolute top-0 right-0 h-24 w-24 rounded-full bg-[#ff4500] opacity-[0.03] blur-[40px]"></div>
+        <div className="pointer-events-none absolute top-0 right-0 h-24 w-24 rounded-full bg-[#ff4500]/5 blur-2xl" />
       )}
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-3 flex items-center justify-between">
         <div
-          className={`rounded-xl p-2 transition-all duration-300 group-hover:scale-105 ${
+          className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all ${
             isHighlight
-              ? "bg-[#ff4500]/10 text-[#ff4500]"
-              : "border border-black/[0.04] bg-black/[0.02] text-zinc-700"
+              ? "bg-[#ff4500]/10 text-[#ff4500] dark:bg-orange-950/40 dark:text-orange-400"
+              : "border border-zinc-200 bg-zinc-50 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
           }`}
         >
           {icon}
         </div>
         {badge && (
-          <span className="rounded-full border border-[#ff4500]/10 bg-[#ff4500]/5 px-2.5 py-0.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase">
+          <span className="rounded-md bg-[#ff4500]/10 px-2 py-0.5 font-mono text-[9px] font-bold text-[#ff4500] uppercase dark:bg-orange-950/50 dark:text-orange-300">
             {badge}
           </span>
         )}
       </div>
+
       <div>
-        <p className="mb-1 font-mono text-[10px] font-extrabold tracking-widest text-zinc-400 uppercase">
+        <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
           {title}
         </p>
-        <div className="flex items-baseline gap-2">
+        <div className="mt-1 flex items-baseline gap-2">
           <p
-            className={`text-[28px] leading-none font-extrabold tracking-tight ${isHighlight ? "text-[#ff4500]" : "text-zinc-950"}`}
+            className={`font-mono text-2xl font-extrabold tracking-tight ${
+              isHighlight
+                ? "text-[#ff4500] dark:text-orange-400"
+                : "text-zinc-950 dark:text-white"
+            }`}
           >
             {value}
           </p>
           {trend && (
-            <p className="flex items-center gap-0.5 text-[12px] font-black text-emerald-600">
+            <span className="flex items-center gap-0.5 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
               <TrendingUp className="h-3 w-3" /> {trend}
-            </p>
+            </span>
           )}
         </div>
+
         {progress !== undefined && (
           <div className="mt-3">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/80">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
               <div
                 className="h-full rounded-full bg-[#ff4500]"
                 style={{ width: `${progress}%` }}
-              ></div>
+              />
             </div>
-            <p className="mt-2 font-mono text-[9px] font-extrabold tracking-widest text-zinc-400 uppercase">
-              {subtext}
-            </p>
+            {subtext && (
+              <p className="mt-1.5 font-mono text-[9px] font-medium text-zinc-400 dark:text-zinc-500">
+                {subtext}
+              </p>
+            )}
           </div>
         )}
+
         {trendSub && (
-          <p className="mt-1.5 font-mono text-[9px] font-extrabold tracking-widest text-zinc-400 uppercase">
+          <p className="mt-1 font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
             {trendSub}
           </p>
         )}

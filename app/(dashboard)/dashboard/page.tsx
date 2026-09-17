@@ -272,88 +272,90 @@ export default async function DashboardPage({
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-8 p-4 duration-500 sm:p-6 lg:p-8">
       {planContext.planPurchaseRequired ? (
-        <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#ff4500]/25 bg-[#ff4500]/5 px-5 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[#ff4500]/25 bg-[#ff4500]/5 px-6 py-4.5 dark:bg-[#ff4500]/10">
           <div>
-            <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-[#ff4500] uppercase">
+            <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
               Action Required
             </p>
-            <p className="text-sm font-semibold text-[#ff4500]/95">
-              Upgrade to a paid plan to unlock new scans, deep mining, and AI
-              suggestions.
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Your account is currently in read-only mode. Claim a Lifetime Deal to unlock unlimited search depth and AI teardowns.
             </p>
           </div>
           <Link
             href="/dashboard/billing"
-            className="shrink-0 rounded-full bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#ff4500] px-5 py-2.5 font-mono text-xs font-black tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
           >
-            Upgrade Now
+            Claim LTD Deal
           </Link>
         </div>
       ) : null}
+
       {/* Welcome Header */}
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/10 bg-[#ff4500]/5 px-3 py-1 text-[11px] font-bold text-[#ff4500] shadow-2xs">
-            <div className="relative flex h-1.5 w-1.5">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-3 py-1 font-mono text-[10px] font-bold text-[#ff4500] uppercase shadow-2xs">
+            <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff4500] opacity-75"></span>
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#ff4500]"></span>
-            </div>
-            Market Research Active
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff4500]"></span>
+            </span>
+            Market Research Radar Active
           </div>
-          <h2 className="mb-3 text-[36px] leading-[1.08] font-extrabold tracking-[-0.03em] text-zinc-950 sm:text-[44px]">
-            Welcome, {userFirstName}
+          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
+            Welcome back, {userFirstName}
           </h2>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-500">
-            Your semantic insights engine has analyzed{" "}
-            <strong className="text-zinc-850">
+          <p className="mt-1 text-[14px] leading-relaxed font-medium text-zinc-500 sm:text-[15px] dark:text-zinc-400">
+            Your semantic insights engine has indexed{" "}
+            <strong className="text-zinc-900 font-bold dark:text-zinc-100">
               {reportsSaved} investigations
             </strong>
             .
           </p>
         </div>
-        <div className="hidden items-center gap-1.5 rounded-full border border-black/[0.05] bg-white/50 p-1 shadow-xs backdrop-blur-md lg:flex">
+
+        {/* Time Window Switcher */}
+        <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white/80 p-1 shadow-2xs backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
           <Link
             href="/dashboard?window=realtime"
-            className={`rounded-full px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
+            className={`rounded-lg px-3.5 py-1.5 font-mono text-[11px] font-bold tracking-wider uppercase transition-all ${
               selectedWindow === "realtime"
                 ? "bg-[#ff4500] text-white shadow-xs"
-                : "text-zinc-500 hover:text-zinc-800"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
-            Realtime
+            Realtime (24h)
           </Link>
           <Link
             href="/dashboard?window=30d"
-            className={`rounded-full px-4 py-2 font-mono text-[11px] font-bold tracking-wider uppercase transition-all duration-300 ${
+            className={`rounded-lg px-3.5 py-1.5 font-mono text-[11px] font-bold tracking-wider uppercase transition-all ${
               selectedWindow === "30d"
                 ? "bg-[#ff4500] text-white shadow-xs"
-                : "text-zinc-500 hover:text-zinc-800"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
-            Past 30 Days
+            30 Days
           </Link>
         </div>
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Monthly Scans"
           value={searchesRemainingLabel}
-          icon={<Search className="h-4 w-4 text-zinc-700" />}
+          icon={<Search className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
           progress={searchesProgress}
           subtext={searchesSubtext}
         />
         <MetricCard
           title="Reports Saved"
           value={reportsSaved.toString()}
-          icon={<BarChart3 className="h-4 w-4 text-zinc-700" />}
+          icon={<BarChart3 className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
           trendSub="Total investigations"
         />
         <MetricCard
           title="Pain Points Found"
           value={painPointsFound.toString()}
-          icon={<AlertCircle className="h-4 w-4 text-zinc-700" />}
+          icon={<AlertCircle className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
           trendSub="Across all reports"
         />
         <MetricCard
@@ -375,7 +377,7 @@ export default async function DashboardPage({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Recent Reports Table */}
-        <div className="overflow-hidden rounded-2xl border border-black/[0.05] bg-white/60 shadow-xs backdrop-blur-md lg:col-span-2">
+        <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-xs lg:col-span-2 dark:border-zinc-800 dark:bg-zinc-900/70">
           {reports.length === 0 ? (
             <EmptyState
               title="Start Your First Investigation"
@@ -388,40 +390,40 @@ export default async function DashboardPage({
             />
           ) : (
             <>
-              <div className="flex items-center justify-between border-b border-black/[0.05] px-8 py-6">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4.5 sm:px-8 dark:border-zinc-800/80">
+                <div className="flex items-center gap-2.5">
                   <div className="h-2 w-2 rounded-full bg-[#ff4500]"></div>
-                  <h4 className="text-lg font-black tracking-tight text-zinc-900">
+                  <h4 className="text-base font-extrabold tracking-tight text-zinc-950 dark:text-white">
                     Recent Investigations
                   </h4>
                 </div>
                 <Link
-                  className="text-zinc-550 font-mono text-[11px] font-bold tracking-widest uppercase transition-colors hover:text-[#ff4500]"
+                  className="font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase transition-colors hover:text-[#ff4500] dark:text-zinc-400 dark:hover:text-[#ff4500]"
                   href="/dashboard/reports"
                 >
-                  View All
+                  View All Dossiers →
                 </Link>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
+                <table className="w-full min-w-[640px] table-fixed border-collapse text-left">
                   <thead>
-                    <tr className="border-b border-black/[0.03] bg-black/[0.01] text-zinc-400">
-                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                    <tr className="border-b border-zinc-100 bg-zinc-50/50 text-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-500">
+                      <th className="px-6 py-3 font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
                         Investigation
                       </th>
-                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
-                        Key Insight
+                      <th className="px-6 py-3 font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
+                        Top Friction Point
                       </th>
-                      <th className="px-8 py-4 text-center font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                      <th className="px-6 py-3 text-center font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
                         Score
                       </th>
-                      <th className="px-8 py-4 font-mono text-[11px] font-bold tracking-[0.15em] uppercase">
+                      <th className="px-6 py-3 font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-black/[0.03]">
-                    {reports.slice(0, 3).map((report) => {
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                    {reports.slice(0, 4).map((report) => {
                       const reportScore = toOpportunityScore(
                         report.painPoints,
                         scoringWeights,
@@ -482,3 +484,4 @@ export default async function DashboardPage({
     </div>
   );
 }
+

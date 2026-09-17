@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, ExternalLink, Loader2 } from "lucide-react";
+import { CreditCard, ExternalLink, Loader2, Sparkles, ShieldCheck, Check, Zap } from "lucide-react";
 import type { BillingPlan, PlanEntitlements } from "@/lib/plan-gating";
 
 type BillingPurchaseOption = {
@@ -50,10 +50,7 @@ export function BillingPageClient({
 }: BillingPageClientProps) {
   const [openingPortal, setOpeningPortal] = useState(false);
   const [startingCheckoutPlan, setStartingCheckoutPlan] =
-    useState<BillingPlan | null>(null);
-  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">(
-    "monthly",
-  );
+    useState<string | null>(null);
   const [actionState, setActionState] = useState<BillingActionState>(null);
 
   const displayLtdTier = ltdTier || "none";
@@ -110,7 +107,7 @@ export function BillingPageClient({
       return;
     }
 
-    setStartingCheckoutPlan(targetTier as any);
+    setStartingCheckoutPlan(targetTier);
     setActionState(null);
 
     try {
@@ -146,416 +143,313 @@ export function BillingPageClient({
     }
   }
 
-  async function startCheckout(targetPlan: BillingPlan) {
-    if (!stripeConfigured) {
-      return;
-    }
-
-    setStartingCheckoutPlan(targetPlan);
-    setActionState(null);
-
-    try {
-      const res = await fetch("/api/auth/subscription/upgrade", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          plan: targetPlan,
-          annual: billingInterval === "yearly",
-          successUrl: `${window.location.origin}/dashboard/billing`,
-          cancelUrl: `${window.location.origin}/dashboard/billing`,
-          returnUrl: `${window.location.origin}/dashboard/billing`,
-          disableRedirect: true,
-        }),
-      });
-
-      const data = await safeJson(res);
-
-      if (!res.ok) {
-        throw new Error(
-          data?.message ?? "Unable to start checkout for this plan.",
-        );
-      }
-
-      if (data?.url) {
-        const url = new URL(data.url, window.location.origin);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
-          throw new Error("Invalid redirect URL.");
-        }
-        window.location.href = data.url;
-        return;
-      }
-
-      throw new Error("Checkout URL was not returned.");
-    } catch (error) {
-      console.error("Error starting checkout:", error);
-      setActionState({
-        type: "error",
-        message:
-          error instanceof Error ? error.message : "Unable to start checkout.",
-      });
-    } finally {
-      setStartingCheckoutPlan(null);
-    }
-  }
-
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-8 p-4 duration-500 sm:p-6 lg:p-8">
       {/* Page Title */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-2 inline-flex items-center gap-2 font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff4500] opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff4500]"></span>
             </span>
-            <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-              Billing & Subscription
-            </p>
+            Account & Quota Engine
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
-            Manage Your Plan
+          <h2 className="text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
+            Billing & Lifetime Access
           </h2>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed font-medium text-zinc-500">
-            Update your payment methods, review transaction invoices, or change
-            your subscription tiers via Stripe.
+          <p className="mt-1 max-w-2xl text-[14px] leading-relaxed font-medium text-zinc-500 sm:text-[15px] dark:text-zinc-400">
+            Manage your Lifetime Deal allocation, review Stripe receipts, or upgrade your monthly scan allowance.
           </p>
         </div>
       </div>
 
-      {/* Plan Inactive Banner */}
+      {/* Plan Inactive / Read Only Banner */}
       {planPurchaseRequired ? (
-        <div className="flex items-center justify-between gap-4 rounded-2xl border border-rose-500/25 bg-rose-500/5 px-5 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 dark:bg-amber-500/10">
           <div>
-            <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-rose-600 uppercase">
-              Plan Inactive
+            <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-amber-600 uppercase">
+              Read-Only Mode Active
             </p>
-            <p className="text-sm font-semibold text-rose-700">
-              Your account is in read-only mode. Purchase a plan to resume new
-              searches and unlock paid features.
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Your account is currently in read-only mode. Claim a Lifetime Deal below to unlock unlimited search depth, automated discovery, and AI pain point clustering.
             </p>
           </div>
         </div>
       ) : null}
 
-      {/* Available Plans Section */}
-      {availablePlans.length > 0 ? (
-        <div className="glass-card space-y-6 rounded-2xl p-6 sm:p-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h3 className="text-lg font-extrabold text-zinc-900">
-                Purchase a Subscription
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
-                Choose a paid plan to unlock full access or upgrade your current
-                account.
-              </p>
-            </div>
-
-            {/* Toggle Billing Interval */}
-            <div className="inline-flex items-center gap-1 self-start rounded-full border border-black/[0.05] bg-white/50 p-1 shadow-xs backdrop-blur-md md:self-auto">
-              <button
-                type="button"
-                onClick={() => setBillingInterval("monthly")}
-                className={`cursor-pointer rounded-full px-4 py-1.5 font-mono text-[10px] font-bold tracking-wider uppercase transition-all duration-300 ${
-                  billingInterval === "monthly"
-                    ? "bg-[#ff4500] text-white shadow-xs"
-                    : "text-zinc-500 hover:text-zinc-800"
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                type="button"
-                onClick={() => setBillingInterval("yearly")}
-                className={`cursor-pointer rounded-full px-4 py-1.5 font-mono text-[10px] font-bold tracking-wider uppercase transition-all duration-300 ${
-                  billingInterval === "yearly"
-                    ? "bg-[#ff4500] text-white shadow-xs"
-                    : "text-zinc-550 hover:text-zinc-855"
-                }`}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-4 pt-2">
-            {availablePlans.map(({ plan: targetPlan, yearlyAvailable }) => {
-              const isCurrentPlan =
-                !planPurchaseRequired && targetPlan === plan;
-              const isLoading = startingCheckoutPlan === targetPlan;
-              const yearlyDisabled =
-                billingInterval === "yearly" && !yearlyAvailable;
-
-              return (
-                <button
-                  key={targetPlan}
-                  type="button"
-                  onClick={() => startCheckout(targetPlan)}
-                  disabled={
-                    isCurrentPlan ||
-                    isLoading ||
-                    !stripeConfigured ||
-                    yearlyDisabled
-                  }
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#ff4500] px-6 py-3 font-mono text-xs font-bold tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ExternalLink className="h-4 w-4" />
-                  )}
-                  {isCurrentPlan
-                    ? `${targetPlan} (Active)`
-                    : yearlyDisabled
-                      ? `Yearly unavailable`
-                      : `Buy ${targetPlan} ${billingInterval}`}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
+      {/*
+        NOTE: Recurring monthly subscription plans are intentionally commented out 
+        per business model update. Only Lifetime Deals (LTD) are active.
+      */}
 
       {/* LTD (Lifetime Deals) Section */}
-      <div className="relative overflow-hidden rounded-2xl border border-amber-500/10 bg-gradient-to-br from-amber-500/[0.02] to-amber-600/[0.04] p-6 shadow-xs sm:p-8">
-        <div className="pointer-events-none absolute top-0 right-0 p-6 text-amber-500 opacity-[0.03]">
-          <CreditCard className="h-28 w-28 rotate-12" />
-        </div>
-        <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center">
-          <div className="flex-1 space-y-3">
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 font-mono text-[9px] font-bold tracking-widest text-amber-700 uppercase">
-              Early Believer Offer
-            </span>
-            <h3 className="text-2xl font-extrabold tracking-tight text-zinc-950 uppercase sm:text-3xl">
-              Lifetime Deals
+      <div className="relative overflow-hidden rounded-3xl border border-zinc-200/90 bg-gradient-to-b from-white via-zinc-50/60 to-zinc-100/50 p-6 shadow-xs sm:p-10 dark:border-zinc-800 dark:from-zinc-900/90 dark:via-zinc-900/50 dark:to-zinc-950/80">
+        <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-0.5 font-mono text-[10px] font-black tracking-widest text-amber-700 uppercase dark:text-amber-400">
+              <Sparkles className="h-3 w-3 text-amber-500" />
+              <span>One-Time Lifetime Deals (LTD)</span>
+            </div>
+            <h3 className="text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+              Pay Once. Mine Forever.
             </h3>
-            <p className="max-w-xl text-sm leading-relaxed text-zinc-500">
-              One-time payment for lifetime access. Support early development
-              and avoid recurring fees forever. Includes monthly recurring base
-              credits plus heavily discounted top-up rates.
+            <p className="mt-1 max-w-xl text-[14px] font-medium text-zinc-500 dark:text-zinc-400">
+              Zero recurring fees. Your monthly scan quota automatically renews on the 1st of every month forever.
             </p>
           </div>
 
-          <div className="flex shrink-0 flex-col gap-6 sm:flex-row">
-            {/* TIER 1: FOUNDER LTD */}
-            <div className="flex w-full flex-col justify-between rounded-2xl border border-black/[0.04] bg-white/60 p-6 backdrop-blur-md sm:w-64">
-              <div>
-                <span className="font-mono text-[9px] font-black tracking-widest text-amber-600 uppercase">
-                  Tier 1
+          <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-1.5 font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+            <ShieldCheck className="h-4 w-4" />
+            <span>14-Day 100% Money-Back Guarantee</span>
+          </div>
+        </div>
+
+        {/* Pricing Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* TIER 1: FOUNDER LTD */}
+          <div className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-white p-7 shadow-xs dark:border-zinc-800 dark:bg-zinc-950/70">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] font-black tracking-widest text-zinc-400 uppercase dark:text-zinc-500">
+                  Tier 1 Pass
                 </span>
-                <h4 className="mt-1 text-base font-extrabold text-zinc-900">
-                  Founder LTD
-                </h4>
-                <div className="text-zinc-955 mt-4 mb-5 flex items-baseline gap-1">
-                  <span className="text-3xl font-black">$149</span>
-                  <span className="text-xs font-medium text-zinc-400">
-                    one-time
-                  </span>
-                </div>
-                <ul className="mb-6 space-y-2.5 text-xs font-medium text-zinc-500">
-                  <li className="flex items-center gap-2">
-                    ✓ 30 scans / month
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ Subreddit heatmaps
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ Basic + Deep extraction
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ 20% top-up discount
-                  </li>
-                </ul>
+                <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[9px] font-black text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                  30 Scans / Mo
+                </span>
               </div>
+              <h4 className="mt-2 text-xl font-extrabold text-zinc-950 dark:text-white">
+                Founder Lifetime Pass
+              </h4>
+              <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                Ideal for solo founders, indie hackers, and early product builders.
+              </p>
+
+              <div className="my-6 flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-zinc-950 dark:text-white">$149</span>
+                <span className="font-mono text-xs font-bold text-zinc-400 uppercase">one-time payment</span>
+              </div>
+
+              <div className="space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:border-zinc-850 dark:text-zinc-300">
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span><strong>30 investigations</strong> per month (resets monthly)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Basic + Deep Reddit semantic extraction</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Subreddit community map & sentiment scoring</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Willingness-to-pay ($/mo) quote extraction</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>20% lifetime discount on bonus credit top-ups</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
               <button
                 type="button"
                 onClick={() => startLtdCheckout("founder")}
-                disabled={ltdTier === "founder" || ltdTier === "professional"}
-                className="inline-flex cursor-pointer justify-center rounded-full border border-amber-500/50 bg-amber-500/5 px-4 py-2.5 font-mono text-xs font-bold text-amber-700 uppercase transition-all hover:bg-amber-500 hover:text-white disabled:opacity-40"
+                disabled={ltdTier === "founder" || ltdTier === "professional" || startingCheckoutPlan === "founder"}
+                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 py-3 font-mono text-xs font-black tracking-wider text-zinc-900 uppercase transition-all hover:border-[#ff4500] hover:bg-[#ff4500] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-[#ff4500]"
               >
+                {startingCheckoutPlan === "founder" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : null}
                 {ltdTier === "founder" || ltdTier === "professional"
-                  ? "Owned"
-                  : "Buy Founder LTD"}
+                  ? "Active on Account"
+                  : "Claim Founder Pass — $149"}
               </button>
             </div>
+          </div>
 
-            {/* TIER 2: PROFESSIONAL LTD */}
-            <div className="flex w-full flex-col justify-between rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-6 shadow-sm backdrop-blur-md sm:w-64">
-              <div>
-                <span className="font-mono text-[9px] font-black tracking-widest text-amber-600 uppercase">
-                  Tier 2
+          {/* TIER 2: PROFESSIONAL / STUDIO LTD */}
+          <div className="relative flex flex-col justify-between rounded-2xl border-2 border-[#ff4500] bg-white p-7 shadow-md dark:bg-zinc-950">
+            {/* Best Value Badge */}
+            <div className="absolute -top-3.5 right-6 rounded-full bg-[#ff4500] px-3 py-1 font-mono text-[9px] font-black tracking-widest text-white uppercase shadow-xs">
+              Most Popular
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
+                  Tier 2 Studio Pass
                 </span>
-                <h4 className="mt-1 text-base font-extrabold text-zinc-900">
-                  Professional LTD
-                </h4>
-                <div className="text-zinc-955 mt-4 mb-5 flex items-baseline gap-1">
-                  <span className="text-3xl font-black">
-                    {ltdTier === "founder" ? "$150" : "$299"}
-                  </span>
-                  <span className="text-xs font-medium text-zinc-400">
-                    {ltdTier === "founder" ? "upgrade" : "one-time"}
-                  </span>
-                </div>
-                <ul className="mb-6 space-y-2.5 text-xs font-medium text-zinc-500">
-                  <li className="flex items-center gap-2">
-                    ✓ 100 scans / month
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ Advanced AI depth
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ Trend Velocity engine
-                  </li>
-                  <li className="flex items-center gap-2">
-                    ✓ 40% top-up discount
-                  </li>
-                </ul>
+                <span className="rounded-full border border-[#ff4500]/30 bg-[#ff4500]/10 px-2 py-0.5 font-mono text-[9px] font-black text-[#ff4500]">
+                  100 Scans / Mo
+                </span>
               </div>
+              <h4 className="mt-2 text-xl font-extrabold text-zinc-950 dark:text-white">
+                Studio Master LTD
+              </h4>
+              <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                For growth teams, SaaS studios, and product consultancies.
+              </p>
+
+              <div className="my-6 flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-zinc-950 dark:text-white">
+                  {ltdTier === "founder" ? "$150" : "$299"}
+                </span>
+                <span className="font-mono text-xs font-bold text-zinc-400 uppercase">
+                  {ltdTier === "founder" ? "upgrade difference" : "one-time payment"}
+                </span>
+              </div>
+
+              <div className="space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:border-zinc-850 dark:text-zinc-300">
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span><strong>100 investigations</strong> per month (resets monthly)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Ultra + Advanced AI depth scanning</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Custom intelligence pattern filters</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>Trend Velocity spike detection engine</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <span>40% lifetime discount on credit top-ups</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
               <button
                 type="button"
                 onClick={() => startLtdCheckout("professional")}
-                disabled={ltdTier === "professional"}
-                className="bg-amber-550 inline-flex cursor-pointer justify-center rounded-full px-4 py-2.5 font-mono text-xs font-bold text-black uppercase transition-colors hover:bg-amber-600 disabled:opacity-40"
+                disabled={ltdTier === "professional" || startingCheckoutPlan === "professional"}
+                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff4500] py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
               >
+                {startingCheckoutPlan === "professional" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : null}
                 {ltdTier === "professional"
-                  ? "Active"
+                  ? "Active on Account"
                   : ltdTier === "founder"
-                    ? "Upgrade to Pro"
-                    : "Buy Pro LTD"}
+                    ? "Upgrade to Studio Pass — $150"
+                    : "Claim Studio Master — $299"}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Billing Portal & Current Access Grid */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      {/* Account Access & Stripe Portal */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Stripe Portal */}
-        <div className="glass-card flex flex-col justify-between rounded-2xl p-6 sm:p-8 lg:col-span-2">
+        <div className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs sm:p-8 lg:col-span-2 dark:border-zinc-800 dark:bg-zinc-900/70">
           <div>
-            <h3 className="flex items-center gap-2.5 text-lg font-extrabold text-zinc-900">
-              <CreditCard className="h-5 w-5 text-[#ff4500]" />
-              Billing Portal
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-500">
-              Open your Stripe billing portal to update payment methods, view
-              invoices, download receipts, or cancel/restore your subscription
-              safely.
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
+                <CreditCard className="h-4 w-4" />
+              </div>
+              <h3 className="text-base font-extrabold text-zinc-950 dark:text-white">
+                Stripe Customer Portal
+              </h3>
+            </div>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+              Access your encrypted Stripe portal to view transaction receipts, download tax invoices, or update your billing email and payment methods.
             </p>
           </div>
-          <div className="mt-8">
+          <div className="mt-6">
             <button
               type="button"
               onClick={openBillingPortal}
               disabled={openingPortal}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#ff4500] px-6 py-3 font-mono text-xs font-bold tracking-widest text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-2.5 font-mono text-xs font-bold text-zinc-800 uppercase shadow-2xs transition-all hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               {openingPortal ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
               )}
-              Open Billing Portal
+              <span>Open Customer Portal</span>
             </button>
             {actionState?.type === "error" ? (
-              <p className="mt-4 font-mono text-xs text-rose-600">
+              <p className="mt-3 font-mono text-xs text-rose-600">
                 {actionState.message}
               </p>
             ) : null}
           </div>
         </div>
 
-        {/* Current Access Quotas */}
-        <div className="glass-card space-y-6 rounded-2xl p-6 sm:p-8">
-          <div>
-            <h3 className="text-lg font-extrabold text-zinc-900">
-              Current Access
-            </h3>
-            <div className="mt-3 flex items-center gap-2 text-xl font-extrabold text-[#ff4500] uppercase">
-              {planPurchaseRequired ? "Read Only" : plan}
-              {ltdTier && ltdTier !== "none" && (
-                <span className="inline-block rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-2.5 py-0.5 text-[9px] font-black tracking-widest text-white uppercase">
-                  {ltdTier === "founder" ? "FOUNDER" : "PRO FOUNDER"}
-                </span>
-              )}
-            </div>
+        {/* Current Quota Status */}
+        <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs sm:p-8 dark:border-zinc-800 dark:bg-zinc-900/70">
+          <h3 className="text-base font-extrabold text-zinc-950 dark:text-white">
+            Current Quota Status
+          </h3>
+          <div className="mt-3 flex items-center gap-2 font-mono text-lg font-black text-[#ff4500] uppercase">
+            {planPurchaseRequired ? "Read Only" : plan}
+            {ltdTier && ltdTier !== "none" && (
+              <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 font-mono text-[9px] font-bold text-amber-700 uppercase dark:text-amber-400">
+                {ltdTier === "founder" ? "FOUNDER LTD" : "STUDIO LTD"}
+              </span>
+            )}
           </div>
 
-          <div className="space-y-4 font-mono text-xs text-zinc-500">
-            <div className="flex justify-between border-b border-black/[0.04] pb-3">
-              <span>Status:</span>
-              <span className="text-zinc-850 font-bold uppercase">
+          <div className="mt-6 space-y-4 font-mono text-xs">
+            <div className="flex justify-between border-b border-zinc-100 pb-2.5 dark:border-zinc-800">
+              <span className="text-zinc-400">Plan Status:</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 uppercase">
                 {ltdTier && ltdTier !== "none"
-                  ? "Lifetime access"
+                  ? "Lifetime active"
                   : planPurchaseRequired
-                    ? "Plan inactive"
-                    : "Active plan"}
+                    ? "Read-only"
+                    : "Active"}
               </span>
             </div>
 
-            {/* Usage credit display */}
-            <div className="space-y-2">
-              <p className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
-                Quota Usage
-              </p>
-              <div className="space-y-1">
-                <p className="flex justify-between font-medium">
-                  <span>Monthly Base:</span>
-                  <span className="font-bold text-zinc-800">
-                    {usage.monthlyUsed} / {usage.monthlyLimit ?? "∞"}
-                  </span>
-                </p>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-black/[0.04]">
-                  <div
-                    className="h-full rounded-full bg-[#ff4500] transition-all duration-300"
-                    style={{
-                      width: `${Math.min(
-                        (usage.monthlyUsed / (usage.monthlyLimit ?? 100)) * 100,
-                        100,
-                      )}%`,
-                    }}
-                  />
-                </div>
-                <p className="flex justify-between pt-1 font-medium">
-                  <span>Rollover Credits:</span>
-                  <span className="font-bold text-amber-600">
-                    {usage.purchasedRemaining}
-                  </span>
-                </p>
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-zinc-400">Monthly Scans:</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                  {usage.monthlyUsed} / {usage.monthlyLimit ?? "∞"}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div
+                  className="h-full rounded-full bg-[#ff4500] transition-all duration-300"
+                  style={{
+                    width: `${Math.min(
+                      (usage.monthlyUsed / (usage.monthlyLimit ?? 100)) * 100,
+                      100,
+                    )}%`,
+                  }}
+                />
               </div>
             </div>
 
-            <div className="space-y-2 border-t border-black/[0.04] pt-3">
-              <p className="flex justify-between">
-                <span>Max subreddits:</span>
-                <span className="font-bold text-zinc-800">
-                  {planPurchaseRequired
-                    ? "Upgrade required"
-                    : entitlements.maxSubredditsPerSearch === null
-                      ? "Unlimited"
-                      : entitlements.maxSubredditsPerSearch}
-                </span>
-              </p>
-              <p className="flex justify-between">
-                <span>Save reports:</span>
-                <span className="font-bold text-zinc-800">
-                  {planPurchaseRequired
-                    ? "View-only"
-                    : entitlements.canSaveReports
-                      ? "Enabled"
-                      : "Upgrade required"}
-                </span>
-              </p>
+            <div className="flex justify-between border-t border-zinc-100 pt-2.5 dark:border-zinc-800">
+              <span className="text-zinc-400">Max Subreddits:</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                {entitlements.maxSubredditsPerSearch ?? "Unlimited"}
+              </span>
             </div>
-            {planPurchaseRequired ? (
-              <p className="font-sans text-[11px] leading-relaxed text-amber-700/85 italic">
-                New scans and AI actions unlock after you purchase an active
-                plan.
-              </p>
-            ) : null}
+
+            <div className="flex justify-between">
+              <span className="text-zinc-400">Save Dossiers:</span>
+              <span className="font-bold text-emerald-600">
+                {entitlements.canSaveReports ? "Enabled" : "Disabled"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

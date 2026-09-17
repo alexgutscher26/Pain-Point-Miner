@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search, Sparkles, Flame } from "lucide-react";
 
 const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
@@ -21,7 +21,9 @@ export function DashboardSearchHero({
   const [keyword, setKeyword] = useState("");
 
   const visibleTags =
-    trendingTags.length > 0 ? trendingTags : ["#saas", "#marketing", "#devops"];
+    trendingTags.length > 0
+      ? trendingTags
+      : ["#cold-email-deliverability", "#hubspot-churn", "#stripe-billing-gaps", "#notion-performance", "#ai-workflow-fatigue"];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,36 +51,40 @@ export function DashboardSearchHero({
   };
 
   return (
-    <div className="group relative">
-      <div className="glass-card relative flex flex-col items-center overflow-hidden rounded-3xl p-12 text-center shadow-xs">
-        <div className="relative mb-8">
-          <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-[#ff4500]/10 bg-[#ff4500]/5 text-[#ff4500] transition-colors duration-500 group-hover:border-[#ff4500]/30">
-            <Sparkles className="h-7 w-7" />
-          </div>
+    <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-gradient-to-b from-white via-zinc-50/50 to-zinc-100/40 p-8 text-center shadow-xs backdrop-blur-md transition-all duration-300 sm:p-12 dark:border-zinc-800 dark:from-zinc-900/90 dark:via-zinc-900/50 dark:to-zinc-950/80">
+      {/* Background Subtle Grid Accent */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:24px_24px] opacity-40 dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] dark:opacity-30" />
+
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Signal Badge */}
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-3.5 py-1 text-[11px] font-mono font-bold tracking-widest text-[#ff4500] uppercase shadow-2xs">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Semantic Intent Mining Engine</span>
         </div>
 
-        <h3 className="mb-4 text-3xl leading-none font-black tracking-tighter text-zinc-900">
-          Scale your validation with{" "}
-          <span className="bg-linear-to-r from-[#ff4500] to-[#ff8c00] bg-clip-text text-transparent italic">
-            Reddit Intel
-          </span>
+        {/* Title */}
+        <h3 className="mb-3 max-w-2xl text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl lg:text-4xl dark:text-white">
+          Extract Unmet Market Needs from{" "}
+          <span className="text-[#ff4500]">Reddit Conversations</span>
         </h3>
-        <p className="mb-10 max-w-lg text-[15px] leading-relaxed font-medium text-zinc-500">
-          Uncover high-intent pain points and &quot;workarounds&quot; that
-          signal profitable SaaS opportunities in minutes, not weeks.
+
+        {/* Subtitle */}
+        <p className="mb-8 max-w-xl text-[14px] leading-relaxed font-medium text-zinc-600 sm:text-[15px] dark:text-zinc-400">
+          Scan discussions across thousands of niche subreddits to pinpoint competitor churn triggers, exact customer friction points, and verified willingness to pay.
         </p>
 
+        {/* Search Bar */}
         <form
           onSubmit={handleSubmit}
-          className="group/search relative w-full max-w-xl"
+          className="group/search relative w-full max-w-2xl"
         >
-          <div className="relative flex items-center rounded-full border border-black/[0.08] bg-white/80 p-1.5 pl-3 shadow-xs transition-colors focus-within:border-[#ff4500]/40">
-            <span className="shrink-0 pr-2 pl-4 text-zinc-400">
+          <div className="relative flex items-center rounded-2xl border border-zinc-200 bg-white p-2 pl-3 shadow-md shadow-zinc-900/5 transition-all focus-within:border-[#ff4500] focus-within:ring-4 focus-within:ring-[#ff4500]/10 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-none">
+            <span className="shrink-0 pr-2 pl-3 text-zinc-400">
               <Search className="h-5 w-5 transition-colors group-focus-within/search:text-[#ff4500]" />
             </span>
             <input
-              className="w-full border-none bg-transparent px-2 py-3.5 text-base font-medium text-zinc-800 placeholder-zinc-400 outline-none focus:ring-0"
-              placeholder="Search niche, e.g. 'cold email deliverability'..."
+              className="w-full border-none bg-transparent px-2 py-3 text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 dark:text-white"
+              placeholder="Search niche, competitor, or problem (e.g. 'cold email deliverability', 'HubSpot pricing')..."
               type="text"
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
@@ -86,22 +92,24 @@ export function DashboardSearchHero({
             />
             <button
               type="submit"
-              className="flex shrink-0 items-center gap-2.5 rounded-full bg-[#ff4500] px-7 py-3.5 font-mono text-[12px] font-black tracking-wider whitespace-nowrap text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
+              className="flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-[#ff4500] px-6 py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md active:scale-95"
             >
-              Begin Analysis{" "}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover/search:translate-x-1" />
+              <span>Scan Radar</span>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/search:translate-x-1" />
             </button>
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <p className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-              Trending:
-            </p>
+          {/* Quick Trending Chips */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+              <Flame className="h-3 w-3 text-[#ff4500]" />
+              <span>Trending Niches:</span>
+            </div>
             {visibleTags.map((tag) => (
               <button
                 key={tag}
                 type="button"
-                className="rounded-full border border-black/[0.06] bg-white/50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-zinc-500 uppercase transition-colors hover:border-[#ff4500]/25 hover:bg-[#ff4500]/5 hover:text-[#ff4500]"
+                className="cursor-pointer rounded-lg border border-zinc-200/80 bg-white/80 px-2.5 py-1 font-mono text-[10px] font-semibold text-zinc-600 transition-all hover:border-[#ff4500]/40 hover:bg-[#ff4500]/5 hover:text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-[#ff4500]/40 dark:hover:text-[#ff4500]"
                 onClick={() => setKeyword(normalizeTagToKeyword(tag))}
               >
                 {tag}
@@ -113,3 +121,4 @@ export function DashboardSearchHero({
     </div>
   );
 }
+
