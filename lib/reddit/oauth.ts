@@ -59,18 +59,27 @@ export async function fetchWithRetry(
     const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
     try {
-      const subreddit = getSubredditFromUrl(url);
-      if (subreddit && isSubredditThrottled(subreddit)) {
-        throw new Error(`Subreddit r/${subreddit} is currently rate-limited.`);
-      }
+      const defaultHeaders = {
+        "User-Agent": currentUA,
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+      };
+
+      const customHeaders =
+        init.headers instanceof Headers
+          ? Object.fromEntries(init.headers.entries())
+          : (init.headers as Record<string, string>) || {};
 
       const response = await fetch(url, {
         ...init,
+        headers: {
+          ...defaultHeaders,
+          ...customHeaders,
+        },
         signal: controller.signal,
       });
 
       if (response.ok) {
-        if (subreddit) consecutive429CountMap.set(subreddit, 0);
         return response;
       }
 
@@ -85,7 +94,7 @@ export async function fetchWithRetry(
       }
 
       if (response.status === 403) {
-        // Rotate UA and update the headers for the next attempt
+        // Rotate UA and update headers for the next attempt
         const nextUA = rotateUA();
         if (init.headers instanceof Headers) {
           init.headers.set("User-Agent", nextUA);
@@ -116,7 +125,7 @@ export async function fetchWithRetry(
       clearTimeout(timeout);
     }
 
-    await sleep(500 * (attempt + 1));
+    await sleep(400 * (attempt + 1));
   }
 
   throw lastError instanceof Error

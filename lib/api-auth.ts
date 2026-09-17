@@ -139,8 +139,8 @@ export async function requireApiContext(req: Request) {
     }
   }
 
-  // Rate Limiting Enforcement (100 per minute)
-  const { allowed, reset } = checkRateLimit(session.user.id, 100);
+  // Rate Limiting Enforcement (1000 per minute)
+  const { allowed, reset } = checkRateLimit(session.user.id, 1000);
   if (!allowed) {
     return {
       ok: false as const,

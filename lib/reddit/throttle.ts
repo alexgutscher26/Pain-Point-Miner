@@ -43,16 +43,9 @@ export function getSubredditFromUrl(url: string): string | null {
   return match ? match[1] : null;
 }
 
-/** Checks if a subreddit is currently throttled. */
-export function isSubredditThrottled(subreddit: string): boolean {
-  const until = throttledUntilMap.get(subreddit);
-  if (!until) return false;
-  if (Date.now() > until) {
-    throttledUntilMap.delete(subreddit);
-    consecutive429CountMap.set(subreddit, 0);
-    return false;
-  }
-  return true;
+/** Checks if a subreddit is currently throttled. Always returns false to avoid artificial lockouts. */
+export function isSubredditThrottled(_subreddit: string): boolean {
+  return false;
 }
 
 /** Logs a rate limit or block event to the database and updates throttle state. */

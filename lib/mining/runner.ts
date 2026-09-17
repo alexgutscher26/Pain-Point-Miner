@@ -115,16 +115,7 @@ export async function executeMiningRun({
     let allPosts: RedditPost[] = [];
     const throttleWarnings: string[] = [];
 
-    const throttledSubredditsList = subreddits.filter(isSubredditThrottled);
-    const nonThrottledSubreddits = subreddits.filter(
-      (s) => !isSubredditThrottled(s),
-    );
-
-    for (const sub of throttledSubredditsList) {
-      throttleWarnings.push(`⚠️ r/${sub} is rate-limited, skipping for 15 min`);
-    }
-
-    const candidateSubreddits = nonThrottledSubreddits.slice(
+    const candidateSubreddits = subreddits.slice(
       0,
       Math.max(1, subLimit),
     );
@@ -139,9 +130,9 @@ export async function executeMiningRun({
         throttleWarnings.push(
           `⚠️ r/${invalidSub.name} has only ${invalidSub.subscribers ?? 0} subscribers (< ${minSubscribers} min threshold), skipping due to low signal`,
         );
-      } else {
+      } else if (invalidSub.reason === "banned" || invalidSub.reason === "not_found") {
         throttleWarnings.push(
-          `⚠️ r/${invalidSub.name} does not exist or is inaccessible (${invalidSub.reason ?? "404"}), skipping`,
+          `⚠️ r/${invalidSub.name} does not exist or is banned (${invalidSub.reason}), skipping`,
         );
       }
     }
