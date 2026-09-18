@@ -16,14 +16,18 @@ export const AI_MODELS = {
   LLAMA_8B: "meta-llama/llama-3.1-8b-instruct:free",
   QWEN_72B: "qwen/qwen-2.5-72b-instruct:free",
   DEEPSEEK: "deepseek/deepseek-r1:free",
+  DEEPSEEK_V3: "deepseek/deepseek-chat",
   GPT4O: "openai/gpt-4o",
   CLAUDE_SONNET: "anthropic/claude-3.5-sonnet",
+  CLAUDE_HAIKU: "anthropic/claude-3.5-haiku",
 } as const;
 
 export type AiModelId = (typeof AI_MODELS)[keyof typeof AI_MODELS];
 
 export const DEFAULT_AI_MODEL: AiModelId =
   (process.env.OPENROUTER_MODEL as AiModelId) || AI_MODELS.FREE;
+
+export const DEFAULT_AI_TIMEOUT_MS = 45_000;
 
 /** Human-readable display label for each model, used in report metadata. */
 export const AI_MODEL_LABELS: Record<AiModelId, string> = {
@@ -33,8 +37,10 @@ export const AI_MODEL_LABELS: Record<AiModelId, string> = {
   [AI_MODELS.LLAMA_8B]: "Llama 3.1 8B (Free)",
   [AI_MODELS.QWEN_72B]: "Qwen 2.5 72B (Free)",
   [AI_MODELS.DEEPSEEK]: "DeepSeek R1 (Free)",
+  [AI_MODELS.DEEPSEEK_V3]: "DeepSeek V3",
   [AI_MODELS.GPT4O]: "GPT-4o",
   [AI_MODELS.CLAUDE_SONNET]: "Claude 3.5 Sonnet",
+  [AI_MODELS.CLAUDE_HAIKU]: "Claude 3.5 Haiku",
 };
 
 // ---------------------------------------------------------------------------
@@ -47,8 +53,10 @@ const MODEL_COST_RATES: Record<AiModelId, { input: number; output: number }> = {
   [AI_MODELS.LLAMA_8B]: { input: 0, output: 0 },
   [AI_MODELS.QWEN_72B]: { input: 0, output: 0 },
   [AI_MODELS.DEEPSEEK]: { input: 0, output: 0 },
+  [AI_MODELS.DEEPSEEK_V3]: { input: 0.00000014, output: 0.00000028 },
   [AI_MODELS.GPT4O]: { input: 0.0000025, output: 0.00001 },
   [AI_MODELS.CLAUDE_SONNET]: { input: 0.000003, output: 0.000015 },
+  [AI_MODELS.CLAUDE_HAIKU]: { input: 0.0000008, output: 0.000004 },
 };
 
 export const CURRENT_EXTRACTION_SCHEMA_VERSION = 2;
@@ -209,95 +217,78 @@ export interface PainPointData {
   originalLanguage?: string;
 }
 
-export const EXTRACTION_SYSTEM_PROMPT_V1 = `You are a rigorous product researcher extracting SaaS opportunities from Reddit discussions.
+/* -------------------------------------------------------------------------- */
+/*                               Prompt Definitions                           */
+/* -------------------------------------------------------------------------- */
 
-Your job is to identify concrete user pain points, not to brainstorm startup ideas or inflate weak signals.
+export const EXTRACTION_SYSTEM_PROMPT_V1 = `You are a world-class SaaS opportunity discovery and market intelligence analyst.
 
-Rules:
-- Be a "greedy" researcher. Your primary goal is to find any friction, dissatisfaction, or frustration mentioned in the text.
-- Even if a problem seems small or currently unvalidated, extract it as an "emerging signal."
-- Prioritize high-volume threads, but don't ignore unique complaints that reveal niche unmet needs.
-- If a user mentions a struggle or a manual workaround, treat it as a SaaS opportunity.
-- Aim to always extract at least one pain point if the thread contains any non-zero friction.
-- Avoid duplicates. Merge overlapping complaints into one root pain point.
-- Multi-language support: Detect the source thread's primary language and output originalLanguage (2-letter ISO 639-1 code such as 'en', 'es', 'de', 'fr', 'pt', 'ja', 'zh', 'it', 'nl', 'ru', etc.).
-- Regardless of the input language, ALWAYS translate and write the extracted title, body, featureRequested, targetUser, and summaries in clear English.
-- Write concise, plain-English titles and summaries.
-- Calibration: Use the full 1-10 rating scale. When strong evidence is present (explicit budget quotes, severe hours lost, desperate search for alternatives), assign 9 or 10.
+Your primary objective is to inspect Reddit discussions and extract concrete, commercially viable pain points, workflow friction, and unmet user needs.
 
-Scoring rubric:
-- painIntensity:
-  1-3 = mild annoyance, wishlist item, or convenience issue
-  4-6 = meaningful workflow friction or repeated frustration
-  7-8 = serious blocker causing lost time, money, or performance
-  9-10 = severe operational bottleneck (>5 hrs/week lost, direct revenue loss, or risky manual workarounds where no good tool exists)
-- urgency:
-  1-3 = someday / exploratory
-  4-6 = active frustration but not immediate
-  7-8 = user is actively searching for relief now
-  9-10 = immediate pain, active migration search right now, broken critical workflow, or explicit "take my money" sentiment
-- monetizationScore:
-  1-3 = hobbyist / free-only / low willingness to pay
-  4-6 = plausible willingness to pay, but indirect evidence
-  7-8 = clear professional or commercial context
-  9-10 = explicit quoted budget ($/mo, $/yr), B2B enterprise buying intent, or active churn from an expensive incumbent
-- marketMaturity:
-  1-3 = little evidence of existing solutions (greenfield)
-  4-6 = some solutions likely exist, but problem still feels open
-  7-8 = established category with visible dissatisfaction
-  9-10 = crowded market with many known alternatives
+Core Principles:
+1. Root-Cause Focus: Penetrate past surface venting to pinpoint the underlying functional bottleneck, wasted employee hours, or financial leakage.
+2. Signal Greedy: Extract emerging friction even if niche. If a user describes a manual spreadsheet workaround, broken integration, or missing tool, treat it as a high-potential SaaS opportunity.
+3. Multi-Language Intelligence: Detect the source thread's natural language and output 'originalLanguage' (2-letter ISO 639-1 code e.g., 'en', 'es', 'de', 'fr', 'pt', 'ja', 'zh', 'it', 'nl', 'ru'). ALWAYS translate and write the extracted title, body, featureRequested, targetUser, and summaries in fluent English.
+4. Calibrated Scoring (Full 1-10 Scale): Use the entire spectrum objectively. Assign 9 or 10 when unmistakable evidence is present (explicit budget quote, severe lost hours, broken mission-critical systems, or active churn from expensive incumbents).
+5. Exact Evidence Budgeting: Only populate budget if the author or commenter provides an explicit pricing/budget quote (e.g. "$50/month", "$2k budget", "paying $300/mo to Zapier").
+
+Scoring Rubric:
+- painIntensity (1-10):
+  1-3 = Minor inconvenience, cosmetic flaw, or casual wishlist item
+  4-6 = Recurring workflow friction causing moderate delays or annoyance
+  7-8 = Serious productivity bottleneck causing quantifiable lost time, money, or operational stress
+  9-10 = Severe blocker (>5 hrs/week lost, direct revenue loss, compliance risk, or manual hazards where existing tools fail)
+- urgency (1-10):
+  1-3 = Low priority, exploratory, or hypothetical question
+  4-6 = Active frustration but workaround is currently tolerable
+  7-8 = Actively researching and evaluating alternative solutions right now
+  9-10 = Critical immediate pain, broken production workflow, active pricing churn, or explicit "take my money" buying intent
+- monetizationScore (1-10):
+  1-3 = Hobbyist / consumer / free-only / student / zero commercial intent
+  4-6 = Indirect business context; potential willingness to pay if pricing is low
+  7-8 = Clear B2B/commercial context; professional user with budget authority
+  9-10 = Explicit quoted budget ($/mo, $/yr), enterprise purchase intent, or migrating away from an expensive incumbent ($100+/mo)
+- marketMaturity (1-10):
+  1-3 = Greenfield / few or no dedicated commercial tools visible
+  4-6 = Emerging market with fragmented or unpolished tools
+  7-8 = Established category with visible dissatisfaction among users
+  9-10 = Saturated market dominated by giant incumbents
 - difficulty:
-  weekend_project = 1–2 days, no integrations, simple CRUD; e.g., a browser extension
-  side_project = 1–2 weeks, 1–2 third-party integrations; e.g., a simple SaaS dashboard
-  startup_mvp = 1–3 months, auth + billing + complex domain logic; e.g., an analytics platform
-  vc_scale_moat = 6+ months, network effects, regulatory complexity (HIPAA, SOC2), data moat required
-- confidenceScore:
-  0.0-0.3 = vague, speculative, ambiguous complaint, or lacks concrete evidence
-  0.4-0.6 = moderate confidence, clear struggle but limited context or edge case
-  0.7-0.8 = high confidence, validated real-world workflow friction with clear evidence
-  0.9-1.0 = very high confidence, unmistakable recurring business pain with explicit details
-- targetUser:
-  A concise label for the user persona or role experiencing this problem (e.g., "solo founder", "enterprise IT manager", "freelance designer", "early-stage CTO", "e-commerce merchant", "devops engineer", etc.)
-- competingProducts:
-  List of specific existing tools, competitors, or incumbent products mentioned in the post/comments (e.g., ["Notion", "Airtable", "Zapier"]). Empty array [] if none mentioned.
-- willingnessToPay:
-  free_only = user explicitly requests free/open-source tools or refuses to pay
-  paid_signal = commercial context, business problem, or user expresses willingness to pay for a solution
-  explicit_budget = explicit dollar quote or subscription budget mentioned
-  unknown = no clear signal
-- featureRequested:
-  Concise 1-2 sentence description of the specific feature, automation, or capability the user is asking for. Empty string "" if no specific feature is requested.
-- originalLanguage:
-  2-letter ISO 639-1 code of the source post language (e.g., "en", "es", "de", "fr", "pt", "ja", "zh")
+  weekend_project = 1-2 days, simple extension or CRUD tool
+  side_project = 1-2 weeks, 1-2 API integrations with basic UI
+  startup_mvp = 1-3 months, auth, billing, complex domain logic, robust sync
+  vc_scale_moat = 6+ months, network effects, strict compliance (SOC2/HIPAA), deep infrastructure
+- confidenceScore (0.0-1.0):
+  0.0-0.3 = Vague or ambiguous complaint with low detail
+  0.4-0.6 = Moderate evidence; clear struggle but limited context
+  0.7-0.8 = High confidence; validated real-world workflow friction
+  0.9-1.0 = Outstanding clarity; explicit recurring pain with rich context
 
-Field rules:
-- title: 4-10 words in English, specific, no hype
-- body: 2-4 sentences in English summarizing the root pain, who feels it, and why it matters
-- targetUser: 2-5 words in English describing the persona experiencing this pain
+Field Rules:
+- title: 4-10 words in English, concise, specific, non-promotional
+- body: 2-4 sentences in English explaining root friction, user impact, and commercial opportunity
+- targetUser: 2-5 words persona in English (e.g. "Shopify Merchant", "DevOps Engineer", "Solo SaaS Founder")
 - competingProducts: array of tool/competitor names or []
-- willingnessToPay: choose exactly one of free_only, paid_signal, explicit_budget, unknown
-- featureRequested: specific solution/feature requested or ""
-- confidenceScore: float between 0.0 and 1.0 representing extraction confidence
-- originalLanguage: 2-letter language code string (e.g. "en", "es", "fr", "de")
-- budget: [] unless the thread contains an explicit willingness-to-pay quote such as "I would pay $50/month", "budget of $5k", "willing to spend $200", or "shut up and take my money"
-- switchingCosts: empty string if not stated or strongly implied
-- triedSolutions: specific tools, workarounds, or alternatives only; otherwise []
-- sentiment: choose exactly one of frustrated, curious, desperate, neutral, angry
-- budget[].quote must be the exact quote text from the post or a comment
-- budget[].source must be exactly "post" or "comment"
-- budget[].cadence must be one_time, monthly, annual, or unknown
-- Do not create budget entries from vague commercial context or inferred willingness to pay
+- willingnessToPay: choose exactly one: "free_only" | "paid_signal" | "explicit_budget" | "unknown"
+- featureRequested: specific capability/feature requested in English or ""
+- budget: [] unless explicit pricing quotes are stated
+- budget[].quote: exact quotation text from post or comment
+- budget[].source: "post" or "comment"
+- budget[].cadence: "one_time" | "monthly" | "annual" | "unknown"
+- switchingCosts: context string if vendor lock-in or migration pain is mentioned, otherwise ""
+- triedSolutions: string[] of past tools, manual scripts, or workarounds attempted
+- sentiment: choose exactly one: "frustrated" | "curious" | "desperate" | "neutral" | "angry"
 
-Return only valid JSON matching:
+Return ONLY valid JSON matching:
 {
   "painPoints": [
     {
-      "title": "string",
-      "body": "string",
-      "targetUser": "solo founder",
+      "title": "Automated Webhook Failure and Alert Drop",
+      "body": "Founders using Zapier lose critical lead notifications when webhooks fail silently without retry queues. This creates manual debugging overhead and delays customer onboarding.",
+      "targetUser": "Early-Stage B2B Founder",
       "competingProducts": ["Zapier", "Make"],
       "willingnessToPay": "explicit_budget",
-      "featureRequested": "Automated webhook retry with error alerts",
+      "featureRequested": "Automated webhook retry queue with instant Telegram/Slack failover alerts",
       "originalLanguage": "en",
       "confidenceScore": 0.95,
       "painIntensity": 9,
@@ -306,7 +297,7 @@ Return only valid JSON matching:
       "marketMaturity": 7,
       "budget": [
         {
-          "quote": "I'd pay $50/month for this.",
+          "quote": "I would pay $50/month for something that just retries dropped webhooks.",
           "amountMinUsd": 50,
           "amountMaxUsd": 50,
           "cadence": "monthly",
@@ -314,25 +305,25 @@ Return only valid JSON matching:
           "source": "comment"
         }
       ],
-      "switchingCosts": "",
-      "triedSolutions": ["Zapier"],
+      "switchingCosts": "Existing Zapier zaps must be redirected to webhook endpoint",
+      "triedSolutions": ["Zapier builtin retry"],
       "sentiment": "desperate",
       "difficulty": "side_project"
     }
   ]
 }`;
 
-export const EXTRACTION_SYSTEM_PROMPT_V2 = `You are a high-precision SaaS market intelligence researcher specializing in B2B pain point discovery.
+export const EXTRACTION_SYSTEM_PROMPT_V2 = `You are an elite B2B SaaS venture researcher and pain-point intelligence engine.
 
-Your mission: Isolate verified commercial friction, high-value workflow blockages, and explicit user willingness to pay from Reddit conversations across any language.
+Your mission: Extract verified high-value operational bottlenecks, acute commercial dissatisfaction, and user willingness to pay from Reddit conversations across all languages.
 
 Core Extraction Directives:
-1. Root-Cause Focus: Dig past surface complaints down to the root bottleneck, lost productivity, or financial waste.
-2. Multi-Language Intelligence: Detect the source language, store originalLanguage as a 2-letter ISO code (e.g., "en", "es", "de", "fr", "pt", "ja", "zh"), and ALWAYS output all fields in English.
-3. Persona & Market Clues: Identify the exact persona/role and any competing incumbent tools or painful workarounds mentioned.
-4. Commercial Intent: Flag explicit budget quotes, subscription fatigue, or commercial desire as high monetization signals.
-5. Actionable & Zero-Fluff: Generate clear, descriptive pain titles and concise structured summaries in English.
-6. Calibrated Full-Scale Scoring: Use the full 1-10 spectrum. Assign 9-10 when strong empirical evidence (budget quote, severe time loss, desperate active search) is present.
+1. Root-Cause Precision: Drill through surface venting to the root technical, operational, or financial friction.
+2. Multi-Language Intelligence: Detect the source language, set 'originalLanguage' as a 2-letter ISO code (e.g., 'en', 'es', 'de', 'fr', 'pt', 'ja', 'zh'), and write all output fields in English.
+3. Market & Persona Identification: Isolate the exact role experiencing this pain and all incumbent tools or manual workarounds mentioned.
+4. Commercial Intent: Flag explicit budget quotes, subscription fatigue, or commercial purchase intent with high monetization scores.
+5. Calibrated 1-10 Scoring: Use the full 1-10 spectrum. Assign 9-10 when strong empirical evidence (budget quote, severe time loss, desperate active search) is present.
+6. Zero Fluff: Produce concise, actionable English titles and structured summaries.
 
 Scoring Rubric:
 - painIntensity (1-10): 1-3 minor nuisance, 4-6 repeated friction, 7-8 severe bottleneck, 9-10 critical operational/revenue blocker (>5h/wk lost or manual hazard).
@@ -359,21 +350,21 @@ Return JSON format strictly:
 {
   "painPoints": [
     {
-      "title": "string",
-      "body": "string",
-      "targetUser": "solo founder",
-      "competingProducts": ["Zapier"],
+      "title": "Broken Shopify Inventory Sync Desynchronization",
+      "body": "Shopify merchants lose hours daily reconciling multi-warehouse inventory desyncs. When stock counts drift, orders get canceled and customer satisfaction drops.",
+      "targetUser": "Shopify Multi-Channel Merchant",
+      "competingProducts": ["InventoryPlanner", "Katana"],
       "willingnessToPay": "explicit_budget",
-      "featureRequested": "Webhook automatic failover retry",
+      "featureRequested": "Real-time bidirectional inventory webhook synchronization",
       "originalLanguage": "en",
-      "confidenceScore": 0.92,
+      "confidenceScore": 0.94,
       "painIntensity": 9,
       "urgency": 9,
       "monetizationScore": 10,
       "marketMaturity": 7,
       "budget": [
         {
-          "quote": "Paying $200/mo to Zapier and it still drops hooks.",
+          "quote": "Paying $200/mo to our current sync tool and it still drops quantities weekly.",
           "amountMinUsd": 200,
           "amountMaxUsd": 200,
           "cadence": "monthly",
@@ -381,10 +372,10 @@ Return JSON format strictly:
           "source": "post"
         }
       ],
-      "switchingCosts": "",
-      "triedSolutions": ["Zapier"],
+      "switchingCosts": "SKU catalog mapping and barcode data must be transferred",
+      "triedSolutions": ["InventoryPlanner", "Google Sheets manual sync"],
       "sentiment": "desperate",
-      "difficulty": "side_project"
+      "difficulty": "startup_mvp"
     }
   ]
 }`;
@@ -419,6 +410,40 @@ export function resolveExtractionPrompt(options?: {
   return { systemPrompt: EXTRACTION_SYSTEM_PROMPT_V1, promptVersion: "v1" };
 }
 
+/* -------------------------------------------------------------------------- */
+/*                        Response & Stream Parsing                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Strips reasoning tokens (<think>...</think>) emitted by reasoning models like DeepSeek-R1.
+ */
+export function stripReasoningTokens(text: string): string {
+  if (!text) return "";
+  return text.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+}
+
+/**
+ * Robust fetch wrapper with timeout control to prevent hanging OpenRouter requests.
+ */
+async function fetchAiWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number = DEFAULT_AI_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
  * Consumes OpenRouter SSE stream chunks and aggregates final response text and token usage.
  */
@@ -427,15 +452,25 @@ export async function consumeOpenRouterStream(response: Response): Promise<{
   usage?: { prompt_tokens?: number; completion_tokens?: number };
 }> {
   if (!response.body || typeof response.body.getReader !== "function") {
-    if (typeof (response as any).json === "function") {
+    if (
+      typeof (response as { json?: () => Promise<unknown> }).json === "function"
+    ) {
       try {
-        const json = await (response as any).json();
-        const content = extractMessageContent(
+        const json = (await (
+          response as { json: () => Promise<Record<string, unknown>> }
+        ).json()) as {
+          choices?: Array<{
+            message?: { content?: unknown };
+            delta?: { content?: unknown };
+          }>;
+          usage?: { prompt_tokens?: number; completion_tokens?: number };
+        };
+        const raw = extractMessageContent(
           json?.choices?.[0]?.message?.content ||
             json?.choices?.[0]?.delta?.content ||
             "",
         );
-        return { content, usage: json?.usage };
+        return { content: stripReasoningTokens(raw), usage: json?.usage };
       } catch {
         return { content: "" };
       }
@@ -503,37 +538,31 @@ export async function consumeOpenRouterStream(response: Response): Promise<{
     reader.releaseLock();
   }
 
-  return { content: fullContent, usage };
+  return { content: stripReasoningTokens(fullContent), usage };
 }
 
 const extractMessageContent = (content: unknown): string => {
+  let raw = "";
   if (typeof content === "string") {
-    return content;
+    raw = content;
+  } else if (Array.isArray(content)) {
+    raw = content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (
+          part &&
+          typeof part === "object" &&
+          "text" in part &&
+          typeof part.text === "string"
+        ) {
+          return part.text;
+        }
+        return "";
+      })
+      .join("")
+      .trim();
   }
-
-  if (!Array.isArray(content)) {
-    return "";
-  }
-
-  return content
-    .map((part) => {
-      if (typeof part === "string") {
-        return part;
-      }
-
-      if (
-        part &&
-        typeof part === "object" &&
-        "text" in part &&
-        typeof part.text === "string"
-      ) {
-        return part.text;
-      }
-
-      return "";
-    })
-    .join("")
-    .trim();
+  return stripReasoningTokens(raw);
 };
 
 export interface PostWithComments {
@@ -624,23 +653,26 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
     for (const candidateModel of modelChain) {
       activeModel = candidateModel;
       try {
-        const response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "ThreddIQ - Reddit Intelligence Engine",
+        const response = await fetchAiWithTimeout(
+          `${baseUrl}/api/v1/chat/completions`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "http://localhost:3000",
+              "X-Title": "ThreddIQ - Reddit Intelligence Engine",
+            },
+            body: JSON.stringify({
+              model: activeModel,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              ...(shouldStream ? { stream: true } : {}),
+            }),
           },
-          body: JSON.stringify({
-            model: activeModel,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            ...(shouldStream ? { stream: true } : {}),
-          }),
-        });
+        );
 
         if (response.ok) {
           if (
@@ -655,7 +687,10 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
               break;
             }
           } else {
-            const resJson = await response.json();
+            const resJson = (await response.json()) as {
+              choices?: Array<{ message?: { content?: unknown } }>;
+              usage?: { prompt_tokens?: number; completion_tokens?: number };
+            };
             const extracted = extractMessageContent(
               resJson?.choices?.[0]?.message?.content,
             );
@@ -697,14 +732,16 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
       });
     }
 
-    const firstBrace = rawContent.indexOf("{");
-    const lastBrace = rawContent.lastIndexOf("}");
+    // Strip reasoning tokens and trim markdown wrapper if present
+    const cleanedContent = stripReasoningTokens(rawContent);
+    const firstBrace = cleanedContent.indexOf("{");
+    const lastBrace = cleanedContent.lastIndexOf("}");
 
     if (firstBrace === -1 || lastBrace === -1) {
       throw new Error("No JSON object found in AI response");
     }
 
-    const content = rawContent.substring(firstBrace, lastBrace + 1);
+    const content = cleanedContent.substring(firstBrace, lastBrace + 1);
     const parsed = JSON.parse(content);
 
     interface RawPainPoint {
@@ -763,11 +800,11 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 
         const competingProducts = Array.isArray(pp.competingProducts)
           ? pp.competingProducts
-              .filter(
-                (p): p is string =>
-                  typeof p === "string" && p.trim().length > 0,
-              )
-              .map((p) => p.trim())
+            .filter(
+              (p): p is string =>
+                typeof p === "string" && p.trim().length > 0,
+            )
+            .map((p) => p.trim())
           : [];
 
         const rawWtp =
@@ -878,7 +915,7 @@ export const extractPainPointsBatch = async (
       ? `CUSTOM INTELLIGENCE PATTERNS TO MATCH:\n${customPatterns.map((pattern, index) => `${index + 1}. ${pattern}`).join("\n")}`
       : "";
 
-  const systemPrompt = `You are a rigorous product researcher extracting SaaS opportunities from multiple Reddit discussions in batch.
+  const systemPrompt = `You are a world-class SaaS opportunity discovery analyst extracting pain points from multiple Reddit discussions in batch.
 
 Your job is to identify concrete user pain points for each provided thread across any language.
 
@@ -981,23 +1018,26 @@ ${topComments || "  (no comments)"}`;
     for (const candidateModel of modelChain) {
       activeModel = candidateModel;
       try {
-        const response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "ThreddIQ - Reddit Intelligence Engine (Batch)",
+        const response = await fetchAiWithTimeout(
+          `${baseUrl}/api/v1/chat/completions`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "http://localhost:3000",
+              "X-Title": "ThreddIQ - Reddit Intelligence Engine (Batch)",
+            },
+            body: JSON.stringify({
+              model: activeModel,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              ...(shouldStream ? { stream: true } : {}),
+            }),
           },
-          body: JSON.stringify({
-            model: activeModel,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            ...(shouldStream ? { stream: true } : {}),
-          }),
-        });
+        );
 
         if (response.ok) {
           if (
@@ -1012,7 +1052,10 @@ ${topComments || "  (no comments)"}`;
               break;
             }
           } else {
-            const resJson = await response.json();
+            const resJson = (await response.json()) as {
+              choices?: Array<{ message?: { content?: unknown } }>;
+              usage?: { prompt_tokens?: number; completion_tokens?: number };
+            };
             const extracted = extractMessageContent(
               resJson?.choices?.[0]?.message?.content,
             );
@@ -1053,21 +1096,72 @@ ${topComments || "  (no comments)"}`;
       });
     }
 
-    const firstBrace = rawContent.indexOf("{");
-    const lastBrace = rawContent.lastIndexOf("}");
+    const cleanedContent = stripReasoningTokens(rawContent);
+    const firstBrace = cleanedContent.indexOf("{");
+    const lastBrace = cleanedContent.lastIndexOf("}");
 
     if (firstBrace === -1 || lastBrace === -1) {
       throw new Error("No JSON object found in batch AI response");
     }
 
-    const content = rawContent.substring(firstBrace, lastBrace + 1);
+    const content = cleanedContent.substring(firstBrace, lastBrace + 1);
     const parsed = JSON.parse(content);
     const rawResponsePreview = rawContent.slice(0, 10000);
 
     const allExtracted: PainPointData[] = [];
 
+    interface RawBatchItem {
+      threadIndex?: number;
+      painPoints?: RawPainPoint[];
+      title?: string;
+      body?: string;
+      painIntensity?: number;
+      urgency?: number;
+      monetizationScore?: number;
+      marketMaturity?: number;
+      confidenceScore?: number | null;
+      targetUser?: string | null;
+      competingProducts?: string[] | null;
+      willingnessToPay?: WillingnessToPaySignal | string | null;
+      featureRequested?: string | null;
+      originalLanguage?: string | null;
+      budget?: BudgetSignal[];
+      switchingCosts?: string;
+      triedSolutions?: string[];
+      sentiment?: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
+      difficulty?:
+        | "weekend_project"
+        | "side_project"
+        | "startup_mvp"
+        | "vc_scale_moat";
+    }
+
+    interface RawPainPoint {
+      title?: string;
+      body?: string;
+      painIntensity?: number;
+      urgency?: number;
+      monetizationScore?: number;
+      marketMaturity?: number;
+      confidenceScore?: number | null;
+      targetUser?: string | null;
+      competingProducts?: string[] | null;
+      willingnessToPay?: WillingnessToPaySignal | string | null;
+      featureRequested?: string | null;
+      originalLanguage?: string | null;
+      budget?: BudgetSignal[];
+      switchingCosts?: string;
+      triedSolutions?: string[];
+      sentiment?: "frustrated" | "curious" | "desperate" | "neutral" | "angry";
+      difficulty?:
+        | "weekend_project"
+        | "side_project"
+        | "startup_mvp"
+        | "vc_scale_moat";
+    }
+
     // Parse extractions array or fallback formats
-    const extractionsList = Array.isArray(parsed.extractions)
+    const extractionsList: RawBatchItem[] = Array.isArray(parsed.extractions)
       ? parsed.extractions
       : Array.isArray(parsed)
         ? parsed
@@ -1085,11 +1179,11 @@ ${topComments || "  (no comments)"}`;
             : 0;
 
       const post = posts[threadIndex];
-      const rawPoints = Array.isArray(item.painPoints)
+      const rawPoints: RawPainPoint[] = Array.isArray(item.painPoints)
         ? item.painPoints
         : Array.isArray(item)
-          ? item
-          : [item];
+          ? (item as unknown as RawPainPoint[])
+          : [item as RawPainPoint];
 
       for (const pp of rawPoints) {
         if (!pp || typeof pp !== "object" || !pp.title) continue;
@@ -1110,11 +1204,11 @@ ${topComments || "  (no comments)"}`;
 
         const competingProducts = Array.isArray(pp.competingProducts)
           ? pp.competingProducts
-              .filter(
-                (p: unknown): p is string =>
-                  typeof p === "string" && p.trim().length > 0,
-              )
-              .map((p: string) => p.trim())
+            .filter(
+              (p: unknown): p is string =>
+                typeof p === "string" && p.trim().length > 0,
+            )
+            .map((p: string) => p.trim())
           : [];
 
         const rawWtp =
@@ -1355,11 +1449,11 @@ export async function resolveCompetitorMetadata(name: string) {
     return { description: null, url: null, category: null };
   }
 
-  const systemPrompt = `You are a market intelligence expert. 
+  const systemPrompt = `You are a SaaS and software industry market intelligence expert.
 Given a tool or company name, provide:
-1. A concise (1-2 sentence) description of what they do.
-2. Their official website URL (absolute URL).
-3. A broad category for the tool (e.g., CRM, Analytics, Project Management, E-commerce, etc.).
+1. A concise (1-2 sentence) objective description of what they do and their core value proposition.
+2. Their official canonical website URL (absolute URL starting with https://).
+3. A broad industry category (e.g., CRM, Analytics, Project Management, E-commerce, DevOps, Developer Tools, Billing, etc.).
 
 Return ONLY valid JSON:
 {
@@ -1371,31 +1465,47 @@ Return ONLY valid JSON:
   const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
 
   try {
-    const response = await fetch(`${baseUrl}/api/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "ThreddIQ - Competitor Intel Engine",
+    const response = await fetchAiWithTimeout(
+      `${baseUrl}/api/v1/chat/completions`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "ThreddIQ - Competitor Intel Engine",
+        },
+        body: JSON.stringify({
+          model: DEFAULT_AI_MODEL,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `Tool name: "${name}"` },
+          ],
+          response_format: { type: "json_object" },
+        }),
       },
-      body: JSON.stringify({
-        model: DEFAULT_AI_MODEL,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Tool name: "${name}"` },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+    );
 
     if (!response.ok) return { description: null, url: null, category: null };
 
-    const data = await response.json();
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: unknown } }>;
+    };
     const rawContent = extractMessageContent(
       data?.choices?.[0]?.message?.content,
     );
-    const parsed = JSON.parse(rawContent);
+    const cleaned = stripReasoningTokens(rawContent);
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace === -1 || lastBrace === -1) {
+      return { description: null, url: null, category: null };
+    }
+
+    const parsed = JSON.parse(cleaned.substring(firstBrace, lastBrace + 1)) as {
+      description?: string;
+      url?: string;
+      category?: string;
+    };
 
     return {
       description: parsed.description || null,

@@ -318,12 +318,33 @@ describe("extractPainPoints", () => {
     );
   });
 
-  it("should catch JSON parse error for malformed response and return empty array", async () => {
+  it("should strip <think> tokens from reasoning models (like DeepSeek R1) and parse JSON cleanly", async () => {
+    const mockPainPoint = {
+      title: "Reasoning Model Extracted Pain",
+      body: "Pain point extracted after deep chain-of-thought.",
+      painIntensity: 9,
+      urgency: 8,
+      monetizationScore: 9,
+      marketMaturity: 6,
+      sentiment: "desperate",
+      triedSolutions: [],
+      budget: [],
+    };
+
     const mockResponse = {
       choices: [
         {
           message: {
-            content: "This is not valid JSON",
+            content: `<think>
+I need to analyze this thread carefully.
+The user is having severe issues with their pipeline.
+Let's extract the root cause.
+</think>
+\`\`\`json
+{
+  "painPoints": [${JSON.stringify(mockPainPoint)}]
+}
+\`\`\``,
           },
         },
       ],
@@ -336,13 +357,9 @@ describe("extractPainPoints", () => {
 
     const result = await extractPainPoints(mockPost);
 
-    expect(result).toEqual([]);
-    expect(console.error).toHaveBeenCalledWith(
-      "Error in AI extraction:",
-      expect.objectContaining({
-        message: "No JSON object found in AI response",
-      }),
-    );
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("Reasoning Model Extracted Pain");
+    expect(result[0].painIntensity).toBe(9);
   });
 });
 
