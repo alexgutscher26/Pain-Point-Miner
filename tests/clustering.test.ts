@@ -149,4 +149,3 @@ describe("mergeDriftingClusters", () => {
     expect(mockDelete).not.toHaveBeenCalled();
   });
 });
-

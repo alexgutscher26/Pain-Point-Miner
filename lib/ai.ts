@@ -607,10 +607,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
   const totalTextLength =
     (post.title || "").length +
     (post.selftext || "").length +
-    (post.comments || []).reduce(
-      (acc, c) => acc + (c.body || "").length,
-      0,
-    );
+    (post.comments || []).reduce((acc, c) => acc + (c.body || "").length, 0);
   const shouldStream =
     options?.stream ?? totalTextLength > STREAMING_LENGTH_THRESHOLD;
 
@@ -618,7 +615,9 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
 
   try {
     let rawContent = "";
-    let usageData: { prompt_tokens?: number; completion_tokens?: number } | undefined;
+    let usageData:
+      | { prompt_tokens?: number; completion_tokens?: number }
+      | undefined;
     let activeModel: string | AiModelId = model;
     const modelChain = getFallbackModelChain(model);
 
@@ -966,13 +965,16 @@ ${topComments || "  (no comments)"}`;
   const userPrompt = `Analyze the following ${posts.length} Reddit threads and extract pain points for each:\n\n${threadsText}\n\n${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Return JSON with "extractions" array.`;
 
   const totalLength = threadsText.length;
-  const shouldStream = options?.stream ?? totalLength > STREAMING_LENGTH_THRESHOLD;
+  const shouldStream =
+    options?.stream ?? totalLength > STREAMING_LENGTH_THRESHOLD;
 
   const baseUrl = str("OPENROUTER_BASE_URL", "https://openrouter.ai");
 
   try {
     let rawContent = "";
-    let usageData: { prompt_tokens?: number; completion_tokens?: number } | undefined;
+    let usageData:
+      | { prompt_tokens?: number; completion_tokens?: number }
+      | undefined;
     let activeModel: string | AiModelId = model;
     const modelChain = getFallbackModelChain(model);
 

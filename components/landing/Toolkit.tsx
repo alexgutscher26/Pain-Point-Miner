@@ -170,7 +170,7 @@ export function Toolkit() {
       </div>
 
       {/* Main Feature Display Card */}
-      <div className="grid w-full max-w-5xl grid-cols-1 gap-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-10 lg:grid-cols-12">
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-10 lg:grid-cols-12 dark:border-zinc-800 dark:bg-zinc-900">
         {/* Left: Detailed Benefit List */}
         <div className="flex flex-col justify-between lg:col-span-7">
           <div>
@@ -213,7 +213,7 @@ export function Toolkit() {
         </div>
 
         {/* Right: Tactile Metric & Signal Card */}
-        <div className="flex flex-col justify-center rounded-2xl border border-zinc-100 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-950 lg:col-span-5">
+        <div className="flex flex-col justify-center rounded-2xl border border-zinc-100 bg-zinc-50 p-6 lg:col-span-5 dark:border-zinc-800 dark:bg-zinc-950">
           <div className="mb-6 border-b border-zinc-200 pb-4 dark:border-zinc-800">
             <span className="font-mono text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400">
               {activeFeature.previewDetail.statTitle}

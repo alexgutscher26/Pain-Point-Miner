@@ -46,7 +46,8 @@ const redditPosts: SocialMockPost[] = [
     user: "Elena Rostova",
     handle: "u/elena_ops",
     time: "1 day ago",
-    title: "Is there a tool to generate weekly client PDF metrics automatically?",
+    title:
+      "Is there a tool to generate weekly client PDF metrics automatically?",
     content:
       "Every Friday I copy screenshots from five different platforms into slide decks for client deliverables. It takes 4 hours. If a tool compiled these metrics automatically and formatted a branded PDF, I would buy it today.",
     budget: "$49/mo ready",
@@ -135,7 +136,7 @@ export function Opportunities() {
                 : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
             }`}
           >
-            <span className="text-zinc-900 dark:text-white font-bold">𝕏</span>
+            <span className="font-bold text-zinc-900 dark:text-white">𝕏</span>
             <span>Twitter (X) Posts</span>
           </button>
         </div>
@@ -154,7 +155,9 @@ export function Opportunities() {
                   <span className="font-mono text-xs font-bold text-zinc-900 dark:text-white">
                     {post.source}
                   </span>
-                  <span className="text-[11px] text-zinc-400">• {post.time}</span>
+                  <span className="text-[11px] text-zinc-400">
+                    • {post.time}
+                  </span>
                 </div>
                 <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                   {post.budget}

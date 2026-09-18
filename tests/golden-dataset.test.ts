@@ -23,12 +23,17 @@ describe("Golden Dataset & Prompt Versioning Pipeline", () => {
     expect(files.length).toBeGreaterThanOrEqual(10);
 
     for (const file of files) {
-      const content = fs.readFileSync(path.join(goldenDatasetDir, file), "utf-8");
+      const content = fs.readFileSync(
+        path.join(goldenDatasetDir, file),
+        "utf-8",
+      );
       const parsed = JSON.parse(content);
 
       expect(parsed.postId).toBeDefined();
       expect(parsed.subreddit).toBeDefined();
-      expect(typeof parsed.selftext === "string" || typeof parsed.title === "string").toBe(true);
+      expect(
+        typeof parsed.selftext === "string" || typeof parsed.title === "string",
+      ).toBe(true);
       expect(Array.isArray(parsed.expected)).toBe(true);
       expect(parsed.expected.length).toBeGreaterThan(0);
 
@@ -56,7 +61,9 @@ describe("Golden Dataset & Prompt Versioning Pipeline", () => {
     it("should randomly assign between v1 and v2 when enableAbTest is true", () => {
       const versions = new Set<string>();
       for (let i = 0; i < 50; i++) {
-        const { promptVersion } = resolveExtractionPrompt({ enableAbTest: true });
+        const { promptVersion } = resolveExtractionPrompt({
+          enableAbTest: true,
+        });
         versions.add(promptVersion);
       }
       expect(versions.has("v1")).toBe(true);
@@ -97,7 +104,10 @@ describe("Golden Dataset & Prompt Versioning Pipeline", () => {
 
       expect(result.content).toContain('{"painPoints": [');
       expect(result.content).toContain("Slow DB queries");
-      expect(result.usage).toEqual({ prompt_tokens: 120, completion_tokens: 45 });
+      expect(result.usage).toEqual({
+        prompt_tokens: 120,
+        completion_tokens: 45,
+      });
     });
   });
 
@@ -105,11 +115,16 @@ describe("Golden Dataset & Prompt Versioning Pipeline", () => {
     it("should attach promptVersion, schemaVersion, and rawResponse to extracted pain points", async () => {
       const mockPost = {
         title: "Manual invoice chasing is wasting 10 hours a week",
-        selftext: "I run a design agency and spend Fridays chasing unpaid invoices.",
+        selftext:
+          "I run a design agency and spend Fridays chasing unpaid invoices.",
         url: "https://reddit.com/r/freelance/123",
         author: "agency_owner",
         subreddit: "freelance",
-        comments: [{ body: "I would pay $100/mo for an automated reminder that actually gets paid." }],
+        comments: [
+          {
+            body: "I would pay $100/mo for an automated reminder that actually gets paid.",
+          },
+        ],
       };
 
       const mockExtractionPayload = {

@@ -29,7 +29,8 @@ export async function GET(request: Request) {
       results[table] = "success";
     } catch (err: unknown) {
       console.error(`❌ Failed to analyze ${table}:`, err);
-      results[table] = `error: ${err instanceof Error ? err.message : "Unknown error"}`;
+      results[table] =
+        `error: ${err instanceof Error ? err.message : "Unknown error"}`;
     }
   }
 

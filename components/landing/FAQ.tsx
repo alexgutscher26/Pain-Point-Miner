@@ -55,8 +55,9 @@ export function FAQ() {
             Everything you need to know about ThreddIQ
           </h2>
           <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300">
-            Have questions about compliance, data freshness, or our Lifetime Deal allocation?
-            Here is how ThreddIQ empowers founders and marketers.
+            Have questions about compliance, data freshness, or our Lifetime
+            Deal allocation? Here is how ThreddIQ empowers founders and
+            marketers.
           </p>
         </div>
 

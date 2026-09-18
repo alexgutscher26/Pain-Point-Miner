@@ -69,7 +69,8 @@ export async function POST(req: Request) {
     if (validCustomerId) {
       try {
         const existing = await stripe.customers.retrieve(validCustomerId);
-        if ("deleted" in existing && existing.deleted) validCustomerId = undefined;
+        if ("deleted" in existing && existing.deleted)
+          validCustomerId = undefined;
       } catch (err: unknown) {
         if (
           typeof err === "object" &&
@@ -101,7 +102,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Credit Top-up Error]", message);
     return NextResponse.json({ message }, { status: 500 });
   }

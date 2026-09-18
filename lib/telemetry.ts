@@ -1,4 +1,9 @@
-import { trace, SpanStatusCode, type Span, type Tracer } from "@opentelemetry/api";
+import {
+  trace,
+  SpanStatusCode,
+  type Span,
+  type Tracer,
+} from "@opentelemetry/api";
 
 const TRACER_NAME = "pain-point-miner";
 const TRACER_VERSION = "1.0.0";

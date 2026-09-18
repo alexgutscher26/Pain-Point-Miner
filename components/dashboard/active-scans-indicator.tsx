@@ -99,7 +99,7 @@ export function ActiveScansIndicator() {
         onClick={() => setIsOpen((prev) => !prev)}
         className={`group flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[11px] font-bold tracking-wider uppercase transition-all select-none ${
           hasActiveScans
-            ? "border-[#ff4500]/40 bg-[#ff4500]/10 text-[#ff4500] hover:bg-[#ff4500]/15 shadow-[0_0_12px_rgba(255,69,0,0.2)]"
+            ? "border-[#ff4500]/40 bg-[#ff4500]/10 text-[#ff4500] shadow-[0_0_12px_rgba(255,69,0,0.2)] hover:bg-[#ff4500]/15"
             : "border-black/[0.08] bg-white/70 text-zinc-600 hover:border-black/15 hover:bg-white dark:border-white/10 dark:bg-zinc-900/70 dark:text-zinc-400 dark:hover:bg-zinc-800"
         }`}
         aria-expanded={isOpen}
@@ -133,7 +133,7 @@ export function ActiveScansIndicator() {
 
       {/* Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-4 shadow-xl backdrop-blur-xl z-50 dark:border-white/15 dark:bg-zinc-900/95">
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-4 shadow-xl backdrop-blur-xl sm:w-96 dark:border-white/15 dark:bg-zinc-900/95">
           <div className="mb-3 flex items-center justify-between border-b border-black/5 pb-2.5 dark:border-white/10">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-[#ff4500]" />
@@ -157,19 +157,24 @@ export function ActiveScansIndicator() {
           </div>
 
           {hasActiveScans ? (
-            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+            <div className="max-h-72 space-y-2.5 overflow-y-auto pr-1">
               {data.activeRuns.map((run) => (
                 <div
                   key={run.id}
                   className="rounded-xl border border-black/5 bg-zinc-50/90 p-3 text-left transition-all hover:border-[#ff4500]/30 hover:bg-white dark:border-white/5 dark:bg-zinc-800/60 dark:hover:bg-zinc-800"
                 >
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <div className="mb-1.5 flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-xs font-bold text-zinc-900 line-clamp-1 dark:text-zinc-100">
-                        {run.scraperName || run.keyword || "Reddit Intelligence Scan"}
+                      <p className="line-clamp-1 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                        {run.scraperName ||
+                          run.keyword ||
+                          "Reddit Intelligence Scan"}
                       </p>
                       <p className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
-                        Keyword: <span className="font-semibold text-zinc-700 dark:text-zinc-300">"{run.keyword}"</span>
+                        Keyword:{" "}
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                          "{run.keyword}"
+                        </span>
                       </p>
                     </div>
                     <span
@@ -195,7 +200,7 @@ export function ActiveScansIndicator() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between border-t border-black/5 pt-2 text-[11px] font-mono text-zinc-600 dark:border-white/5 dark:text-zinc-400">
+                  <div className="flex items-center justify-between border-t border-black/5 pt-2 font-mono text-[11px] text-zinc-600 dark:border-white/5 dark:text-zinc-400">
                     <div className="flex items-center gap-3">
                       <span>
                         <strong className="text-zinc-900 dark:text-zinc-200">
@@ -243,7 +248,7 @@ export function ActiveScansIndicator() {
             </div>
           )}
 
-          <div className="mt-3 border-t border-black/5 pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-400 dark:border-white/5">
+          <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-2 font-mono text-[10px] text-zinc-400 dark:border-white/5">
             <span>ThreddIQ Realtime Ingestion</span>
             <Link
               href="/dashboard/health"

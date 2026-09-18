@@ -141,7 +141,8 @@ describe("extractPainPoints", () => {
   it("should detect non-English originalLanguage and return English extracted pain points", async () => {
     const spanishPost = {
       title: "El software de facturación actual es demasiado lento y complejo",
-      selftext: "Estamos perdiendo clientes porque la sincronización de inventario falla constantemente.",
+      selftext:
+        "Estamos perdiendo clientes porque la sincronización de inventario falla constantemente.",
       url: "https://reddit.com/r/espanol/456",
       author: "usuario_es",
       subreddit: "espanol",
@@ -154,7 +155,8 @@ describe("extractPainPoints", () => {
       targetUser: "Small Business Owner",
       competingProducts: ["FacturaDirecta"],
       willingnessToPay: "paid_signal",
-      featureRequested: "Automated real-time inventory sync and streamlined invoicing",
+      featureRequested:
+        "Automated real-time inventory sync and streamlined invoicing",
       originalLanguage: "es",
       confidenceScore: 0.9,
       painIntensity: 8,
@@ -186,7 +188,9 @@ describe("extractPainPoints", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].originalLanguage).toBe("es");
-    expect(result[0].title).toBe("Billing Software Inefficiency and Inventory Sync Failure");
+    expect(result[0].title).toBe(
+      "Billing Software Inefficiency and Inventory Sync Failure",
+    );
     expect(result[0].targetUser).toBe("Small Business Owner");
   });
 

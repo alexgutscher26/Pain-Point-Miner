@@ -10,11 +10,21 @@ export async function GET(req: Request) {
   const startTime = Date.now();
 
   const checks: {
-    database: { status: "healthy" | "unhealthy"; latencyMs?: number; error?: string };
+    database: {
+      status: "healthy" | "unhealthy";
+      latencyMs?: number;
+      error?: string;
+    };
     cache: { status: "healthy" | "degraded"; type: string; latencyMs?: number };
     externalApis: {
-      reddit: { configured: boolean; status: "configured" | "missing_credentials" };
-      openrouter: { configured: boolean; status: "configured" | "missing_credentials" };
+      reddit: {
+        configured: boolean;
+        status: "configured" | "missing_credentials";
+      };
+      openrouter: {
+        configured: boolean;
+        status: "configured" | "missing_credentials";
+      };
     };
     system: {
       uptimeSeconds: number;
@@ -77,7 +87,10 @@ export async function GET(req: Request) {
   }
 
   // 2. Redis / Cache Check
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  if (
+    process.env.UPSTASH_REDIS_REST_URL &&
+    process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
     checks.cache.type = "upstash-redis";
   } else if (process.env.REDIS_URL) {
     checks.cache.type = "redis";

@@ -1,6 +1,13 @@
 "use client";
 
-import { Search, Brain, Target, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import {
+  Search,
+  Brain,
+  Target,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 
 export function Steps() {
@@ -55,7 +62,7 @@ export function Steps() {
           >
             <div>
               <div className="mb-6 flex items-center justify-between">
-                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-zinc-100 font-mono text-xs font-bold text-zinc-900 group-hover:bg-[#ff4500] group-hover:text-white transition-colors dark:bg-zinc-800 dark:text-white">
+                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-zinc-100 font-mono text-xs font-bold text-zinc-900 transition-colors group-hover:bg-[#ff4500] group-hover:text-white dark:bg-zinc-800 dark:text-white">
                   {step.num}
                 </span>
                 <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
@@ -71,7 +78,7 @@ export function Steps() {
               </p>
             </div>
 
-            <div className="mt-8 border-t border-zinc-100 pt-3 text-[11px] font-mono text-zinc-400 dark:border-zinc-800">
+            <div className="mt-8 border-t border-zinc-100 pt-3 font-mono text-[11px] text-zinc-400 dark:border-zinc-800">
               {step.detail}
             </div>
           </div>

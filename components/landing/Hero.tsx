@@ -9,7 +9,10 @@ const SEARCH_DRAFT_STORAGE_KEY = "threddiq-search-draft-v1";
 
 const QUICK_TAGS = [
   { label: "HubSpot Churn", query: "hubspot alternative pricing" },
-  { label: "Stripe Billing Gaps", query: "stripe invoice reconciliation custom" },
+  {
+    label: "Stripe Billing Gaps",
+    query: "stripe invoice reconciliation custom",
+  },
   { label: "Ahrefs Price Jump", query: "ahrefs too expensive rank tracker" },
   { label: "Notion Lag", query: "notion slow database offline" },
 ];
@@ -100,16 +103,13 @@ export function Hero() {
 
         {/* Subtitle geared towards Founders, Product Leads & Marketers */}
         <p className="mb-9 max-w-[640px] text-lg leading-relaxed font-normal text-zinc-600 sm:text-xl dark:text-zinc-300">
-          Stop guessing your next roadmap item or marketing angle. ThreddIQ mines
-          thousands of unfiltered Reddit complaints to surface verified churn signals,
-          pricing willingness, and exact customer words.
+          Stop guessing your next roadmap item or marketing angle. ThreddIQ
+          mines thousands of unfiltered Reddit complaints to surface verified
+          churn signals, pricing willingness, and exact customer words.
         </p>
 
         {/* Tactile Search Bar */}
-        <form
-          onSubmit={handleHeroSubmit}
-          className="mb-4 w-full max-w-[620px]"
-        >
+        <form onSubmit={handleHeroSubmit} className="mb-4 w-full max-w-[620px]">
           <div className="relative flex w-full flex-col gap-2 rounded-2xl border border-zinc-300/90 bg-white/95 p-2 shadow-xl shadow-zinc-900/5 backdrop-blur-xl transition-all duration-300 focus-within:border-[#ff4500] focus-within:ring-4 focus-within:ring-[#ff4500]/10 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full dark:border-zinc-800 dark:bg-zinc-900/95">
             <div className="flex h-10 w-auto flex-none items-center pr-2 pl-3 text-zinc-400">
               <Search className="h-5 w-5" />

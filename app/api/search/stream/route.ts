@@ -141,9 +141,7 @@ export async function GET(req: Request) {
 
           // Detect stale runs: non-terminal for > 30 minutes → treat as failed
           const isNonTerminal =
-            phase !== "completed" &&
-            phase !== "failed" &&
-            phase !== "canceled";
+            phase !== "completed" && phase !== "failed" && phase !== "canceled";
           const runAgeMs = latestRun?.startedAt
             ? Date.now() - latestRun.startedAt.getTime()
             : 0;

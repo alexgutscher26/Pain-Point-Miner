@@ -140,10 +140,7 @@ export async function executeMiningRun({
         let allPosts: RedditPost[] = [];
         const throttleWarnings: string[] = [];
 
-        const candidateSubreddits = subreddits.slice(
-          0,
-          Math.max(1, subLimit),
-        );
+        const candidateSubreddits = subreddits.slice(0, Math.max(1, subLimit));
 
         // Phase 1: SCANNING
         const { fetchedPosts, filteredPosts, postsSkipped } = await withSpan(
@@ -177,7 +174,10 @@ export async function executeMiningRun({
               }
             }
             const targetSubreddits = validationResult.valid;
-            scanSpan.setAttribute("validSubredditsCount", targetSubreddits.length);
+            scanSpan.setAttribute(
+              "validSubredditsCount",
+              targetSubreddits.length,
+            );
 
             const maxAiExtractions = num("MAX_CONCURRENT_AI_EXTRACTIONS", 5);
             const baseSubConcurrency = maxAiExtractions;

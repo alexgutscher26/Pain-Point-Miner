@@ -39,7 +39,8 @@ export async function GET(req: Request) {
       presets: [...DEFAULT_FILTER_PRESETS, ...userPresets],
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Saved Filters GET Error]", message);
     return NextResponse.json({ message }, { status: 500 });
   }
@@ -57,7 +58,10 @@ export async function POST(req: Request) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { message: "Invalid filter preset format", errors: parsed.error.format() },
+        {
+          message: "Invalid filter preset format",
+          errors: parsed.error.format(),
+        },
         { status: 400 },
       );
     }
@@ -108,7 +112,8 @@ export async function POST(req: Request) {
       presets: [...DEFAULT_FILTER_PRESETS, ...updatedSavedFilters],
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Saved Filters POST Error]", message);
     return NextResponse.json({ message }, { status: 500 });
   }
@@ -162,7 +167,8 @@ export async function DELETE(req: Request) {
       presets: [...DEFAULT_FILTER_PRESETS, ...updatedSavedFilters],
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Saved Filters DELETE Error]", message);
     return NextResponse.json({ message }, { status: 500 });
   }

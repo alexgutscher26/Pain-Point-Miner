@@ -42,17 +42,21 @@ const PRESETS: MockRedditPreset[] = [
     author: "u/growth_vp_dan",
     upvotes: "1.8k",
     timeAgo: "2 days ago",
-    title: "HubSpot just hiked our tier by $600/month for 3 basic email sequences",
+    title:
+      "HubSpot just hiked our tier by $600/month for 3 basic email sequences",
     rawComment:
       "We just crossed 2,000 contacts and HubSpot automatically kicked us into their Professional tier which is an extra $600/month. We literally only need 3 automated outbound sequences and pipeline stages. I would cancel today and pay $79/mo for a lightweight sales pipeline that connects to Google Workspace without enterprise bloat.",
-    highlightPhrase: "I would cancel today and pay $79/mo for a lightweight sales pipeline",
+    highlightPhrase:
+      "I would cancel today and pay $79/mo for a lightweight sales pipeline",
     insight: {
       opportunityTitle: "Unbundled Lightweight Sales CRM",
       opportunityScore: 96,
       urgencyLevel: "Critical",
-      competitorFlaw: "Forced tier upgrades with 80% unused enterprise features",
+      competitorFlaw:
+        "Forced tier upgrades with 80% unused enterprise features",
       willingnessToPay: "$79 / month (Explicit budget committed)",
-      marketingHook: '"The CRM for teams who refuse to pay $600/mo for 3 email workflows."',
+      marketingHook:
+        '"The CRM for teams who refuse to pay $600/mo for 3 email workflows."',
       targetBuyer: "Early-stage B2B founders & outbound sales leads",
     },
   },
@@ -64,17 +68,21 @@ const PRESETS: MockRedditPreset[] = [
     author: "u/marcus_builder",
     upvotes: "1.4k",
     timeAgo: "4 days ago",
-    title: "Tired of manual invoice reconciliation between custom enterprise deals & Stripe",
+    title:
+      "Tired of manual invoice reconciliation between custom enterprise deals & Stripe",
     rawComment:
       "We spend 8 hours every month reconciling bespoke annual contracts with Stripe Billing. Stripe doesn't handle custom payment milestones natively without heavy custom code. I would pay $99 monthly just to automate milestone contract invoices via webhook.",
-    highlightPhrase: "I would pay $99 monthly just to automate milestone contract invoices",
+    highlightPhrase:
+      "I would pay $99 monthly just to automate milestone contract invoices",
     insight: {
       opportunityTitle: "Milestone Contract & Stripe Syncer",
       opportunityScore: 94,
       urgencyLevel: "High",
-      competitorFlaw: "Stripe Billing lacks out-of-the-box bespoke milestone contract schedules",
+      competitorFlaw:
+        "Stripe Billing lacks out-of-the-box bespoke milestone contract schedules",
       willingnessToPay: "$99 / month (8 hours/mo saved)",
-      marketingHook: '"Sync enterprise annual contracts to Stripe in 60 seconds without writing code."',
+      marketingHook:
+        '"Sync enterprise annual contracts to Stripe in 60 seconds without writing code."',
       targetBuyer: "B2B SaaS founders & finance operations",
     },
   },
@@ -86,17 +94,21 @@ const PRESETS: MockRedditPreset[] = [
     author: "u/elena_bootstraps",
     upvotes: "940",
     timeAgo: "1 week ago",
-    title: "Why does basic rank tracking cost $129/mo across modern SEO suites?",
+    title:
+      "Why does basic rank tracking cost $129/mo across modern SEO suites?",
     rawComment:
       "Existing SEO tools charge enterprise rates just to monitor 15 keywords. I am bootstrapping 3 micro-tools and only need ranking volatility alerts on Telegram. I would gladly pay $19/mo for a clean, zero-bloat rank monitor.",
-    highlightPhrase: "I would gladly pay $19/mo for a clean, zero-bloat rank monitor",
+    highlightPhrase:
+      "I would gladly pay $19/mo for a clean, zero-bloat rank monitor",
     insight: {
       opportunityTitle: "Micro Rank Monitor for Builders",
       opportunityScore: 89,
       urgencyLevel: "High",
-      competitorFlaw: "Extremely punitive credit limits and high base seat cost for solo builders",
+      competitorFlaw:
+        "Extremely punitive credit limits and high base seat cost for solo builders",
       willingnessToPay: "$19 / month (High volume indie demand)",
-      marketingHook: '"Track your 20 most important keywords without an expensive enterprise subscription."',
+      marketingHook:
+        '"Track your 20 most important keywords without an expensive enterprise subscription."',
       targetBuyer: "Indie hackers, solo founders, and niche site builders",
     },
   },
@@ -108,17 +120,21 @@ const PRESETS: MockRedditPreset[] = [
     author: "u/sarah_agency_ops",
     upvotes: "2.3k",
     timeAgo: "3 days ago",
-    title: "Notion databases take 5 seconds to load on mobile when meeting clients",
+    title:
+      "Notion databases take 5 seconds to load on mobile when meeting clients",
     rawComment:
       "Our team relies on Notion for client briefs, but when I open it on the go or offline, it takes ages to render. If there were a fast local-first client portal that syncs markdown seamlessly, I would switch our entire 12-person agency immediately at $10/user.",
-    highlightPhrase: "I would switch our entire 12-person agency immediately at $10/user",
+    highlightPhrase:
+      "I would switch our entire 12-person agency immediately at $10/user",
     insight: {
       opportunityTitle: "Fast Local-First Agency Client Portal",
       opportunityScore: 92,
       urgencyLevel: "High",
-      competitorFlaw: "Cloud latency and poor offline support on complex nested databases",
+      competitorFlaw:
+        "Cloud latency and poor offline support on complex nested databases",
       willingnessToPay: "$120 / month ($10/seat across 12 team members)",
-      marketingHook: '"Sub-millisecond client documentation that works offline and never buffers."',
+      marketingHook:
+        '"Sub-millisecond client documentation that works offline and never buffers."',
       targetBuyer: "Design & marketing agency founders",
     },
   },
@@ -130,7 +146,8 @@ const PRESETS: MockRedditPreset[] = [
     author: "u/alex_productlead",
     upvotes: "1.1k",
     timeAgo: "5 days ago",
-    title: "Loom's continuous audio drift and compression on design walkthroughs",
+    title:
+      "Loom's continuous audio drift and compression on design walkthroughs",
     rawComment:
       "Half of our async engineering review videos have audio sync drift after 10 minutes. If someone built a lightweight Mac menubar recorder that uploads native high-res MP4 directly to S3 or Cloudflare Stream, I'd pay $15/mo in a heartbeat.",
     highlightPhrase: "I'd pay $15/mo in a heartbeat",
@@ -138,9 +155,11 @@ const PRESETS: MockRedditPreset[] = [
       opportunityTitle: "Native High-Fidelity Async Screen Recorder",
       opportunityScore: 91,
       urgencyLevel: "High",
-      competitorFlaw: "Cloud transcoding degradation and audio-video desync on longer clips",
+      competitorFlaw:
+        "Cloud transcoding degradation and audio-video desync on longer clips",
       willingnessToPay: "$15 / month (Direct credit card ready)",
-      marketingHook: '"Lossless 4K screen recordings hosted on your own cloud storage with zero compression lag."',
+      marketingHook:
+        '"Lossless 4K screen recordings hosted on your own cloud storage with zero compression lag."',
       targetBuyer: "Product managers, engineers, and UX researchers",
     },
   },
@@ -173,8 +192,9 @@ export function InteractiveDemo() {
           See raw Reddit complaints turn into revenue opportunities
         </h2>
         <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
-          Select a competitor below to see how ThreddIQ isolates genuine buyer frustration,
-          extracts competitor flaws, and calculates willingness to pay in real time.
+          Select a competitor below to see how ThreddIQ isolates genuine buyer
+          frustration, extracts competitor flaws, and calculates willingness to
+          pay in real time.
         </p>
 
         {/* Competitor Presets Bar */}
@@ -215,7 +235,7 @@ export function InteractiveDemo() {
         }`}
       >
         {/* Left Column: Raw Reddit Discussion Feed */}
-        <div className="flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:col-span-6">
+        <div className="flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-6 dark:border-zinc-800 dark:bg-zinc-900">
           <div>
             {/* Reddit Header */}
             <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3.5 dark:border-zinc-800">
@@ -228,9 +248,13 @@ export function InteractiveDemo() {
                     <span className="text-xs font-bold text-zinc-900 dark:text-white">
                       {activePreset.subreddit}
                     </span>
-                    <span className="text-[11px] text-zinc-400">• Posted by {activePreset.author}</span>
+                    <span className="text-[11px] text-zinc-400">
+                      • Posted by {activePreset.author}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-zinc-400">{activePreset.timeAgo}</span>
+                  <span className="text-[10px] text-zinc-400">
+                    {activePreset.timeAgo}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
@@ -246,22 +270,24 @@ export function InteractiveDemo() {
 
             {/* Post Body with highlighted quote */}
             <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-4 text-xs leading-relaxed text-zinc-700 sm:text-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
-              {activePreset.rawComment.split(activePreset.highlightPhrase).map((part, index, arr) => (
-                <span key={index}>
-                  {part}
-                  {index < arr.length - 1 && (
-                    <mark className="rounded-md bg-amber-100 px-1.5 py-0.5 font-semibold text-zinc-900 ring-1 ring-amber-300/60 dark:bg-amber-950/80 dark:text-amber-200 dark:ring-amber-800">
-                      {activePreset.highlightPhrase}
-                    </mark>
-                  )}
-                </span>
-              ))}
+              {activePreset.rawComment
+                .split(activePreset.highlightPhrase)
+                .map((part, index, arr) => (
+                  <span key={index}>
+                    {part}
+                    {index < arr.length - 1 && (
+                      <mark className="rounded-md bg-amber-100 px-1.5 py-0.5 font-semibold text-zinc-900 ring-1 ring-amber-300/60 dark:bg-amber-950/80 dark:text-amber-200 dark:ring-amber-800">
+                        {activePreset.highlightPhrase}
+                      </mark>
+                    )}
+                  </span>
+                ))}
             </div>
           </div>
 
           <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px] text-zinc-400 dark:border-zinc-800">
             <span>Verified public discussion permalink</span>
-            <span className="font-mono text-emerald-600 font-semibold dark:text-emerald-400">
+            <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
               ✓ Authenticity verified
             </span>
           </div>
@@ -283,13 +309,15 @@ export function InteractiveDemo() {
               </div>
               <div className="flex items-center gap-1.5 rounded-full bg-[#ff4500]/20 px-3 py-1 text-xs font-bold text-[#ff6b33]">
                 <Sparkles className="h-3 w-3" />
-                <span>Validation Score: {activePreset.insight.opportunityScore}/100</span>
+                <span>
+                  Validation Score: {activePreset.insight.opportunityScore}/100
+                </span>
               </div>
             </div>
 
             {/* Extracted Opportunity Title */}
             <div className="mb-4">
-              <span className="text-[11px] font-mono font-medium text-zinc-400 uppercase">
+              <span className="font-mono text-[11px] font-medium text-zinc-400 uppercase">
                 Validated Concept
               </span>
               <h4 className="text-lg font-bold text-white sm:text-xl">
@@ -327,7 +355,7 @@ export function InteractiveDemo() {
                   <Quote className="h-3.5 w-3.5" />
                   <span>Customer Voice Copy Hook</span>
                 </div>
-                <p className="text-xs italic text-zinc-300">
+                <p className="text-xs text-zinc-300 italic">
                   {activePreset.insight.marketingHook}
                 </p>
               </div>
@@ -337,7 +365,10 @@ export function InteractiveDemo() {
           {/* Action Trigger */}
           <div className="mt-6 flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-[11px] text-zinc-400">
-              Target: <strong className="text-zinc-200">{activePreset.insight.targetBuyer}</strong>
+              Target:{" "}
+              <strong className="text-zinc-200">
+                {activePreset.insight.targetBuyer}
+              </strong>
             </span>
             <Link
               href={`/niches`}

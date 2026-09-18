@@ -48,16 +48,16 @@ export function DashboardActivityHeatmap({
 
   return (
     <div
-      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
+      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
     >
       {/* Header & Stats */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+      <div className="flex flex-col gap-4 border-b border-zinc-100 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
             <Calendar className="h-4 w-4" />
           </div>
           <div>
-            <h4 className="text-sm font-black tracking-tight text-zinc-950 dark:text-white uppercase font-mono">
+            <h4 className="font-mono text-sm font-black tracking-tight text-zinc-950 uppercase dark:text-white">
               Scan & Insight Activity
             </h4>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -67,22 +67,22 @@ export function DashboardActivityHeatmap({
         </div>
 
         {/* Quick Streak Stats */}
-        <div className="flex items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-50 px-2.5 py-1 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5">
+        <div className="flex items-center gap-4 font-mono text-xs">
+          <div className="flex items-center gap-1.5 rounded-lg border border-black/5 bg-zinc-50 px-2.5 py-1 dark:border-white/5 dark:bg-zinc-800/60">
             <Flame className="h-3.5 w-3.5 text-[#ff4500]" />
             <span className="text-zinc-500 dark:text-zinc-400">Streak:</span>
             <strong className="text-zinc-900 dark:text-white">
               {data.currentStreak}d
             </strong>
           </div>
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-50 px-2.5 py-1 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-1.5 rounded-lg border border-black/5 bg-zinc-50 px-2.5 py-1 dark:border-white/5 dark:bg-zinc-800/60">
             <Award className="h-3.5 w-3.5 text-amber-500" />
             <span className="text-zinc-500 dark:text-zinc-400">Best:</span>
             <strong className="text-zinc-900 dark:text-white">
               {data.longestStreak}d
             </strong>
           </div>
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-50 px-2.5 py-1 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-1.5 rounded-lg border border-black/5 bg-zinc-50 px-2.5 py-1 dark:border-white/5 dark:bg-zinc-800/60">
             <Zap className="h-3.5 w-3.5 text-emerald-500" />
             <span className="text-zinc-500 dark:text-zinc-400">Total:</span>
             <strong className="text-zinc-900 dark:text-white">
@@ -94,7 +94,7 @@ export function DashboardActivityHeatmap({
 
       {/* Heatmap Grid */}
       <div className="mt-5 overflow-x-auto pb-2">
-        <div className="inline-flex gap-1.5 min-w-[580px]">
+        <div className="inline-flex min-w-[580px] gap-1.5">
           {/* Day of week labels */}
           <div className="flex flex-col justify-between py-1 pr-2 font-mono text-[9px] text-zinc-400 select-none">
             <span>Mon</span>
@@ -112,7 +112,8 @@ export function DashboardActivityHeatmap({
                     return <div key={dIdx} className="h-3.5 w-3.5 opacity-0" />;
                   }
 
-                  let bgClass = "bg-zinc-100 hover:ring-1 hover:ring-zinc-400 dark:bg-zinc-800/70 dark:hover:ring-zinc-600";
+                  let bgClass =
+                    "bg-zinc-100 hover:ring-1 hover:ring-zinc-400 dark:bg-zinc-800/70 dark:hover:ring-zinc-600";
                   if (day.level === 1) {
                     bgClass = "bg-[#ff4500]/30 hover:bg-[#ff4500]/40";
                   } else if (day.level === 2) {
@@ -120,7 +121,8 @@ export function DashboardActivityHeatmap({
                   } else if (day.level === 3) {
                     bgClass = "bg-[#ff4500]/85 hover:bg-[#ff4500]";
                   } else if (day.level === 4) {
-                    bgClass = "bg-[#ff4500] shadow-[0_0_8px_rgba(255,69,0,0.6)]";
+                    bgClass =
+                      "bg-[#ff4500] shadow-[0_0_8px_rgba(255,69,0,0.6)]";
                   }
 
                   return (
@@ -128,7 +130,7 @@ export function DashboardActivityHeatmap({
                       key={day.date}
                       onMouseEnter={() => setHoveredDay(day)}
                       onMouseLeave={() => setHoveredDay(null)}
-                      className={`h-3.5 w-3.5 rounded-xs transition-transform hover:scale-125 cursor-pointer ${bgClass}`}
+                      className={`h-3.5 w-3.5 cursor-pointer rounded-xs transition-transform hover:scale-125 ${bgClass}`}
                     />
                   );
                 })}
@@ -139,17 +141,20 @@ export function DashboardActivityHeatmap({
       </div>
 
       {/* Footer Details / Legend & Tooltip readout */}
-      <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-black/[0.04] dark:border-white/[0.06] pt-3 text-[11px] font-mono">
+      <div className="mt-3 flex flex-col items-center justify-between gap-2 border-t border-black/[0.04] pt-3 font-mono text-[11px] sm:flex-row dark:border-white/[0.06]">
         {/* Dynamic Tooltip Info */}
-        <div className="text-zinc-600 dark:text-zinc-400 min-h-[1.5rem] flex items-center">
+        <div className="flex min-h-[1.5rem] items-center text-zinc-600 dark:text-zinc-400">
           {hoveredDay ? (
             <span>
-              <strong className="text-zinc-900 dark:text-white font-bold">
-                {new Date(hoveredDay.date + "T00:00:00").toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+              <strong className="font-bold text-zinc-900 dark:text-white">
+                {new Date(hoveredDay.date + "T00:00:00").toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  },
+                )}
               </strong>
               :{" "}
               {hoveredDay.count === 0

@@ -229,12 +229,16 @@ export async function mergeDriftingClusters(
   ];
 
   if (options.userId) {
-    conditions.push(sql`c1."userId" = ${options.userId} AND c2."userId" = ${options.userId}`);
+    conditions.push(
+      sql`c1."userId" = ${options.userId} AND c2."userId" = ${options.userId}`,
+    );
   }
 
   if (options.workspaceId !== undefined) {
     if (options.workspaceId === null) {
-      conditions.push(sql`c1."workspaceId" IS NULL AND c2."workspaceId" IS NULL`);
+      conditions.push(
+        sql`c1."workspaceId" IS NULL AND c2."workspaceId" IS NULL`,
+      );
     } else {
       conditions.push(
         sql`c1."workspaceId" = ${options.workspaceId} AND c2."workspaceId" = ${options.workspaceId}`,
@@ -283,8 +287,8 @@ export async function mergeDriftingClusters(
     const isC1Target = (pair.c1Count || 0) >= (pair.c2Count || 0);
     const targetClusterId = isC1Target ? pair.c1Id : pair.c2Id;
     const sourceClusterId = isC1Target ? pair.c2Id : pair.c1Id;
-    const targetCount = isC1Target ? (pair.c1Count || 1) : (pair.c2Count || 1);
-    const sourceCount = isC1Target ? (pair.c2Count || 1) : (pair.c1Count || 1);
+    const targetCount = isC1Target ? pair.c1Count || 1 : pair.c2Count || 1;
+    const sourceCount = isC1Target ? pair.c2Count || 1 : pair.c1Count || 1;
 
     // 1. Move all pain points to target cluster
     await db
@@ -354,4 +358,3 @@ export async function mergeDriftingClusters(
     merges,
   };
 }
-

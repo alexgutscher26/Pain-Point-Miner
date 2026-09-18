@@ -19,7 +19,9 @@ describe("SectionErrorBoundary", () => {
 
     const setStateSpy = vi.spyOn(boundary, "setState");
     const error = new Error("Failed to render radar chart");
-    const errorInfo = { componentStack: "\n    in RadarChart\n    in Section" } as React.ErrorInfo;
+    const errorInfo = {
+      componentStack: "\n    in RadarChart\n    in Section",
+    } as React.ErrorInfo;
 
     boundary.componentDidCatch(error, errorInfo);
 
@@ -89,7 +91,11 @@ describe("SectionErrorBoundary", () => {
   });
 
   it("renders custom fallback node when provided and in error state", () => {
-    const fallbackNode = React.createElement("div", { id: "custom-fallback" }, "Custom Error");
+    const fallbackNode = React.createElement(
+      "div",
+      { id: "custom-fallback" },
+      "Custom Error",
+    );
     const boundary = new SectionErrorBoundary({
       children: React.createElement("div", null, "Healthy Child"),
       fallback: fallbackNode,

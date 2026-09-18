@@ -510,7 +510,7 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-2 font-mono text-xs font-bold tracking-wide text-zinc-700 uppercase transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-850"
+              className="dark:hover:bg-zinc-850 cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-2 font-mono text-xs font-bold tracking-wide text-zinc-700 uppercase transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
             >
               Close
             </button>
@@ -626,7 +626,8 @@ export default function SearchPage() {
                 Configure Market Radar
               </h2>
               <p className="mt-1 text-[14px] leading-relaxed font-medium text-zinc-500 dark:text-zinc-400">
-                Define the problem space, competitors, or niche to mine across Reddit communities.
+                Define the problem space, competitors, or niche to mine across
+                Reddit communities.
               </p>
             </div>
 
@@ -717,7 +718,7 @@ export default function SearchPage() {
 
                 {/* Common Core Subreddits */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="font-mono text-[10px] font-semibold text-zinc-400 uppercase mr-1">
+                  <span className="mr-1 font-mono text-[10px] font-semibold text-zinc-400 uppercase">
                     Popular:
                   </span>
                   {visibleCommunities.map((sub) => {
@@ -733,11 +734,11 @@ export default function SearchPage() {
                         key={sub}
                         type="button"
                         onClick={() => addSubreddit(sub)}
-                        className="cursor-pointer inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-[10px] font-semibold text-zinc-600 transition-all hover:border-[#ff4500]/40 hover:text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:border-[#ff4500]/40 dark:hover:text-[#ff4500]"
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-[10px] font-semibold text-zinc-600 transition-all hover:border-[#ff4500]/40 hover:text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:border-[#ff4500]/40 dark:hover:text-[#ff4500]"
                       >
                         <span>+ r/{sub}</span>
                         {formattedSubs && (
-                          <span className="text-zinc-400 text-[9px]">
+                          <span className="text-[9px] text-zinc-400">
                             ({formattedSubs})
                           </span>
                         )}
@@ -859,7 +860,7 @@ export default function SearchPage() {
                             </p>
                           </div>
 
-                          <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-2.5 font-mono text-[9px] text-zinc-400 dark:border-zinc-850 dark:text-zinc-500">
+                          <div className="dark:border-zinc-850 mt-4 flex items-center justify-between border-t border-zinc-100 pt-2.5 font-mono text-[9px] text-zinc-400 dark:text-zinc-500">
                             <span>{preset.subreddits} Subreddits</span>
                             <span>{preset.timeEstimate}</span>
                           </div>
@@ -967,7 +968,9 @@ export default function SearchPage() {
                       Use High-Intent Queries
                     </p>
                     <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-                      Instead of broad keywords like &quot;CRM&quot;, query &quot;HubSpot migration friction&quot; or &quot;Pipedrive billing limits&quot;.
+                      Instead of broad keywords like &quot;CRM&quot;, query
+                      &quot;HubSpot migration friction&quot; or &quot;Pipedrive
+                      billing limits&quot;.
                     </p>
                   </div>
                 </div>
@@ -981,7 +984,9 @@ export default function SearchPage() {
                       Target Real Buyer Frustration
                     </p>
                     <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-                      Our semantic parser searches for &quot;I switched from...&quot;, &quot;anyone else tired of...&quot;, and explicit budget mentions.
+                      Our semantic parser searches for &quot;I switched
+                      from...&quot;, &quot;anyone else tired of...&quot;, and
+                      explicit budget mentions.
                     </p>
                   </div>
                 </div>
@@ -995,7 +1000,15 @@ export default function SearchPage() {
                       Narrow by Vertical
                     </p>
                     <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-                      Subreddits like <code className="font-mono text-[10px] text-[#ff4500]">r/sales</code> or <code className="font-mono text-[10px] text-[#ff4500]">r/sysadmin</code> yield 3x higher willingness-to-pay signals.
+                      Subreddits like{" "}
+                      <code className="font-mono text-[10px] text-[#ff4500]">
+                        r/sales
+                      </code>{" "}
+                      or{" "}
+                      <code className="font-mono text-[10px] text-[#ff4500]">
+                        r/sysadmin
+                      </code>{" "}
+                      yield 3x higher willingness-to-pay signals.
                     </p>
                   </div>
                 </div>
@@ -1007,4 +1020,3 @@ export default function SearchPage() {
     </div>
   );
 }
-

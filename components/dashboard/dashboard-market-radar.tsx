@@ -22,7 +22,9 @@ export function DashboardMarketRadar({
   points,
   className = "",
 }: DashboardMarketRadarProps) {
-  const [selectedQuadrant, setSelectedQuadrant] = useState<RadarQuadrant | "all">("all");
+  const [selectedQuadrant, setSelectedQuadrant] = useState<
+    RadarQuadrant | "all"
+  >("all");
   const [hoveredPoint, setHoveredPoint] = useState<RadarPoint | null>(null);
 
   const filteredPoints =
@@ -30,10 +32,18 @@ export function DashboardMarketRadar({
       ? points
       : points.filter((p) => p.quadrant === selectedQuadrant);
 
-  const blueOceanCount = points.filter((p) => p.quadrant === "blue-ocean").length;
-  const battlegroundCount = points.filter((p) => p.quadrant === "battleground").length;
-  const unchartedCount = points.filter((p) => p.quadrant === "uncharted").length;
-  const commodityCount = points.filter((p) => p.quadrant === "commodity").length;
+  const blueOceanCount = points.filter(
+    (p) => p.quadrant === "blue-ocean",
+  ).length;
+  const battlegroundCount = points.filter(
+    (p) => p.quadrant === "battleground",
+  ).length;
+  const unchartedCount = points.filter(
+    (p) => p.quadrant === "uncharted",
+  ).length;
+  const commodityCount = points.filter(
+    (p) => p.quadrant === "commodity",
+  ).length;
 
   // 2D chart dimensions
   const width = 600;
@@ -43,21 +53,22 @@ export function DashboardMarketRadar({
   const plotHeight = height - padding.top - padding.bottom;
 
   const toX = (val: number) => padding.left + (val / 10) * plotWidth;
-  const toY = (val: number) => padding.top + plotHeight - (val / 10) * plotHeight;
+  const toY = (val: number) =>
+    padding.top + plotHeight - (val / 10) * plotHeight;
 
   return (
     <div
-      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
+      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
     >
       {/* Header & Quadrant Filter Pills */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+      <div className="flex flex-col gap-4 border-b border-zinc-100 pb-4 lg:flex-row lg:items-center lg:justify-between dark:border-zinc-800/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
             <Crosshair className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-black tracking-tight text-zinc-950 dark:text-white uppercase font-mono">
+              <h4 className="font-mono text-sm font-black tracking-tight text-zinc-950 uppercase dark:text-white">
                 Market Competition Radar
               </h4>
               <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 font-mono text-[9px] font-black text-[#ff4500] uppercase">
@@ -131,10 +142,10 @@ export function DashboardMarketRadar({
       </div>
 
       {/* 2D Radar Canvas / SVG */}
-      <div className="mt-4 relative overflow-hidden rounded-xl border border-black/5 bg-zinc-50/70 dark:border-white/5 dark:bg-zinc-950/40 p-2">
+      <div className="relative mt-4 overflow-hidden rounded-xl border border-black/5 bg-zinc-50/70 p-2 dark:border-white/5 dark:bg-zinc-950/40">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="w-full h-80 overflow-visible"
+          className="h-80 w-full overflow-visible"
         >
           {/* Quadrant Background Shading */}
           {/* Top-Left: Blue Ocean */}
@@ -174,28 +185,28 @@ export function DashboardMarketRadar({
           <text
             x={padding.left + 10}
             y={padding.top + 20}
-            className="fill-emerald-600/60 dark:fill-emerald-400/60 font-mono text-[11px] font-black uppercase tracking-wider"
+            className="fill-emerald-600/60 font-mono text-[11px] font-black tracking-wider uppercase dark:fill-emerald-400/60"
           >
             ★ Blue Ocean (High Pain, Few Solutions)
           </text>
           <text
             x={padding.left + plotWidth / 2 + 10}
             y={padding.top + 20}
-            className="fill-amber-600/60 dark:fill-amber-400/60 font-mono text-[11px] font-black uppercase tracking-wider"
+            className="fill-amber-600/60 font-mono text-[11px] font-black tracking-wider uppercase dark:fill-amber-400/60"
           >
             Competitive Battleground (High Demand)
           </text>
           <text
             x={padding.left + 10}
             y={height - padding.bottom - 10}
-            className="fill-zinc-400 font-mono text-[10px] font-bold uppercase tracking-wider"
+            className="fill-zinc-400 font-mono text-[10px] font-bold tracking-wider uppercase"
           >
             Uncharted Niche (Low Friction)
           </text>
           <text
             x={padding.left + plotWidth / 2 + 10}
             y={height - padding.bottom - 10}
-            className="fill-rose-500/60 font-mono text-[10px] font-bold uppercase tracking-wider"
+            className="fill-rose-500/60 font-mono text-[10px] font-bold tracking-wider uppercase"
           >
             Commodity Zone (High Competition)
           </text>
@@ -242,7 +253,7 @@ export function DashboardMarketRadar({
           <text
             x={padding.left + 5}
             y={padding.top - 10}
-            className="fill-zinc-500 dark:fill-zinc-400 font-mono text-[10px] font-bold uppercase"
+            className="fill-zinc-500 font-mono text-[10px] font-bold uppercase dark:fill-zinc-400"
           >
             ↑ High Pain Intensity (10)
           </text>
@@ -250,7 +261,7 @@ export function DashboardMarketRadar({
             x={width - padding.right}
             y={height - padding.bottom + 25}
             textAnchor="end"
-            className="fill-zinc-500 dark:fill-zinc-400 font-mono text-[10px] font-bold uppercase"
+            className="fill-zinc-500 font-mono text-[10px] font-bold uppercase dark:fill-zinc-400"
           >
             Market Maturity (Incumbent Density) →
           </text>
@@ -301,10 +312,10 @@ export function DashboardMarketRadar({
       </div>
 
       {/* Selected Point Tooltip / Inspection Bar */}
-      <div className="mt-3 min-h-[3rem] flex items-center justify-between border-t border-black/[0.04] dark:border-white/[0.06] pt-3 text-[11px] font-mono">
+      <div className="mt-3 flex min-h-[3rem] items-center justify-between border-t border-black/[0.04] pt-3 font-mono text-[11px] dark:border-white/[0.06]">
         {hoveredPoint ? (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-2">
-            <div className="flex items-center gap-2 min-w-0">
+          <div className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 items-center gap-2">
               <span
                 className={`inline-block h-2 w-2 rounded-full ${
                   hoveredPoint.quadrant === "blue-ocean"
@@ -316,23 +327,25 @@ export function DashboardMarketRadar({
                         : "bg-zinc-400"
                 }`}
               />
-              <span className="font-bold text-zinc-900 dark:text-white truncate">
+              <span className="truncate font-bold text-zinc-900 dark:text-white">
                 "{hoveredPoint.title}"
               </span>
-              <span className="text-zinc-400 shrink-0">
-                (Pain: {hoveredPoint.painIntensity}/10, Maturity: {hoveredPoint.marketMaturity}/10)
+              <span className="shrink-0 text-zinc-400">
+                (Pain: {hoveredPoint.painIntensity}/10, Maturity:{" "}
+                {hoveredPoint.marketMaturity}/10)
               </span>
             </div>
             <Link
               href={`/dashboard/reports/${hoveredPoint.reportId}`}
-              className="inline-flex items-center gap-1 font-bold text-[#ff4500] hover:underline shrink-0"
+              className="inline-flex shrink-0 items-center gap-1 font-bold text-[#ff4500] hover:underline"
             >
               Open Dossier <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         ) : (
           <div className="text-zinc-400">
-            Hover over radar nodes to inspect market quadrant & opportunity score
+            Hover over radar nodes to inspect market quadrant & opportunity
+            score
           </div>
         )}
       </div>

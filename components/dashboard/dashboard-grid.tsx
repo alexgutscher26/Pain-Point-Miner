@@ -136,7 +136,6 @@ export function DashboardGrid({
     "recent-reports": recentReportsSlot,
   };
 
-
   return (
     <div className="space-y-6">
       {/* Layout Customizer Controls Bar */}
@@ -151,7 +150,7 @@ export function DashboardGrid({
             <button
               type="button"
               onClick={resetLayout}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-600 shadow-2xs hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-600 shadow-2xs transition-colors hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             >
               <RotateCcw className="h-3 w-3" />
               <span>Reset Default</span>
@@ -220,15 +219,15 @@ export function DashboardGrid({
               }}
               className={`relative transition-all duration-200 ${
                 isDragging
-                  ? "opacity-40 scale-[0.99] ring-2 ring-[#ff4500]/50 rounded-2xl"
+                  ? "scale-[0.99] rounded-2xl opacity-40 ring-2 ring-[#ff4500]/50"
                   : ""
               } ${
                 isDragOver
-                  ? "ring-2 ring-[#ff4500] ring-offset-4 rounded-2xl scale-[1.005]"
+                  ? "scale-[1.005] rounded-2xl ring-2 ring-[#ff4500] ring-offset-4"
                   : ""
               } ${
                 isReordering
-                  ? "rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-2 bg-zinc-50/50 dark:bg-zinc-950/20"
+                  ? "rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50/50 p-2 dark:border-zinc-700 dark:bg-zinc-950/20"
                   : ""
               }`}
             >
@@ -236,8 +235,8 @@ export function DashboardGrid({
               {isReordering && (
                 <div className="mb-2 flex items-center justify-between rounded-xl bg-zinc-900 px-3 py-2 text-white shadow-md dark:bg-zinc-800">
                   <div className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-zinc-400 cursor-grab active:cursor-grabbing" />
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-200">
+                    <GripVertical className="h-4 w-4 cursor-grab text-zinc-400 active:cursor-grabbing" />
+                    <span className="font-mono text-xs font-bold tracking-wider text-zinc-200 uppercase">
                       {CARD_TITLES[cardId]}
                     </span>
                   </div>

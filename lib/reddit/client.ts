@@ -411,7 +411,10 @@ export async function fetchSubredditPostsBatched(
   try {
     const maxPosts = Math.max(1, Math.min(2_000, options?.maxPosts ?? 25));
     const envDelay = getRedditRateLimitDelayMs();
-    const delayMs = Math.max(0, options?.delayMs ?? (envDelay > 0 ? envDelay : 250));
+    const delayMs = Math.max(
+      0,
+      options?.delayMs ?? (envDelay > 0 ? envDelay : 250),
+    );
     const time = options?.time ?? "all";
     const requestLimit = Math.max(
       1,
@@ -845,112 +848,260 @@ export async function fetchSubredditPostsPaginated(
 
 export const KNOWN_SUBREDDITS: Record<
   string,
-  { name: string; subscribers: number; description: string; activeUsers?: number; keywords: string[] }
+  {
+    name: string;
+    subscribers: number;
+    description: string;
+    activeUsers?: number;
+    keywords: string[];
+  }
 > = {
   saas: {
     name: "saas",
     subscribers: 185000,
-    description: "The primary community for Software as a Service founders, operators, and builders.",
+    description:
+      "The primary community for Software as a Service founders, operators, and builders.",
     activeUsers: 450,
-    keywords: ["saas", "software", "b2b", "subscription", "cloud", "mrr", "churn", "app", "startup"],
+    keywords: [
+      "saas",
+      "software",
+      "b2b",
+      "subscription",
+      "cloud",
+      "mrr",
+      "churn",
+      "app",
+      "startup",
+    ],
   },
   entrepreneur: {
     name: "entrepreneur",
     subscribers: 3400000,
-    description: "A community of individuals seeking to solve problems, start businesses, and build wealth.",
+    description:
+      "A community of individuals seeking to solve problems, start businesses, and build wealth.",
     activeUsers: 2100,
-    keywords: ["entrepreneur", "business", "founder", "startup", "marketing", "sales", "revenue", "hustle"],
+    keywords: [
+      "entrepreneur",
+      "business",
+      "founder",
+      "startup",
+      "marketing",
+      "sales",
+      "revenue",
+      "hustle",
+    ],
   },
   startups: {
     name: "startups",
     subscribers: 1650000,
-    description: "Discussions, feedback, and advice for startup founders and early employees.",
+    description:
+      "Discussions, feedback, and advice for startup founders and early employees.",
     activeUsers: 850,
-    keywords: ["startups", "startup", "founder", "fundraising", "investor", "pitch", "mvp", "product"],
+    keywords: [
+      "startups",
+      "startup",
+      "founder",
+      "fundraising",
+      "investor",
+      "pitch",
+      "mvp",
+      "product",
+    ],
   },
   smallbusiness: {
     name: "smallbusiness",
     subscribers: 2200000,
-    description: "Questions and answers for small business owners and operators.",
+    description:
+      "Questions and answers for small business owners and operators.",
     activeUsers: 1200,
-    keywords: ["smallbusiness", "business", "agency", "local", "client", "billing", "service", "invoicing"],
+    keywords: [
+      "smallbusiness",
+      "business",
+      "agency",
+      "local",
+      "client",
+      "billing",
+      "service",
+      "invoicing",
+    ],
   },
   sales: {
     name: "sales",
     subscribers: 420000,
-    description: "Everything about selling, pipeline generation, cold outreach, and closing deals.",
+    description:
+      "Everything about selling, pipeline generation, cold outreach, and closing deals.",
     activeUsers: 600,
-    keywords: ["sales", "outreach", "cold email", "closing", "b2b", "leads", "crm", "prospecting"],
+    keywords: [
+      "sales",
+      "outreach",
+      "cold email",
+      "closing",
+      "b2b",
+      "leads",
+      "crm",
+      "prospecting",
+    ],
   },
   marketing: {
     name: "marketing",
     subscribers: 850000,
-    description: "Where marketers share strategies, growth ideas, and industry insights.",
+    description:
+      "Where marketers share strategies, growth ideas, and industry insights.",
     activeUsers: 550,
-    keywords: ["marketing", "growth", "ads", "seo", "content", "traffic", "branding", "funnel"],
+    keywords: [
+      "marketing",
+      "growth",
+      "ads",
+      "seo",
+      "content",
+      "traffic",
+      "branding",
+      "funnel",
+    ],
   },
   digitalmarketing: {
     name: "digitalmarketing",
     subscribers: 310000,
-    description: "Digital marketing strategies, SEO, PPC, social media, and analytics.",
+    description:
+      "Digital marketing strategies, SEO, PPC, social media, and analytics.",
     activeUsers: 300,
-    keywords: ["digitalmarketing", "marketing", "seo", "ppc", "analytics", "google", "meta"],
+    keywords: [
+      "digitalmarketing",
+      "marketing",
+      "seo",
+      "ppc",
+      "analytics",
+      "google",
+      "meta",
+    ],
   },
   webdev: {
     name: "webdev",
     subscribers: 2600000,
     description: "A community dedicated to all things web development.",
     activeUsers: 1400,
-    keywords: ["webdev", "developer", "frontend", "backend", "fullstack", "css", "html", "javascript"],
+    keywords: [
+      "webdev",
+      "developer",
+      "frontend",
+      "backend",
+      "fullstack",
+      "css",
+      "html",
+      "javascript",
+    ],
   },
   reactjs: {
     name: "reactjs",
     subscribers: 410000,
-    description: "A community for learning and developing web applications with React.",
+    description:
+      "A community for learning and developing web applications with React.",
     activeUsers: 520,
-    keywords: ["react", "reactjs", "nextjs", "frontend", "javascript", "typescript", "ui"],
+    keywords: [
+      "react",
+      "reactjs",
+      "nextjs",
+      "frontend",
+      "javascript",
+      "typescript",
+      "ui",
+    ],
   },
   sideproject: {
     name: "sideproject",
     subscribers: 240000,
-    description: "A subreddit for sharing and getting feedback on your side projects.",
+    description:
+      "A subreddit for sharing and getting feedback on your side projects.",
     activeUsers: 380,
-    keywords: ["sideproject", "project", "indie", "builder", "mvp", "launch", "app"],
+    keywords: [
+      "sideproject",
+      "project",
+      "indie",
+      "builder",
+      "mvp",
+      "launch",
+      "app",
+    ],
   },
   ecommerce: {
     name: "ecommerce",
     subscribers: 490000,
-    description: "Discussions on running an e-commerce business, conversion optimization, and fulfillment.",
+    description:
+      "Discussions on running an e-commerce business, conversion optimization, and fulfillment.",
     activeUsers: 410,
-    keywords: ["ecommerce", "shopify", "store", "products", "shipping", "orders", "conversion"],
+    keywords: [
+      "ecommerce",
+      "shopify",
+      "store",
+      "products",
+      "shipping",
+      "orders",
+      "conversion",
+    ],
   },
   artificial: {
     name: "artificial",
     subscribers: 620000,
-    description: "Artificial intelligence news, breakthroughs, and discussions.",
+    description:
+      "Artificial intelligence news, breakthroughs, and discussions.",
     activeUsers: 480,
-    keywords: ["ai", "artificial", "llm", "gpt", "automation", "machine learning", "models"],
+    keywords: [
+      "ai",
+      "artificial",
+      "llm",
+      "gpt",
+      "automation",
+      "machine learning",
+      "models",
+    ],
   },
   productivity: {
     name: "productivity",
     subscribers: 2800000,
-    description: "Tips, systems, and tools to help you get more done and optimize workflow.",
+    description:
+      "Tips, systems, and tools to help you get more done and optimize workflow.",
     activeUsers: 950,
-    keywords: ["productivity", "notion", "workflow", "time", "habits", "focus", "tools"],
+    keywords: [
+      "productivity",
+      "notion",
+      "workflow",
+      "time",
+      "habits",
+      "focus",
+      "tools",
+    ],
   },
   freelance: {
     name: "freelance",
     subscribers: 390000,
-    description: "Discussions, rate advice, and client management for freelancers.",
+    description:
+      "Discussions, rate advice, and client management for freelancers.",
     activeUsers: 310,
-    keywords: ["freelance", "contractor", "clients", "pricing", "invoicing", "rates", "upwork"],
+    keywords: [
+      "freelance",
+      "contractor",
+      "clients",
+      "pricing",
+      "invoicing",
+      "rates",
+      "upwork",
+    ],
   },
   notion: {
     name: "notion",
     subscribers: 360000,
-    description: "Tips, templates, performance, and discussions about Notion workspaces.",
+    description:
+      "Tips, templates, performance, and discussions about Notion workspaces.",
     activeUsers: 420,
-    keywords: ["notion", "workspace", "templates", "database", "productivity", "notes", "performance"],
+    keywords: [
+      "notion",
+      "workspace",
+      "templates",
+      "database",
+      "productivity",
+      "notes",
+      "performance",
+    ],
   },
 };
 
@@ -992,7 +1143,10 @@ export async function searchSubreddits(
       if (results.length > 0) return results;
     }
   } catch (error) {
-    console.warn("Reddit API subreddit search unavailable, using curated directory fallback:", (error as Error)?.message || error);
+    console.warn(
+      "Reddit API subreddit search unavailable, using curated directory fallback:",
+      (error as Error)?.message || error,
+    );
   }
 
   // Fallback: match query against our curated catalog
@@ -1006,7 +1160,8 @@ export async function searchSubreddits(
       if (sub.name.toLowerCase().includes(cleanQ)) score += 25;
       for (const token of queryTokens) {
         if (sub.name.toLowerCase().includes(token)) score += 15;
-        if (sub.keywords.some((k) => k.includes(token) || token.includes(k))) score += 10;
+        if (sub.keywords.some((k) => k.includes(token) || token.includes(k)))
+          score += 10;
         if (sub.description.toLowerCase().includes(token)) score += 5;
       }
       return { sub, score };
@@ -1031,12 +1186,14 @@ export async function searchSubreddits(
     KNOWN_SUBREDDITS.startups,
     KNOWN_SUBREDDITS.smallbusiness,
     KNOWN_SUBREDDITS.sales,
-  ].map((s) => ({
-    name: s.name,
-    subscribers: s.subscribers,
-    description: s.description,
-    activeUsers: s.activeUsers,
-  })).slice(0, limit);
+  ]
+    .map((s) => ({
+      name: s.name,
+      subscribers: s.subscribers,
+      description: s.description,
+      activeUsers: s.activeUsers,
+    }))
+    .slice(0, limit);
 }
 
 /**
@@ -1154,7 +1311,8 @@ export async function validateSubredditExists(
       const data = (await response.json()) as any;
       if (
         data?.error === 404 ||
-        (data?.data?.name === undefined && data?.data?.display_name === undefined)
+        (data?.data?.name === undefined &&
+          data?.data?.display_name === undefined)
       ) {
         if (data?.reason === "banned") {
           return { exists: false, name: cleanSub, reason: "banned" };

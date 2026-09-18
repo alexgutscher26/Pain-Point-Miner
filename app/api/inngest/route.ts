@@ -15,4 +15,3 @@ export const { GET, POST, PUT } = serve({
     clusterMergeJob,
   ],
 });
-

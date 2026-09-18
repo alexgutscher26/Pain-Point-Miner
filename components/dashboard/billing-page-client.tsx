@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, ExternalLink, Loader2, Sparkles, ShieldCheck, Check, Zap } from "lucide-react";
+import {
+  CreditCard,
+  ExternalLink,
+  Loader2,
+  Sparkles,
+  ShieldCheck,
+  Check,
+  Zap,
+} from "lucide-react";
 import type { BillingPlan, PlanEntitlements } from "@/lib/plan-gating";
 
 type BillingPurchaseOption = {
@@ -49,8 +57,9 @@ export function BillingPageClient({
   usage,
 }: BillingPageClientProps) {
   const [openingPortal, setOpeningPortal] = useState(false);
-  const [startingCheckoutPlan, setStartingCheckoutPlan] =
-    useState<string | null>(null);
+  const [startingCheckoutPlan, setStartingCheckoutPlan] = useState<
+    string | null
+  >(null);
   const [actionState, setActionState] = useState<BillingActionState>(null);
 
   const displayLtdTier = ltdTier || "none";
@@ -159,20 +168,23 @@ export function BillingPageClient({
             Billing & Lifetime Access
           </h2>
           <p className="mt-1 max-w-2xl text-[14px] leading-relaxed font-medium text-zinc-500 sm:text-[15px] dark:text-zinc-400">
-            Manage your Lifetime Deal allocation, review Stripe receipts, or upgrade your monthly scan allowance.
+            Manage your Lifetime Deal allocation, review Stripe receipts, or
+            upgrade your monthly scan allowance.
           </p>
         </div>
       </div>
 
       {/* Plan Inactive / Read Only Banner */}
       {planPurchaseRequired ? (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 dark:bg-amber-500/10">
+        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 sm:flex-row sm:items-center dark:bg-amber-500/10">
           <div>
             <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-amber-600 uppercase">
               Read-Only Mode Active
             </p>
             <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Your account is currently in read-only mode. Claim a Lifetime Deal below to unlock unlimited search depth, automated discovery, and AI pain point clustering.
+              Your account is currently in read-only mode. Claim a Lifetime Deal
+              below to unlock unlimited search depth, automated discovery, and
+              AI pain point clustering.
             </p>
           </div>
         </div>
@@ -195,7 +207,8 @@ export function BillingPageClient({
               Pay Once. Mine Forever.
             </h3>
             <p className="mt-1 max-w-xl text-[14px] font-medium text-zinc-500 dark:text-zinc-400">
-              Zero recurring fees. Your monthly scan quota automatically renews on the 1st of every month forever.
+              Zero recurring fees. Your monthly scan quota automatically renews
+              on the 1st of every month forever.
             </p>
           </div>
 
@@ -222,18 +235,26 @@ export function BillingPageClient({
                 Founder Lifetime Pass
               </h4>
               <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                Ideal for solo founders, indie hackers, and early product builders.
+                Ideal for solo founders, indie hackers, and early product
+                builders.
               </p>
 
               <div className="my-6 flex items-baseline gap-1.5">
-                <span className="text-4xl font-black text-zinc-950 dark:text-white">$149</span>
-                <span className="font-mono text-xs font-bold text-zinc-400 uppercase">one-time payment</span>
+                <span className="text-4xl font-black text-zinc-950 dark:text-white">
+                  $149
+                </span>
+                <span className="font-mono text-xs font-bold text-zinc-400 uppercase">
+                  one-time payment
+                </span>
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:border-zinc-850 dark:text-zinc-300">
+              <div className="dark:border-zinc-850 space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:text-zinc-300">
                 <div className="flex items-center gap-2.5">
                   <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
-                  <span><strong>30 investigations</strong> per month (resets monthly)</span>
+                  <span>
+                    <strong>30 investigations</strong> per month (resets
+                    monthly)
+                  </span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
@@ -258,8 +279,12 @@ export function BillingPageClient({
               <button
                 type="button"
                 onClick={() => startLtdCheckout("founder")}
-                disabled={ltdTier === "founder" || ltdTier === "professional" || startingCheckoutPlan === "founder"}
-                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 py-3 font-mono text-xs font-black tracking-wider text-zinc-900 uppercase transition-all hover:border-[#ff4500] hover:bg-[#ff4500] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-[#ff4500]"
+                disabled={
+                  ltdTier === "founder" ||
+                  ltdTier === "professional" ||
+                  startingCheckoutPlan === "founder"
+                }
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 py-3 font-mono text-xs font-black tracking-wider text-zinc-900 uppercase transition-all hover:border-[#ff4500] hover:bg-[#ff4500] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-[#ff4500]"
               >
                 {startingCheckoutPlan === "founder" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -299,14 +324,19 @@ export function BillingPageClient({
                   {ltdTier === "founder" ? "$150" : "$299"}
                 </span>
                 <span className="font-mono text-xs font-bold text-zinc-400 uppercase">
-                  {ltdTier === "founder" ? "upgrade difference" : "one-time payment"}
+                  {ltdTier === "founder"
+                    ? "upgrade difference"
+                    : "one-time payment"}
                 </span>
               </div>
 
-              <div className="space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:border-zinc-850 dark:text-zinc-300">
+              <div className="dark:border-zinc-850 space-y-3 border-t border-zinc-100 pt-5 text-[13px] font-medium text-zinc-600 dark:text-zinc-300">
                 <div className="flex items-center gap-2.5">
                   <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
-                  <span><strong>100 investigations</strong> per month (resets monthly)</span>
+                  <span>
+                    <strong>100 investigations</strong> per month (resets
+                    monthly)
+                  </span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Check className="h-4 w-4 shrink-0 text-[#ff4500]" />
@@ -331,8 +361,11 @@ export function BillingPageClient({
               <button
                 type="button"
                 onClick={() => startLtdCheckout("professional")}
-                disabled={ltdTier === "professional" || startingCheckoutPlan === "professional"}
-                className="w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff4500] py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={
+                  ltdTier === "professional" ||
+                  startingCheckoutPlan === "professional"
+                }
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#ff4500] py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {startingCheckoutPlan === "professional" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -362,7 +395,9 @@ export function BillingPageClient({
               </h3>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Access your encrypted Stripe portal to view transaction receipts, download tax invoices, or update your billing email and payment methods.
+              Access your encrypted Stripe portal to view transaction receipts,
+              download tax invoices, or update your billing email and payment
+              methods.
             </p>
           </div>
           <div className="mt-6">
@@ -404,7 +439,7 @@ export function BillingPageClient({
           <div className="mt-6 space-y-4 font-mono text-xs">
             <div className="flex justify-between border-b border-zinc-100 pb-2.5 dark:border-zinc-800">
               <span className="text-zinc-400">Plan Status:</span>
-              <span className="font-bold text-zinc-800 dark:text-zinc-200 uppercase">
+              <span className="font-bold text-zinc-800 uppercase dark:text-zinc-200">
                 {ltdTier && ltdTier !== "none"
                   ? "Lifetime active"
                   : planPurchaseRequired
@@ -452,4 +487,3 @@ export function BillingPageClient({
     </div>
   );
 }
-

@@ -116,7 +116,9 @@ describe("comparison engine", () => {
 
       // Verify Verdict
       expect(result.summaryVerdict.overallWinner).toBe("B");
-      expect(result.summaryVerdict.winnerKeyword).toBe("Stripe Webhook Inspector");
+      expect(result.summaryVerdict.winnerKeyword).toBe(
+        "Stripe Webhook Inspector",
+      );
     });
   });
 });

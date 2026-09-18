@@ -190,7 +190,12 @@ export function compareReports(
     for (const p of points) {
       const s = (p.sentiment || "").toLowerCase();
       if (s.includes("desperate")) desperate++;
-      else if (s.includes("frustrat") || s.includes("angry") || s.includes("annoy")) frustrated++;
+      else if (
+        s.includes("frustrat") ||
+        s.includes("angry") ||
+        s.includes("annoy")
+      )
+        frustrated++;
       else neutral++;
     }
     return { desperate, frustrated, neutral };
@@ -255,7 +260,11 @@ export function compareReports(
   // Deltas
   const deltas = {
     opportunityScore: computeMetricDelta(scoreA, scoreB, true),
-    painPointsCount: computeMetricDelta(rawA.painPoints.length, rawB.painPoints.length, true),
+    painPointsCount: computeMetricDelta(
+      rawA.painPoints.length,
+      rawB.painPoints.length,
+      true,
+    ),
     avgUrgency: computeMetricDelta(avgUrgA, avgUrgB, true),
     avgMonetization: computeMetricDelta(avgMonA, avgMonB, true),
     avgMarketMaturity: computeMetricDelta(avgMatA, avgMatB, false), // lower market maturity is easier competition
@@ -281,7 +290,8 @@ export function compareReports(
 
   let overallWinner: "A" | "B" | "tie" = "tie";
   let winnerKeyword = "Both Opportunities";
-  let verdictStatement = "Both investigations demonstrate comparable commercial viability and audience struggle intensity.";
+  let verdictStatement =
+    "Both investigations demonstrate comparable commercial viability and audience struggle intensity.";
 
   if (scorePointsA > scorePointsB) {
     overallWinner = "A";
@@ -297,7 +307,10 @@ export function compareReports(
     reportA: {
       id: rawA.id,
       keyword: rawA.keyword,
-      createdAt: typeof rawA.createdAt === "string" ? rawA.createdAt : rawA.createdAt.toISOString(),
+      createdAt:
+        typeof rawA.createdAt === "string"
+          ? rawA.createdAt
+          : rawA.createdAt.toISOString(),
       subreddits: rawA.subreddits,
       opportunityScore: scoreA,
       painPointsCount: rawA.painPoints.length,
@@ -312,7 +325,10 @@ export function compareReports(
     reportB: {
       id: rawB.id,
       keyword: rawB.keyword,
-      createdAt: typeof rawB.createdAt === "string" ? rawB.createdAt : rawB.createdAt.toISOString(),
+      createdAt:
+        typeof rawB.createdAt === "string"
+          ? rawB.createdAt
+          : rawB.createdAt.toISOString(),
       subreddits: rawB.subreddits,
       opportunityScore: scoreB,
       painPointsCount: rawB.painPoints.length,

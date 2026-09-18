@@ -47,8 +47,7 @@ export function calculateSingleOpportunityScore(
   const modifier = sentimentMap[point.sentiment || ""] || 1.0;
   const validation = toValidationScore(point);
 
-  const feedbackBalance =
-    (point.userUpvotes ?? 0) - (point.userDownvotes ?? 0);
+  const feedbackBalance = (point.userUpvotes ?? 0) - (point.userDownvotes ?? 0);
   const feedbackBoost =
     feedbackBalance > 0 ? Math.min(feedbackBalance * 2, 10) : 0;
   const feedbackPenalty =
@@ -123,7 +122,9 @@ export function getTopOpportunities(
     };
   });
 
-  return scored.sort((a, b) => b.opportunityScore - a.opportunityScore).slice(0, limit);
+  return scored
+    .sort((a, b) => b.opportunityScore - a.opportunityScore)
+    .slice(0, limit);
 }
 
 export interface HeatmapDay {
@@ -356,13 +357,17 @@ export function calculateClusterGrowth(
   const initialClusterCount = baseClusters;
   const growthPercent =
     initialClusterCount > 0
-      ? Math.round(((totalClusters - initialClusterCount) / initialClusterCount) * 100)
+      ? Math.round(
+          ((totalClusters - initialClusterCount) / initialClusterCount) * 100,
+        )
       : totalClusters > 0
         ? 100
         : 0;
 
   const avgDensity =
-    totalClusters > 0 ? Number((totalPainPoints / totalClusters).toFixed(1)) : 0;
+    totalClusters > 0
+      ? Number((totalPainPoints / totalClusters).toFixed(1))
+      : 0;
 
   // Find top cluster by source count
   const sortedClusters = [...clusters].sort(
@@ -463,4 +468,3 @@ export function calculateMarketRadarPoints(
     };
   });
 }
-

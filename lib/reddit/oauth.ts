@@ -70,7 +70,7 @@ export async function fetchWithRetry(
     try {
       const defaultHeaders = {
         "User-Agent": currentUA,
-        "Accept": "application/json, text/plain, */*",
+        Accept: "application/json, text/plain, */*",
         "Accept-Language": "en-US,en;q=0.9",
       };
 

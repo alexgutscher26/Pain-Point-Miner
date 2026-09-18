@@ -26,8 +26,9 @@ export function GoldMine() {
           Where real buyers explain why they're leaving competitors
         </h2>
         <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
-          Reddit isn't just forum discussions—it is the world's most candid repository of
-          user frustration, workarounds, and unfulfilled software requests.
+          Reddit isn't just forum discussions—it is the world's most candid
+          repository of user frustration, workarounds, and unfulfilled software
+          requests.
         </p>
       </div>
 
@@ -40,7 +41,9 @@ export function GoldMine() {
           <span className="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
             Pain Points Classified
           </span>
-          <span className="text-xs text-zinc-500">Filtered for genuine friction & intent</span>
+          <span className="text-xs text-zinc-500">
+            Filtered for genuine friction & intent
+          </span>
         </div>
         <div className="flex flex-col items-start gap-1 sm:border-l sm:border-zinc-200 sm:pl-8 dark:sm:border-zinc-800">
           <span className="font-mono text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
@@ -49,7 +52,9 @@ export function GoldMine() {
           <span className="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
             Niche Communities Monitored
           </span>
-          <span className="text-xs text-zinc-500">From r/SaaS to niche industry subreddits</span>
+          <span className="text-xs text-zinc-500">
+            From r/SaaS to niche industry subreddits
+          </span>
         </div>
         <div className="flex flex-col items-start gap-1 sm:border-l sm:border-zinc-200 sm:pl-8 dark:sm:border-zinc-800">
           <span className="font-mono text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
@@ -58,7 +63,9 @@ export function GoldMine() {
           <span className="font-mono text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
             Intent Signal Accuracy
           </span>
-          <span className="text-xs text-zinc-500">Removes noise, spam, and bot posts</span>
+          <span className="text-xs text-zinc-500">
+            Removes noise, spam, and bot posts
+          </span>
         </div>
       </div>
 
@@ -74,14 +81,16 @@ export function GoldMine() {
               Frustration Density & Churn Scoring
             </h3>
             <p className="mb-6 text-sm leading-relaxed font-normal text-zinc-600 sm:text-base dark:text-zinc-300">
-              Quantify the intensity of customer friction before writing software.
-              Our algorithms measure emotional urgency, manual workaround frequency,
-              and explicit budget mentions.
+              Quantify the intensity of customer friction before writing
+              software. Our algorithms measure emotional urgency, manual
+              workaround frequency, and explicit budget mentions.
             </p>
             <div className="space-y-2.5 text-xs font-semibold text-zinc-800 sm:text-sm dark:text-zinc-200">
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-[#ff4500]" />
-                <span>Automated thread clustering across 1,200+ subreddits</span>
+                <span>
+                  Automated thread clustering across 1,200+ subreddits
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-[#ff4500]" />
@@ -100,7 +109,9 @@ export function GoldMine() {
                 <span className="font-mono text-xs font-bold tracking-wider text-zinc-900 uppercase dark:text-white">
                   Live Community Frustration Index
                 </span>
-                <span className="font-mono text-[11px] text-zinc-400">Real-time scan</span>
+                <span className="font-mono text-[11px] text-zinc-400">
+                  Real-time scan
+                </span>
               </div>
               <div className="space-y-3.5">
                 {[
@@ -170,7 +181,8 @@ export function GoldMine() {
                     Raw User Quote
                   </span>
                   <p className="italic">
-                    "I waste 4 hours every Friday copying screenshots across 5 dashboards for client decks."
+                    "I waste 4 hours every Friday copying screenshots across 5
+                    dashboards for client decks."
                   </p>
                 </div>
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-3.5 text-xs text-white">
@@ -178,7 +190,8 @@ export function GoldMine() {
                     Extracted Landing Page Headline
                   </span>
                   <p className="font-bold text-white">
-                    "Automated agency KPI slides delivered to your inbox before Friday 5 PM."
+                    "Automated agency KPI slides delivered to your inbox before
+                    Friday 5 PM."
                   </p>
                 </div>
               </div>
@@ -193,9 +206,10 @@ export function GoldMine() {
               Customer Voice & Copywriting Goldmine
             </h3>
             <p className="mb-6 text-sm leading-relaxed font-normal text-zinc-600 sm:text-base dark:text-zinc-300">
-              High-converting landing pages speak the exact language of frustrated users.
-              ThreddIQ automatically extracts the verbatim phrasing customers use to describe
-              their pain—giving you instant headline and ad copy inspiration.
+              High-converting landing pages speak the exact language of
+              frustrated users. ThreddIQ automatically extracts the verbatim
+              phrasing customers use to describe their pain—giving you instant
+              headline and ad copy inspiration.
             </p>
             <div className="space-y-2.5 text-xs font-semibold text-zinc-800 sm:text-sm dark:text-zinc-200">
               <div className="flex items-center gap-2.5">

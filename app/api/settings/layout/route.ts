@@ -39,7 +39,9 @@ export async function PUT(req: Request) {
     const updatedLayout = {
       ...currentLayout,
       cardOrder: parsed.data.cardOrder,
-      cardVisibility: parsed.data.cardVisibility ?? (currentLayout.cardVisibility as Record<string, boolean> | undefined),
+      cardVisibility:
+        parsed.data.cardVisibility ??
+        (currentLayout.cardVisibility as Record<string, boolean> | undefined),
     };
 
     if (existing) {
@@ -62,11 +64,9 @@ export async function PUT(req: Request) {
       dashboardLayout: updatedLayout,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Dashboard Layout Save Error]", message);
-    return NextResponse.json(
-      { message },
-      { status: 500 },
-    );
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

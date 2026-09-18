@@ -27,13 +27,13 @@ export function DashboardTopOpportunities({
       <div
         className={`rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
       >
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+        <div className="flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800/80">
           <div className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
               <Flame className="h-4 w-4" />
             </div>
             <div>
-              <h4 className="text-sm font-black tracking-tight text-zinc-950 dark:text-white uppercase font-mono">
+              <h4 className="font-mono text-sm font-black tracking-tight text-zinc-950 uppercase dark:text-white">
                 Top Opportunities This Week
               </h4>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -43,16 +43,17 @@ export function DashboardTopOpportunities({
           </div>
         </div>
         <div className="py-8 text-center">
-          <Sparkles className="mx-auto h-8 w-8 text-zinc-400 dark:text-zinc-500 mb-2 opacity-60" />
+          <Sparkles className="mx-auto mb-2 h-8 w-8 text-zinc-400 opacity-60 dark:text-zinc-500" />
           <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
             No opportunities identified yet
           </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
-            Launch a scan across subreddits to surface high-intent problems and willingness to pay.
+          <p className="mx-auto mt-1 max-w-sm text-xs text-zinc-500 dark:text-zinc-400">
+            Launch a scan across subreddits to surface high-intent problems and
+            willingness to pay.
           </p>
           <Link
             href="/dashboard/search"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#ff4500] px-4 py-2 font-mono text-xs font-bold text-white uppercase shadow-xs hover:bg-[#e03d00] transition-colors"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#ff4500] px-4 py-2 font-mono text-xs font-bold text-white uppercase shadow-xs transition-colors hover:bg-[#e03d00]"
           >
             Launch First Scan
           </Link>
@@ -63,16 +64,16 @@ export function DashboardTopOpportunities({
 
   return (
     <div
-      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
+      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
     >
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+      <div className="flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
             <Flame className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-black tracking-tight text-zinc-950 dark:text-white uppercase font-mono">
+              <h4 className="font-mono text-sm font-black tracking-tight text-zinc-950 uppercase dark:text-white">
                 Top Opportunities This Week
               </h4>
               <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 font-mono text-[9px] font-black text-[#ff4500] uppercase">
@@ -106,7 +107,7 @@ export function DashboardTopOpportunities({
               }`}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
+                <div className="flex min-w-0 items-start gap-3">
                   <div
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md font-mono text-xs font-black ${
                       isTop
@@ -119,10 +120,10 @@ export function DashboardTopOpportunities({
                     #{index + 1}
                   </div>
                   <div className="min-w-0">
-                    <h5 className="text-xs sm:text-sm font-bold text-zinc-900 line-clamp-1 group-hover:text-[#ff4500] transition-colors dark:text-zinc-100">
+                    <h5 className="line-clamp-1 text-xs font-bold text-zinc-900 transition-colors group-hover:text-[#ff4500] sm:text-sm dark:text-zinc-100">
                       {opp.title}
                     </h5>
-                    <p className="mt-0.5 text-xs text-zinc-500 line-clamp-1 dark:text-zinc-400">
+                    <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
                       {opp.body}
                     </p>
                   </div>
@@ -140,7 +141,7 @@ export function DashboardTopOpportunities({
                 </div>
               </div>
 
-              <div className="mt-2.5 flex flex-wrap items-center gap-2 pt-2 border-t border-black/[0.04] dark:border-white/[0.06] text-[10px] font-mono">
+              <div className="mt-2.5 flex flex-wrap items-center gap-2 border-t border-black/[0.04] pt-2 font-mono text-[10px] dark:border-white/[0.06]">
                 {opp.subreddit && (
                   <span className="inline-flex items-center gap-1 rounded bg-zinc-200/70 px-1.5 py-0.5 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                     <Layers className="h-2.5 w-2.5 text-[#ff4500]" />
@@ -154,19 +155,20 @@ export function DashboardTopOpportunities({
                   </strong>
                 </span>
                 {opp.budgetSignalsCount > 0 && (
-                  <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="inline-flex items-center gap-0.5 font-semibold text-emerald-600 dark:text-emerald-400">
                     <DollarSign className="h-3 w-3" />
-                    {opp.budgetSignalsCount} Budget Signal{opp.budgetSignalsCount > 1 ? "s" : ""}
+                    {opp.budgetSignalsCount} Budget Signal
+                    {opp.budgetSignalsCount > 1 ? "s" : ""}
                   </span>
                 )}
                 {opp.urgency >= 7 && (
-                  <span className="inline-flex items-center gap-0.5 text-amber-600 dark:text-amber-400 font-semibold">
+                  <span className="inline-flex items-center gap-0.5 font-semibold text-amber-600 dark:text-amber-400">
                     <TrendingUp className="h-3 w-3" />
                     High Urgency
                   </span>
                 )}
 
-                <span className="ml-auto inline-flex items-center gap-1 font-bold text-[#ff4500] opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="ml-auto inline-flex items-center gap-1 font-bold text-[#ff4500] opacity-0 transition-opacity group-hover:opacity-100">
                   View Dossier <ArrowRight className="h-2.5 w-2.5" />
                 </span>
               </div>

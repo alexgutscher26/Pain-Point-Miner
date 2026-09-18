@@ -92,7 +92,8 @@ export async function reExtractOutdatedOpportunities({
       const matchingExtracted = extractedResults.find(
         (ext) =>
           ext.url === originalPoint.postUrl ||
-          (ext.title && ext.title.toLowerCase() === originalPoint.title.toLowerCase()),
+          (ext.title &&
+            ext.title.toLowerCase() === originalPoint.title.toLowerCase()),
       );
 
       const tags = [...(originalPoint.tags || [])];
@@ -132,7 +133,9 @@ export async function reExtractOutdatedOpportunities({
           explanationParts.push(`WTP: ${matchingExtracted.willingnessToPay}`);
         }
         if (matchingExtracted.featureRequested) {
-          explanationParts.push(`Feature: ${matchingExtracted.featureRequested}`);
+          explanationParts.push(
+            `Feature: ${matchingExtracted.featureRequested}`,
+          );
         }
 
         await db
@@ -182,7 +185,10 @@ export async function reExtractOutdatedOpportunities({
       remaining,
     };
   } catch (error) {
-    console.error("[reExtractOutdatedOpportunities] Error during re-extraction:", error);
+    console.error(
+      "[reExtractOutdatedOpportunities] Error during re-extraction:",
+      error,
+    );
     // Mark the batch as updated with current schema version to prevent infinite error loops
     await Promise.all(
       outdatedPoints.map((p) =>

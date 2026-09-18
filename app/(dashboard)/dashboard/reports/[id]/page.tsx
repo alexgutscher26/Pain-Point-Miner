@@ -989,13 +989,13 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     {/* Phone 1: Detection / Resolver App Screen */}
                     <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-[#0f172a] p-3 text-white shadow-sm">
                       <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="h-2 w-2 rounded-full bg-emerald-400 shrink-0"></div>
-                          <span className="font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase truncate">
+                        <div className="flex min-w-0 items-center gap-1.5">
+                          <div className="h-2 w-2 shrink-0 rounded-full bg-emerald-400"></div>
+                          <span className="truncate font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase">
                             {ideaTitle.split(" ")[0]} Flow
                           </span>
                         </div>
-                        <span className="shrink-0 py-0.2 rounded bg-white/10 px-1.5 font-mono text-[8px] text-zinc-300">
+                        <span className="py-0.2 shrink-0 rounded bg-white/10 px-1.5 font-mono text-[8px] text-zinc-300">
                           {currentPain.subreddits[0]
                             ? `r/${currentPain.subreddits[0].replace(/^r\//i, "")}`
                             : "Active"}
@@ -1007,7 +1007,7 @@ Please generate the schema, API routes, and main dashboard screen.`;
                           <p className="font-mono text-[8px] text-zinc-400">
                             Problem Detected
                           </p>
-                          <p className="line-clamp-2 text-[10px] font-bold text-white leading-tight">
+                          <p className="line-clamp-2 text-[10px] leading-tight font-bold text-white">
                             {currentPain.title}
                           </p>
                           <p className="text-[9px] font-semibold text-emerald-400">
@@ -1015,10 +1015,10 @@ Please generate the schema, API routes, and main dashboard screen.`;
                           </p>
                         </div>
                         <div className="flex gap-1">
-                          <span className="flex-1 rounded bg-white/10 py-1 text-center font-mono text-[8px] text-zinc-300 truncate px-1">
+                          <span className="flex-1 truncate rounded bg-white/10 px-1 py-1 text-center font-mono text-[8px] text-zinc-300">
                             {currentPain.sentiment || "Frustrated"}
                           </span>
-                          <span className="flex-1 rounded bg-blue-500/20 py-1 text-center font-mono text-[8px] text-blue-300 truncate px-1">
+                          <span className="flex-1 truncate rounded bg-blue-500/20 px-1 py-1 text-center font-mono text-[8px] text-blue-300">
                             Urgency {currentPain.urgency || 7}/10
                           </span>
                         </div>
@@ -1054,13 +1054,13 @@ Please generate the schema, API routes, and main dashboard screen.`;
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-1 text-center font-mono text-[8px]">
-                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1 truncate">
+                          <div className="truncate rounded border border-zinc-100 bg-zinc-50 p-1">
                             <span className="text-zinc-400">Target:</span>{" "}
                             <b className="text-zinc-700">
                               {customer.split(" ")[0]}
                             </b>
                           </div>
-                          <div className="rounded border border-zinc-100 bg-zinc-50 p-1 truncate">
+                          <div className="truncate rounded border border-zinc-100 bg-zinc-50 p-1">
                             <span className="text-zinc-400">Vs:</span>{" "}
                             <b className="text-zinc-700">
                               {competition.split(" ")[0]}
@@ -1419,13 +1419,15 @@ Please generate the schema, API routes, and main dashboard screen.`;
                     <div className="flex items-start gap-2">
                       <span className="font-bold text-blue-600">•</span>
                       <span>
-                        Automated workflow resolving &quot;{currentPain.title}&quot;
+                        Automated workflow resolving &quot;{currentPain.title}
+                        &quot;
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-bold text-blue-600">•</span>
                       <span>
-                        Direct displacement alternative to {competition} at {pricing}
+                        Direct displacement alternative to {competition} at{" "}
+                        {pricing}
                       </span>
                     </div>
                   </div>

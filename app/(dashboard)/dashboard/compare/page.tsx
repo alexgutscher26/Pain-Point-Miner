@@ -42,8 +42,12 @@ export default async function DashboardComparePage({
     subreddits: Array.isArray(s.subreddits) ? s.subreddits : [],
     createdAt: s.createdAt,
     painPoints: s.painPoints.map((p) => {
-      const upvotes = (p.painPointFeedback || []).filter((v) => v.vote === 1).length;
-      const downvotes = (p.painPointFeedback || []).filter((v) => v.vote === -1).length;
+      const upvotes = (p.painPointFeedback || []).filter(
+        (v) => v.vote === 1,
+      ).length;
+      const downvotes = (p.painPointFeedback || []).filter(
+        (v) => v.vote === -1,
+      ).length;
       return {
         id: p.id,
         title: p.title,
@@ -57,7 +61,12 @@ export default async function DashboardComparePage({
         userDownvotes: downvotes,
         commentCount: p.commentCount,
         mentionCount: p.mentionCount,
-        budget: (p.budget as Array<{ amount?: number; currency?: string; period?: string }>) || [],
+        budget:
+          (p.budget as Array<{
+            amount?: number;
+            currency?: string;
+            period?: string;
+          }>) || [],
       };
     }),
   }));
@@ -81,7 +90,7 @@ export default async function DashboardComparePage({
         <div className="space-y-1">
           <Link
             href="/dashboard/reports"
-            className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-zinc-500 hover:text-[#ff4500] transition-colors"
+            className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-zinc-500 transition-colors hover:text-[#ff4500]"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
             <span>Back to Research Dossiers</span>
@@ -95,7 +104,8 @@ export default async function DashboardComparePage({
                 Side-by-Side Comparison
               </h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Benchmark commercial viability, audience friction, and market quadrant positioning
+                Benchmark commercial viability, audience friction, and market
+                quadrant positioning
               </p>
             </div>
           </div>

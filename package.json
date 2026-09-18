@@ -9,6 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "write": "prettier . --write",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "ai:eval": "tsx scripts/ai-eval.ts",
     "eval:ai": "tsx scripts/ai-eval.ts",
     "email": "email dev --dir emails --port 3001",

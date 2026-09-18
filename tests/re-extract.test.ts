@@ -24,33 +24,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/ai", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/ai")>();
-  return {
-    ...actual,
-    extractPainPointsBatch: vi.fn().mockResolvedValue([
-      {
-        title: "Upgraded Title",
-        body: "Upgraded Body",
-        painIntensity: 8,
-        urgency: 8,
-        monetizationScore: 8,
-        marketMaturity: 7,
-        confidenceScore: 0.9,
-        targetUser: "SaaS Founder",
-        competingProducts: ["Competitor X"],
-        willingnessToPay: "paid_signal",
-        featureRequested: "Automated webhook sync",
-        url: "https://reddit.com/r/saas/1",
-        author: "founder1",
-        subreddit: "saas",
-        triedSolutions: [],
-        sentiment: "frustrated",
-        difficulty: "startup_mvp",
-      },
-    ]),
-  };
-});
+import * as ai from "@/lib/ai";
 
 describe("reExtractOutdatedOpportunities", () => {
   beforeEach(() => {
@@ -80,6 +54,28 @@ describe("reExtractOutdatedOpportunities", () => {
         painPointComments: [{ id: "c1", body: "Comment text" }],
       },
     ] as any);
+
+    vi.spyOn(ai, "extractPainPointsBatch").mockResolvedValueOnce([
+      {
+        title: "Upgraded Title",
+        body: "Upgraded Body",
+        painIntensity: 8,
+        urgency: 8,
+        monetizationScore: 8,
+        marketMaturity: 7,
+        confidenceScore: 0.9,
+        targetUser: "SaaS Founder",
+        competingProducts: ["Competitor X"],
+        willingnessToPay: "paid_signal",
+        featureRequested: "Automated webhook sync",
+        url: "https://reddit.com/r/saas/1",
+        author: "founder1",
+        subreddit: "saas",
+        triedSolutions: [],
+        sentiment: "frustrated",
+        difficulty: "startup_mvp",
+      },
+    ]);
 
     const result = await reExtractOutdatedOpportunities({
       userId: "user-123",

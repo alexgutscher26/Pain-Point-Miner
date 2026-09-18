@@ -215,7 +215,6 @@ export default async function DashboardPage({
     selectedWindowLabel = "all time";
   }
 
-
   const preferences = await db.query.userPreferences.findFirst({
     where: eq(userPreferences.userId, session.user.id),
     columns: { scoringWeights: true, dashboardLayout: true },
@@ -233,7 +232,9 @@ export default async function DashboardPage({
     },
   });
 
-  const layoutData = preferences?.dashboardLayout as Record<string, unknown> | undefined;
+  const layoutData = preferences?.dashboardLayout as
+    | Record<string, unknown>
+    | undefined;
   const initialCardOrder = Array.isArray(layoutData?.cardOrder)
     ? (layoutData.cardOrder as DashboardCardId[])
     : undefined;
@@ -280,7 +281,10 @@ export default async function DashboardPage({
     5,
   );
 
-  const allActivities: Array<{ createdAt: Date | string; type?: "painPoint" | "scan" }> = [
+  const allActivities: Array<{
+    createdAt: Date | string;
+    type?: "painPoint" | "scan";
+  }> = [
     ...allPainPointsWithReport.map((p) => ({
       createdAt: p.createdAt,
       type: "painPoint" as const,
@@ -379,13 +383,14 @@ export default async function DashboardPage({
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-8 p-4 duration-500 sm:p-6 lg:p-8">
       {planContext.planPurchaseRequired ? (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[#ff4500]/25 bg-[#ff4500]/5 px-6 py-4.5 dark:bg-[#ff4500]/10">
+        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-[#ff4500]/25 bg-[#ff4500]/5 px-6 py-4.5 sm:flex-row sm:items-center dark:bg-[#ff4500]/10">
           <div>
             <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
               Action Required
             </p>
             <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Your account is currently in read-only mode. Claim a Lifetime Deal to unlock unlimited search depth and AI teardowns.
+              Your account is currently in read-only mode. Claim a Lifetime Deal
+              to unlock unlimited search depth and AI teardowns.
             </p>
           </div>
           <Link
@@ -412,10 +417,10 @@ export default async function DashboardPage({
           </h2>
           <p className="mt-1 text-[14px] leading-relaxed font-medium text-zinc-500 sm:text-[15px] dark:text-zinc-400">
             Your semantic insights engine has indexed{" "}
-            <strong className="text-zinc-900 font-bold dark:text-zinc-100">
+            <strong className="font-bold text-zinc-900 dark:text-zinc-100">
               {reportsSaved} investigations
-            </strong>
-            {" "}across {selectedWindowLabel}.
+            </strong>{" "}
+            across {selectedWindowLabel}.
           </p>
         </div>
 
@@ -431,20 +436,26 @@ export default async function DashboardPage({
             <MetricCard
               title="Monthly Scans"
               value={searchesRemainingLabel}
-              icon={<Search className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
+              icon={
+                <Search className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />
+              }
               progress={searchesProgress}
               subtext={searchesSubtext}
             />
             <MetricCard
               title="Reports Saved"
               value={reportsSaved.toString()}
-              icon={<BarChart3 className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
+              icon={
+                <BarChart3 className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />
+              }
               trendSub="Total investigations"
             />
             <MetricCard
               title="Pain Points Found"
               value={painPointsFound.toString()}
-              icon={<AlertCircle className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />}
+              icon={
+                <AlertCircle className="h-4 w-4 text-zinc-700 dark:text-zinc-300" />
+              }
               trendSub="Across all reports"
             />
             <MetricCard
@@ -549,20 +560,21 @@ export default async function DashboardPage({
                               keyword={
                                 report.keywords?.[0] || "Unknown Investigation"
                               }
-                              date={new Date(report.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                },
-                              )}
+                              date={new Date(
+                                report.createdAt,
+                              ).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              })}
                               painPoint={
                                 report.painPoints[0]?.title ||
                                 "No pain points extracted yet"
                               }
                               score={reportScore}
                               status={statusLabel}
-                              explanation={report.painPoints[0]?.scoreExplanation}
+                              explanation={
+                                report.painPoints[0]?.scoreExplanation
+                              }
                             />
                           );
                         })}
@@ -589,5 +601,3 @@ export default async function DashboardPage({
     </div>
   );
 }
-
-

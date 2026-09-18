@@ -1,6 +1,12 @@
 import React from "react";
 import Link from "next/link";
-import { TrendingUp, Sparkles, AlertCircle, Database, ArrowUpRight } from "lucide-react";
+import {
+  TrendingUp,
+  Sparkles,
+  AlertCircle,
+  Database,
+  ArrowUpRight,
+} from "lucide-react";
 import {
   formatTrendChangePercent,
   type TrendInsight,
@@ -49,7 +55,7 @@ export function DashboardMarketPulse({
             }
             className="group/item flex items-center justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-4 transition-all hover:border-[#ff4500]/40 hover:bg-white hover:shadow-xs dark:border-zinc-800 dark:bg-zinc-950/60 dark:hover:border-[#ff4500]/40 dark:hover:bg-zinc-900"
           >
-            <div className="flex items-center gap-3.5 min-w-0">
+            <div className="flex min-w-0 items-center gap-3.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500] transition-colors group-hover/item:bg-[#ff4500] group-hover/item:text-white">
                 <Sparkles className="h-4 w-4" />
               </div>
@@ -94,7 +100,7 @@ export function DashboardMarketPulse({
                 Critical
               </span>
             </div>
-            <p className="text-[12px] leading-relaxed font-medium italic text-zinc-700 transition-colors group-hover/item:text-zinc-950 dark:text-zinc-300 dark:group-hover/item:text-white">
+            <p className="text-[12px] leading-relaxed font-medium text-zinc-700 italic transition-colors group-hover/item:text-zinc-950 dark:text-zinc-300 dark:group-hover/item:text-white">
               &ldquo;
               {urgentPainPoint?.title ||
                 "No high-urgency pain point detected in recent scans."}
@@ -103,11 +109,13 @@ export function DashboardMarketPulse({
           </Link>
           <p className="mt-3.5 flex items-center gap-1.5 font-mono text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">
             <Database className="h-3 w-3" /> Cited across{" "}
-            <span className="font-bold text-zinc-600 dark:text-zinc-300">{urgentPainPointMentions || 0}</span> discussions
+            <span className="font-bold text-zinc-600 dark:text-zinc-300">
+              {urgentPainPointMentions || 0}
+            </span>{" "}
+            discussions
           </p>
         </div>
       </div>
     </div>
   );
 }
-

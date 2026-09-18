@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 
 export function FinalCTA() {
   return (
@@ -20,8 +26,9 @@ export function FinalCTA() {
         </h2>
 
         <p className="relative z-10 mb-8 max-w-[620px] text-base leading-relaxed text-pretty text-zinc-300 sm:text-lg">
-          Join founders, growth marketers, and product teams who validate demand,
-          discover competitor vulnerabilities, and find paying users before writing code.
+          Join founders, growth marketers, and product teams who validate
+          demand, discover competitor vulnerabilities, and find paying users
+          before writing code.
         </p>
 
         <div className="relative z-10 mb-8 flex flex-col items-center gap-3 sm:flex-row">

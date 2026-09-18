@@ -122,7 +122,8 @@ export default function ReportsPage() {
             Research Dossiers
           </h2>
           <p className="mt-1 text-[14px] font-medium text-zinc-500 dark:text-zinc-400">
-            Browse, filter, and export all past Reddit mining runs and market teardowns.
+            Browse, filter, and export all past Reddit mining runs and market
+            teardowns.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -174,7 +175,7 @@ export default function ReportsPage() {
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Date Range
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-100 dark:bg-zinc-850" />
+            <DropdownMenuSeparator className="dark:bg-zinc-850 bg-zinc-100" />
             <DropdownMenuRadioGroup value={days} onValueChange={setDays}>
               <DropdownMenuRadioItem
                 value="7"
@@ -219,7 +220,7 @@ export default function ReportsPage() {
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Scraper Status
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-100 dark:bg-zinc-850" />
+            <DropdownMenuSeparator className="dark:bg-zinc-850 bg-zinc-100" />
             <DropdownMenuRadioGroup value={status} onValueChange={setStatus}>
               <DropdownMenuRadioItem
                 value="all"
@@ -255,7 +256,7 @@ export default function ReportsPage() {
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Minimum Score
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-100 dark:bg-zinc-850" />
+            <DropdownMenuSeparator className="dark:bg-zinc-850 bg-zinc-100" />
             <DropdownMenuRadioGroup
               value={minScore}
               onValueChange={setMinScore}
@@ -300,7 +301,7 @@ export default function ReportsPage() {
             <DropdownMenuLabel className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
               Saved Filter
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-zinc-100 dark:bg-zinc-850" />
+            <DropdownMenuSeparator className="dark:bg-zinc-850 bg-zinc-100" />
             <DropdownMenuRadioGroup
               value={savedOnly}
               onValueChange={setSavedOnly}
@@ -354,7 +355,7 @@ export default function ReportsPage() {
               <thead>
                 <tr className="border-b border-zinc-100 bg-zinc-50/50 text-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-500">
                   <th className="w-12 px-3 py-3.5 text-center font-mono text-[10px] font-bold tracking-[0.15em] uppercase">
-                    <Scale className="h-3.5 w-3.5 mx-auto text-zinc-400" />
+                    <Scale className="mx-auto h-3.5 w-3.5 text-zinc-400" />
                   </th>
                   <th className="px-6 py-3.5 font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
                     Investigation
@@ -395,8 +396,12 @@ export default function ReportsPage() {
                         <button
                           type="button"
                           onClick={() => toggleReportSelection(report.id)}
-                          className="cursor-pointer text-zinc-400 hover:text-[#ff4500] transition-colors"
-                          title={isSelected ? "Deselect for comparison" : "Select for side-by-side comparison"}
+                          className="cursor-pointer text-zinc-400 transition-colors hover:text-[#ff4500]"
+                          title={
+                            isSelected
+                              ? "Deselect for comparison"
+                              : "Select for side-by-side comparison"
+                          }
                         >
                           {isSelected ? (
                             <CheckSquare className="h-4 w-4 text-[#ff4500]" />
@@ -438,7 +443,7 @@ export default function ReportsPage() {
                       </td>
                       <td className="px-6 py-4.5 sm:px-8">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase">
+                          <span className="font-mono text-[11px] font-semibold text-zinc-600 uppercase dark:text-zinc-400">
                             {report.category}
                           </span>
                           {report.saved && (
@@ -509,8 +514,8 @@ export default function ReportsPage() {
 
       {/* Floating Sticky Comparison Bar */}
       {selectedForCompare.length > 0 && (
-        <div className="fixed bottom-6 inset-x-0 lg:left-60 z-50 flex justify-center pointer-events-none px-4">
-          <div className="pointer-events-auto flex items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/95 px-5 py-3 text-white shadow-2xl backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-900/95 animate-in slide-in-from-bottom-5">
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4 lg:left-60">
+          <div className="animate-in slide-in-from-bottom-5 pointer-events-auto flex items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/95 px-5 py-3 text-white shadow-2xl backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-900/95">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/20 text-[#ff4500]">
                 <Scale className="h-4 w-4" />
@@ -526,14 +531,14 @@ export default function ReportsPage() {
               {selectedForCompare.length === 2 ? (
                 <Link
                   href={`/dashboard/compare?a=${selectedForCompare[0]}&b=${selectedForCompare[1]}`}
-                  className="rounded-xl bg-[#ff4500] px-4 py-2 font-mono text-xs font-black uppercase text-white hover:bg-[#e03d00] transition-colors shadow-sm"
+                  className="rounded-xl bg-[#ff4500] px-4 py-2 font-mono text-xs font-black text-white uppercase shadow-sm transition-colors hover:bg-[#e03d00]"
                 >
                   Compare Head-to-Head →
                 </Link>
               ) : (
                 <Link
                   href={`/dashboard/compare?a=${selectedForCompare[0]}`}
-                  className="rounded-xl border border-zinc-700 bg-zinc-800 px-3.5 py-1.5 font-mono text-xs font-bold uppercase text-zinc-300 hover:text-white transition-colors"
+                  className="rounded-xl border border-zinc-700 bg-zinc-800 px-3.5 py-1.5 font-mono text-xs font-bold text-zinc-300 uppercase transition-colors hover:text-white"
                 >
                   Open Compare Page
                 </Link>
@@ -542,7 +547,7 @@ export default function ReportsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedForCompare([])}
-                className="rounded-lg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="cursor-pointer rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
                 title="Clear selection"
               >
                 <X className="h-4 w-4" />
@@ -638,4 +643,3 @@ function PaginationButton({
     </button>
   );
 }
-

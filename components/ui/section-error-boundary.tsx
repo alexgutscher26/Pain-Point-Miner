@@ -1,7 +1,14 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { AlertCircle, RefreshCcw, ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
+import {
+  AlertCircle,
+  RefreshCcw,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Check,
+} from "lucide-react";
 
 interface SectionErrorBoundaryProps {
   children: ReactNode;
@@ -34,7 +41,9 @@ export class SectionErrorBoundary extends Component<
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<SectionErrorBoundaryState> {
+  static getDerivedStateFromError(
+    error: Error,
+  ): Partial<SectionErrorBoundaryState> {
     return { hasError: true, error };
   }
 
@@ -50,7 +59,9 @@ export class SectionErrorBoundary extends Component<
   componentDidUpdate(prevProps: SectionErrorBoundaryProps): void {
     if (this.state.hasError && this.props.resetKeys) {
       const hasChanged = this.props.resetKeys.some(
-        (key, index) => key !== (prevProps.resetKeys ? prevProps.resetKeys[index] : undefined),
+        (key, index) =>
+          key !==
+          (prevProps.resetKeys ? prevProps.resetKeys[index] : undefined),
       );
       if (hasChanged) {
         this.resetError();
@@ -85,8 +96,8 @@ export class SectionErrorBoundary extends Component<
       const sectionTitle = this.props.title || "This Dashboard Section";
 
       return (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 dark:border-red-500/20 dark:bg-red-950/20 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 shadow-xs dark:border-red-500/20 dark:bg-red-950/20">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex items-start gap-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-400">
                 <AlertCircle className="h-5 w-5" />
@@ -96,16 +107,17 @@ export class SectionErrorBoundary extends Component<
                   Failed to render {sectionTitle}
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {this.state.error?.message || "An unexpected rendering error occurred."}
+                  {this.state.error?.message ||
+                    "An unexpected rendering error occurred."}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={this.resetError}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-1.5 font-mono text-xs font-bold text-zinc-800 uppercase shadow-xs transition-colors hover:border-black/20 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-1.5 font-mono text-xs font-bold text-zinc-800 uppercase shadow-xs transition-colors hover:border-black/20 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
               >
                 <RefreshCcw className="h-3.5 w-3.5" />
                 <span>Retry</span>
@@ -113,8 +125,10 @@ export class SectionErrorBoundary extends Component<
 
               <button
                 type="button"
-                onClick={() => this.setState((prev) => ({ showDetails: !prev.showDetails }))}
-                className="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
+                onClick={() =>
+                  this.setState((prev) => ({ showDetails: !prev.showDetails }))
+                }
+                className="inline-flex cursor-pointer items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                 title="Toggle technical details"
               >
                 <span>Details</span>
@@ -128,15 +142,15 @@ export class SectionErrorBoundary extends Component<
           </div>
 
           {this.state.showDetails && (
-            <div className="mt-4 pt-3 border-t border-red-500/10 dark:border-red-500/15 space-y-2">
+            <div className="mt-4 space-y-2 border-t border-red-500/10 pt-3 dark:border-red-500/15">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase font-bold text-zinc-400">
+                <span className="font-mono text-[10px] font-bold text-zinc-400 uppercase">
                   Error Stack
                 </span>
                 <button
                   type="button"
                   onClick={this.handleCopy}
-                  className="inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white cursor-pointer"
+                  className="inline-flex cursor-pointer items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
                 >
                   {this.state.copied ? (
                     <>

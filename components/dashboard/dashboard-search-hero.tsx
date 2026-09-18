@@ -23,7 +23,13 @@ export function DashboardSearchHero({
   const visibleTags =
     trendingTags.length > 0
       ? trendingTags
-      : ["#cold-email-deliverability", "#hubspot-churn", "#stripe-billing-gaps", "#notion-performance", "#ai-workflow-fatigue"];
+      : [
+          "#cold-email-deliverability",
+          "#hubspot-churn",
+          "#stripe-billing-gaps",
+          "#notion-performance",
+          "#ai-workflow-fatigue",
+        ];
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -57,7 +63,7 @@ export function DashboardSearchHero({
 
       <div className="relative z-10 flex flex-col items-center">
         {/* Signal Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-3.5 py-1 text-[11px] font-mono font-bold tracking-widest text-[#ff4500] uppercase shadow-2xs">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff4500]/20 bg-[#ff4500]/5 px-3.5 py-1 font-mono text-[11px] font-bold tracking-widest text-[#ff4500] uppercase shadow-2xs">
           <Sparkles className="h-3.5 w-3.5" />
           <span>Semantic Intent Mining Engine</span>
         </div>
@@ -70,7 +76,9 @@ export function DashboardSearchHero({
 
         {/* Subtitle */}
         <p className="mb-8 max-w-xl text-[14px] leading-relaxed font-medium text-zinc-600 sm:text-[15px] dark:text-zinc-400">
-          Scan discussions across thousands of niche subreddits to pinpoint competitor churn triggers, exact customer friction points, and verified willingness to pay.
+          Scan discussions across thousands of niche subreddits to pinpoint
+          competitor churn triggers, exact customer friction points, and
+          verified willingness to pay.
         </p>
 
         {/* Search Bar */}
@@ -83,7 +91,7 @@ export function DashboardSearchHero({
               <Search className="h-5 w-5 transition-colors group-focus-within/search:text-[#ff4500]" />
             </span>
             <input
-              className="w-full border-none bg-transparent px-2 py-3 text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 dark:text-white"
+              className="w-full border-none bg-transparent px-2 py-3 text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none dark:text-white"
               placeholder="Search niche, competitor, or problem (e.g. 'cold email deliverability', 'HubSpot pricing')..."
               type="text"
               value={keyword}
@@ -121,4 +129,3 @@ export function DashboardSearchHero({
     </div>
   );
 }
-

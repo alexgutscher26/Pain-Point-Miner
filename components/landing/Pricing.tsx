@@ -35,8 +35,9 @@ export function Pricing() {
           Pay once. Mine customer demand forever.
         </h2>
         <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
-          Secure early-adopter lifetime access with recurring monthly scan credits that
-          automatically refresh every year. Zero recurring monthly invoices.
+          Secure early-adopter lifetime access with recurring monthly scan
+          credits that automatically refresh every year. Zero recurring monthly
+          invoices.
         </p>
       </div>
 
@@ -81,8 +82,8 @@ export function Pricing() {
                 Founder Pass
               </h3>
               <p className="mb-6 text-xs text-zinc-600 sm:text-sm dark:text-zinc-300">
-                Ideal for solo founders and builders who want continuous market validation
-                without monthly SaaS subscriptions.
+                Ideal for solo founders and builders who want continuous market
+                validation without monthly SaaS subscriptions.
               </p>
 
               <div className="mb-2 flex items-baseline gap-2">
@@ -157,8 +158,8 @@ export function Pricing() {
                 Studio Master
               </h3>
               <p className="mb-6 text-xs text-zinc-600 sm:text-sm dark:text-zinc-300">
-                For active market researchers, growth agencies, and studios running deep weekly
-                competitor teardowns.
+                For active market researchers, growth agencies, and studios
+                running deep weekly competitor teardowns.
               </p>
 
               <div className="mb-2 flex items-baseline gap-2">
@@ -262,7 +263,9 @@ export function Pricing() {
                 <thead>
                   <tr className="border-b border-zinc-200 text-xs font-bold tracking-wider text-zinc-400 uppercase dark:border-zinc-800">
                     <th className="pt-2 pb-4">Feature / Capability</th>
-                    <th className="pt-2 pb-4 text-center">Founder LTD ($149)</th>
+                    <th className="pt-2 pb-4 text-center">
+                      Founder LTD ($149)
+                    </th>
                     <th className="pt-2 pb-4 text-center text-amber-600 dark:text-amber-400">
                       Professional LTD ($299)
                     </th>

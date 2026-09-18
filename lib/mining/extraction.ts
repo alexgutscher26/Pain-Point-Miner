@@ -109,11 +109,12 @@ export async function processPostBatch({
   const clusterJobs = [];
 
   for (const point of points) {
-    const matchingItem = eligibleItems.find(
-      (item) =>
-        item.post.url === point.url ||
-        item.post.subreddit.toLowerCase() === point.subreddit.toLowerCase(),
-    ) || eligibleItems[0];
+    const matchingItem =
+      eligibleItems.find(
+        (item) =>
+          item.post.url === point.url ||
+          item.post.subreddit.toLowerCase() === point.subreddit.toLowerCase(),
+      ) || eligibleItems[0];
 
     const painPointId = crypto.randomUUID();
     const tags: string[] = [];

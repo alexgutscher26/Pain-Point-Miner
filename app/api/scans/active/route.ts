@@ -57,11 +57,9 @@ export async function GET(req: Request) {
       activeRuns,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
     console.error("[Active Scans Query Error]", message);
-    return NextResponse.json(
-      { message },
-      { status: 500 },
-    );
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

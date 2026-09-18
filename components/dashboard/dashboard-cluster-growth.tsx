@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { ClusterGrowthData, ClusterGrowthPoint } from "@/lib/dashboard-analytics";
+import {
+  ClusterGrowthData,
+  ClusterGrowthPoint,
+} from "@/lib/dashboard-analytics";
 import { TrendingUp, Layers, Compass, Sparkles } from "lucide-react";
 
 interface DashboardClusterGrowthProps {
@@ -13,7 +16,9 @@ export function DashboardClusterGrowth({
   data,
   className = "",
 }: DashboardClusterGrowthProps) {
-  const [hoveredPoint, setHoveredPoint] = useState<ClusterGrowthPoint | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<ClusterGrowthPoint | null>(
+    null,
+  );
 
   const timeline = data.timeline;
   const maxCumulativePoints = Math.max(
@@ -29,7 +34,8 @@ export function DashboardClusterGrowth({
   const graphHeight = height - padding.top - padding.bottom;
 
   const points = timeline.map((pt, idx) => {
-    const x = padding.left + (idx / Math.max(timeline.length - 1, 1)) * graphWidth;
+    const x =
+      padding.left + (idx / Math.max(timeline.length - 1, 1)) * graphWidth;
     const y =
       padding.top +
       graphHeight -
@@ -45,20 +51,20 @@ export function DashboardClusterGrowth({
 
   return (
     <div
-      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 sm:p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
+      className={`rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs sm:p-6 dark:border-zinc-800 dark:bg-zinc-900/70 ${className}`}
     >
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80">
+      <div className="flex flex-col gap-3 border-b border-zinc-100 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800/80">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/10 text-[#ff4500]">
             <TrendingUp className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-black tracking-tight text-zinc-950 dark:text-white uppercase font-mono">
+              <h4 className="font-mono text-sm font-black tracking-tight text-zinc-950 uppercase dark:text-white">
                 Cluster Growth & Evolution
               </h4>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase">
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-black text-emerald-600 uppercase dark:text-emerald-400">
                 +{data.growthPercent}% 30d
               </span>
             </div>
@@ -69,15 +75,15 @@ export function DashboardClusterGrowth({
         </div>
 
         {/* Stats Badges */}
-        <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-50 px-2.5 py-1 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5">
+        <div className="flex items-center gap-3 font-mono text-xs">
+          <div className="flex items-center gap-1.5 rounded-lg border border-black/5 bg-zinc-50 px-2.5 py-1 dark:border-white/5 dark:bg-zinc-800/60">
             <Layers className="h-3.5 w-3.5 text-[#ff4500]" />
             <span className="text-zinc-500 dark:text-zinc-400">Clusters:</span>
             <strong className="text-zinc-900 dark:text-white">
               {data.totalClusters}
             </strong>
           </div>
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-50 px-2.5 py-1 dark:bg-zinc-800/60 border border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-1.5 rounded-lg border border-black/5 bg-zinc-50 px-2.5 py-1 dark:border-white/5 dark:bg-zinc-800/60">
             <Compass className="h-3.5 w-3.5 text-blue-500" />
             <span className="text-zinc-500 dark:text-zinc-400">Density:</span>
             <strong className="text-zinc-900 dark:text-white">
@@ -88,10 +94,10 @@ export function DashboardClusterGrowth({
       </div>
 
       {/* Sparkline Visual */}
-      <div className="mt-4 relative">
+      <div className="relative mt-4">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="w-full h-36 overflow-visible"
+          className="h-36 w-full overflow-visible"
           preserveAspectRatio="none"
         >
           <defs>
@@ -140,7 +146,7 @@ export function DashboardClusterGrowth({
               cx={p.x}
               cy={p.y}
               r={hoveredPoint?.date === p.pt.date ? 5 : 2.5}
-              className="fill-[#ff4500] stroke-white dark:stroke-zinc-900 transition-all cursor-pointer"
+              className="cursor-pointer fill-[#ff4500] stroke-white transition-all dark:stroke-zinc-900"
               strokeWidth="2"
               onMouseEnter={() => setHoveredPoint(p.pt)}
               onMouseLeave={() => setHoveredPoint(null)}
@@ -149,30 +155,31 @@ export function DashboardClusterGrowth({
         </svg>
 
         {/* Date Markers on X-Axis */}
-        <div className="flex justify-between px-1 text-[10px] font-mono text-zinc-400 pt-1">
+        <div className="flex justify-between px-1 pt-1 font-mono text-[10px] text-zinc-400">
           <span>{timeline[0]?.formattedDate}</span>
-          <span>{timeline[Math.floor(timeline.length / 2)]?.formattedDate}</span>
+          <span>
+            {timeline[Math.floor(timeline.length / 2)]?.formattedDate}
+          </span>
           <span>{timeline[timeline.length - 1]?.formattedDate}</span>
         </div>
       </div>
 
       {/* Footer Info & Active Tooltip */}
-      <div className="mt-3 flex items-center justify-between border-t border-black/[0.04] dark:border-white/[0.06] pt-3 text-[11px] font-mono">
-        <div className="min-h-[1.5rem] flex items-center text-zinc-600 dark:text-zinc-400">
+      <div className="mt-3 flex items-center justify-between border-t border-black/[0.04] pt-3 font-mono text-[11px] dark:border-white/[0.06]">
+        <div className="flex min-h-[1.5rem] items-center text-zinc-600 dark:text-zinc-400">
           {hoveredPoint ? (
             <span>
-              <strong className="text-zinc-900 dark:text-white font-bold">
+              <strong className="font-bold text-zinc-900 dark:text-white">
                 {hoveredPoint.formattedDate}
               </strong>
-              :{" "}
-              {hoveredPoint.cumulativePainPoints} cumulative pain points (
+              : {hoveredPoint.cumulativePainPoints} cumulative pain points (
               {hoveredPoint.cumulativeClusters} active clusters)
             </span>
           ) : data.topClusterTitle ? (
             <span className="flex items-center gap-1.5 truncate">
-              <Sparkles className="h-3 w-3 text-[#ff4500] shrink-0" />
+              <Sparkles className="h-3 w-3 shrink-0 text-[#ff4500]" />
               <span className="text-zinc-400">Dominant Cluster:</span>
-              <strong className="text-zinc-900 dark:text-zinc-200 truncate">
+              <strong className="truncate text-zinc-900 dark:text-zinc-200">
                 "{data.topClusterTitle}"
               </strong>
             </span>
@@ -183,7 +190,7 @@ export function DashboardClusterGrowth({
           )}
         </div>
 
-        <span className="text-[10px] text-zinc-400 shrink-0">
+        <span className="shrink-0 text-[10px] text-zinc-400">
           Updated in Realtime
         </span>
       </div>

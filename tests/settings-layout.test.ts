@@ -3,7 +3,9 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { PUT } from "@/app/api/settings/layout/route";
 
 const mockFindFirst = vi.fn();
-const mockUpdateSet = vi.fn(() => ({ where: vi.fn().mockResolvedValue([{ id: "mock" }]) }));
+const mockUpdateSet = vi.fn(() => ({
+  where: vi.fn().mockResolvedValue([{ id: "mock" }]),
+}));
 const mockUpdate = vi.fn(() => ({ set: mockUpdateSet }));
 const mockInsertValues = vi.fn().mockResolvedValue([{ id: "mock" }]);
 const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
