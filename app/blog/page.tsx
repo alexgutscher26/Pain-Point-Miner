@@ -38,6 +38,16 @@ export const metadata: Metadata = constructMetadata({
 
 const blogPosts = [
   {
+    title: "The Founder's Playbook: Solving Customer Pain Points",
+    subtitle: "Turning unmet friction into profitable SaaS products",
+    description:
+      "A systematic 5-step blueprint to discover, score, and solve real customer pain points with verified willingness to pay.",
+    href: "/blog/solving-customer-pain-points-saas-blueprint",
+    icon: <Sparkles className="h-6 w-6 text-[#ff4500]" />,
+    badge: "Playbook",
+    date: "September 2026",
+  },
+  {
     title: "Reddit vs. Customer Interviews vs. Surveys",
     subtitle: "Which validation method actually predicts revenue?",
     description:
