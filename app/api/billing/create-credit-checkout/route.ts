@@ -6,7 +6,7 @@ import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia" as any,
+  apiVersion: "2025-01-27.acacia" as Stripe.LatestApiVersion,
 });
 
 export async function POST(req: Request) {
@@ -69,9 +69,14 @@ export async function POST(req: Request) {
     if (validCustomerId) {
       try {
         const existing = await stripe.customers.retrieve(validCustomerId);
-        if ((existing as any).deleted) validCustomerId = undefined;
-      } catch (err: any) {
-        if (err.code === "resource_missing") {
+        if ("deleted" in existing && existing.deleted) validCustomerId = undefined;
+      } catch (err: unknown) {
+        if (
+          typeof err === "object" &&
+          err !== null &&
+          "code" in err &&
+          (err as { code?: string }).code === "resource_missing"
+        ) {
           validCustomerId = undefined;
         } else {
           throw err;
@@ -95,8 +100,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ url: checkoutSession.url });
-  } catch (error: any) {
-    const message = error?.message ?? "Internal server error";
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Internal server error";
     console.error("[Credit Top-up Error]", message);
     return NextResponse.json({ message }, { status: 500 });
   }

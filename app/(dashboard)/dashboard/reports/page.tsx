@@ -11,6 +11,10 @@ import {
   ChevronRight,
   Loader2,
   Search,
+  Scale,
+  CheckSquare,
+  Square,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -24,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { SavedFiltersMenu } from "@/components/dashboard/saved-filters-menu";
 
 interface Report {
   id: string;
@@ -47,6 +52,21 @@ export default function ReportsPage() {
   const [minScore, setMinScore] = useState("0");
   const [savedOnly, setSavedOnly] = useState("false");
   const [category, setCategory] = useState("all");
+
+  // Comparison selection state
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+
+  const toggleReportSelection = (id: string) => {
+    setSelectedForCompare((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      }
+      if (prev.length >= 2) {
+        return [prev[1], id];
+      }
+      return [...prev, id];
+    });
+  };
 
   const fetchReports = useCallback(async () => {
     setIsLoading(true);
@@ -105,17 +125,43 @@ export default function ReportsPage() {
             Browse, filter, and export all past Reddit mining runs and market teardowns.
           </p>
         </div>
-        <Link
-          href="/dashboard/search"
-          className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff4500] px-5 py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md active:scale-95"
-        >
-          <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
-          <span>New Investigation</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/compare"
+            className="group inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 font-mono text-xs font-bold tracking-wider text-zinc-700 uppercase shadow-xs transition-all hover:border-[#ff4500] hover:text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:text-[#ff4500]"
+          >
+            <Scale className="h-4 w-4" />
+            <span>Comparison Mode</span>
+          </Link>
+          <Link
+            href="/dashboard/search"
+            className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#ff4500] px-5 py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md active:scale-95"
+          >
+            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+            <span>New Investigation</span>
+          </Link>
+        </div>
       </div>
 
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-200/80 bg-white p-3 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70">
+        <SavedFiltersMenu
+          currentFilters={{
+            days,
+            status,
+            minScore,
+            savedOnly,
+            category,
+          }}
+          onApplyPreset={(preset) => {
+            if (preset.days) setDays(preset.days);
+            if (preset.status) setStatus(preset.status);
+            if (preset.minScore) setMinScore(preset.minScore);
+            if (preset.savedOnly) setSavedOnly(preset.savedOnly);
+            if (preset.category) setCategory(preset.category);
+          }}
+        />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50/80 px-3.5 py-2 font-mono text-[11px] font-bold tracking-wide text-zinc-700 uppercase transition-all outline-none hover:border-[#ff4500]/40 hover:bg-white hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/80 dark:text-zinc-300 dark:hover:bg-zinc-900">
@@ -304,9 +350,12 @@ export default function ReportsPage() {
               className="border-none bg-transparent py-24"
             />
           ) : (
-            <table className="w-full min-w-[800px] table-fixed border-collapse text-left">
+            <table className="w-full min-w-[840px] table-fixed border-collapse text-left">
               <thead>
                 <tr className="border-b border-zinc-100 bg-zinc-50/50 text-zinc-400 dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:text-zinc-500">
+                  <th className="w-12 px-3 py-3.5 text-center font-mono text-[10px] font-bold tracking-[0.15em] uppercase">
+                    <Scale className="h-3.5 w-3.5 mx-auto text-zinc-400" />
+                  </th>
                   <th className="px-6 py-3.5 font-mono text-[10px] font-bold tracking-[0.15em] uppercase sm:px-8">
                     Investigation
                   </th>
@@ -331,91 +380,112 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
-                {reports.map((report) => (
-                  <tr
-                    key={report.id}
-                    className="group transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-900/60"
-                  >
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-950">
-                          <Search className="h-4 w-4" />
+                {reports.map((report) => {
+                  const isSelected = selectedForCompare.includes(report.id);
+                  return (
+                    <tr
+                      key={report.id}
+                      className={`group transition-colors ${
+                        isSelected
+                          ? "bg-[#ff4500]/5 dark:bg-[#ff4500]/10"
+                          : "hover:bg-zinc-50/80 dark:hover:bg-zinc-900/60"
+                      }`}
+                    >
+                      <td className="w-12 px-3 py-4.5 text-center">
+                        <button
+                          type="button"
+                          onClick={() => toggleReportSelection(report.id)}
+                          className="cursor-pointer text-zinc-400 hover:text-[#ff4500] transition-colors"
+                          title={isSelected ? "Deselect for comparison" : "Select for side-by-side comparison"}
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="h-4 w-4 text-[#ff4500]" />
+                          ) : (
+                            <Square className="h-4 w-4" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-950">
+                            <Search className="h-4 w-4" />
+                          </div>
+                          <p className="min-w-0 truncate text-[14px] font-extrabold text-zinc-950 transition-colors group-hover:text-[#ff4500] dark:text-zinc-100">
+                            {report.niche}
+                          </p>
                         </div>
-                        <p className="min-w-0 truncate text-[14px] font-extrabold text-zinc-950 transition-colors group-hover:text-[#ff4500] dark:text-zinc-100">
-                          {report.niche}
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <p className="font-mono text-xs font-semibold text-zinc-400 dark:text-zinc-500">
+                          {report.date}
                         </p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <p className="font-mono text-xs font-semibold text-zinc-400 dark:text-zinc-500">
-                        {report.date}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <span className="font-mono text-xs font-bold text-zinc-800 dark:text-zinc-200">
-                        {report.painPoints} signals
-                      </span>
-                    </td>
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <span
-                        className={`inline-flex items-center rounded-lg border px-2 py-0.5 font-mono text-[11px] font-black ${
-                          report.score >= 80
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        }`}
-                      >
-                        {report.score}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase">
-                          {report.category}
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <span className="font-mono text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                          {report.painPoints} signals
                         </span>
-                        {report.saved && (
-                          <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-emerald-600 uppercase dark:text-emerald-400">
-                            Saved
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <span
+                          className={`inline-flex items-center rounded-lg border px-2 py-0.5 font-mono text-[11px] font-black ${
+                            report.score >= 80
+                              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          }`}
+                        >
+                          {report.score}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase">
+                            {report.category}
                           </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4.5 sm:px-8">
-                      <div className="flex items-center gap-2">
-                        {report.status === "Completed" ? (
-                          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
-                            <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                              Analyzed
+                          {report.saved && (
+                            <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-emerald-600 uppercase dark:text-emerald-400">
+                              Saved
                             </span>
-                          </div>
-                        ) : report.status === "Failed" ? (
-                          <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
-                            <div className="h-1.5 w-1.5 rounded-full bg-rose-500"></div>
-                            <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                              Failed
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1.5 text-[#ff4500]">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
-                              Mining
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4.5 text-right sm:px-8">
-                      <Link
-                        href={`/dashboard/reports/${report.id}`}
-                        className="group/btn inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 font-mono text-[11px] font-bold text-zinc-700 uppercase transition-all hover:border-[#ff4500] hover:bg-[#ff4500] hover:text-white dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-[#ff4500]"
-                      >
-                        <span>Open</span>
-                        <ArrowUpRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4.5 sm:px-8">
+                        <div className="flex items-center gap-2">
+                          {report.status === "Completed" ? (
+                            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
+                                Analyzed
+                              </span>
+                            </div>
+                          ) : report.status === "Failed" ? (
+                            <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
+                              <div className="h-1.5 w-1.5 rounded-full bg-rose-500"></div>
+                              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
+                                Failed
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-[#ff4500]">
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <span className="font-mono text-[10px] font-bold tracking-wider uppercase">
+                                Mining
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4.5 text-right sm:px-8">
+                        <Link
+                          href={`/dashboard/reports/${report.id}`}
+                          className="group/btn inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 font-mono text-[11px] font-bold text-zinc-700 uppercase transition-all hover:border-[#ff4500] hover:bg-[#ff4500] hover:text-white dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-[#ff4500]"
+                        >
+                          <span>Open</span>
+                          <ArrowUpRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -436,6 +506,51 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
+
+      {/* Floating Sticky Comparison Bar */}
+      {selectedForCompare.length > 0 && (
+        <div className="fixed bottom-6 inset-x-0 lg:left-60 z-50 flex justify-center pointer-events-none px-4">
+          <div className="pointer-events-auto flex items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/95 px-5 py-3 text-white shadow-2xl backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-900/95 animate-in slide-in-from-bottom-5">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff4500]/20 text-[#ff4500]">
+                <Scale className="h-4 w-4" />
+              </div>
+              <span className="font-mono text-xs font-bold text-zinc-200">
+                {selectedForCompare.length === 1
+                  ? "1 report selected (pick 1 more to compare)"
+                  : "2 reports selected"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {selectedForCompare.length === 2 ? (
+                <Link
+                  href={`/dashboard/compare?a=${selectedForCompare[0]}&b=${selectedForCompare[1]}`}
+                  className="rounded-xl bg-[#ff4500] px-4 py-2 font-mono text-xs font-black uppercase text-white hover:bg-[#e03d00] transition-colors shadow-sm"
+                >
+                  Compare Head-to-Head →
+                </Link>
+              ) : (
+                <Link
+                  href={`/dashboard/compare?a=${selectedForCompare[0]}`}
+                  className="rounded-xl border border-zinc-700 bg-zinc-800 px-3.5 py-1.5 font-mono text-xs font-bold uppercase text-zinc-300 hover:text-white transition-colors"
+                >
+                  Open Compare Page
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setSelectedForCompare([])}
+                className="rounded-lg p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                title="Clear selection"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -103,7 +103,7 @@
 - [ ] Batch embedding API calls (currently one call per pain point — very expensive at scale)
 - [ ] Add a HNSW index rebuild job when `m` or `ef_construction` parameters change
 - [ ] Implement hierarchical clustering: micro-clusters → macro-themes for report generation
-- [ ] Add cluster merge job: when two clusters drift too close (cosine > 0.95), merge them automatically
+- [x] Add cluster merge job: when two clusters drift too close (cosine > 0.95), merge them automatically (implemented in `lib/clustering.ts` with `mergeDriftingClusters` & Inngest function `lib/inngest/functions/cluster-maintenance.ts`)
 - [ ] Store the cluster centroid as a `vector(1536)` type (currently stored as `double_precision[]` — loses PGVector operators)
 - [ ] Add cluster quality score (intra-cluster similarity variance — lower = tighter cluster)
 - [ ] Implement cluster labels auto-generation using LLM summarization of canonical bodies
@@ -128,16 +128,16 @@
 
 ### 3.1 Main Dashboard
 
-- [ ] Add a global "active scans" indicator in the nav showing live scan count across all scrapers
-- [ ] Implement dashboard card drag-to-reorder with persisted layout in `userPreferences.dashboardLayout`
-- [ ] Add "Top Opportunities This Week" summary card showing highest-scored pain points
-- [ ] Implement a pain point heatmap calendar (GitHub-style) showing scan activity over time
-- [ ] Add "Cluster Growth" sparkline chart showing how clusters evolved over past 30 days
-- [ ] Add a "Market Competition Radar" chart: plot pain points on a 2D axis (pain intensity × market maturity)
-- [ ] Implement a "Quick Actions" panel: start scan, view latest report, jump to top opportunity
-- [ ] Add configurable time-range selector (7d, 30d, 90d, 1y, all-time) that applies globally to all dashboard metrics
-- [ ] Add "Comparison Mode": select two scrapers/keywords and compare their pain point distributions side-by-side
-- [ ] Implement "Saved Filters" — save complex filter combinations and switch between them instantly
+- [x] Add a global "active scans" indicator in the nav showing live scan count across all scrapers (implemented in `components/dashboard/active-scans-indicator.tsx` + `/api/scans/active` route)
+- [x] Implement dashboard card drag-to-reorder with persisted layout in `userPreferences.dashboardLayout` (implemented in `components/dashboard/dashboard-grid.tsx` + `app/api/settings/layout/route.ts`)
+- [x] Add "Top Opportunities This Week" summary card showing highest-scored pain points (implemented in `components/dashboard/dashboard-top-opportunities.tsx`)
+- [x] Implement a pain point heatmap calendar (GitHub-style) showing scan activity over time (implemented in `components/dashboard/dashboard-activity-heatmap.tsx`)
+- [x] Add "Cluster Growth" sparkline chart showing how clusters evolved over past 30 days (implemented in `components/dashboard/dashboard-cluster-growth.tsx`)
+- [x] Add a "Market Competition Radar" chart: plot pain points on a 2D axis (pain intensity × market maturity) (implemented in `components/dashboard/dashboard-market-radar.tsx` + `lib/dashboard-analytics.ts`)
+- [x] Implement a "Quick Actions" panel: start scan, view latest report, jump to top opportunity (implemented in `components/dashboard/dashboard-quick-actions.tsx`)
+- [x] Add configurable time-range selector (7d, 30d, 90d, 1y, all-time) that applies globally to all dashboard metrics (implemented in `components/dashboard/dashboard-time-range-selector.tsx` + `app/(dashboard)/dashboard/page.tsx`)
+- [x] Add "Comparison Mode": select two scrapers/keywords and compare their pain point distributions side-by-side (implemented in `app/(dashboard)/dashboard/compare/page.tsx` + `lib/comparison.ts` + `components/dashboard/comparison-view.tsx`)
+- [x] Implement "Saved Filters" — save complex filter combinations and switch between them instantly (implemented in `components/dashboard/saved-filters-menu.tsx` + `app/api/settings/saved-filters/route.ts`)
 
 ### 3.2 Pain Point Analytics
 
@@ -249,11 +249,11 @@
 
 ### 6.1 Design System & Components
 
-- [ ] Audit all color usages — ensure full dark mode support with no hardcoded light-mode values
+- [x] Audit all color usages — ensure full dark mode support with no hardcoded light-mode values
 - [x] Add skeleton loading states to all data-fetching components (replace spinner with content-shaped skeletons)
 - [x] Implement consistent empty state components with actionable CTAs (e.g., "Start your first scan")
-- [ ] Add `ErrorBoundary` components around all major dashboard sections
-- [ ] Create a unified toast notification system (success, error, warning, info) with queue management
+- [x] Add `ErrorBoundary` components around all major dashboard sections
+- [x] Create a unified toast notification system (success, error, warning, info) with queue management
 - [ ] Audit and fix all Radix/Shadcn accessibility attributes (aria-labels, focus traps, keyboard navigation)
 - [ ] Add keyboard shortcuts for common actions (e.g., `Cmd+K` for command palette, `Cmd+N` for new scan)
 - [ ] Build a command palette (`Cmd+K`) for quick navigation and action execution

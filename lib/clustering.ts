@@ -192,3 +192,166 @@ export async function refreshClusterRollups(clusterId: string) {
     })
     .where(eq(painPointCluster.id, clusterId));
 }
+
+export interface MergeDriftingClustersOptions {
+  userId?: string;
+  workspaceId?: string | null;
+  similarityThreshold?: number; // default 0.95
+  maxPairs?: number;
+}
+
+export interface ClusterMergeDetail {
+  sourceClusterId: string;
+  targetClusterId: string;
+  similarity: number;
+  painPointsMoved: number;
+}
+
+export interface ClusterMergeResult {
+  mergedCount: number;
+  merges: ClusterMergeDetail[];
+}
+
+/**
+ * Identify pairs of clusters that are too close in embedding space
+ * (cosine similarity >= threshold, default 0.95) and merge them automatically.
+ */
+export async function mergeDriftingClusters(
+  options: MergeDriftingClustersOptions = {},
+): Promise<ClusterMergeResult> {
+  const threshold = options.similarityThreshold ?? 0.95;
+  const maxPairs = options.maxPairs ?? 50;
+
+  const conditions = [
+    sql`c1.id < c2.id`,
+    sql`c1.embedding IS NOT NULL AND c2.embedding IS NOT NULL`,
+    sql`1 - (c1.embedding <=> c2.embedding) >= ${threshold}`,
+  ];
+
+  if (options.userId) {
+    conditions.push(sql`c1."userId" = ${options.userId} AND c2."userId" = ${options.userId}`);
+  }
+
+  if (options.workspaceId !== undefined) {
+    if (options.workspaceId === null) {
+      conditions.push(sql`c1."workspaceId" IS NULL AND c2."workspaceId" IS NULL`);
+    } else {
+      conditions.push(
+        sql`c1."workspaceId" = ${options.workspaceId} AND c2."workspaceId" = ${options.workspaceId}`,
+      );
+    }
+  }
+
+  const whereSql = sql.join(conditions, sql` AND `);
+
+  // Find close cluster pairs
+  const pairs = await db.execute<{
+    c1Id: string;
+    c1Count: number;
+    c1Embedding: number[] | string | null;
+    c2Id: string;
+    c2Count: number;
+    c2Embedding: number[] | string | null;
+    similarity: number;
+  }>(
+    sql`SELECT
+          c1.id AS "c1Id",
+          c1."sourceCount" AS "c1Count",
+          c1.embedding AS "c1Embedding",
+          c2.id AS "c2Id",
+          c2."sourceCount" AS "c2Count",
+          c2.embedding AS "c2Embedding",
+          1 - (c1.embedding <=> c2.embedding) AS similarity
+        FROM pain_point_cluster c1
+        INNER JOIN pain_point_cluster c2
+          ON c1."userId" = c2."userId"
+          AND ((c1."workspaceId" IS NULL AND c2."workspaceId" IS NULL) OR (c1."workspaceId" = c2."workspaceId"))
+        WHERE ${whereSql}
+        ORDER BY similarity DESC
+        LIMIT ${maxPairs}`,
+  );
+
+  const deletedClusters = new Set<string>();
+  const merges: ClusterMergeDetail[] = [];
+
+  for (const pair of Array.from(pairs)) {
+    if (deletedClusters.has(pair.c1Id) || deletedClusters.has(pair.c2Id)) {
+      continue;
+    }
+
+    // Retain cluster with higher source count as target; break tie with c1
+    const isC1Target = (pair.c1Count || 0) >= (pair.c2Count || 0);
+    const targetClusterId = isC1Target ? pair.c1Id : pair.c2Id;
+    const sourceClusterId = isC1Target ? pair.c2Id : pair.c1Id;
+    const targetCount = isC1Target ? (pair.c1Count || 1) : (pair.c2Count || 1);
+    const sourceCount = isC1Target ? (pair.c2Count || 1) : (pair.c1Count || 1);
+
+    // 1. Move all pain points to target cluster
+    await db
+      .update(painPoint)
+      .set({
+        clusterId: targetClusterId,
+        updatedAt: new Date(),
+      })
+      .where(eq(painPoint.clusterId, sourceClusterId));
+
+    // 2. Compute blended centroid embedding if both are available
+    const rawEmb1 = pair.c1Embedding;
+    const rawEmb2 = pair.c2Embedding;
+    const emb1 = Array.isArray(rawEmb1)
+      ? rawEmb1
+      : typeof rawEmb1 === "string"
+        ? JSON.parse(rawEmb1)
+        : null;
+    const emb2 = Array.isArray(rawEmb2)
+      ? rawEmb2
+      : typeof rawEmb2 === "string"
+        ? JSON.parse(rawEmb2)
+        : null;
+
+    if (emb1 && emb2 && emb1.length === emb2.length) {
+      const blended: number[] = new Array(emb1.length);
+      let sumSq = 0;
+      for (let i = 0; i < emb1.length; i++) {
+        const v =
+          (Number(emb1[i]) * (pair.c1Count || 1) +
+            Number(emb2[i]) * (pair.c2Count || 1)) /
+          ((pair.c1Count || 1) + (pair.c2Count || 1));
+        blended[i] = v;
+        sumSq += v * v;
+      }
+      const norm = Math.sqrt(sumSq) || 1;
+      const normalizedEmbedding = blended.map((v) => v / norm);
+
+      await db
+        .update(painPointCluster)
+        .set({
+          embedding: normalizedEmbedding,
+          updatedAt: new Date(),
+        })
+        .where(eq(painPointCluster.id, targetClusterId));
+    }
+
+    // 3. Refresh rollups for target cluster
+    await refreshClusterRollups(targetClusterId);
+
+    // 4. Delete the source cluster
+    await db
+      .delete(painPointCluster)
+      .where(eq(painPointCluster.id, sourceClusterId));
+
+    deletedClusters.add(sourceClusterId);
+    merges.push({
+      sourceClusterId,
+      targetClusterId,
+      similarity: Number(pair.similarity),
+      painPointsMoved: sourceCount,
+    });
+  }
+
+  return {
+    mergedCount: merges.length,
+    merges,
+  };
+}
+

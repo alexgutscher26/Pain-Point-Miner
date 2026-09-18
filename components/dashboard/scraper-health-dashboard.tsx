@@ -42,8 +42,8 @@ type HealthStats = {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="animate-in fade-in rounded-xl border border-zinc-200/50 bg-white/80 p-3.5 shadow-lg backdrop-blur-md duration-200">
-        <p className="mb-2 font-mono text-[10px] font-bold text-zinc-400 uppercase">
+      <div className="animate-in fade-in rounded-xl border border-zinc-200/80 bg-white/95 p-3.5 shadow-lg backdrop-blur-md duration-200 dark:border-zinc-800 dark:bg-zinc-900/95">
+        <p className="mb-2 font-mono text-[10px] font-bold text-zinc-400 uppercase dark:text-zinc-500">
           {label}
         </p>
         <div className="space-y-1">
@@ -52,14 +52,14 @@ function CustomTooltip({ active, payload, label }: any) {
               key={item.name}
               className="flex items-center justify-between gap-4"
             >
-              <span className="flex items-center gap-1.5 font-sans text-xs font-semibold text-zinc-600">
+              <span className="flex items-center gap-1.5 font-sans text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                 <span
                   className="h-2.5 w-2.5 rounded-full"
                   style={{ backgroundColor: item.color }}
                 />
                 {item.name}:
               </span>
-              <span className="font-mono text-xs font-bold text-zinc-900">
+              <span className="font-mono text-xs font-bold text-zinc-900 dark:text-white">
                 {item.value}
                 {item.name === "Success Rate" ? "%" : ""}
               </span>

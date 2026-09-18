@@ -27,9 +27,9 @@ export async function GET(request: Request) {
     try {
       await db.execute(sql.raw(`ANALYZE ${table}`));
       results[table] = "success";
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`❌ Failed to analyze ${table}:`, err);
-      results[table] = `error: ${err.message}`;
+      results[table] = `error: ${err instanceof Error ? err.message : "Unknown error"}`;
     }
   }
 

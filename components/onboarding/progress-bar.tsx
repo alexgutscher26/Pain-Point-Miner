@@ -43,7 +43,7 @@ export function OnboardingProgressBar() {
                     ? "border-[#ff4500] bg-[#ff4500] text-white"
                     : isActive
                       ? "border-[#ff4500] bg-[#ff4500]/10 text-[#ff4500]"
-                      : "border-zinc-200/60 bg-white/60 text-zinc-400",
+                      : "border-zinc-200/60 bg-white/60 text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-500",
                 )}
               >
                 {isCompleted ? (
@@ -57,7 +57,7 @@ export function OnboardingProgressBar() {
 
               {/* Connector */}
               {idx < STEPS.length - 1 && (
-                <div className="mx-2 h-[2px] flex-1 overflow-hidden bg-zinc-200/60">
+                <div className="mx-2 h-[2px] flex-1 overflow-hidden bg-zinc-200/60 dark:bg-zinc-800">
                   <div
                     className={cn(
                       "h-full bg-[#ff4500] transition-all duration-700 ease-in-out",
