@@ -412,10 +412,10 @@ export function calculateMarketRadarPoints(
     reportId: string;
     reportKeyword: string;
     score: number;
-    marketMaturity: number | null;
-    urgency: number | null;
-    monetizationScore: number | null;
-    subreddit: string | null;
+    marketMaturity?: number | null;
+    urgency?: number | null;
+    monetizationScore?: number | null;
+    subreddit?: string | null;
     sentiment?: string | null;
     userUpvotes?: number;
     userDownvotes?: number;
@@ -430,9 +430,9 @@ export function calculateMarketRadarPoints(
     const oppScore = calculateSingleOpportunityScore(
       {
         score: p.score,
-        urgency: p.urgency,
-        monetizationScore: p.monetizationScore,
-        marketMaturity: p.marketMaturity,
+        urgency: p.urgency ?? null,
+        monetizationScore: p.monetizationScore ?? null,
+        marketMaturity: p.marketMaturity ?? null,
         sentiment: p.sentiment ?? null,
         userUpvotes: p.userUpvotes,
         userDownvotes: p.userDownvotes,
@@ -463,7 +463,7 @@ export function calculateMarketRadarPoints(
       urgency: p.urgency ?? 0,
       monetizationScore: p.monetizationScore ?? 0,
       opportunityScore: oppScore,
-      subreddit: p.subreddit,
+      subreddit: p.subreddit ?? null,
       quadrant,
     };
   });

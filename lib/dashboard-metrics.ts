@@ -1,9 +1,9 @@
 export type DashboardPainPoint = {
   score: number;
-  urgency: number | null;
-  monetizationScore: number | null;
-  marketMaturity: number | null;
-  sentiment: string | null;
+  urgency?: number | null;
+  monetizationScore?: number | null;
+  marketMaturity?: number | null;
+  sentiment?: string | null;
   mentionCount?: number | null;
   commentCount?: number | null;
   upvoteSignal?: number | null;

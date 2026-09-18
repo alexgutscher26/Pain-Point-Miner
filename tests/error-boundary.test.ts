@@ -79,7 +79,7 @@ describe("SectionErrorBoundary", () => {
     expect(resetSpy).not.toHaveBeenCalled();
 
     // Key changed -> reset triggered
-    boundary.props = {
+    (boundary as any).props = {
       children: React.createElement("div", null, "Child"),
       resetKeys: ["v2"],
     };

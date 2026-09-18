@@ -33,7 +33,7 @@ describe("reExtractOutdatedOpportunities", () => {
 
   it("should return zeros when no outdated records are found", async () => {
     const { db } = await import("@/lib/db");
-    vi.mocked(db.query.painPoint.findMany).mockResolvedValueOnce([]);
+    (db.query.painPoint.findMany as any).mockResolvedValueOnce([]);
 
     const result = await reExtractOutdatedOpportunities({ userId: "user-123" });
     expect(result).toEqual({ scanned: 0, updated: 0, remaining: 0 });
@@ -41,7 +41,7 @@ describe("reExtractOutdatedOpportunities", () => {
 
   it("should re-extract and upgrade schemaVersion for outdated records", async () => {
     const { db } = await import("@/lib/db");
-    vi.mocked(db.query.painPoint.findMany).mockResolvedValueOnce([
+    (db.query.painPoint.findMany as any).mockResolvedValueOnce([
       {
         id: "p1",
         title: "Old Title",
@@ -74,6 +74,7 @@ describe("reExtractOutdatedOpportunities", () => {
         triedSolutions: [],
         sentiment: "frustrated",
         difficulty: "startup_mvp",
+        budget: []
       },
     ]);
 

@@ -90,6 +90,8 @@ describe("SEO System", () => {
       `AI Pain Point Mining | ${siteConfig.name}`,
     );
     expect(meta.openGraph?.url).toBe(`${siteUrl}/features/pain-point-mining`);
-    expect(meta.twitter?.card).toBe("summary_large_image");
+    expect((meta.twitter as { card?: string })?.card).toBe(
+      "summary_large_image",
+    );
   });
 });

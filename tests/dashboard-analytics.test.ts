@@ -134,8 +134,10 @@ describe("dashboard-analytics", () => {
           title: "Desperate need for simple tool, no competitors",
           score: 9,
           urgency: 9,
+          monetizationScore: 8,
           marketMaturity: 3, // < 5.0 -> Blue Ocean
           sentiment: "desperate",
+          subreddit: "startups",
           reportId: "r1",
           reportKeyword: "niche tool",
         },
@@ -144,8 +146,10 @@ describe("dashboard-analytics", () => {
           title: "High pain in crowded CRM space",
           score: 9,
           urgency: 8,
+          monetizationScore: 9,
           marketMaturity: 8, // >= 5.0 -> Battleground
           sentiment: "frustrated",
+          subreddit: "sales",
           reportId: "r2",
           reportKeyword: "crm",
         },
@@ -154,8 +158,10 @@ describe("dashboard-analytics", () => {
           title: "Mild annoyance in novel hobby",
           score: 3,
           urgency: 2,
+          monetizationScore: 2,
           marketMaturity: 2, // < 5.0 -> Uncharted Niche
           sentiment: "neutral",
+          subreddit: "hobbies",
           reportId: "r3",
           reportKeyword: "hobby",
         },
@@ -164,8 +170,10 @@ describe("dashboard-analytics", () => {
           title: "Minor request in saturated project management tool",
           score: 3,
           urgency: 3,
+          monetizationScore: 4,
           marketMaturity: 9, // >= 5.0 -> Commodity Zone
           sentiment: "neutral",
+          subreddit: "productivity",
           reportId: "r4",
           reportKeyword: "pm tool",
         },
