@@ -21,8 +21,6 @@ import {
 import { toast } from "sonner";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
 import { ScanWizard } from "@/components/dashboard/scan-wizard";
-import { ScanPresetsModal } from "@/components/dashboard/scan-presets-modal";
-import { type ScanPreset } from "@/lib/scan-presets";
 import {
   Dialog,
   DialogContent,
@@ -483,17 +481,6 @@ export default function SearchPage() {
     toast.success("Draft saved.");
   };
 
-  const handleApplyPreset = (preset: ScanPreset) => {
-    setKeyword(preset.keyword);
-    setSubreddits(preset.subreddits.map((s) => `r/${s}`).join(", "));
-    setMiningDepth(preset.miningDepth);
-    setTimeWindow(preset.timeWindow);
-    if (preset.customPatterns && preset.customPatterns.length > 0) {
-      setCustomPatterns(preset.customPatterns.join(", "));
-    }
-    toast.success(`Loaded "${preset.name}" preset!`);
-  };
-
   return (
     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
@@ -553,8 +540,6 @@ export default function SearchPage() {
               <span>Guided Wizard</span>
             </button>
           </div>
-
-          <ScanPresetsModal onSelectPreset={handleApplyPreset} />
         </div>
 
         <span className="font-mono text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">

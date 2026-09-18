@@ -24,8 +24,6 @@ import {
   type TimeWindow,
 } from "@/lib/time-window";
 import { cn } from "@/lib/utils";
-import { ScanPresetsModal } from "@/components/dashboard/scan-presets-modal";
-import { type ScanPreset } from "@/lib/scan-presets";
 
 export interface ScanWizardProps {
   keyword: string;
@@ -252,16 +250,6 @@ export function ScanWizard({
                 <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                 <span>Or choose a high-converting niche template:</span>
               </p>
-              <ScanPresetsModal
-                onSelectPreset={(p: ScanPreset) => {
-                  setKeyword(p.keyword);
-                  setSubreddits(p.subreddits.join(", "));
-                  setMiningDepth(p.miningDepth);
-                  setTimeWindow(p.timeWindow);
-                  if (p.customPatterns)
-                    setCustomPatterns(p.customPatterns.join(", "));
-                }}
-              />
             </div>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {TOPIC_PRESETS.map((preset) => (
