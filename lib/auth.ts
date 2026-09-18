@@ -8,7 +8,7 @@ import {
   oneTimeToken,
   username,
 } from "better-auth/plugins";
-import { sentinel } from "@better-auth/infra";
+import { dash, sentinel } from "@better-auth/infra";
 import { stripe as stripePlugin } from "@better-auth/stripe";
 import Stripe from "stripe";
 import { db } from "./db";
@@ -149,6 +149,14 @@ export const auth = betterAuth({
               const trimmed = value.trim();
               return trimmed.length >= 2 && trimmed.length <= 40;
             },
+          }),
+        ]
+      : []),
+    ...(sentinelApiKey
+      ? [
+          dash({
+            apiKey: sentinelApiKey,
+            ...(sentinelApiUrl ? { apiUrl: sentinelApiUrl } : {}),
           }),
         ]
       : []),
