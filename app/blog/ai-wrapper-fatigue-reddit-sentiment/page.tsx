@@ -6,9 +6,7 @@ import {
   Brain,
   ArrowRight,
   ShieldCheck,
-  TrendingUp,
   Workflow,
-  Sparkles,
   Database,
 } from "lucide-react";
 import Link from "next/link";

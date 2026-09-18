@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { requireApiContext } from "@/lib/api-auth";
-import { z } from "zod";
 import { db } from "@/lib/db";
 import { subredditCache } from "@/lib/db/schema";
 import { inArray } from "drizzle-orm";

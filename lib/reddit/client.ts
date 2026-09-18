@@ -547,6 +547,64 @@ function generateFallbackPosts(
 }
 
 /**
+ * Fetch a single post from Reddit by ID and subreddit.
+ */
+export async function fetchSingleRedditPost(
+  postId: string,
+  subreddit: string,
+): Promise<RedditPost | null> {
+  const cleanSub = subreddit.replace(/^r\//i, "").trim();
+  if (!cleanSub || !/^[A-Za-z0-9_]{2,24}$/.test(cleanSub)) {
+    return null;
+  }
+
+  const cleanId = postId.replace(/^t3_/, "");
+
+  try {
+    const url = `https://www.reddit.com/r/${cleanSub}/comments/${cleanId}.json`;
+    const response = await fetchRedditResponse(url);
+    const data = await response.json();
+    const rawPost = data?.[0]?.data?.children?.[0]?.data;
+
+    if (rawPost) {
+      return {
+        id: rawPost.id || cleanId,
+        title: rawPost.title || "",
+        selftext: rawPost.selftext || "",
+        author: rawPost.author || "unknown",
+        score: rawPost.score ?? 0,
+        subreddit: rawPost.subreddit || cleanSub,
+        url: rawPost.permalink
+          ? `https://www.reddit.com${rawPost.permalink}`
+          : (rawPost.url || `https://www.reddit.com/r/${cleanSub}/comments/${cleanId}`),
+        num_comments: rawPost.num_comments ?? 0,
+        created_utc: rawPost.created_utc ?? Math.floor(Date.now() / 1000),
+        is_self: rawPost.is_self ?? true,
+      };
+    }
+  } catch {
+    // Attempt fallback from ArcticShift / PullPush
+    try {
+      const arcticPosts = await fetchFromArcticShiftSubmissions(cleanSub, cleanId, 10);
+      const found = arcticPosts.find(
+        (p) => p.id === cleanId || p.id === `t3_${cleanId}`,
+      );
+      if (found) return found;
+    } catch {}
+
+    try {
+      const pullPushPosts = await fetchFromPullPushSubmissions(cleanSub, cleanId, 10);
+      const found = pullPushPosts.find(
+        (p) => p.id === cleanId || p.id === `t3_${cleanId}`,
+      );
+      if (found) return found;
+    } catch {}
+  }
+
+  return null;
+}
+
+/**
  * Fetch comments from a Reddit post.
  */
 export async function fetchComments(

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ActivityHeatmapData, HeatmapDay } from "@/lib/dashboard-analytics";
 import { Calendar, Flame, Zap, Award } from "lucide-react";
 

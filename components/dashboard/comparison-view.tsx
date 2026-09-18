@@ -5,19 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Scale,
-  ArrowRight,
-  TrendingUp,
-  TrendingDown,
   Sparkles,
   Zap,
   Flame,
   DollarSign,
   Compass,
   Download,
-  Check,
   ChevronDown,
   Layers,
-  Search,
   ExternalLink,
 } from "lucide-react";
 import {

@@ -8,7 +8,6 @@ import {
   X,
   ArrowRight,
   ArrowLeft,
-  SkipForward,
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";

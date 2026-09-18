@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { ReportDetailSkeleton } from "@/components/dashboard/report-detail-skeleton";
 import { EmptyState } from "@/components/dashboard/empty-state";

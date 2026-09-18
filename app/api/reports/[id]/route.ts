@@ -189,7 +189,7 @@ export async function GET(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {
@@ -724,7 +724,7 @@ export async function PATCH(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {

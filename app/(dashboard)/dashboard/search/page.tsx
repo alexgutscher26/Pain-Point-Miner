@@ -13,10 +13,8 @@ import {
   Loader2,
   Lock,
   Database,
-  HelpCircle,
   Flame,
   Compass,
-  Sliders,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";

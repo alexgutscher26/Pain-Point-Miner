@@ -8,7 +8,6 @@ import {
   Sparkles,
   ShieldCheck,
   Check,
-  Zap,
 } from "lucide-react";
 import type { BillingPlan, PlanEntitlements } from "@/lib/plan-gating";
 

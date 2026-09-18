@@ -5,11 +5,6 @@ import { Footer } from "@/components/landing/Footer";
 import {
   Sparkles,
   ArrowRight,
-  Clock,
-  Search,
-  Zap,
-  BarChart2,
-  CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

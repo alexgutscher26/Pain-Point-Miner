@@ -5,11 +5,7 @@ import { Footer } from "@/components/landing/Footer";
 import {
   Compass,
   ArrowRight,
-  Target,
-  DollarSign,
-  Briefcase,
   CheckCircle2,
-  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

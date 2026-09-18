@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { scraper, user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { fetchComments } from "@/lib/reddit";
+import { fetchComments, fetchSingleRedditPost, type RedditPost } from "@/lib/reddit";
 import { processSinglePost } from "@/lib/mining-runner";
 import { type MiningDepth } from "@/lib/plan-gating";
 
@@ -73,30 +73,39 @@ export async function POST(req: NextRequest) {
 
     const anonymize = userRecord?.anonymizeRedditUsernames ?? false;
 
-    // 4. Fetch the full post and comments from Reddit to ensure AI context
-    // We only need the post instance; fetchSubredditPostsMultiSort is overkill here,
-    // so we build a minimal RedditPost object and then fetch its comments.
-    const comments = await fetchComments(postId, subreddit, {
-      maxDepth: 50,
-      maxComments: 100,
-    });
+    // 4. Fetch the real post and its comments from Reddit
+    const [fetchedPost, comments] = await Promise.all([
+      fetchSingleRedditPost(postId, subreddit),
+      fetchComments(postId, subreddit, {
+        maxDepth: 50,
+        maxComments: 100,
+      }),
+    ]);
 
-    // Mock the post object; processSinglePost only really uses id, title, selftext, url, author, subreddit
-    const postMock = {
+    const post: RedditPost = fetchedPost ?? {
       id: postId,
       title: payload.title || "Post from Webhook",
       selftext: payload.body || payload.selftext || "",
-      url: link || `https://www.reddit.com/comments/${postId}`,
+      url: link || `https://www.reddit.com/r/${subreddit}/comments/${postId}`,
       author: payload.author || "unknown",
       subreddit,
-      score: payload.score || 0,
+      score: payload.score ?? 0,
       num_comments: comments.length,
       created_utc: payload.created_utc || Math.floor(Date.now() / 1000),
+      is_self: true,
     };
+
+    // If webhook provided explicit overrides or fetched post was partial
+    if (!post.title && payload.title) {
+      post.title = payload.title;
+    }
+    if (!post.selftext && (payload.body || payload.selftext)) {
+      post.selftext = payload.body || payload.selftext;
+    }
 
     // 5. Process the post through the standard mining pipeline
     const count = await processSinglePost({
-      post: postMock,
+      post,
       comments,
       scraperId,
       userId: scraperRecord.userId,

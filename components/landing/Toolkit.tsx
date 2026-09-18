@@ -2,15 +2,8 @@
 
 import { useState } from "react";
 import {
-  Search,
-  TrendingUp,
-  Bell,
   CheckCircle2,
-  ShieldCheck,
   ArrowRight,
-  Layers,
-  FileSpreadsheet,
-  Target,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";

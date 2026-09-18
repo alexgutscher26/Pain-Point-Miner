@@ -1,16 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { RadarPoint, RadarQuadrant } from "@/lib/dashboard-analytics";
 import {
   Crosshair,
-  Sparkles,
   ArrowRight,
-  ShieldAlert,
-  Flame,
-  HelpCircle,
-  TrendingUp,
 } from "lucide-react";
 
 interface DashboardMarketRadarProps {

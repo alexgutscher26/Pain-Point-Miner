@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Sparkles,
   ArrowRight,
@@ -10,16 +10,11 @@ import {
   Sliders,
   CheckCircle2,
   Lock,
-  Layers,
   Clock,
-  Zap,
-  Flame,
-  ShieldAlert,
   Compass,
 } from "lucide-react";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
 import {
-  DEFAULT_TIME_WINDOW,
   getTimeWindowLabel,
   type TimeWindow,
 } from "@/lib/time-window";

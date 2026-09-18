@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import {
   Zap,
@@ -8,7 +7,6 @@ import {
   FileText,
   Flame,
   Compass,
-  Activity,
   ArrowRight,
 } from "lucide-react";
 

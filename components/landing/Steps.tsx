@@ -1,14 +1,8 @@
 "use client";
 
 import {
-  Search,
-  Brain,
-  Target,
   Sparkles,
-  ArrowRight,
-  ShieldCheck,
 } from "lucide-react";
-import Link from "next/link";
 
 export function Steps() {
   const steps = [

@@ -3,12 +3,9 @@ import type { Metadata } from "next";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import {
-  Search,
   ArrowRight,
   TrendingUp,
-  MessageCircle,
   Calendar,
-  Repeat,
   AlertTriangle,
   Zap,
 } from "lucide-react";

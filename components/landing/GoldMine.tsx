@@ -2,16 +2,8 @@
 
 import {
   CheckCircle2,
-  Flame,
-  Sparkles,
-  TrendingUp,
-  BarChart3,
   Database,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
 } from "lucide-react";
-import Link from "next/link";
 
 export function GoldMine() {
   return (

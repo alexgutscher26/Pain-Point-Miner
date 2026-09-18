@@ -9,7 +9,6 @@ import {
   Clock,
   RefreshCcw,
   ExternalLink,
-  Loader2,
 } from "lucide-react";
 import {
   XAxis,

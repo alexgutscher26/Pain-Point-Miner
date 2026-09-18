@@ -4,7 +4,6 @@ import { getServerSession } from "@/lib/auth";
 import { BillingPageClient } from "@/components/dashboard/billing-page-client";
 import {
   type BillingPlan,
-  getMonthlyScanUsage,
   getCreditSummary,
   getPlanEntitlements,
 } from "@/lib/plan-gating";

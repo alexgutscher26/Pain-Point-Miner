@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { auth, getServerSession } from "@/lib/auth";
+import {  getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
