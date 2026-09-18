@@ -31,7 +31,8 @@ const stripeSubscriptionEnabled =
   Boolean(stripePriceProMonthly);
 const usernamePluginEnabled = process.env.USERNAME_PLUGIN_ENABLED === "true";
 const sentinelApiUrl = process.env.BETTER_AUTH_API_URL;
-const sentinelKvUrl = process.env.BETTER_AUTH_KV_URL;
+const sentinelKvUrl =
+  process.env.BETTER_AUTH_IDENTIFY_URL || process.env.BETTER_AUTH_KV_URL;
 const sentinelApiKey = process.env.BETTER_AUTH_API_KEY;
 const sentinelEnabled =
   Boolean(sentinelApiUrl && /^https?:\/\//i.test(sentinelApiUrl)) &&

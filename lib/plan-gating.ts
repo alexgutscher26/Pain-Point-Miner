@@ -31,7 +31,7 @@ export type PlanEntitlements = {
 
 export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
   starter: {
-    monthlyScans: 2,
+    monthlyScans: 1,
     maxSubredditsPerSearch: 3,
     allowedMiningDepths: ["basic"],
     canSaveReports: false,
