@@ -1,9 +1,6 @@
 import {
   currentUA,
   rotateUA,
-  getSubredditFromUrl,
-  isSubredditThrottled,
-  consecutive429CountMap,
   logRateLimitEvent,
 } from "./throttle";
 

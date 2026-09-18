@@ -16,7 +16,6 @@ import {
   fetchSubredditPostsMultiSort,
   rankRedditPosts,
   resolveProblemPatterns,
-  isSubredditThrottled,
   getGlobal429Rate,
   validateSubredditsBulk,
   type RedditPost,
@@ -32,7 +31,7 @@ import {
   calculatePostQualityScore,
   filterPostsByTimeAndQuality,
 } from "./discovery";
-import { processSinglePost, processPostBatch } from "./extraction";
+import { processPostBatch } from "./extraction";
 import { createChildLogger } from "@/lib/logger";
 import { withSpan } from "@/lib/telemetry";
 

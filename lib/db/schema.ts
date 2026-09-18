@@ -8,7 +8,6 @@ import {
   pgEnum,
   pgMaterializedView,
   pgTable,
-  primaryKey,
   text,
   timestamp,
   uniqueIndex,

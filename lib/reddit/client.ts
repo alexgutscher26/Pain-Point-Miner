@@ -7,7 +7,7 @@ import type {
   RedditPostWithMeta,
 } from "./types";
 import { getSortModesForDepth } from "./types";
-import { currentUA, isSubredditThrottled } from "./throttle";
+import { currentUA } from "./throttle";
 import { fetchRedditResponse, sleep, getRedditRateLimitDelayMs } from "./oauth";
 import { rankRedditPosts } from "./ranking";
 

@@ -20,6 +20,13 @@ export const DEFAULT_PROBLEM_PATTERNS = [
   "expensive",
   "alternative to",
   "how do i",
+  "how to",
+  "should i",
+  "has anyone tried",
+  "worst thing about",
+  "best way to",
+  "can someone explain",
+  "is it just me",
 ] as const;
 
 export type ProblemPatternMatchStats = {

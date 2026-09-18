@@ -153,14 +153,14 @@ export default async function BillingPage({
         yearlyPriceId: process.env.STRIPE_PRICE_STARTER_YEARLY,
       },
       {
-        plan: "growth",
-        monthlyPriceId: process.env.STRIPE_PRICE_GROWTH_MONTHLY,
-        yearlyPriceId: process.env.STRIPE_PRICE_GROWTH_YEARLY,
+        plan: "founder",
+        monthlyPriceId: process.env.STRIPE_PRICE_FOUNDER_MONTHLY,
+        yearlyPriceId: process.env.STRIPE_PRICE_FOUNDER_YEARLY,
       },
       {
-        plan: "pro",
-        monthlyPriceId: process.env.STRIPE_PRICE_PRO_MONTHLY,
-        yearlyPriceId: process.env.STRIPE_PRICE_PRO_YEARLY,
+        plan: "professional",
+        monthlyPriceId: process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY,
+        yearlyPriceId: process.env.STRIPE_PRICE_PROFESSIONAL_YEARLY,
       },
     ] satisfies BillingPurchaseConfig[]
   )

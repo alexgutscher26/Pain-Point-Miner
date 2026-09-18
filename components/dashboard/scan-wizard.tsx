@@ -434,13 +434,7 @@ export function ScanWizard({
                     <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 font-mono text-[10px] text-zinc-400">
                       <span>{preset.postsPerSub} posts/sub</span>
                       <span className="font-bold text-amber-400">
-                        {d === "basic"
-                          ? "0.5 CR"
-                          : d === "deep"
-                            ? "2 CR"
-                            : d === "advanced"
-                              ? "5 CR"
-                              : "10 CR"}
+                        {preset.estimatedCredits} CR
                       </span>
                     </div>
                   </button>

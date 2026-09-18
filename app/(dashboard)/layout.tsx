@@ -62,11 +62,11 @@ export default async function DashboardLayout({
   });
   const planLabel = `${plan.charAt(0).toUpperCase()}${plan.slice(1)} Plan`;
   const upgradeMessage =
-    plan === "pro"
+    plan === "professional"
       ? "You have full access to all features."
-      : plan === "growth"
-        ? "Upgrade to Pro for unlimited scans and deep analysis."
-        : "Upgrade to Growth or Pro for advanced features.";
+      : plan === "founder"
+        ? "Upgrade to Professional for unlimited subreddits and ultra deep analysis."
+        : "Upgrade to Founder or Professional for higher limits.";
 
   const monthlyScansUsed = await getMonthlyScanUsage(session.user.id);
   const { monthlyScansLimit } = getMonthlyUsageSummary(plan, monthlyScansUsed);

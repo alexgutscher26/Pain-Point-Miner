@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { painPoint, painPointComment } from "@/lib/db/schema";
+import { painPoint } from "@/lib/db/schema";
 import { and, eq, lt, sql } from "drizzle-orm";
 import {
   CURRENT_EXTRACTION_SCHEMA_VERSION,

@@ -14,8 +14,6 @@ export type { MiningDepth };
 
 export type BillingPlan =
   | "starter"
-  | "growth"
-  | "pro"
   | "founder"
   | "professional";
 
@@ -38,24 +36,6 @@ export const PLAN_ENTITLEMENTS: Record<BillingPlan, PlanEntitlements> = {
     hasTrendDetection: false,
     hasSaasOpportunities: false,
     hasCustomPatterns: false,
-  },
-  growth: {
-    monthlyScans: 50,
-    maxSubredditsPerSearch: 10,
-    allowedMiningDepths: ["basic", "deep"],
-    canSaveReports: true,
-    hasTrendDetection: false,
-    hasSaasOpportunities: false,
-    hasCustomPatterns: false,
-  },
-  pro: {
-    monthlyScans: null,
-    maxSubredditsPerSearch: null,
-    allowedMiningDepths: ["basic", "deep", "advanced", "ultra"],
-    canSaveReports: true,
-    hasTrendDetection: true,
-    hasSaasOpportunities: true,
-    hasCustomPatterns: true,
   },
   founder: {
     monthlyScans: 30,
@@ -84,10 +64,8 @@ export function calculateMiningCost(depth: MiningDepth): number {
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "past_due"]);
 const PLAN_ORDER: Record<BillingPlan, number> = {
   starter: 1,
-  growth: 2,
-  pro: 3,
-  founder: 4,
-  professional: 5,
+  founder: 2,
+  professional: 3,
 };
 
 type SubscriptionLike = {
@@ -101,10 +79,8 @@ function planFromString(input: string | null | undefined): BillingPlan | null {
 
   if (normalized.includes("professional")) return "professional";
   if (normalized.includes("founder")) return "founder";
-  if (normalized.includes("growth")) return "growth";
   if (normalized.includes("starter") || normalized.includes("free"))
     return "starter";
-  if (normalized.includes("pro")) return "pro";
 
   return null;
 }
