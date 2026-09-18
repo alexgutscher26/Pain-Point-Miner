@@ -496,6 +496,7 @@ export async function POST(req: Request) {
         timeWindow,
         userId,
         workspaceId,
+        requestId: correlationId,
         maxPostsPerSubreddit:
           miningDepth === "advanced" ? 400 : miningDepth === "deep" ? 250 : 120, // Keep these high for actual results
         processingLimit:

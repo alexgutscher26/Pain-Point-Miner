@@ -1,7 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
 import { painPoint, painPointComment } from "@/lib/db/schema";
-import { extractPainPoints } from "@/lib/ai";
+import {
+  extractPainPoints,
+  extractPainPointsBatch,
+  CURRENT_EXTRACTION_SCHEMA_VERSION,
+} from "@/lib/ai";
 import { clusterPainPoint } from "@/lib/clustering";
 import { claimRedditPostForAiProcessing } from "@/lib/reddit-idempotency";
 import type { RedditPost } from "@/lib/reddit";
@@ -20,6 +23,211 @@ export type ProcessSinglePostInput = {
   miningDepth: MiningDepth;
   customApiKey?: string | null;
 };
+
+export type ProcessPostBatchInput = {
+  items: Array<{
+    post: RedditPost;
+    comments: any[];
+  }>;
+  scraperId: string;
+  userId: string;
+  workspaceId: string | null;
+  anonymize: boolean;
+  customPatterns: string[];
+  miningDepth: MiningDepth;
+  customApiKey?: string | null;
+};
+
+/**
+ * Processes a batch of Reddit posts in a single AI call: claims idempotency,
+ * extracts pain points, saves to DB in bulk, and fires off clustering.
+ */
+export async function processPostBatch({
+  items,
+  scraperId,
+  userId,
+  workspaceId,
+  anonymize,
+  customPatterns,
+  miningDepth,
+  customApiKey,
+}: ProcessPostBatchInput): Promise<number> {
+  if (!items || items.length === 0) return 0;
+
+  // 1. Claim all posts in batch for idempotency
+  const claimResults = await Promise.all(
+    items.map(async (item) => ({
+      item,
+      claimed: await claimRedditPostForAiProcessing(item.post.id, userId),
+    })),
+  );
+
+  const eligibleItems = claimResults
+    .filter((r) => r.claimed)
+    .map((r) => r.item);
+
+  if (eligibleItems.length === 0) return 0;
+
+  // If only 1 post, call processSinglePost
+  if (eligibleItems.length === 1) {
+    return processSinglePost({
+      post: eligibleItems[0].post,
+      comments: eligibleItems[0].comments,
+      scraperId,
+      userId,
+      workspaceId,
+      anonymize,
+      customPatterns,
+      miningDepth,
+      customApiKey,
+    });
+  }
+
+  // 2. Format batch payload for AI
+  const batchPayload = eligibleItems.map((item) => ({
+    title: item.post.title,
+    selftext: item.post.selftext,
+    url: item.post.url,
+    author: item.post.author,
+    subreddit: item.post.subreddit,
+    comments: item.comments.map((comment) => ({ body: comment.body })),
+  }));
+
+  const points = await extractPainPointsBatch(
+    batchPayload,
+    customPatterns,
+    undefined,
+    miningDepth,
+    { userId, scraperId },
+    customApiKey,
+  );
+
+  if (!points || points.length === 0) return 0;
+
+  const painPointsToInsert = [];
+  const commentsToInsert = [];
+  const clusterJobs = [];
+
+  for (const point of points) {
+    const matchingItem = eligibleItems.find(
+      (item) =>
+        item.post.url === point.url ||
+        item.post.subreddit.toLowerCase() === point.subreddit.toLowerCase(),
+    ) || eligibleItems[0];
+
+    const painPointId = crypto.randomUUID();
+    const tags: string[] = [];
+    if (point.targetUser) {
+      tags.push(`persona:${point.targetUser}`);
+    }
+    if (point.willingnessToPay && point.willingnessToPay !== "unknown") {
+      tags.push(`wtp:${point.willingnessToPay}`);
+    }
+    if (point.competingProducts && point.competingProducts.length > 0) {
+      for (const comp of point.competingProducts) {
+        tags.push(`competitor:${comp}`);
+      }
+    }
+
+    const mergedTriedSolutions = Array.from(
+      new Set([
+        ...(point.triedSolutions || []),
+        ...(point.competingProducts || []),
+      ]),
+    );
+
+    const explanationParts: string[] = [];
+    if (point.confidenceScore !== undefined) {
+      explanationParts.push(
+        `Confidence: ${(point.confidenceScore * 100).toFixed(0)}%`,
+      );
+    }
+    if (point.targetUser) {
+      explanationParts.push(`Persona: ${point.targetUser}`);
+    }
+    if (point.willingnessToPay && point.willingnessToPay !== "unknown") {
+      explanationParts.push(`WTP: ${point.willingnessToPay}`);
+    }
+    if (point.featureRequested) {
+      explanationParts.push(`Feature: ${point.featureRequested}`);
+    }
+
+    painPointsToInsert.push({
+      id: painPointId,
+      title: point.title,
+      body: point.body,
+      score: point.painIntensity,
+      urgency: point.urgency,
+      monetizationScore: point.monetizationScore,
+      marketMaturity: point.marketMaturity,
+      budget: point.budget,
+      switchingCosts: point.switchingCosts,
+      triedSolutions: mergedTriedSolutions,
+      userId,
+      scraperId,
+      subreddit: point.subreddit || matchingItem.post.subreddit,
+      postUrl: point.url || matchingItem.post.url,
+      author: anonymize
+        ? "[Anonymized]"
+        : point.author || matchingItem.post.author,
+      sentiment: point.sentiment,
+      difficulty: point.difficulty,
+      commentCount: matchingItem.comments.length,
+      mentionCount: 1,
+      tags,
+      scoreExplanation:
+        explanationParts.length > 0 ? explanationParts.join(" | ") : undefined,
+      schemaVersion: CURRENT_EXTRACTION_SCHEMA_VERSION,
+      promptVersion: point.promptVersion || "v1",
+      rawResponse: point.rawResponse ? point.rawResponse.slice(0, 10000) : null,
+      originalLanguage: point.originalLanguage || "en",
+      workspaceId,
+      updatedAt: new Date(),
+    });
+
+    const commentRows = matchingItem.comments
+      .filter((comment) => {
+        const body = cleanCommentBody(comment.body ?? "");
+        if (!body) return false;
+        const normalized = body.toLowerCase();
+        return normalized !== "[deleted]" && normalized !== "[removed]";
+      })
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+      .slice(0, 12)
+      .map((comment) => ({
+        id: crypto.randomUUID(),
+        body: cleanCommentBody(comment.body),
+        author: anonymize ? "[Anonymized]" : comment.author || "unknown",
+        score: comment.score ?? 0,
+        commentUrl: comment.permalink || null,
+        painScore: point.painIntensity ?? 0,
+        painPointId,
+      }));
+
+    if (commentRows.length > 0) {
+      commentsToInsert.push(...commentRows);
+    }
+
+    clusterJobs.push(painPointId);
+  }
+
+  if (painPointsToInsert.length > 0) {
+    await db.insert(painPoint).values(painPointsToInsert);
+  }
+
+  if (commentsToInsert.length > 0) {
+    await db.insert(painPointComment).values(commentsToInsert);
+  }
+
+  for (const painPointId of clusterJobs) {
+    void clusterPainPoint(painPointId, userId, workspaceId, customApiKey).catch(
+      (err) =>
+        console.error(`Embedding/clustering failed for ${painPointId}:`, err),
+    );
+  }
+
+  return points.length;
+}
 
 /**
  * Processes a single Reddit post: extracts pain points, saves to DB, and fires off clustering.
@@ -127,6 +335,10 @@ export async function processSinglePost({
       tags,
       scoreExplanation:
         explanationParts.length > 0 ? explanationParts.join(" | ") : undefined,
+      schemaVersion: CURRENT_EXTRACTION_SCHEMA_VERSION,
+      promptVersion: point.promptVersion || "v1",
+      rawResponse: point.rawResponse ? point.rawResponse.slice(0, 10000) : null,
+      originalLanguage: point.originalLanguage || "en",
       workspaceId,
       updatedAt: new Date(),
     });

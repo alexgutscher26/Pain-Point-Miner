@@ -8,7 +8,7 @@ import type {
 } from "./types";
 import { getSortModesForDepth } from "./types";
 import { currentUA, isSubredditThrottled } from "./throttle";
-import { fetchRedditResponse, sleep } from "./oauth";
+import { fetchRedditResponse, sleep, getRedditRateLimitDelayMs } from "./oauth";
 import { rankRedditPosts } from "./ranking";
 
 type RedditListingResponse = {
@@ -410,7 +410,8 @@ export async function fetchSubredditPostsBatched(
 ): Promise<RedditPost[]> {
   try {
     const maxPosts = Math.max(1, Math.min(2_000, options?.maxPosts ?? 25));
-    const delayMs = Math.max(0, options?.delayMs ?? 250);
+    const envDelay = getRedditRateLimitDelayMs();
+    const delayMs = Math.max(0, options?.delayMs ?? (envDelay > 0 ? envDelay : 250));
     const time = options?.time ?? "all";
     const requestLimit = Math.max(
       1,

@@ -13,6 +13,15 @@ export const DEFAULT_TIMEOUT_MS = 15_000;
 export const MAX_RETRIES = 3;
 export const TOKEN_EXPIRY_SAFETY_SECONDS = 30;
 
+export function getRedditRateLimitDelayMs(): number {
+  const envVal = process.env.REDDIT_RATE_LIMIT_DELAY_MS;
+  if (envVal) {
+    const parsed = parseInt(envVal, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return 0;
+}
+
 export type RedditTokenResponse = {
   access_token?: string;
   expires_in?: number;
@@ -159,6 +168,34 @@ export async function getRedditAccessToken(
 
   activeTokenPromise = (async () => {
     try {
+      // Layer 2: Check persistent DB cache across requests/processes
+      if (!forceRefresh) {
+        try {
+          const { db } = await import("../db");
+          const { redditOAuthCache } = await import("../db/schema");
+
+          const minExpiry = new Date(
+            Date.now() + TOKEN_EXPIRY_SAFETY_SECONDS * 1000,
+          );
+          const dbCached = await db.query.redditOAuthCache.findFirst({
+            where: (t, { and, eq, gt }) =>
+              and(eq(t.key, creds.clientId), gt(t.expiresAt, minExpiry)),
+          });
+
+          if (dbCached?.token) {
+            cachedToken = {
+              token: dbCached.token,
+              expiresAtEpochSeconds: Math.floor(
+                dbCached.expiresAt.getTime() / 1000,
+              ),
+            };
+            return cachedToken.token;
+          }
+        } catch {
+          // Gracefully continue to API token fetch if DB table is unavailable
+        }
+      }
+
       const basicAuth = Buffer.from(
         `${creds.clientId}:${creds.clientSecret}`,
       ).toString("base64");
@@ -207,11 +244,36 @@ export async function getRedditAccessToken(
       }
 
       const expiresIn = payload.expires_in ?? 3_600;
+      const expiresAt = new Date(Date.now() + Math.max(60, expiresIn) * 1000);
       cachedToken = {
         token: payload.access_token,
-        expiresAtEpochSeconds:
-          Math.floor(Date.now() / 1_000) + Math.max(60, expiresIn),
+        expiresAtEpochSeconds: Math.floor(expiresAt.getTime() / 1000),
       };
+
+      // Persist token in DB cache across requests
+      try {
+        const { db } = await import("../db");
+        const { redditOAuthCache } = await import("../db/schema");
+        await db
+          .insert(redditOAuthCache)
+          .values({
+            key: creds.clientId,
+            token: payload.access_token,
+            expiresAt,
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: redditOAuthCache.key,
+            set: {
+              token: payload.access_token,
+              expiresAt,
+              updatedAt: new Date(),
+            },
+          });
+      } catch (dbErr) {
+        // Silently continue if DB logging fails
+      }
+
       return cachedToken.token;
     } finally {
       activeTokenPromise = null;
@@ -228,6 +290,11 @@ export async function fetchRedditResponse(
   url: string,
   retriesOnAuthFailure = 1,
 ): Promise<Response> {
+  const delayMs = getRedditRateLimitDelayMs();
+  if (delayMs > 0) {
+    await sleep(delayMs);
+  }
+
   const authToken = await getRedditAccessToken();
 
   if (authToken) {

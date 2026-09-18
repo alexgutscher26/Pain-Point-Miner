@@ -81,6 +81,10 @@ describe("extractPainPoints", () => {
       subreddit: mockPost.subreddit,
       budget: [],
       triedSolutions: [],
+      schemaVersion: 2,
+      promptVersion: "v1",
+      rawResponse: `\`\`\`json\n[${JSON.stringify(mockPainPoint)}]\n\`\`\``,
+      originalLanguage: "en",
     });
   });
 
@@ -127,7 +131,63 @@ describe("extractPainPoints", () => {
       subreddit: mockPost.subreddit,
       budget: [],
       triedSolutions: ["Solution A"],
+      schemaVersion: 2,
+      promptVersion: "v1",
+      rawResponse: JSON.stringify({ painPoints: [mockPainPoint] }),
+      originalLanguage: "en",
     });
+  });
+
+  it("should detect non-English originalLanguage and return English extracted pain points", async () => {
+    const spanishPost = {
+      title: "El software de facturación actual es demasiado lento y complejo",
+      selftext: "Estamos perdiendo clientes porque la sincronización de inventario falla constantemente.",
+      url: "https://reddit.com/r/espanol/456",
+      author: "usuario_es",
+      subreddit: "espanol",
+      comments: [],
+    };
+
+    const mockExtractedSpanish = {
+      title: "Billing Software Inefficiency and Inventory Sync Failure",
+      body: "Businesses are losing customers due to persistent inventory synchronization failures and slow invoicing software.",
+      targetUser: "Small Business Owner",
+      competingProducts: ["FacturaDirecta"],
+      willingnessToPay: "paid_signal",
+      featureRequested: "Automated real-time inventory sync and streamlined invoicing",
+      originalLanguage: "es",
+      confidenceScore: 0.9,
+      painIntensity: 8,
+      urgency: 8,
+      monetizationScore: 8,
+      marketMaturity: 6,
+      budget: [],
+      triedSolutions: [],
+      sentiment: "frustrated",
+      difficulty: "side_project",
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ painPoints: [mockExtractedSpanish] }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(spanishPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].originalLanguage).toBe("es");
+    expect(result[0].title).toBe("Billing Software Inefficiency and Inventory Sync Failure");
+    expect(result[0].targetUser).toBe("Small Business Owner");
   });
 
   it("should extract confidenceScore, targetUser, competingProducts, willingnessToPay, and featureRequested", async () => {
@@ -248,7 +308,7 @@ describe("extractPainPoints", () => {
       "Error in AI extraction:",
       expect.objectContaining({
         message: expect.stringContaining(
-          "OpenRouter API error: 500 Internal Server Error - API is down",
+          "All models in fallback chain failed to produce a valid response",
         ),
       }),
     );

@@ -453,6 +453,7 @@ export const scraperPost = pgTable(
     id: text().primaryKey().notNull(),
     runId: text().notNull(),
     postId: text().notNull(),
+    subreddit: text(),
     commentCount: integer().default(0).notNull(),
     qualityScore: doublePrecision().default(0).notNull(),
     skipReason: text(),
@@ -470,8 +471,21 @@ export const scraperPost = pgTable(
       .onDelete("cascade"),
     index("scraper_post_runId_idx").on(table.runId),
     index("scraper_post_postId_idx").on(table.postId),
+    index("scraper_post_subreddit_idx").on(table.subreddit),
   ],
 );
+
+export const redditOAuthCache = pgTable("reddit_oauth_cache", {
+  key: text().primaryKey().notNull(),
+  token: text().notNull(),
+  expiresAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
 
 export const discoveryCache = pgTable("discovery_cache", {
   keyword: text().primaryKey().notNull(),
@@ -646,8 +660,16 @@ export const painPoint = pgTable(
     sourceType: painPointSourceType().default("post"),
     redditPostId: text(),
     difficulty: painPointDifficulty().default("weekend_project"),
+    schemaVersion: integer("schema_version").default(2).notNull(),
+    promptVersion: text("prompt_version").default("v1"),
+    rawResponse: text("raw_response"),
+    originalLanguage: text("original_language").default("en"),
   },
   (table) => [
+    index("pain_point_userId_schemaVersion_idx").on(
+      table.userId,
+      table.schemaVersion,
+    ),
     index("pain_point_userId_clusterId_createdAt_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
@@ -803,6 +825,8 @@ export const aiEvalLog = pgTable("ai_eval_log", {
   switched: boolean().default(false).notNull(),
   flaggedForReview: boolean().default(false).notNull(),
   reasoning: text().notNull(),
+  promptVersion: text("prompt_version").default("v1"),
+  rawResponse: text("raw_response"),
   comparisonModelId: text(),
   improvementPercentage: doublePrecision(),
   evalMetadata: jsonb(), // Stores detailed model-by-model metrics
