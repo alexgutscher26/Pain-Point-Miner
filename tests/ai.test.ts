@@ -361,6 +361,52 @@ Let's extract the root cause.
     expect(result[0].title).toBe("Reasoning Model Extracted Pain");
     expect(result[0].painIntensity).toBe(9);
   });
+
+  it("should extract and map 5-pillar ideaNarrative when provided in AI response", async () => {
+    const mockPainPoint = {
+      title: "Board Game Table Formation Automation",
+      body: "Independent game stores struggle to fill game night tables while players cannot find groups.",
+      painIntensity: 8,
+      urgency: 8,
+      monetizationScore: 8,
+      marketMaturity: 6,
+      sentiment: "frustrated",
+      triedSolutions: ["Meetup", "Facebook Events"],
+      budget: [],
+      ideaNarrative: {
+        catalystContext: "Every independent game store runs a weekly night where tables sit half empty.",
+        productMechanics: "This is player-matching software priced at $79/mo for single store, $149/mo for automatic table formation.",
+        distributionPlaybook: "The founder starts in one metro with 30 stores, closing pilots in person.",
+        wedgeAnalysis: "The wedge customer is the FLGS owner who already spends $99 to $150/mo on event calendars.",
+        revenueCeilingModel: "Money splits three ways: store subs at $1.17M ARR plus publisher campaigns and rev-shares for $3M-$6M ARR ceiling."
+      }
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ painPoints: [mockPainPoint] }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(mockPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].ideaNarrative).toBeDefined();
+    expect(result[0].ideaNarrative?.catalystContext).toContain("Every independent game store");
+    expect(result[0].ideaNarrative?.productMechanics).toContain("player-matching software");
+    expect(result[0].ideaNarrative?.distributionPlaybook).toContain("The founder starts");
+    expect(result[0].ideaNarrative?.wedgeAnalysis).toContain("The wedge customer");
+    expect(result[0].ideaNarrative?.revenueCeilingModel).toContain("Money splits three ways");
+  });
 });
 
 // ---------------------------------------------------------------------------

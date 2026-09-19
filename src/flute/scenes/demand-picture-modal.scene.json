@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "demand-picture-modal",
+  "title": "Search Demand Picture Modal",
+  "description": "Cinematic floating 3D presentation of Google Search Engine intelligence, keyword velocity, CPC metrics, and interactive area trend chart.",
+  "definition": {
+    "scene": {
+      "version": 3,
+      "camera": {
+        "x": 0,
+        "y": -10,
+        "z": 0,
+        "perspective": 1350,
+        "rotateX": 7,
+        "rotateY": 15,
+        "rotateZ": 0
+      },
+      "focus": {
+        "distance": 1350,
+        "fStop": 4.0,
+        "focalLength": 90,
+        "maxBlur": 6
+      },
+      "nodes": [
+        {
+          "id": "demand-modal-surface",
+          "transform": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "rotateX": 0,
+            "rotateY": 0,
+            "rotateZ": 0,
+            "scale": 1
+          }
+        }
+      ]
+    },
+    "motion": {
+      "durationMs": 8000,
+      "speed": 0.5,
+      "tracks": [
+        {
+          "target": { "kind": "camera" },
+          "property": "rotateY",
+          "keyframes": [
+            { "timeMs": 0, "value": 16, "easing": "cinematic" },
+            { "timeMs": 4000, "value": 0, "easing": "cinematic" },
+            { "timeMs": 8000, "value": -14, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "camera" },
+          "property": "y",
+          "keyframes": [
+            { "timeMs": 0, "value": -25, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 25, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "focus" },
+          "property": "distance",
+          "keyframes": [
+            { "timeMs": 0, "value": 1330, "easing": "cinematic" },
+            { "timeMs": 4000, "value": 1350, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 1370, "easing": "cinematic" }
+          ]
+        }
+      ]
+    },
+    "width": 1400,
+    "height": 980
+  }
+}

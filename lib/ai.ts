@@ -187,6 +187,14 @@ export type WillingnessToPaySignal =
   | "explicit_budget"
   | "unknown";
 
+export interface IdeaNarrative {
+  catalystContext?: string;
+  productMechanics?: string;
+  distributionPlaybook?: string;
+  wedgeAnalysis?: string;
+  revenueCeilingModel?: string;
+}
+
 export interface PainPointData {
   title: string;
   body: string;
@@ -215,6 +223,7 @@ export interface PainPointData {
   promptVersion?: string;
   rawResponse?: string;
   originalLanguage?: string;
+  ideaNarrative?: IdeaNarrative;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -278,6 +287,12 @@ Field Rules:
 - switchingCosts: context string if vendor lock-in or migration pain is mentioned, otherwise ""
 - triedSolutions: string[] of past tools, manual scripts, or workarounds attempted
 - sentiment: choose exactly one: "frustrated" | "curious" | "desperate" | "neutral" | "angry"
+- ideaNarrative: (IdeaBrowser 5-Pillar Investment Breakdown)
+  - catalystContext: 2-3 sentences on real-world catalyst, incumbent failures/acquisitions, thread evidence, and unmet demand.
+  - productMechanics: 2-3 sentences explaining exact software workflow and 3-tier SaaS pricing architecture ($79 / $149 / $299+).
+  - distributionPlaybook: 2-3 sentences explaining 0-to-1 distribution, direct sales vs search reality, warm demo artifact, initial pilot goal.
+  - wedgeAnalysis: 2-3 sentences detailing the exact wedge customer, budget line replaced, core retention hurdle, and churn risk.
+  - revenueCeilingModel: 2-3 sentences breaking down 3 revenue streams at ceiling, serviceable accounts, Year 1 ARR vs ARR ceiling ($3M-$6M).
 
 Return ONLY valid JSON matching:
 {
@@ -308,7 +323,14 @@ Return ONLY valid JSON matching:
       "switchingCosts": "Existing Zapier zaps must be redirected to webhook endpoint",
       "triedSolutions": ["Zapier builtin retry"],
       "sentiment": "desperate",
-      "difficulty": "side_project"
+      "difficulty": "side_project",
+      "ideaNarrative": {
+        "catalystContext": "Across modern webhook-dependent stacks, founders lose critical customer events when unhandled errors drop silently. Search for webhook reliability tools is up significantly as Zapier and Make raise tier minimums while failing to provide dedicated dead-letter queues.",
+        "productMechanics": "This is a zero-config webhook proxy that intercepts incoming payloads, persists them in an encrypted buffer, and retries failing endpoints with exponential backoff. Priced at $29/mo for solo founders, $79/mo for team queues with Slack alerts, and $199/mo for enterprise audit trails.",
+        "distributionPlaybook": "The founder targets active developers complaining about Zapier timeout errors in developer forums. The outbound motion involves sending a 30-second video demonstrating how the proxy recovers a simulated failed Stripe invoice. Converting 10 pilot teams at $79/mo is the first milestone.",
+        "wedgeAnalysis": "The wedge customer is the technical founder or lead developer who already pays $50-$200/mo for integration tools. The hard part is building ironclad sub-5ms proxy latency; the core retention risk is ensuring zero payload loss during upstream outages.",
+        "revenueCeilingModel": "Revenue splits across core developer subscriptions ($1.2M ARR across 1,500 teams), an enterprise compliance addon ($400K), and high-volume burst overages ($300K). Realistic ARR ceiling is $3M to $5M with a Year 1 target of $80K to $150K."
+      }
     }
   ]
 }`;
@@ -775,6 +797,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
         | "side_project"
         | "startup_mvp"
         | "vc_scale_moat";
+      ideaNarrative?: IdeaNarrative | null;
     }
 
     const rawPainPoints: RawPainPoint[] = Array.isArray(parsed)
@@ -837,6 +860,32 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
             : "en";
         const originalLanguage = rawLang || "en";
 
+        const ideaNarrative =
+          pp.ideaNarrative && typeof pp.ideaNarrative === "object"
+            ? {
+                catalystContext:
+                  typeof pp.ideaNarrative.catalystContext === "string"
+                    ? pp.ideaNarrative.catalystContext.trim()
+                    : undefined,
+                productMechanics:
+                  typeof pp.ideaNarrative.productMechanics === "string"
+                    ? pp.ideaNarrative.productMechanics.trim()
+                    : undefined,
+                distributionPlaybook:
+                  typeof pp.ideaNarrative.distributionPlaybook === "string"
+                    ? pp.ideaNarrative.distributionPlaybook.trim()
+                    : undefined,
+                wedgeAnalysis:
+                  typeof pp.ideaNarrative.wedgeAnalysis === "string"
+                    ? pp.ideaNarrative.wedgeAnalysis.trim()
+                    : undefined,
+                revenueCeilingModel:
+                  typeof pp.ideaNarrative.revenueCeilingModel === "string"
+                    ? pp.ideaNarrative.revenueCeilingModel.trim()
+                    : undefined,
+              }
+            : undefined;
+
         return {
           ...pp,
           confidenceScore,
@@ -853,6 +902,7 @@ ${customPatternsSection ? `${customPatternsSection}\n\n` : ""}Instructions:
           schemaVersion: CURRENT_EXTRACTION_SCHEMA_VERSION,
           promptVersion: resolvedPrompt.promptVersion,
           rawResponse: rawResponsePreview,
+          ideaNarrative,
         };
       })
       .filter(
@@ -1158,6 +1208,7 @@ ${topComments || "  (no comments)"}`;
         | "side_project"
         | "startup_mvp"
         | "vc_scale_moat";
+      ideaNarrative?: IdeaNarrative | null;
     }
 
     // Parse extractions array or fallback formats
@@ -1239,6 +1290,32 @@ ${topComments || "  (no comments)"}`;
             : "en";
         const originalLanguage = rawLang || "en";
 
+        const ideaNarrative =
+          pp.ideaNarrative && typeof pp.ideaNarrative === "object"
+            ? {
+                catalystContext:
+                  typeof pp.ideaNarrative.catalystContext === "string"
+                    ? pp.ideaNarrative.catalystContext.trim()
+                    : undefined,
+                productMechanics:
+                  typeof pp.ideaNarrative.productMechanics === "string"
+                    ? pp.ideaNarrative.productMechanics.trim()
+                    : undefined,
+                distributionPlaybook:
+                  typeof pp.ideaNarrative.distributionPlaybook === "string"
+                    ? pp.ideaNarrative.distributionPlaybook.trim()
+                    : undefined,
+                wedgeAnalysis:
+                  typeof pp.ideaNarrative.wedgeAnalysis === "string"
+                    ? pp.ideaNarrative.wedgeAnalysis.trim()
+                    : undefined,
+                revenueCeilingModel:
+                  typeof pp.ideaNarrative.revenueCeilingModel === "string"
+                    ? pp.ideaNarrative.revenueCeilingModel.trim()
+                    : undefined,
+              }
+            : undefined;
+
         allExtracted.push({
           title: pp.title,
           body: pp.body || post.title,
@@ -1262,6 +1339,7 @@ ${topComments || "  (no comments)"}`;
           schemaVersion: CURRENT_EXTRACTION_SCHEMA_VERSION,
           promptVersion: resolvedPrompt.promptVersion,
           rawResponse: rawResponsePreview,
+          ideaNarrative,
         });
       }
     }

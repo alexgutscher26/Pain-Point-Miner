@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "id": "idea-market-snapshot",
+  "title": "Idea Market Snapshot & The Receipts",
+  "description": "Cinematic 3D presentation of the Idea Detail view featuring Market Snapshot receipts, search demand intelligence, Whitespace market gap, and The Wedge strategy.",
+  "definition": {
+    "scene": {
+      "version": 3,
+      "camera": {
+        "x": 0,
+        "y": -15,
+        "z": 0,
+        "perspective": 1400,
+        "rotateX": 6,
+        "rotateY": -14,
+        "rotateZ": 0
+      },
+      "focus": {
+        "distance": 1400,
+        "fStop": 4.5,
+        "focalLength": 85,
+        "maxBlur": 5
+      },
+      "nodes": [
+        {
+          "id": "market-snapshot-card",
+          "transform": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "rotateX": 0,
+            "rotateY": 0,
+            "rotateZ": 0,
+            "scale": 1
+          }
+        }
+      ]
+    },
+    "motion": {
+      "durationMs": 7500,
+      "speed": 0.5,
+      "tracks": [
+        {
+          "target": { "kind": "camera" },
+          "property": "rotateY",
+          "keyframes": [
+            { "timeMs": 0, "value": -16, "easing": "cinematic" },
+            { "timeMs": 3750, "value": 0, "easing": "cinematic" },
+            { "timeMs": 7500, "value": 14, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "camera" },
+          "property": "y",
+          "keyframes": [
+            { "timeMs": 0, "value": -30, "easing": "cinematic" },
+            { "timeMs": 7500, "value": 30, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "camera" },
+          "property": "rotateX",
+          "keyframes": [
+            { "timeMs": 0, "value": 6, "easing": "cinematic" },
+            { "timeMs": 3750, "value": 2, "easing": "cinematic" },
+            { "timeMs": 7500, "value": 5, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "focus" },
+          "property": "distance",
+          "keyframes": [
+            { "timeMs": 0, "value": 1390, "easing": "cinematic" },
+            { "timeMs": 7500, "value": 1410, "easing": "cinematic" }
+          ]
+        }
+      ]
+    },
+    "width": 1400,
+    "height": 980
+  }
+}

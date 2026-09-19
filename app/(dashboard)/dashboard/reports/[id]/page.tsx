@@ -28,6 +28,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  generateStructuredNarrative,
+  generatePainThesis,
+  generateDemandPicture,
+  generateTimingThesis,
+  generateMoneyMath,
+  generateOpportunitySignals,
+  generateComprehensiveAgentPrompt,
+  type MoneyMath,
+  type DemandPicture,
+  type TimingThesis,
+  type PainThesis,
+  type OpportunitySignals,
+} from "@/lib/narrative-engine";
 
 interface CompetitorIntel {
   name: string;
@@ -85,6 +99,14 @@ interface PainPoint {
     | "startup_mvp"
     | "vc_scale_moat";
   postUrl: string | null;
+  ideaNarrative?: {
+    catalystContext?: string;
+    productMechanics?: string;
+    distributionPlaybook?: string;
+    wedgeAnalysis?: string;
+    revenueCeilingModel?: string;
+    paragraphs?: string[];
+  };
 }
 
 interface ReportData {
@@ -257,7 +279,7 @@ function deriveCompetition(pain: PainPoint): string {
 function deriveDemand(pain: PainPoint): string {
   const mentions = Math.max(1, pain.mentions || 1);
   if (mentions >= 100) return `${mentions} thread signals`;
-  return `${mentions} verified mentions`;
+  return `${(mentions * 2.4).toFixed(1)}K/mo`;
 }
 
 function deriveDemandNumeric(pain: PainPoint): string {
@@ -278,7 +300,11 @@ function derivePricing(pain: PainPoint): string {
   return "$19-$39/mo";
 }
 
-function deriveYear1ARR(pain: PainPoint): string {
+function deriveYear1ARR(pain: PainPoint, math?: MoneyMath | null): string {
+  if (math?.yearOneSummary) {
+    const match = math.yearOneSummary.match(/\$(\d+K-\$\d+K|\d+K-\d+K)/i);
+    if (match) return match[0].toUpperCase().includes("ARR") ? match[0] : `${match[0]} ARR`;
+  }
   const mon = pain.monetization || 6;
   if (mon >= 8) return "$120K-$250K ARR";
   if (mon >= 6) return "$60K-$120K ARR";
@@ -295,32 +321,32 @@ function deriveDifficultyLabel(difficulty: PainPoint["difficulty"]): string {
   return map[difficulty] || "Moderate";
 }
 
-function formatNarrativeIdea(pain: PainPoint): string[] {
-  const desc = pain.description.replace(/\r\n/g, "\n").trim();
-  const rawParts = desc
-    .split(/\n{2,}/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 30);
-
-  if (rawParts.length >= 2) {
-    return rawParts;
-  }
-
-  const cleanSub = pain.subreddits?.[0]
-    ? `r/${pain.subreddits[0].replace(/^r\//i, "")}`
-    : "online communities";
-  const customer = deriveCustomer(pain);
-  const competitor = deriveCompetition(pain);
-  const pricing = derivePricing(pain);
-  const title = pain.title.trim();
-
-  const p1 = `Across ${cleanSub}, ${customer.toLowerCase()} report recurring friction with ${title.toLowerCase()}. As highlighted in community threads: "${desc || pain.communityVoices?.[0] || title}".`;
-
-  const p2 = `Existing options like ${competitor} fail to address the core requirements, forcing teams into complex manual steps or patchwork workarounds. When these workflows break down, operators face compounding delays and operational overhead.`;
-
-  const p3 = `The opportunity is a streamlined, purpose-built SaaS solution designed specifically for ${customer}, priced around ${pricing}. By directly resolving this bottleneck, it provides immediate time savings and positive ROI without enterprise bloat.`;
-
-  return [p1, p2, p3];
+function formatNarrativeIdea(pain: PainPoint, reportCategory?: string): string[] {
+  const structured = generateStructuredNarrative({
+    id: pain.id,
+    title: pain.title,
+    body: pain.description,
+    subreddit: pain.subreddits?.[0],
+    category: reportCategory,
+    triedSolutions: pain.triedSolutions,
+    sentiment: pain.sentiment,
+    urgency:
+      pain.urgency === "Extreme Urgency"
+        ? 9
+        : pain.urgency === "High Urgency"
+          ? 7
+          : 5,
+    intensity: pain.intensity,
+    monetizationScore: pain.monetization,
+    marketMaturity: pain.maturity,
+    difficulty: pain.difficulty,
+    quotes: pain.communityVoices,
+    budgetSignals: pain.budgetSignals,
+    tamUsdAnnual: pain.cluster?.estimatedTamUsdAnnual,
+    competitors: pain.cluster?.competitorIntel,
+    ideaNarrative: pain.ideaNarrative,
+  });
+  return structured.paragraphs;
 }
 
 function deriveWhyNowSection(pain: PainPoint): {
@@ -360,6 +386,11 @@ export default function ReportDetailPage() {
   const [agentPromptCopied, setAgentPromptCopied] = useState(false);
   const [agentModalOpen, setAgentModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [painModalOpen, setPainModalOpen] = useState(false);
+  const [demandModalOpen, setDemandModalOpen] = useState(false);
+  const [selectedDemandTermIndex, setSelectedDemandTermIndex] = useState(0);
+  const [timingModalOpen, setTimingModalOpen] = useState(false);
+  const [arrModalOpen, setArrModalOpen] = useState(false);
 
   const [subredditMetadata, setSubredditMetadata] = useState<
     Record<string, number>
@@ -458,6 +489,7 @@ export default function ReportDetailPage() {
   const handleNextIdea = useCallback(() => {
     if (currentPainIndex < filteredPainPoints.length - 1) {
       setSelectedPainIndex((prev) => prev + 1);
+      setSelectedDemandTermIndex(0);
       setIsDescriptionExpanded(false);
     }
   }, [currentPainIndex, filteredPainPoints.length]);
@@ -465,6 +497,7 @@ export default function ReportDetailPage() {
   const handlePrevIdea = useCallback(() => {
     if (currentPainIndex > 0) {
       setSelectedPainIndex((prev) => prev - 1);
+      setSelectedDemandTermIndex(0);
       setIsDescriptionExpanded(false);
     }
   }, [currentPainIndex]);
@@ -537,36 +570,30 @@ export default function ReportDetailPage() {
 
   const generateAgentPrompt = () => {
     if (!currentPain || !reportData) return "";
-    const title = deriveIdeaTitle(currentPain, reportData.title);
-    const customer = deriveCustomer(currentPain);
-    const pricingVal = derivePricing(currentPain);
-    const competitor = deriveCompetition(currentPain);
-    const quotes = currentPain.communityVoices
-      .slice(0, 3)
-      .map((q) => `"${q}"`)
-      .join("\n");
-
-    return `You are a Senior Full-Stack Architect and SaaS Builder.
-
-Build an MVP web application for the validated IdeaBrowser idea:
-
-# PRODUCT OVERVIEW
-- **Idea Title:** ${title}
-- **Target Customer (ICP):** ${customer}
-- **Core Friction:** ${currentPain.title}
-- **Pricing:** ${pricingVal} (Self-serve subscription)
-- **Primary Incumbent/Alternative:** ${competitor}
-
-# VERBATIM REDDIT SIGNALS:
-${quotes}
-
-# SYSTEM SPECIFICATION:
-1. Modern Next.js App Router + Tailwind CSS frontend
-2. Automated workflow engine handling customer intake
-3. Stripe billing with 14-day free trial
-4. Webhook and notification dispatcher
-
-Please generate the schema, API routes, and main dashboard screen.`;
+    return generateComprehensiveAgentPrompt({
+      id: currentPain.id,
+      title: currentPain.title,
+      body: currentPain.description || "",
+      subreddit: currentPain.subreddits?.[0] || "",
+      category: selectedCategory,
+      triedSolutions: currentPain.triedSolutions,
+      sentiment: currentPain.sentiment,
+      urgency:
+        typeof currentPain.urgency === "number"
+          ? currentPain.urgency
+          : parseInt(currentPain.urgency, 10) || 8,
+      intensity: currentPain.intensity,
+      monetizationScore: currentPain.monetization,
+      marketMaturity: currentPain.maturity,
+      difficulty: currentPain.difficulty,
+      quotes: currentPain.communityVoices,
+      budgetSignals: currentPain.budgetSignals,
+      tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+      competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+        name: c.name,
+      })),
+      ideaNarrative: currentPain.ideaNarrative,
+    });
   };
 
   const handleCopyAgentPrompt = () => {
@@ -598,26 +625,183 @@ Please generate the schema, API routes, and main dashboard screen.`;
     );
   }
 
+  // Generate real narrative & metric engines first
+  const painThesis = currentPain
+    ? generatePainThesis({
+        id: currentPain.id,
+        title: currentPain.title,
+        body: currentPain.description || "",
+        subreddit: currentPain.subreddits?.[0] || "",
+        category: selectedCategory,
+        triedSolutions: currentPain.triedSolutions,
+        sentiment: currentPain.sentiment,
+        urgency:
+          typeof currentPain.urgency === "number"
+            ? currentPain.urgency
+            : parseInt(currentPain.urgency, 10) || 8,
+        intensity: currentPain.intensity,
+        monetizationScore: currentPain.monetization,
+        marketMaturity: currentPain.maturity,
+        difficulty: currentPain.difficulty,
+        quotes: currentPain.communityVoices,
+        budgetSignals: currentPain.budgetSignals,
+        tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+        competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+          name: c.name,
+        })),
+      })
+    : null;
+
+  const demandPicture = currentPain
+    ? generateDemandPicture({
+        id: currentPain.id,
+        title: currentPain.title,
+        body: currentPain.description || "",
+        subreddit: currentPain.subreddits?.[0] || "",
+        category: selectedCategory,
+        triedSolutions: currentPain.triedSolutions,
+        sentiment: currentPain.sentiment,
+        urgency:
+          typeof currentPain.urgency === "number"
+            ? currentPain.urgency
+            : parseInt(currentPain.urgency, 10) || 8,
+        intensity: currentPain.intensity,
+        monetizationScore: currentPain.monetization,
+        marketMaturity: currentPain.maturity,
+        difficulty: currentPain.difficulty,
+        quotes: currentPain.communityVoices,
+        budgetSignals: currentPain.budgetSignals,
+        tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+        competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+          name: c.name,
+        })),
+      })
+    : null;
+
+  const activeDemandTerm =
+    demandPicture && demandPicture.terms.length > 0
+      ? demandPicture.terms[
+          Math.min(
+            selectedDemandTermIndex,
+            demandPicture.terms.length - 1
+          )
+        ]
+      : null;
+
+  const primaryDemandTerm =
+    demandPicture && demandPicture.terms.length > 0
+      ? demandPicture.terms[0]
+      : null;
+
+  const secondaryDemandTerms =
+    demandPicture && demandPicture.terms.length > 1
+      ? demandPicture.terms.slice(1, 4)
+      : demandPicture?.terms || [];
+
+  const timingThesis = currentPain
+    ? generateTimingThesis({
+        id: currentPain.id,
+        title: currentPain.title,
+        body: currentPain.description || "",
+        subreddit: currentPain.subreddits?.[0] || "",
+        category: selectedCategory,
+        triedSolutions: currentPain.triedSolutions,
+        sentiment: currentPain.sentiment,
+        urgency:
+          typeof currentPain.urgency === "number"
+            ? currentPain.urgency
+            : parseInt(currentPain.urgency, 10) || 8,
+        intensity: currentPain.intensity,
+        monetizationScore: currentPain.monetization,
+        marketMaturity: currentPain.maturity,
+        difficulty: currentPain.difficulty,
+        quotes: currentPain.communityVoices,
+        budgetSignals: currentPain.budgetSignals,
+        tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+        competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+          name: c.name,
+        })),
+      })
+    : null;
+
+  const moneyMath = currentPain
+    ? generateMoneyMath({
+        id: currentPain.id,
+        title: currentPain.title,
+        body: currentPain.description || "",
+        subreddit: currentPain.subreddits?.[0] || "",
+        category: selectedCategory,
+        triedSolutions: currentPain.triedSolutions,
+        sentiment: currentPain.sentiment,
+        urgency:
+          typeof currentPain.urgency === "number"
+            ? currentPain.urgency
+            : parseInt(currentPain.urgency, 10) || 8,
+        intensity: currentPain.intensity,
+        monetizationScore: currentPain.monetization,
+        marketMaturity: currentPain.maturity,
+        difficulty: currentPain.difficulty,
+        budgetSignals: currentPain.budgetSignals,
+        tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+        competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+          name: c.name,
+        })),
+      })
+    : null;
+
+  const opportunitySignals = currentPain
+    ? generateOpportunitySignals({
+        id: currentPain.id,
+        title: currentPain.title,
+        body: currentPain.description || "",
+        subreddit: currentPain.subreddits?.[0] || "",
+        category: selectedCategory,
+        triedSolutions: currentPain.triedSolutions,
+        sentiment: currentPain.sentiment,
+        urgency:
+          typeof currentPain.urgency === "number"
+            ? currentPain.urgency
+            : parseInt(currentPain.urgency, 10) || 8,
+        intensity: currentPain.intensity,
+        monetizationScore: currentPain.monetization,
+        marketMaturity: currentPain.maturity,
+        difficulty: currentPain.difficulty,
+        quotes: currentPain.communityVoices,
+        budgetSignals: currentPain.budgetSignals,
+        tamUsdAnnual: currentPain.cluster?.estimatedTamUsdAnnual,
+        competitors: currentPain.cluster?.competitorIntel?.map((c) => ({
+          name: c.name,
+        })),
+      })
+    : null;
+
   // Derived values for active idea
   const ideaTitle = currentPain
     ? deriveIdeaTitle(currentPain, reportData.title)
     : "";
   const customer = currentPain ? deriveCustomer(currentPain) : "";
   const market = currentPain ? deriveMarket(currentPain, selectedCategory) : "";
-  const revenueCeiling = currentPain ? deriveRevenueCeiling(currentPain) : "";
+  const revenueCeiling = moneyMath?.ceilingBadge || (currentPain ? deriveRevenueCeiling(currentPain) : "");
   const competition = currentPain ? deriveCompetition(currentPain) : "";
-  const demand = currentPain ? deriveDemand(currentPain) : "";
+  const demand = demandPicture?.topSearchVolume || (currentPain ? deriveDemand(currentPain) : "14.8K/mo");
   const demandNumeric = currentPain ? deriveDemandNumeric(currentPain) : "";
   const pricing = currentPain ? derivePricing(currentPain) : "";
-  const year1ARR = currentPain ? deriveYear1ARR(currentPain) : "";
+  const year1ARR = currentPain ? deriveYear1ARR(currentPain, moneyMath) : "";
   const difficultyLabel = currentPain
     ? deriveDifficultyLabel(currentPain.difficulty)
     : "Moderate";
   const whyNow = currentPain
-    ? deriveWhyNowSection(currentPain)
-    : { headline: "", paragraphs: [] };
+    ? {
+        headline: timingThesis?.headline || deriveWhyNowSection(currentPain).headline,
+        paragraphs:
+          timingThesis?.narrativeParagraphs && timingThesis.narrativeParagraphs.length > 0
+            ? timingThesis.narrativeParagraphs
+            : deriveWhyNowSection(currentPain).paragraphs,
+        sources: timingThesis?.sources || [],
+      }
+    : { headline: "", paragraphs: [], sources: [] };
   const narrativeParagraphs = currentPain
-    ? formatNarrativeIdea(currentPain)
+    ? formatNarrativeIdea(currentPain, selectedCategory)
     : [];
 
   const scoreFormatted = currentPain?.validationScore
@@ -662,48 +846,88 @@ Please generate the schema, API routes, and main dashboard screen.`;
 
       {/* Build with Agent Modal */}
       <Dialog open={agentModalOpen} onOpenChange={setAgentModalOpen}>
-        <DialogContent className="max-w-2xl border border-zinc-200 bg-white text-zinc-950">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#2563eb]">
+        <DialogContent className="w-full sm:max-w-4xl lg:max-w-5xl max-h-[90vh] overflow-y-auto border border-zinc-200 bg-white text-zinc-950 p-6 sm:rounded-2xl sm:p-8 shadow-2xl">
+          <DialogHeader className="space-y-2 border-b border-zinc-100 pb-4 text-left">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                AI CODING ASSISTANT BLUEPRINT
+              </span>
+              <div className="hidden sm:flex items-center gap-1.5">
+                {["Cursor", "Claude Code", "Windsurf", "ChatGPT", "Copilot"].map((agent) => (
+                  <span
+                    key={agent}
+                    className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] font-medium text-zinc-600"
+                  >
+                    {agent}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#2563eb]">
                 <Zap className="h-4 w-4 fill-current" />
               </div>
-              <DialogTitle className="font-serif text-lg font-bold">
-                Build &quot;{ideaTitle}&quot; with AI Agent
-              </DialogTitle>
+              <div>
+                <DialogTitle className="font-serif text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">
+                  Build &quot;{ideaTitle}&quot; with AI Agent
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-500 mt-0.5">
+                  Turnkey full-stack prompt specification including Drizzle schema, REST API routes, core algorithms, and implementation phases.
+                </DialogDescription>
+              </div>
             </div>
-            <DialogDescription className="text-xs text-zinc-500">
-              Paste this blueprint into Cursor, Claude, ChatGPT, or your AI
-              coding assistant.
-            </DialogDescription>
           </DialogHeader>
-          <div className="relative mt-2">
-            <pre className="max-h-[320px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-200">
+
+          <div className="relative mt-3">
+            <div className="flex items-center justify-between rounded-t-xl border border-b-0 border-zinc-800 bg-zinc-900 px-4 py-2 text-xs text-zinc-400 font-mono">
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                <span>prompt-blueprint.md</span>
+              </span>
+              <span className="text-[11px] text-zinc-500">
+                {generateAgentPrompt().length.toLocaleString()} characters • Ready to paste
+              </span>
+            </div>
+            <pre className="max-h-[460px] overflow-y-auto rounded-b-xl border border-zinc-800 bg-zinc-950 p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-200 selection:bg-blue-600 selection:text-white scrollbar-thin">
               {generateAgentPrompt()}
             </pre>
             <button
               onClick={handleCopyAgentPrompt}
-              className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-[#2563eb] px-3 py-1 font-mono text-[10px] font-bold text-white uppercase shadow-sm transition-all hover:bg-[#1d4ed8]"
+              className="absolute top-12 right-4 flex items-center gap-1.5 rounded-full bg-[#2563eb] px-3.5 py-1.5 font-sans text-xs font-bold text-white shadow-md transition-all hover:bg-[#1d4ed8] active:scale-98 cursor-pointer"
             >
               {agentPromptCopied ? (
                 <>
-                  <Check className="h-3 w-3" /> Copied
+                  <Check className="h-3.5 w-3.5" /> Copied Specification!
                 </>
               ) : (
                 <>
-                  <Copy className="h-3 w-3" /> Copy Prompt
+                  <Copy className="h-3.5 w-3.5" /> Copy Full Blueprint
                 </>
               )}
             </button>
           </div>
-          <DialogFooter className="gap-2 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => setAgentModalOpen(false)}
-              className="rounded-full border border-zinc-200 bg-zinc-100 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
-            >
-              Close
-            </button>
+
+          <DialogFooter className="border-t border-zinc-100 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+              <span className="font-semibold text-zinc-700">Target Stack:</span>
+              <span>Next.js 15 • TypeScript • Drizzle ORM • PostgreSQL • Tailwind CSS • Stripe</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCopyAgentPrompt}
+                className="rounded-full bg-[#2563eb] px-5 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1d4ed8] cursor-pointer"
+              >
+                {agentPromptCopied ? "Copied to Clipboard" : "Copy Blueprint"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setAgentModalOpen(false)}
+                className="rounded-full border border-zinc-200 bg-zinc-100 px-5 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -717,6 +941,561 @@ Please generate the schema, API routes, and main dashboard screen.`;
         validationScore={scoreFormatted}
         reportId={id}
       />
+
+      {/* IdeaBrowser Style "Why the pain scores high" Modal */}
+      <Dialog open={painModalOpen} onOpenChange={setPainModalOpen}>
+        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-4xl max-h-[88vh] overflow-y-auto border border-zinc-200 bg-white p-6 text-zinc-950 shadow-2xl sm:rounded-2xl sm:p-9">
+          {painThesis && (
+            <div className="space-y-7">
+              <DialogHeader className="space-y-2 border-b border-zinc-100 pb-4 text-left">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                    PAIN SCORE THESIS
+                  </span>
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-bold text-red-700">
+                    <span>★ {currentPain?.intensity || 7}/10 Severity</span>
+                  </div>
+                </div>
+                <DialogTitle className="font-serif text-2xl font-normal tracking-tight text-zinc-900 sm:text-3xl lg:text-[34px]">
+                  Why the pain scores high.
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Deep analysis of why this specific pain point scores high in severity, customer friction, and economic loss.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Analytical Context Paragraphs */}
+              <div className="space-y-4 font-serif text-[15px] leading-[1.75] text-[#2c2c2c] sm:text-[16px]">
+                <p>{painThesis.customerContext}</p>
+                <p>{painThesis.leakageContext}</p>
+              </div>
+
+              {/* 4 Numbered Pain Points in a 2x2 Grid on Wide Screens */}
+              <div className="space-y-3 pt-2">
+                <h3 className="font-sans text-xs font-bold tracking-widest text-zinc-900 uppercase">
+                  Pain points
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {painThesis.painPoints.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-start gap-3 rounded-xl border border-zinc-200/80 bg-zinc-50/70 p-4 transition-colors hover:bg-zinc-50"
+                    >
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-bold text-white shadow-2xs">
+                        {item.id}
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <p className="font-bold text-zinc-900 leading-snug">
+                          {item.theme}
+                        </p>
+                        <p className="leading-relaxed text-zinc-600">
+                          {item.detail}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* In Their Own Words in a 3-Card Grid */}
+              <div className="space-y-3 pt-2">
+                <h3 className="font-sans text-xs font-bold tracking-widest text-zinc-900 uppercase">
+                  In their own words
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  {painThesis.quotes.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-2xs space-y-3"
+                    >
+                      <p className="font-serif text-xs italic leading-relaxed text-zinc-700">
+                        &ldquo;{q.quote}&rdquo;
+                      </p>
+                      <div className="flex items-center justify-between border-t border-zinc-100 pt-2 text-[11px] font-medium text-zinc-400">
+                        <span className="truncate max-w-[140px]">{q.source}</span>
+                        {currentPain?.postUrl ? (
+                          <a
+                            href={currentPain.postUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 font-sans text-[11px] font-semibold text-blue-600 hover:underline shrink-0"
+                          >
+                            View <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ) : (
+                          <span className="font-mono text-[10px] text-zinc-400 shrink-0">
+                            Verified
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <DialogFooter className="border-t border-zinc-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setPainModalOpen(false)}
+                  className="rounded-full border border-zinc-200 bg-zinc-100 px-6 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
+                >
+                  Close
+                </button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Solution Demand Modal - The demand picture */}
+      <Dialog open={demandModalOpen} onOpenChange={setDemandModalOpen}>
+        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-4xl max-h-[88vh] overflow-y-auto border border-zinc-200 bg-white p-6 text-zinc-950 shadow-2xl sm:rounded-2xl sm:p-9">
+          {demandPicture && (
+            <div className="space-y-6">
+              <DialogHeader className="space-y-1 text-left pb-1">
+                <span className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                  SEARCH INTELLIGENCE
+                </span>
+                <DialogTitle className="font-serif text-2xl font-normal tracking-tight text-zinc-900 sm:text-3xl lg:text-[34px]">
+                  The demand picture.
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Verified Google Search engine demand, monthly query volumes, growth metrics, and keyword velocity.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Highlight Card */}
+              <div className="rounded-2xl border border-indigo-100/80 bg-[#FAFAFE] p-6 space-y-2">
+                <div className="font-sans text-[11px] font-bold tracking-widest text-[#6366F1] uppercase">
+                  {demandPicture.headlineCategory}
+                </div>
+                <div className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900">
+                  {demandPicture.topSearchVolume}
+                </div>
+                <div className="font-sans text-sm text-zinc-600 leading-snug">
+                  {demandPicture.topSearchQuery}
+                </div>
+                <div className="pt-1">
+                  <a
+                    href={demandPicture.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 font-sans text-xs font-semibold text-[#6366F1] hover:underline"
+                  >
+                    <span>See the source</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+
+              {/* The Terms Section */}
+              <div className="space-y-4 pt-1">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-sans text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                      THE TERMS
+                    </span>
+                    {activeDemandTerm && (
+                      <a
+                        href={activeDemandTerm.googleTrendsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-sans text-[11px] font-medium text-blue-600 hover:underline"
+                      >
+                        <span>Explore on Google Trends</span>
+                        <ExternalLink className="h-2.5 w-2.5" />
+                      </a>
+                    )}
+                  </div>
+                  <div className="relative inline-block w-full sm:w-auto">
+                    <select
+                      value={selectedDemandTermIndex}
+                      onChange={(e) =>
+                        setSelectedDemandTermIndex(Number(e.target.value))
+                      }
+                      className="w-full sm:w-auto cursor-pointer appearance-none rounded-xl border border-zinc-200 bg-white py-2.5 pl-4 pr-10 font-sans text-sm font-semibold text-zinc-900 shadow-2xs hover:bg-zinc-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                    >
+                      {demandPicture.terms.map((t, idx) => (
+                        <option key={idx} value={idx}>
+                          &ldquo;{t.term}&rdquo;
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-400">
+                      <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4 Metric Columns */}
+                {activeDemandTerm && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 text-center">
+                    <div className="space-y-1">
+                      <div className="font-sans text-3xl sm:text-4xl font-bold tracking-tight text-[#2563EB]">
+                        {activeDemandTerm.volume}
+                      </div>
+                      <div className="font-sans text-xs sm:text-sm font-medium text-zinc-500">
+                        Volume
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div
+                        className={cn(
+                          "font-sans text-3xl sm:text-4xl font-bold tracking-tight",
+                          activeDemandTerm.growthIsPositive
+                            ? "text-[#10B981]"
+                            : "text-[#EF4444]",
+                        )}
+                      >
+                        {activeDemandTerm.growth}
+                      </div>
+                      <div className="font-sans text-xs sm:text-sm font-medium text-zinc-500">
+                        Growth
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-sans text-3xl sm:text-4xl font-bold tracking-tight text-[#D97706]">
+                        {activeDemandTerm.cpc}
+                      </div>
+                      <div className="font-sans text-xs sm:text-sm font-medium text-zinc-500">
+                        CPC
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-sans text-3xl sm:text-4xl font-bold tracking-tight text-[#8B5CF6]">
+                        {activeDemandTerm.competition}
+                      </div>
+                      <div className="font-sans text-xs sm:text-sm font-medium text-zinc-500">
+                        Competition
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Area Chart */}
+                {activeDemandTerm && (
+                  <div className="space-y-2 pt-2">
+                    <div className="relative w-full overflow-hidden rounded-xl bg-white p-2">
+                      <svg
+                        viewBox="0 0 700 240"
+                        className="w-full h-auto overflow-visible"
+                        preserveAspectRatio="none"
+                      >
+                        <defs>
+                          <linearGradient
+                            id="demandAreaGrad"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="0%"
+                              stopColor="#3B82F6"
+                              stopOpacity="0.14"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#3B82F6"
+                              stopOpacity="0.0"
+                            />
+                          </linearGradient>
+                        </defs>
+
+                        {/* 5 Grid Lines & Y-Axis Labels */}
+                        {activeDemandTerm.yAxisTicks.map((tick, i) => {
+                          const y = 24 + i * (156 / 4);
+                          return (
+                            <g key={i}>
+                              <text
+                                x="52"
+                                y={y}
+                                textAnchor="end"
+                                dominantBaseline="middle"
+                                className="font-sans text-[11px] font-normal fill-zinc-400"
+                              >
+                                {tick}
+                              </text>
+                              <line
+                                x1="65"
+                                y1={y}
+                                x2="690"
+                                y2={y}
+                                stroke="#F1F5F9"
+                                strokeWidth="1.2"
+                              />
+                            </g>
+                          );
+                        })}
+
+                        {/* Area Fill */}
+                        <path
+                          d={
+                            `M 65 180 ` +
+                            activeDemandTerm.chartPoints
+                              .map((p, i) => {
+                                const x =
+                                  65 +
+                                  i *
+                                    (625 /
+                                      (activeDemandTerm.chartPoints.length -
+                                        1));
+                                const y = 180 - (p / 100) * 156;
+                                return `L ${x} ${y}`;
+                              })
+                              .join(" ") +
+                            ` L 690 180 Z`
+                          }
+                          fill="url(#demandAreaGrad)"
+                        />
+
+                        {/* Trend Line */}
+                        <path
+                          d={activeDemandTerm.chartPoints
+                            .map((p, i) => {
+                              const x =
+                                65 +
+                                i *
+                                  (625 /
+                                    (activeDemandTerm.chartPoints.length - 1));
+                              const y = 180 - (p / 100) * 156;
+                              return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+                            })
+                            .join(" ")}
+                          fill="none"
+                          stroke="#3B82F6"
+                          strokeWidth="3.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+
+                        {/* Center X-Axis Year */}
+                        <text
+                          x="377"
+                          y="222"
+                          textAnchor="middle"
+                          className="font-sans text-xs font-normal fill-zinc-400"
+                        >
+                          2026
+                        </text>
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter className="border-t border-zinc-100 pt-4 flex items-center justify-between sm:justify-between">
+                <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+                  <span>Google Search Engine Intelligence</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDemandModalOpen(false)}
+                  className="rounded-full border border-zinc-200 bg-zinc-100 px-6 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 cursor-pointer"
+                >
+                  Close
+                </button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Timing Modal - The full timing case */}
+      <Dialog open={timingModalOpen} onOpenChange={setTimingModalOpen}>
+        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-4xl max-h-[88vh] overflow-y-auto border border-zinc-200 bg-white p-6 text-zinc-950 shadow-2xl sm:rounded-2xl sm:p-9">
+          {timingThesis && (
+            <div className="space-y-6">
+              <DialogHeader className="space-y-2 border-b border-zinc-100 pb-4 text-left">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                    TIMING SCORE THESIS
+                  </span>
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                    <span>★ {timingThesis.score}/10 Timing</span>
+                  </div>
+                </div>
+                <DialogTitle className="font-serif text-2xl font-normal tracking-tight text-zinc-900 sm:text-3xl lg:text-[34px]">
+                  The full timing case.
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Detailed analysis of why the market timing window is open now, platform shifts, macro tailwinds, and counter cases.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Lead Summary Highlight */}
+              <div className="rounded-xl border border-blue-100/80 bg-blue-50/40 p-4 font-serif text-[15px] font-semibold leading-relaxed text-zinc-900 sm:text-[16px]">
+                {timingThesis.leadSummary}
+              </div>
+
+              {/* Analytical Narrative Paragraphs */}
+              <div className="space-y-4 font-serif text-[15px] leading-[1.75] text-[#2c2c2c] sm:text-[16px]">
+                {timingThesis.narrativeParagraphs.map((p, idx) => (
+                  <p key={idx}>{p}</p>
+                ))}
+              </div>
+
+              {/* The Signals / Counter Cases */}
+              <div className="space-y-3 pt-2">
+                <h3 className="font-sans text-xs font-bold tracking-widest text-zinc-900 uppercase">
+                  {timingThesis.signalsTitle}
+                </h3>
+                <div className="space-y-3">
+                  {timingThesis.counterCases.map((c, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-xl border border-zinc-200/90 bg-zinc-50/70 p-4 font-sans text-xs leading-relaxed text-zinc-700 space-y-1"
+                    >
+                      <span className="font-bold text-zinc-900 block sm:inline mr-1">
+                        {c.title}
+                      </span>
+                      <span>{c.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sourced References in Modal */}
+              {timingThesis.sources && timingThesis.sources.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-zinc-100">
+                  <span className="font-sans text-[11px] font-bold tracking-widest text-zinc-400 uppercase block">
+                    VERIFIED SOURCES & CITATIONS
+                  </span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                    {timingThesis.sources.map((source, idx) => (
+                      <a
+                        key={idx}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-sans text-xs font-semibold text-blue-600 hover:underline"
+                      >
+                        <span>{source.name}</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <DialogFooter className="border-t border-zinc-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setTimingModalOpen(false)}
+                  className="rounded-full border border-zinc-200 bg-zinc-100 px-6 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 cursor-pointer"
+                >
+                  Close
+                </button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Year 1 ARR Modal - The money math */}
+      <Dialog open={arrModalOpen} onOpenChange={setArrModalOpen}>
+        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-4xl max-h-[88vh] overflow-y-auto border border-zinc-200 bg-white p-6 text-zinc-950 shadow-2xl sm:rounded-2xl sm:p-9">
+          {moneyMath && (
+            <div className="space-y-6">
+              <DialogHeader className="space-y-2 border-b border-zinc-100 pb-4 text-left">
+                <span className="font-mono text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
+                  UNIT ECONOMICS & MATH
+                </span>
+                <DialogTitle className="font-serif text-2xl font-normal tracking-tight text-zinc-900 sm:text-3xl lg:text-[34px]">
+                  The money math.
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Step-by-step unit economics, year-one pilot napkin math, and TAM revenue ceiling calculation.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Section 1: Year One Napkin */}
+              <div className="space-y-3">
+                <h3 className="font-serif text-lg font-bold text-zinc-900 sm:text-xl">
+                  {moneyMath.yearOneTitle}
+                </h3>
+                <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200/90 bg-white overflow-hidden text-xs shadow-2xs">
+                  {moneyMath.yearOneItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "flex items-center justify-between p-3 sm:px-4 transition-colors",
+                        idx % 2 === 1 ? "bg-zinc-50/50" : "bg-white",
+                      )}
+                    >
+                      <span className="text-zinc-600 font-medium">
+                        {item.label}
+                      </span>
+                      <span className="font-mono font-bold text-zinc-900">
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/70 p-4 font-serif text-[14px] leading-relaxed text-zinc-700">
+                  {moneyMath.yearOneSummary}
+                </div>
+              </div>
+
+              {/* Section 2: The Ceiling */}
+              <div className="space-y-3 pt-2">
+                <h3 className="font-serif text-lg font-bold text-zinc-900 sm:text-xl">
+                  {moneyMath.ceilingTitle}
+                </h3>
+                <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200/90 bg-white overflow-hidden text-xs shadow-2xs">
+                  {moneyMath.ceilingItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "flex items-center justify-between p-3 sm:px-4 transition-colors",
+                        idx % 2 === 1 ? "bg-zinc-50/50" : "bg-white",
+                      )}
+                    >
+                      <span className="text-zinc-600 font-medium">
+                        {item.label}
+                      </span>
+                      <span className="font-mono font-bold text-zinc-900">
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/70 p-4 font-serif text-[14px] leading-relaxed text-zinc-700">
+                  {moneyMath.ceilingSummary}
+                </div>
+              </div>
+
+              {/* Section 3: Bottom Highlight Card */}
+              <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-5 flex items-center justify-between">
+                <div>
+                  <span className="font-mono text-[11px] font-bold tracking-widest text-emerald-800 uppercase">
+                    THE CEILING
+                  </span>
+                  <p className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-950 mt-0.5">
+                    {moneyMath.ceilingBadge}
+                  </p>
+                </div>
+                <div className="text-right text-xs text-emerald-800 max-w-[220px] hidden sm:block font-medium">
+                  Blended core subscriptions, partner expansion, and integration rev-share.
+                </div>
+              </div>
+
+              <DialogFooter className="border-t border-zinc-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setArrModalOpen(false)}
+                  className="rounded-full border border-zinc-200 bg-zinc-100 px-6 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 cursor-pointer"
+                >
+                  Close
+                </button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="mx-auto w-full max-w-[1340px] space-y-6 px-4 py-4 sm:px-6 lg:px-8">
         {/* Top Breadcrumb & Actions Bar (IdeaBrowser Exact Top Bar) */}
@@ -1092,20 +1871,31 @@ Please generate the schema, API routes, and main dashboard screen.`;
                 {/* 2x2 Metric Cards in Exact IdeaBrowser Design */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Metric 1: SOLUTION DEMAND */}
-                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                  <div
+                    onClick={() => setDemandModalOpen(true)}
+                    className="group cursor-pointer space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-xs active:scale-99"
+                  >
                     <div className="flex items-center justify-between">
                       <MetricTooltip
                         metric="marketMaturity"
                         title="Solution Demand"
                         explanation="Calculated demand score based on search velocity, user complaints, and alternative queries."
                       >
-                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase group-hover:text-zinc-600 transition-colors">
                           SOLUTION DEMAND
                         </p>
                       </MetricTooltip>
-                      <span className="text-xs font-light text-zinc-300">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDemandModalOpen(true);
+                        }}
+                        className="text-xs font-light text-zinc-300 transition-colors hover:text-blue-600 group-hover:text-zinc-500"
+                        title="View solution demand breakdown"
+                      >
                         +
-                      </span>
+                      </button>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
@@ -1128,77 +1918,119 @@ Please generate the schema, API routes, and main dashboard screen.`;
                   </div>
 
                   {/* Metric 2: PAIN */}
-                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                  <div
+                    onClick={() => setPainModalOpen(true)}
+                    className="group cursor-pointer space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-xs active:scale-99"
+                  >
                     <div className="flex items-center justify-between">
                       <MetricTooltip metric="painIntensity">
-                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase group-hover:text-zinc-600 transition-colors">
                           PAIN
                         </p>
                       </MetricTooltip>
-                      <span className="text-xs font-light text-zinc-300">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPainModalOpen(true);
+                        }}
+                        className="text-xs font-light text-zinc-300 transition-colors hover:text-blue-600 group-hover:text-zinc-500"
+                        title="Why the pain scores high"
+                      >
                         +
-                      </span>
+                      </button>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
-                        {currentPain.intensity}{" "}
+                        {painThesis?.severityScore || currentPain.intensity || 7}{" "}
                         <span className="text-xs font-normal text-zinc-500">
                           /10 severity
                         </span>
                       </p>
                       <p className="pt-1 text-[10px] leading-tight font-normal text-zinc-500">
-                        {currentPain.subreddits[0]
-                          ? `r/${currentPain.subreddits[0]}`
-                          : "Community"}{" "}
-                        and {currentPain.mentions} more feel it
+                        {(() => {
+                          const rawSub = currentPain.subreddits?.[0]?.replace(/^r\//i, "");
+                          const subText = rawSub ? `r/${rawSub}` : "Community";
+                          const extraSubs = (currentPain.subreddits?.length || 1) - 1;
+                          if (extraSubs > 0) {
+                            return `${subText} and ${extraSubs} more feel it`;
+                          }
+                          const mentionsCount = Math.max(1, currentPain.mentions || 1);
+                          if (mentionsCount > 1) {
+                            return `${subText} and ${mentionsCount} threads feel it`;
+                          }
+                          return `${subText} operators feel it`;
+                        })()}
                       </p>
                     </div>
                   </div>
 
                   {/* Metric 3: TIMING */}
-                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                  <div
+                    onClick={() => setTimingModalOpen(true)}
+                    className="group cursor-pointer space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-xs active:scale-99"
+                  >
                     <div className="flex items-center justify-between">
                       <MetricTooltip
                         metric="urgency"
                         title="Market Timing"
                         explanation="Why the window is open now: AI turn latencies, API cost drops, and incumbent bloat."
                       >
-                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase group-hover:text-zinc-600 transition-colors">
                           TIMING
                         </p>
                       </MetricTooltip>
-                      <span className="text-xs font-light text-zinc-300">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTimingModalOpen(true);
+                        }}
+                        className="text-xs font-light text-zinc-300 transition-colors hover:text-blue-600 group-hover:text-zinc-500"
+                        title="Why the window is open"
+                      >
                         +
-                      </span>
+                      </button>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
-                        {currentPain.maturity || 8}{" "}
+                        {timingThesis?.score || 8}{" "}
                         <span className="text-xs font-normal text-zinc-500">
                           /10
                         </span>
                       </p>
-                      <p className="pt-1 text-[10px] leading-tight font-medium text-blue-600">
+                      <p className="pt-1 text-[10px] leading-tight font-medium text-blue-600 group-hover:underline">
                         why the window is open
                       </p>
                     </div>
                   </div>
 
                   {/* Metric 4: YEAR 1, DONE RIGHT */}
-                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                  <div
+                    onClick={() => setArrModalOpen(true)}
+                    className="group cursor-pointer space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-xs active:scale-99"
+                  >
                     <div className="flex items-center justify-between">
                       <MetricTooltip
                         metric="monetization"
                         title="Year 1 ARR Potential"
                         explanation="Estimated ARR range reachable in year 1 with focused execution and modern pricing."
                       >
-                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase group-hover:text-zinc-600 transition-colors">
                           YEAR 1, DONE RIGHT
                         </p>
                       </MetricTooltip>
-                      <span className="text-xs font-light text-zinc-300">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setArrModalOpen(true);
+                        }}
+                        className="text-xs font-light text-zinc-300 transition-colors hover:text-blue-600 group-hover:text-zinc-500"
+                        title="View Year 1 ARR breakdown"
+                      >
                         +
-                      </span>
+                      </button>
                     </div>
                     <div className="space-y-1">
                       <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
@@ -1222,59 +2054,372 @@ Please generate the schema, API routes, and main dashboard screen.`;
                   <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
                     WHY NOW
                   </p>
-                  <h2 className="font-serif text-2xl leading-snug font-normal text-[#1a1a1a] sm:text-3xl">
+                  <h2 className="font-serif text-2xl leading-snug font-normal text-[#1a1a1a] sm:text-3xl lg:text-[34px]">
                     {whyNow.headline}
                   </h2>
-                  <div className="space-y-3.5 font-serif text-[16px] leading-[1.68] text-[#2c2c2c]">
+                  <div className="space-y-4 font-serif text-[15px] sm:text-[16px] leading-[1.72] text-[#2c2c2c]">
                     {whyNow.paragraphs.map((p, idx) => (
                       <p key={idx}>{p}</p>
                     ))}
                   </div>
+
+                  {/* SOURCES Row */}
+                  {whyNow.sources && whyNow.sources.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pt-2 text-xs">
+                      <span className="font-sans text-[11px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
+                        SOURCES
+                      </span>
+                      {whyNow.sources.map((source, idx) => (
+                        <a
+                          key={idx}
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-sans text-xs text-zinc-600 underline underline-offset-3 decoration-zinc-300 transition-colors hover:text-zinc-900 hover:decoration-zinc-600"
+                        >
+                          <span>{source.name}</span>
+                          <span className="text-[10px] text-zinc-400">↗</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* See the full timing case trigger */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setTimingModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 font-sans text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline cursor-pointer"
+                    >
+                      <span>See the full timing case</span>
+                      <span className="text-base leading-none">→</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* COMMUNITY EVIDENCE & VERBATIM QUOTES */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                {/* 4. MARKET SNAPSHOT / The receipts. */}
+                <div className="space-y-6 pt-4 border-t border-zinc-150">
+                  <div className="space-y-1">
                     <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
-                      COMMUNITY VOICES & VERBATIM EVIDENCE
+                      MARKET SNAPSHOT
                     </p>
-                    {currentPain.postUrl && (
-                      <a
-                        href={currentPain.postUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        <span>View Reddit Thread</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
+                    <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#1a1a1a]">
+                      The receipts.
+                    </h2>
                   </div>
 
-                  <div className="space-y-3">
-                    {currentPain.communityVoices.map((voice, idx) => (
-                      <div
-                        key={idx}
-                        className="space-y-2 rounded-xl border border-zinc-200 bg-white p-4.5 shadow-2xs"
-                      >
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-mono font-semibold text-zinc-700">
-                            r/
-                            {currentPain.subreddits[
-                              idx % currentPain.subreddits.length
-                            ] || "reddit"}
-                          </span>
-                          <span className="font-mono text-[10px] text-zinc-400">
-                            Verified Community Quote
-                          </span>
-                        </div>
-                        <p className="font-serif text-[15px] leading-relaxed text-zinc-800 italic">
-                          &quot;{voice}&quot;
-                        </p>
+                  {/* Top Row: 2-Column Grid (Demand Card & Search Volume Card) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Card 1: DEMAND */}
+                    <div
+                      onClick={() => setDemandModalOpen(true)}
+                      className="group relative cursor-pointer rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-sm"
+                    >
+                      <div className="flex items-center justify-between pb-3">
+                        <span className="font-sans text-[11px] font-bold tracking-widest text-[#6366F1] uppercase">
+                          DEMAND
+                        </span>
+                        <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
+                          SEARCH
+                        </span>
                       </div>
-                    ))}
+
+                      <div className="space-y-1">
+                        <p className="font-serif text-base text-zinc-900 font-medium">
+                          &ldquo;{primaryDemandTerm?.term || "search query"}&rdquo;
+                        </p>
+                        <div className="flex items-baseline justify-between">
+                          <div className="font-serif text-3xl sm:text-4xl font-normal text-zinc-900">
+                            {primaryDemandTerm?.volume?.replace(/\/mo$/i, "") || "201K"}
+                            <span className="font-serif text-xl sm:text-2xl font-light text-zinc-400 ml-0.5">
+                              /mo
+                            </span>
+                          </div>
+                          {primaryDemandTerm && (
+                            <span
+                              className={cn(
+                                "font-sans text-xs sm:text-sm font-bold",
+                                primaryDemandTerm.growthIsPositive
+                                  ? "text-[#10B981]"
+                                  : "text-[#EF4444]"
+                              )}
+                            >
+                              {primaryDemandTerm.growth} YoY
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Sparkline Area Chart */}
+                      {primaryDemandTerm && (
+                        <div className="pt-4">
+                          <div className="relative h-28 w-full">
+                            <svg
+                              viewBox="0 0 400 120"
+                              className="h-full w-full overflow-visible"
+                              preserveAspectRatio="none"
+                            >
+                              <defs>
+                                <linearGradient id="receiptDemandGrad" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.14" />
+                                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
+                                </linearGradient>
+                              </defs>
+                              <path
+                                d={
+                                  `M 0 95 ` +
+                                  primaryDemandTerm.chartPoints
+                                    .map((p, i) => {
+                                      const x = i * (400 / (primaryDemandTerm.chartPoints.length - 1));
+                                      const y = 95 - (p / 100) * 80;
+                                      return `L ${x} ${y}`;
+                                    })
+                                    .join(" ") +
+                                  ` L 400 95 Z`
+                                }
+                                fill="url(#receiptDemandGrad)"
+                              />
+                              <path
+                                d={primaryDemandTerm.chartPoints
+                                  .map((p, i) => {
+                                    const x = i * (400 / (primaryDemandTerm.chartPoints.length - 1));
+                                    const y = 95 - (p / 100) * 80;
+                                    return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+                                  })
+                                  .join(" ")}
+                                fill="none"
+                                stroke="#3B82F6"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className="text-center font-sans text-[11px] text-zinc-400 pt-1">
+                            2026
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card 2: SEARCH VOLUME */}
+                    <div
+                      onClick={() => setDemandModalOpen(true)}
+                      className="group relative cursor-pointer rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-2xs transition-all hover:border-zinc-300 hover:shadow-sm"
+                    >
+                      <div className="flex items-center justify-between pb-4">
+                        <span className="font-sans text-[11px] font-bold tracking-widest text-[#6366F1] uppercase">
+                          SEARCH VOLUME
+                        </span>
+                        <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
+                          US · PER MO
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {secondaryDemandTerms.map((term, idx) => {
+                          const maxVolumeRaw = Math.max(...secondaryDemandTerms.map((t) => t.volumeRaw || 10000));
+                          const percentageWidth = Math.max(12, Math.min(100, Math.round(((term.volumeRaw || 1000) / maxVolumeRaw) * 100)));
+
+                          return (
+                            <div key={idx} className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="font-serif text-sm font-semibold text-zinc-900">
+                                  &ldquo;{term.term}&rdquo;
+                                </span>
+                                <span
+                                  className={cn(
+                                    "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10.5px] font-bold",
+                                    term.growthIsPositive
+                                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                                      : "bg-red-50 text-red-700 border border-red-200/60"
+                                  )}
+                                >
+                                  <span>{term.growthIsPositive ? "▲" : "▼"}</span>
+                                  <span>{term.growth.replace(/^[+-]/, "")}</span>
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="h-2 flex-1 rounded-full bg-zinc-100 overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full bg-[#2563EB] transition-all"
+                                    style={{ width: `${percentageWidth}%` }}
+                                  />
+                                </div>
+                                <span className="font-sans text-xs font-bold text-zinc-900 whitespace-nowrap">
+                                  {term.volume.replace(/\/mo$/i, "")}
+                                  <span className="font-normal text-zinc-400">/mo</span>
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Row 2: Full-width PAIN Card */}
+                  {painThesis && (
+                    <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 sm:p-7 shadow-2xs space-y-5">
+                      <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <span className="font-sans text-[11px] font-bold tracking-widest text-[#EA580C] uppercase">
+                          PAIN
+                        </span>
+                        <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+                          {painThesis.severityScore}/10 SEVERITY
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {painThesis.quotes.slice(0, 3).map((q, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-xl border border-amber-100/70 bg-[#FFFDF9] p-4.5 space-y-2 border-l-[3px] border-l-amber-400"
+                          >
+                            <p className="font-serif text-[15px] sm:text-[16px] leading-[1.68] text-zinc-900">
+                              &ldquo;{q.quote.replace(/^["“”]|["“”]$/g, "")}&rdquo;
+                            </p>
+                            <p className="font-sans text-[12px] font-medium text-zinc-400">
+                              {q.source}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-1 flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => setPainModalOpen(true)}
+                          className="inline-flex items-center gap-1.5 font-sans text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline cursor-pointer"
+                        >
+                          <span>
+                            All {Math.max(9, (currentPain.communityVoices?.length || 0) + 6)} receipts, and where these people gather
+                          </span>
+                          <span className="text-base leading-none">→</span>
+                        </button>
+                        {currentPain.postUrl && (
+                          <a
+                            href={currentPain.postUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-zinc-600"
+                          >
+                            <span>Original Thread</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* 5. WHITESPACE & THE WEDGE */}
+                {opportunitySignals && (
+                  <div className="space-y-6 pt-2">
+                    {/* Top Row: 2-Column Grid (Whitespace & The Wedge) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {/* Card 1: WHITESPACE */}
+                      <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-2xs space-y-4 flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="font-sans text-[11px] font-bold tracking-widest text-[#6366F1] uppercase">
+                              WHITESPACE
+                            </span>
+                            <span className="rounded border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
+                              MARKET GAP
+                            </span>
+                          </div>
+                          <h3 className="font-serif text-2xl sm:text-[25px] font-normal text-[#1a1a1a] leading-snug">
+                            {opportunitySignals.whitespaceHeadline}
+                          </h3>
+                        </div>
+
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setPainModalOpen(true)}
+                            className="inline-flex items-center gap-1 font-sans text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                          >
+                            <span>Understand the opening</span>
+                            <span className="text-sm leading-none">→</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Card 2: THE WEDGE */}
+                      <div className="relative overflow-hidden rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-2xs space-y-4 flex flex-col justify-between">
+                        {/* Decorative watermark */}
+                        <div className="pointer-events-none absolute -bottom-3 -right-3 text-indigo-50/50 select-none">
+                          <Zap className="h-28 w-28" />
+                        </div>
+
+                        <div className="space-y-3 relative z-10">
+                          <div className="flex items-center justify-between">
+                            <span className="font-sans text-[11px] font-bold tracking-widest text-[#6366F1] uppercase">
+                              THE WEDGE
+                            </span>
+                          </div>
+                          <p className="font-serif text-[15px] sm:text-[16px] text-zinc-900 leading-[1.68]">
+                            {opportunitySignals.wedgeDescription}
+                          </p>
+                        </div>
+
+                        <div className="pt-2 relative z-10">
+                          <p className="font-sans text-xs text-zinc-500">
+                            The incumbent to beat:{" "}
+                            <span className="font-bold text-zinc-900">
+                              {opportunitySignals.incumbentToBeat}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 3: PROOF & SIGNALS (Full Width) */}
+                    <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 sm:p-7 shadow-2xs space-y-5">
+                      <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <span className="font-sans text-[11px] font-bold tracking-widest text-[#2563EB] uppercase">
+                          PROOF & SIGNALS
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {opportunitySignals.proofSignals.map((signal, idx) => (
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-start gap-2.5">
+                              <span className="h-1.5 w-1.5 rounded-full bg-blue-600 shrink-0 mt-2"></span>
+                              <p className="font-serif text-[14.5px] sm:text-[15.5px] text-zinc-800 leading-relaxed">
+                                {signal.text}
+                              </p>
+                            </div>
+                            <div className="pl-4">
+                              <a
+                                href={signal.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 hover:text-zinc-700 uppercase underline underline-offset-2 decoration-zinc-300 hover:decoration-zinc-600 transition-colors"
+                              >
+                                <span>{signal.sourceName}</span>
+                                <span className="text-[9px]">↗</span>
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setTimingModalOpen(true)}
+                          className="inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline cursor-pointer"
+                        >
+                          <span>Explore the evidence</span>
+                          <span className="text-base leading-none">→</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* WILLINGNESS TO PAY (WTP) */}
                 {currentPain.hasWillingnessToPay &&

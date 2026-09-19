@@ -149,6 +149,62 @@ function buildUserLanguageReport(
   };
 }
 
+const SUBREDDIT_PERSONA_MAP: Record<string, string> = {
+  reactjs: "React & Next.js Developers",
+  webdev: "Full-Stack Web Developers",
+  javascript: "Frontend & Full-Stack Engineers",
+  python: "Python Developers & Data Engineers",
+  programming: "Software Engineers & Tech Teams",
+  startups: "Startup Founders & Operators",
+  entrepreneur: "Small Business Owners & Founders",
+  indiehackers: "Solo Founders & Indie Builders",
+  saas: "B2B SaaS Founders & Product Teams",
+  smallbusiness: "Small Business Owners",
+  shopify: "Shopify & E-Commerce Merchants",
+  ecommerce: "Online Brand Operators & Merchants",
+  marketing: "Digital Marketers & Growth Leads",
+  seo: "SEO Specialists & Content Strategists",
+  copywriting: "Copywriters & Content Agencies",
+  devops: "DevOps & Cloud Engineers",
+  sysadmin: "Systems & Infrastructure Admins",
+  cybersecurity: "Security Engineers & Analysts",
+  freelance: "Independent Freelancers & Consultants",
+  notion: "Knowledge Workers & Notion Power Users",
+  sales: "B2B Sales Reps & Account Execs",
+};
+
+import {
+  generateStructuredNarrative,
+  type StructuredNarrative as StructuredIdeaNarrative,
+} from "@/lib/narrative-engine";
+
+function buildStructuredIdeaNarrative(
+  point: DBPainPoint,
+  reportCategory?: string,
+): StructuredIdeaNarrative {
+  const budgetSignals = normalizeBudgetSignals(point.budget);
+  return generateStructuredNarrative({
+    id: point.id,
+    title: point.title,
+    body: point.body,
+    subreddit: point.subreddit,
+    category: reportCategory,
+    triedSolutions: point.triedSolutions,
+    sentiment: point.sentiment,
+    urgency: point.urgency,
+    intensity: point.score,
+    monetizationScore: point.monetizationScore,
+    marketMaturity: point.marketMaturity,
+    difficulty: point.difficulty,
+    quotes: (point.painPointComments ?? []).map((c) => c.body),
+    budgetSignals,
+    tamUsdAnnual: point.painPointCluster?.estimatedTamUsdAnnual,
+    competitors: point.painPointCluster?.competitorIntel,
+    rawResponse: point.rawResponse,
+    ideaNarrative: point.ideaNarrative,
+  });
+}
+
 interface DBPainPoint {
   id: string;
   title: string;
@@ -166,6 +222,8 @@ interface DBPainPoint {
   switchingCosts?: string;
   triedSolutions?: string[];
   difficulty?: string;
+  rawResponse?: string | null;
+  ideaNarrative?: any;
   painPointCluster?: {
     id: string;
     estimatedTamUsdAnnual: number | null;
@@ -696,6 +754,10 @@ export async function GET(
               `Lightweight workflow tool tuned for r/${pp.subreddit} teams`,
               `Self-serve micro-SaaS eliminating manual ${pp.title.toLowerCase()} overhead`,
             ],
+            ideaNarrative: buildStructuredIdeaNarrative(
+              pp,
+              currentScraper.reportCategory,
+            ),
           };
         }),
       saasOpportunities: entitlements.hasSaasOpportunities

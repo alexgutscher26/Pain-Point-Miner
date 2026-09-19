@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "id": "money-math-modal",
+  "title": "Unit Economics & Money Math Modal",
+  "description": "Cinematic floating 3D presentation of the napkin unit economics, pilot ramp, ARPU projections, and $3M ARR total addressable ceiling.",
+  "definition": {
+    "scene": {
+      "version": 3,
+      "camera": {
+        "x": 0,
+        "y": -12,
+        "z": 0,
+        "perspective": 1380,
+        "rotateX": 6,
+        "rotateY": -14,
+        "rotateZ": 0
+      },
+      "focus": {
+        "distance": 1380,
+        "fStop": 3.8,
+        "focalLength": 85,
+        "maxBlur": 6
+      },
+      "nodes": [
+        {
+          "id": "money-math-surface",
+          "transform": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "rotateX": 0,
+            "rotateY": 0,
+            "rotateZ": 0,
+            "scale": 1
+          }
+        }
+      ]
+    },
+    "motion": {
+      "durationMs": 8000,
+      "speed": 0.5,
+      "tracks": [
+        {
+          "target": { "kind": "camera" },
+          "property": "rotateY",
+          "keyframes": [
+            { "timeMs": 0, "value": -16, "easing": "cinematic" },
+            { "timeMs": 4000, "value": 0, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 15, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "camera" },
+          "property": "rotateX",
+          "keyframes": [
+            { "timeMs": 0, "value": 8, "easing": "cinematic" },
+            { "timeMs": 4000, "value": 4, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 8, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "camera" },
+          "property": "y",
+          "keyframes": [
+            { "timeMs": 0, "value": -20, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 20, "easing": "cinematic" }
+          ]
+        },
+        {
+          "target": { "kind": "focus" },
+          "property": "distance",
+          "keyframes": [
+            { "timeMs": 0, "value": 1350, "easing": "cinematic" },
+            { "timeMs": 4000, "value": 1380, "easing": "cinematic" },
+            { "timeMs": 8000, "value": 1410, "easing": "cinematic" }
+          ]
+        }
+      ]
+    },
+    "width": 1400,
+    "height": 980
+  }
+}
