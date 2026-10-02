@@ -253,10 +253,10 @@ export default async function FreeToolPage({
                 size="lg"
                 className="w-full rounded-2xl bg-[#ff4500] py-7 text-xl font-black text-white hover:bg-[#ff5a1a]"
               >
-                <Link href="/sign-up">Start 2-Day Free Trial</Link>
+                <Link href="/sign-up">Get Started Now</Link>
               </Button>
-              <p className="mt-6 text-[11px] font-bold tracking-widest text-zinc-600 uppercase">
-                Cancel anytime • Credit card required
+              <p className="mt-6 text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
+                No credit card required to get started
               </p>
             </div>
           </div>

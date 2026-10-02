@@ -1,13 +1,35 @@
-import { Search, FileText, LayoutDashboard, ArrowRight } from "lucide-react";
+import React from "react";
+import {
+  Search,
+  FileText,
+  LayoutDashboard,
+  ArrowRight,
+  Bookmark,
+  Sparkles,
+  Filter,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 
-interface EmptyStateProps {
+export interface EmptyStateProps {
   title: string;
   description: string;
   actionLabel?: string;
   actionHref?: string;
-  icon?: "dashboard" | "reports" | "analysis" | "search";
-  variant?: "hero" | "card" | "inline";
+  actionOnClick?: () => void;
+  secondaryActionLabel?: string;
+  secondaryActionHref?: string;
+  secondaryActionOnClick?: () => void;
+  icon?:
+    | "dashboard"
+    | "reports"
+    | "analysis"
+    | "search"
+    | "bookmarks"
+    | "sparkles"
+    | "filter";
+  iconElement?: React.ReactNode;
+  variant?: "hero" | "card" | "inline" | "glass";
   className?: string;
 }
 
@@ -16,7 +38,12 @@ export function EmptyState({
   description,
   actionLabel,
   actionHref,
+  actionOnClick,
+  secondaryActionLabel,
+  secondaryActionHref,
+  secondaryActionOnClick,
   icon = "dashboard",
+  iconElement,
   variant = "hero",
   className = "",
 }: EmptyStateProps) {
@@ -25,80 +52,138 @@ export function EmptyState({
     reports: FileText,
     analysis: Search,
     search: Search,
+    bookmarks: Bookmark,
+    sparkles: Sparkles,
+    filter: Filter,
   }[icon];
+
+  const renderActionButton = (
+    label?: string,
+    href?: string,
+    onClick?: () => void,
+    isPrimary = true,
+  ) => {
+    if (!label) return null;
+
+    const baseClasses = isPrimary
+      ? "group flex items-center gap-2 rounded-xl border border-[#ff8a57] bg-[#ff4500] px-6 py-3 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-all shadow-sm hover:shadow-md hover:bg-[#ff571a] active:scale-95"
+      : "group flex items-center gap-2 rounded-xl border border-zinc-200 bg-white/60 px-5 py-2.5 font-mono text-[12px] font-bold tracking-wider text-zinc-700 uppercase transition-all hover:bg-white hover:text-zinc-900 active:scale-95";
+
+    if (href) {
+      return (
+        <Link href={href} className={baseClasses}>
+          {isPrimary && (
+            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+          )}
+          <span>{label}</span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      );
+    }
+
+    if (onClick) {
+      return (
+        <button type="button" onClick={onClick} className={baseClasses}>
+          {isPrimary && (
+            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+          )}
+          <span>{label}</span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      );
+    }
+
+    return null;
+  };
 
   if (variant === "hero") {
     return (
-      <div className={`relative overflow-hidden border-2 border-white/10 bg-[#0c0c0c] p-12 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,0.65)] ${className}`}>
-        {/* Animated Background Elements */}
-        <div className="absolute top-0 left-0 h-full w-full overflow-hidden opacity-20 pointer-events-none">
-          <div className="absolute -top-24 -left-24 h-64 w-64 animate-pulse rounded-full bg-[#ff4500]/10 blur-[80px]"></div>
-          <div className="absolute -bottom-24 -right-24 h-64 w-64 animate-pulse rounded-full bg-[#ff4500]/10 blur-[80px]" style={{ animationDelay: "1s" }}></div>
-        </div>
-
+      <div
+        className={`relative overflow-hidden rounded-3xl border border-zinc-200/60 bg-white/80 p-10 text-center shadow-xs backdrop-blur-md ${className}`}
+      >
         <div className="relative z-10 flex flex-col items-center">
-          <div className="relative mb-8">
-            <div className="relative flex h-24 w-24 items-center justify-center border-2 border-[#ff4500]/50 bg-[#111] text-[#ff4500] shadow-[4px_4px_0px_0px_rgba(255,69,0,0.3)]">
-              <IconComponent className="h-12 w-12 animate-pulse" />
-              {/* Decorative particles */}
-              <div className="absolute -top-2 -right-2 h-3 w-3 animate-ping bg-[#ff4500]/40"></div>
-              <div className="absolute -bottom-1 -left-1 h-2 w-2 animate-ping bg-[#ff4500]/20" style={{ animationDelay: "0.5s" }}></div>
+          <div className="relative mb-6">
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500] shadow-xs">
+              {iconElement ? (
+                iconElement
+              ) : (
+                <IconComponent className="h-10 w-10 animate-pulse" />
+              )}
             </div>
           </div>
 
-          <h3 className="mb-4 text-3xl font-black tracking-tighter text-white uppercase sm:text-4xl">
+          <h3 className="mb-3 text-2xl font-black tracking-tight text-zinc-900 uppercase sm:text-3xl">
             {title}
           </h3>
-          <p className="mx-auto mb-10 max-w-lg text-[16px] leading-relaxed font-medium text-zinc-500">
+          <p className="mx-auto mb-8 max-w-lg text-[15px] leading-relaxed font-medium text-zinc-500">
             {description}
           </p>
 
-          {actionLabel && actionHref && (
-            <Link
-              href={actionHref}
-              className="group flex items-center gap-3 border-2 border-[#ff8a57] bg-[#ff4500] px-10 py-4 font-mono text-[14px] font-black tracking-widest text-white uppercase transition-all hover:bg-[#ff571a] hover:translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(255,138,87,0.4)] active:scale-95"
-            >
-              {actionLabel}
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {renderActionButton(actionLabel, actionHref, actionOnClick, true)}
+            {renderActionButton(
+              secondaryActionLabel,
+              secondaryActionHref,
+              secondaryActionOnClick,
+              false,
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === "glass" || variant === "card") {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center rounded-2xl border border-zinc-200/50 bg-white/60 p-12 text-center shadow-xs backdrop-blur-md ${className}`}
+      >
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-[#ff4500]">
+          {iconElement ? iconElement : <IconComponent className="h-7 w-7" />}
+        </div>
+        <h4 className="mb-2 text-lg font-black tracking-tight text-zinc-900 uppercase">
+          {title}
+        </h4>
+        <p className="mx-auto mb-6 max-w-[360px] text-sm font-medium text-zinc-500">
+          {description}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {renderActionButton(actionLabel, actionHref, actionOnClick, true)}
+          {renderActionButton(
+            secondaryActionLabel,
+            secondaryActionHref,
+            secondaryActionOnClick,
+            false,
           )}
         </div>
       </div>
     );
   }
 
-  if (variant === "card") {
-    return (
-      <div className={`flex flex-col items-center justify-center border-2 border-white/5 bg-[#0c0c0c] p-12 text-center ${className}`}>
-        <div className="mb-6 flex h-16 w-16 items-center justify-center border border-white/10 bg-zinc-900 text-zinc-600">
-          <IconComponent className="h-8 w-8" />
-        </div>
-        <h4 className="mb-2 text-xl font-black tracking-tight text-white uppercase">
-          {title}
-        </h4>
-        <p className="mx-auto mb-8 max-w-[320px] text-sm font-medium text-zinc-500">
-          {description}
-        </p>
-        {actionLabel && actionHref && (
-          <Link
-            href={actionHref}
-            className="border border-[#ff4500]/40 px-6 py-2.5 font-mono text-[12px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:bg-[#ff4500]/10"
-          >
-            {actionLabel}
-          </Link>
-        )}
-      </div>
-    );
-  }
-
   return (
-    <div className={`border-2 border-white/5 bg-zinc-900/40 p-10 text-center ${className}`}>
-      <p className="font-mono text-[13px] font-black tracking-[0.2em] text-zinc-500 uppercase">
+    <div
+      className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-white/40 p-8 text-center ${className}`}
+    >
+      <div className="mb-3 text-zinc-400">
+        {iconElement ? iconElement : <IconComponent className="h-6 w-6" />}
+      </div>
+      <p className="font-mono text-[12px] font-black tracking-widest text-zinc-700 uppercase">
         {title}
       </p>
-      <p className="mt-2 text-sm font-medium text-zinc-600">
+      <p className="mt-1 max-w-md text-xs font-medium text-zinc-500">
         {description}
       </p>
+      {(actionLabel || secondaryActionLabel) && (
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          {renderActionButton(actionLabel, actionHref, actionOnClick, true)}
+          {renderActionButton(
+            secondaryActionLabel,
+            secondaryActionHref,
+            secondaryActionOnClick,
+            false,
+          )}
+        </div>
+      )}
     </div>
   );
 }

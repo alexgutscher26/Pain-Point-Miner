@@ -6,6 +6,7 @@ import {
   integer,
   jsonb,
   pgEnum,
+  pgMaterializedView,
   pgTable,
   text,
   timestamp,
@@ -38,14 +39,46 @@ export const painPointDifficulty = pgEnum("PainPointDifficulty", [
   "vc_scale_moat",
 ]);
 
+export const painPointSourceType = pgEnum("PainPointSourceType", [
+  "post",
+  "comment",
+  "cross_post",
+]);
+
 export const verification = pgTable("verification", {
   id: text().primaryKey().notNull(),
   identifier: text().notNull(),
   value: text().notNull(),
-  expiresAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-  createdAt: timestamp({ precision: 3, mode: "date" }),
-  updatedAt: timestamp({ precision: 3, mode: "date" }),
+  expiresAt: timestamp("expires_at", { precision: 3, mode: "date" }).notNull(),
+  createdAt: timestamp("created_at", { precision: 3, mode: "date" }),
+  updatedAt: timestamp("updated_at", { precision: 3, mode: "date" }),
 });
+
+export const tool = pgTable(
+  "tool",
+  {
+    id: text().primaryKey().notNull(),
+    name: text().notNull(),
+    slug: text().notNull(),
+    url: text(),
+    description: text(),
+    category: text(),
+    iconUrl: text(),
+    lastCrawledAt: timestamp({ precision: 3, mode: "date" }),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("tool_slug_unique").using(
+      "btree",
+      table.slug.asc().nullsLast().op("text_ops"),
+    ),
+  ],
+);
 
 export const user = pgTable(
   "user",
@@ -53,18 +86,34 @@ export const user = pgTable(
     id: text().primaryKey().notNull(),
     name: text().notNull(),
     email: text().notNull(),
-    emailVerified: boolean().notNull(),
-    username: text(),
-    displayUsername: text(),
-    stripeCustomerId: text(),
-    image: text(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    anonymizeRedditUsernames: boolean().default(false).notNull(),
-    deletedAt: timestamp({ precision: 3, mode: "date" }),
-    role: text().default("user").notNull(),
-    ltdTier: ltdTier().default("none").notNull(),
-    ltdPricePaid: doublePrecision().default(0),
+    emailVerified: boolean("email_verified").notNull(),
+    username: text("username"),
+    displayUsername: text("display_username"),
+    stripeCustomerId: text("stripe_customer_id"),
+    image: text("image"),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    anonymizeRedditUsernames: boolean("anonymize_reddit_usernames")
+      .default(false)
+      .notNull(),
+    deletedAt: timestamp("deleted_at", { precision: 3, mode: "date" }),
+    role: text("role").default("user").notNull(),
+    ltdTier: ltdTier("ltd_tier").default("none").notNull(),
+    ltdPricePaid: doublePrecision("ltd_price_paid").default(0),
+    lastLoginMethod: text("last_login_method"),
+    plan: text("plan"),
+    referralCode: text("referral_code"),
+    referredById: text("referred_by_id"),
+    referralActivatedAt: timestamp("referral_activated_at", {
+      precision: 3,
+      mode: "date",
+    }),
   },
   (table) => [
     uniqueIndex("user_email_key").using(
@@ -82,13 +131,22 @@ export const session = pgTable(
   "session",
   {
     id: text().primaryKey().notNull(),
-    expiresAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    token: text().notNull(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    ipAddress: text(),
-    userAgent: text(),
-    userId: text().notNull(),
+    expiresAt: timestamp("expires_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    token: text("token").notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id").notNull(),
   },
   (table) => [
     uniqueIndex("session_token_key").using(
@@ -109,18 +167,30 @@ export const account = pgTable(
   "account",
   {
     id: text().primaryKey().notNull(),
-    accountId: text().notNull(),
-    providerId: text().notNull(),
-    userId: text().notNull(),
-    accessToken: text(),
-    refreshToken: text(),
-    idToken: text(),
-    accessTokenExpiresAt: timestamp({ precision: 3, mode: "date" }),
-    refreshTokenExpiresAt: timestamp({ precision: 3, mode: "date" }),
-    scope: text(),
-    password: text(),
-    createdAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id").notNull(),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      precision: 3,
+      mode: "date",
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      precision: 3,
+      mode: "date",
+    }),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
   },
   (table) => [
     foreignKey({
@@ -189,6 +259,7 @@ export const workspace = pgTable(
       .notNull(),
     updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
     deletedAt: timestamp({ precision: 3, mode: "date" }),
+    plan: text(),
   },
   (table) => [
     uniqueIndex("workspace_slug_key").using(
@@ -258,6 +329,7 @@ export const userPreferences = pgTable(
       w3: number; // urgency
       w4: number; // marketMaturity
     }>(),
+    customApiKey: text("custom_api_key"),
   },
   (table) => [
     uniqueIndex("user_preferences_userId_key").using(
@@ -284,6 +356,7 @@ export const scraper = pgTable(
     postsScanned: integer().default(0).notNull(),
     painPointsFound: integer().default(0).notNull(),
     lastRunAt: timestamp({ precision: 3, mode: "date" }),
+    lastSuccessfulRunAt: timestamp({ precision: 3, mode: "date" }),
     userId: text().notNull(),
     createdAt: timestamp({ precision: 3, mode: "date" })
       .default(sql`CURRENT_TIMESTAMP`)
@@ -336,7 +409,7 @@ export const scraperRun = pgTable(
     scraperId: text().notNull(),
     status: text().default("success").notNull(),
     startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
-    finishedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    finishedAt: timestamp({ precision: 3, mode: "date" }),
     postsFetched: integer().default(0).notNull(),
     postsMatched: integer().default(0).notNull(),
     commentsFetched: integer().default(0).notNull(),
@@ -379,6 +452,7 @@ export const scraperPost = pgTable(
     id: text().primaryKey().notNull(),
     runId: text().notNull(),
     postId: text().notNull(),
+    subreddit: text(),
     commentCount: integer().default(0).notNull(),
     qualityScore: doublePrecision().default(0).notNull(),
     skipReason: text(),
@@ -396,8 +470,21 @@ export const scraperPost = pgTable(
       .onDelete("cascade"),
     index("scraper_post_runId_idx").on(table.runId),
     index("scraper_post_postId_idx").on(table.postId),
+    index("scraper_post_subreddit_idx").on(table.subreddit),
   ],
 );
+
+export const redditOAuthCache = pgTable("reddit_oauth_cache", {
+  key: text().primaryKey().notNull(),
+  token: text().notNull(),
+  expiresAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  createdAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
 
 export const discoveryCache = pgTable("discovery_cache", {
   keyword: text().primaryKey().notNull(),
@@ -478,10 +565,11 @@ export const painPointCluster = pgTable(
     workspaceId: text(),
     embeddingProvider: text().notNull(),
     embeddingModel: text().notNull(),
-    embedding: doublePrecision().array(),
+    embedding: vector({ dimensions: 1536 }),
     canonicalTitle: text().notNull(),
     canonicalBody: text().notNull(),
     sourceCount: integer().default(1).notNull(),
+    memberCount: integer().default(0).notNull(),
     estimatedTamUsdAnnual: integer(),
     competitorIntel: jsonb().$type<CompetitorIntel[]>(),
     budgetSignalCount: integer().default(0).notNull(),
@@ -504,7 +592,7 @@ export const painPointCluster = pgTable(
     ),
     index("pain_point_cluster_userId_lastMatchedAt_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("timestamp_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
       table.lastMatchedAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({
@@ -521,6 +609,9 @@ export const painPointCluster = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
+    index("pain_point_cluster_hnsw_idx")
+      .using("hnsw", table.embedding.op("vector_cosine_ops"))
+      .with({ m: 24, ef_construction: 200 }),
   ],
 );
 
@@ -533,6 +624,7 @@ export const painPoint = pgTable(
     postUrl: text(),
     author: text(),
     score: integer().default(0).notNull(),
+    upvoteCount: integer().default(0).notNull(),
     urgency: integer().default(0),
     monetizationScore: integer().default(0),
     marketMaturity: integer().default(0),
@@ -564,18 +656,28 @@ export const painPoint = pgTable(
     clusterId: text(),
     clusterSimilarity: doublePrecision(),
     scoreExplanation: text(),
+    sourceType: painPointSourceType().default("post"),
+    redditPostId: text(),
     difficulty: painPointDifficulty().default("weekend_project"),
+    schemaVersion: integer("schema_version").default(2).notNull(),
+    promptVersion: text("prompt_version").default("v1"),
+    rawResponse: text("raw_response"),
+    originalLanguage: text("original_language").default("en"),
   },
   (table) => [
+    index("pain_point_userId_schemaVersion_idx").on(
+      table.userId,
+      table.schemaVersion,
+    ),
     index("pain_point_userId_clusterId_createdAt_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
       table.clusterId.asc().nullsLast().op("text_ops"),
-      table.createdAt.asc().nullsLast().op("text_ops"),
+      table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     index("pain_point_userId_createdAt_idx").using(
       "btree",
-      table.userId.asc().nullsLast().op("timestamp_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
       table.createdAt.asc().nullsLast().op("timestamp_ops"),
     ),
     foreignKey({
@@ -612,6 +714,7 @@ export const painPoint = pgTable(
       table.scraperId,
       table.createdAt.desc(),
     ),
+    index("pain_point_tags_idx").using("gin", table.tags),
   ],
 );
 
@@ -688,10 +791,9 @@ export const painPointEmbedding = pgTable(
     })
       .onUpdate("cascade")
       .onDelete("cascade"),
-    index("pain_point_embedding_hnsw_idx").using(
-      "hnsw",
-      table.embedding.op("vector_cosine_ops"),
-    ),
+    index("pain_point_embedding_hnsw_idx")
+      .using("hnsw", table.embedding.op("vector_cosine_ops"))
+      .with({ m: 24, ef_construction: 200 }),
   ],
 );
 
@@ -722,6 +824,8 @@ export const aiEvalLog = pgTable("ai_eval_log", {
   switched: boolean().default(false).notNull(),
   flaggedForReview: boolean().default(false).notNull(),
   reasoning: text().notNull(),
+  promptVersion: text("prompt_version").default("v1"),
+  rawResponse: text("raw_response"),
   comparisonModelId: text(),
   improvementPercentage: doublePrecision(),
   evalMetadata: jsonb(), // Stores detailed model-by-model metrics
@@ -798,23 +902,6 @@ export const purchasedCredits = pgTable(
   ],
 );
 
-export const tool = pgTable("tool", {
-  id: text().primaryKey().notNull(),
-  name: text().notNull(),
-  slug: text().unique().notNull(),
-  url: text(),
-  description: text(),
-  category: text(),
-  iconUrl: text(),
-  lastCrawledAt: timestamp({ precision: 3, mode: "date" }),
-  createdAt: timestamp({ precision: 3, mode: "date" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: timestamp({ precision: 3, mode: "date" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
-
 export const slowQueryLog = pgTable("slow_query_log", {
   id: text().primaryKey().notNull(),
   query: text().notNull(),
@@ -882,3 +969,143 @@ export const scraperRunSummary = pgTable(
       .onDelete("cascade"),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// AI Usage — per-extraction cost tracking for billing reconciliation
+// ---------------------------------------------------------------------------
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: text().primaryKey().notNull(),
+    userId: text().notNull(),
+    /** OpenRouter model identifier, e.g. "openai/gpt-4o" */
+    modelId: text().notNull(),
+    inputTokens: integer().default(0).notNull(),
+    outputTokens: integer().default(0).notNull(),
+    /** Computed cost in USD based on per-model token rates */
+    costUsd: doublePrecision().default(0).notNull(),
+    /** Optional: the scraper that triggered this extraction */
+    scraperId: text(),
+    /** FK to scraper_run for complete cost-per-run attribution */
+    runId: text(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index("ai_usage_userId_createdAt_idx").on(table.userId, table.createdAt),
+    index("ai_usage_modelId_createdAt_idx").on(table.modelId, table.createdAt),
+    index("ai_usage_runId_idx").on(table.runId),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "ai_usage_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+    foreignKey({
+      columns: [table.runId],
+      foreignColumns: [scraperRun.id],
+      name: "ai_usage_runId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("set null"),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Changelog — schema migration tracking for ops visibility
+// ---------------------------------------------------------------------------
+export const changelog = pgTable("changelog", {
+  id: text().primaryKey().notNull(),
+  version: text().notNull(),
+  description: text().notNull(),
+  appliedAt: timestamp({ precision: 3, mode: "date" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// User Notification Preferences — granular notification toggles
+// ---------------------------------------------------------------------------
+export const userNotificationPreferences = pgTable(
+  "user_notification_preferences",
+  {
+    id: text().primaryKey().notNull(),
+    userId: text().notNull(),
+    weeklyDigest: boolean().default(true).notNull(),
+    scanCompleteAlerts: boolean().default(true).notNull(),
+    thresholdNotifications: boolean().default(false).notNull(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_notification_preferences_userId_key").on(table.userId),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "user_notification_preferences_userId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Scraper Run Event — per-phase timing/metrics for granular run observability
+// ---------------------------------------------------------------------------
+export const scraperRunEvent = pgTable(
+  "scraper_run_event",
+  {
+    id: text().primaryKey().notNull(),
+    runId: text().notNull(),
+    phase: text().notNull(),
+    startedAt: timestamp({ precision: 3, mode: "date" }).notNull(),
+    finishedAt: timestamp({ precision: 3, mode: "date" }),
+    metrics: jsonb(),
+    createdAt: timestamp({ precision: 3, mode: "date" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => [
+    index("scraper_run_event_runId_phase_idx").on(table.runId, table.phase),
+    foreignKey({
+      columns: [table.runId],
+      foreignColumns: [scraperRun.id],
+      name: "scraper_run_event_runId_fkey",
+    })
+      .onUpdate("cascade")
+      .onDelete("cascade"),
+  ],
+);
+
+export const dashboardOpportunityMv = pgMaterializedView(
+  "dashboard_opportunity_mv",
+  {
+    scraperId: text("scraper_id").primaryKey().notNull(),
+    userId: text("user_id").notNull(),
+    workspaceId: text("workspace_id"),
+    keywords: text("keywords").array(),
+    createdAt: timestamp("created_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 3,
+      mode: "date",
+    }).notNull(),
+    reportSaved: boolean("report_saved").notNull(),
+    reportCategory: text("report_category").notNull(),
+    reportSavedAt: timestamp("report_saved_at", { precision: 3, mode: "date" }),
+    latestRunStatus: text("latest_run_status"),
+    latestRunStartedAt: timestamp("latest_run_started_at", {
+      precision: 3,
+      mode: "date",
+    }),
+    latestPostsFetched: integer("latest_posts_fetched"),
+    painPointCount: integer("pain_point_count").notNull(),
+    painPoints: jsonb("pain_points").notNull(),
+  },
+).existing();

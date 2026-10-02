@@ -20,8 +20,14 @@ describe("getSortModesForDepth", () => {
     expect(getSortModesForDepth("deep")).toEqual(["relevance", "hot"]);
   });
 
-  it("returns all 4 modes for advanced", () => {
+  it("returns all 4 modes for advanced and ultra", () => {
     expect(getSortModesForDepth("advanced")).toEqual([
+      "relevance",
+      "hot",
+      "new",
+      "top",
+    ]);
+    expect(getSortModesForDepth("ultra")).toEqual([
       "relevance",
       "hot",
       "new",
@@ -35,7 +41,7 @@ describe("getSortModesForDepth", () => {
 
   it("SORT_MODES_BY_DEPTH contains all defined depths", () => {
     expect(Object.keys(SORT_MODES_BY_DEPTH)).toEqual(
-      expect.arrayContaining(["basic", "deep", "advanced"]),
+      expect.arrayContaining(["basic", "deep", "advanced", "ultra"]),
     );
   });
 
@@ -71,8 +77,7 @@ import { fetchSubredditPostsMultiSort } from "@/lib/reddit";
 /** Minimal Reddit OAuth token response */
 const FAKE_TOKEN_RESPONSE = {
   ok: true,
-  json: () =>
-    Promise.resolve({ access_token: "fake-token", expires_in: 3600 }),
+  json: () => Promise.resolve({ access_token: "fake-token", expires_in: 3600 }),
 };
 
 /** Minimal Reddit listing API response */

@@ -5,64 +5,64 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773991710170,
-      "tag": "0000_add_performance_indexes",
+      "when": 1781756711596,
+      "tag": "0000_faithful_mimic",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1773994535425,
-      "tag": "0001_add_auth_fields",
+      "when": 1781756711597,
+      "tag": "0001_ai_usage",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1774644835072,
-      "tag": "0002_slippery_sleepwalker",
+      "when": 1781756711598,
+      "tag": "0002_hnsw_index_tuning",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
-      "when": 1774659560315,
-      "tag": "0003_add_scoring_weights",
+      "when": 1781756711599,
+      "tag": "0003_pain_point_tags_gin_idx",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "7",
-      "when": 1774659617153,
-      "tag": "0004_add_score_explanation",
+      "when": 1781756711600,
+      "tag": "0004_create_dashboard_opportunity_mv",
       "breakpoints": true
     },
     {
       "idx": 5,
       "version": "7",
-      "when": 1774857634606,
-      "tag": "0005_nice_vertigo",
+      "when": 1781756711601,
+      "tag": "0005_schema_columns_and_triggers",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "7",
-      "when": 1774980462782,
-      "tag": "0006_keen_marvel_apes",
+      "when": 1781756711602,
+      "tag": "0006_schema_partition_tables",
       "breakpoints": true
     },
     {
       "idx": 7,
       "version": "7",
-      "when": 1777335033362,
-      "tag": "0007_broken_leech",
+      "when": 1788125594747,
+      "tag": "0007_married_colonel_america",
       "breakpoints": true
     },
     {
       "idx": 8,
       "version": "7",
-      "when": 1777335582836,
-      "tag": "0008_careless_norman_osborn",
+      "when": 1788125687225,
+      "tag": "0008_handy_lady_vermin",
       "breakpoints": true
     }
   ]

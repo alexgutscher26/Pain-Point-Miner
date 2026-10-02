@@ -5,7 +5,9 @@
   "selftext": "Every month I have to manually email my clients 4 times just to get paid. The software I use doesn't let me text them, which is the only way they respond. Is there a simple texting invoice reminder tool?",
   "comments": [
     { "body": "I totally agree, texting is the only way now." },
-    { "body": "I built a crappy twilio script for this but an app would be nice." }
+    {
+      "body": "I built a crappy twilio script for this but an app would be nice."
+    }
   ],
   "expected": [
     {

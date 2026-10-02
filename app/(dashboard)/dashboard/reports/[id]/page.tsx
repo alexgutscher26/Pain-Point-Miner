@@ -1,30 +1,25 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
-  TrendingUp,
-  ShieldCheck,
-  Users,
-  BarChart3,
-  Filter,
-  Star,
-  AlertTriangle,
-  Lightbulb,
-  Loader2,
-  DollarSign,
-  ArrowRightLeft,
-  Wrench,
-  Sparkles,
   ExternalLink,
+  Zap,
+  Copy,
+  Check,
+  Bookmark,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import { ReportDetailSkeleton } from "@/components/dashboard/report-detail-skeleton";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { MetricTooltip } from "@/components/ui/metric-tooltip";
+import { ReportShareModal } from "@/components/dashboard/report-share-modal";
 import {
   Dialog,
   DialogContent,
@@ -33,9 +28,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PainPointFeedback } from "@/components/dashboard/pain-point-feedback";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import { SpotlightCard } from "@/components/dashboard/spotlight-card";
 
 interface CompetitorIntel {
   name: string;
@@ -87,16 +79,23 @@ interface PainPoint {
   } | null;
   switchingCosts?: string;
   triedSolutions?: string[];
-  difficulty: "weekend_project" | "side_project" | "startup_mvp" | "vc_scale_moat";
+  difficulty:
+    | "weekend_project"
+    | "side_project"
+    | "startup_mvp"
+    | "vc_scale_moat";
   postUrl: string | null;
 }
 
 interface ReportData {
+  isTeaser?: boolean;
   reportId: string;
   title: string;
   date: string;
   saved: boolean;
   category: string;
+  miningDepth?: "basic" | "deep" | "advanced";
+  aiModel?: string;
   timeWindow?: "24h" | "7d" | "30d" | "90d";
   timeWindowLabel?: string;
   trend?: {
@@ -127,72 +126,8 @@ interface ReportData {
   }[];
 }
 
-const PAIN_POINTS_PER_PAGE = 5;
-type CardTab = "signals" | "community" | "build";
 type IntensityFilter = "all" | "high" | "medium";
 type SentimentFilter = "all" | "frustrated" | "neutral";
-
-function deriveBuildIdea(pain: PainPoint) {
-  const base = pain.title.replace(/\s+leads?\s+to\s+/i, " ");
-  return `${base} Assistant`;
-}
-
-function deriveTargetUser(pain: PainPoint) {
-  if (pain.subreddits.length > 0) {
-    return `Teams active in r/${pain.subreddits[0]}`;
-  }
-  return "Ops and product teams actively handling this pain";
-}
-
-function deriveMvpFeatures(pain: PainPoint) {
-  const features: string[] = [];
-  features.push(`Signal dashboard for "${pain.title}"`);
-  features.push("Automated playbooks with step-by-step interventions");
-  if (pain.triedSolutions && pain.triedSolutions.length > 0) {
-    features.push(
-      `Alternative to "${pain.triedSolutions[0]}" with measurable outcomes`,
-    );
-  } else {
-    features.push("Experiment tracker to compare interventions by impact");
-  }
-  return features.slice(0, 3);
-}
-
-function renderMultiline(text: string) {
-  return text.replace(/\\n/g, "\n");
-}
-
-function formatPainDescription(description: string) {
-  const normalized = renderMultiline(description).replace(/\r\n/g, "\n").trim();
-  const cleaned = normalized.replace(/\*([^*\n]+)\*/g, "$1");
-
-  const explicitParagraphs = cleaned
-    .split(/\n{2,}/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  if (explicitParagraphs.length > 1) {
-    return explicitParagraphs;
-  }
-
-  const sentenceList = cleaned
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?])\s+/)
-    .filter(Boolean);
-  if (sentenceList.length <= 2) {
-    return [cleaned];
-  }
-
-  const paragraphs: string[] = [];
-  for (let i = 0; i < sentenceList.length; i += 2) {
-    paragraphs.push(sentenceList.slice(i, i + 2).join(" "));
-  }
-  return paragraphs;
-}
-
-function normalizeEvidenceText(value?: string | null) {
-  const normalized = value?.trim();
-  return normalized && normalized.length > 0 ? normalized : null;
-}
 
 function toTitleCase(value: string) {
   return value
@@ -205,149 +140,214 @@ function toTitleCase(value: string) {
     .join(" ");
 }
 
-function formatBudgetValue(
-  budgetSignals?: PainPoint["budgetSignals"],
-  budgetSignalSummary?: string | null,
-  monetization?: number,
-  urgency?: string,
-) {
-  const value = normalizeEvidenceText(budgetSignalSummary);
-  if (value) return value;
-
-  const quote = normalizeEvidenceText(budgetSignals?.[0]?.quote);
-  if (quote) return quote;
-
-  if ((monetization ?? 0) >= 8) {
-    return "High willingness";
+function deriveIdeaTitle(pain: PainPoint, reportTitle: string): string {
+  let title = pain.title.trim();
+  // Clean prefixes if any
+  title = title.replace(/^lack of\s+/i, "Automated ");
+  title = title.replace(/^inability to\s+/i, "Instant ");
+  title = title.replace(/^difficulty in\s+/i, "Streamlined ");
+  if (title.length > 70) {
+    title = title.slice(0, 67).trim() + "...";
   }
-
-  if ((monetization ?? 0) >= 6) {
-    return "Paid team need";
-  }
-
-  if ((monetization ?? 0) >= 4) {
-    return urgency === "Extreme Urgency"
-      ? "Budget pressure"
-      : "Some willingness";
-  }
-
-  return "Weak signal";
+  return toTitleCase(title);
 }
 
-function formatCurrency(value?: number | null) {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    return "No TAM yet";
-  }
+const SUBREDDIT_PERSONA_MAP: Record<string, string> = {
+  reactjs: "React & Next.js Developers",
+  webdev: "Full-Stack Web Developers",
+  javascript: "Frontend & Full-Stack Engineers",
+  python: "Python Developers & Data Engineers",
+  programming: "Software Engineers & Tech Teams",
+  startups: "Startup Founders & Operators",
+  entrepreneur: "Small Business Owners & Founders",
+  indiehackers: "Solo Founders & Indie Builders",
+  saas: "B2B SaaS Founders & Product Teams",
+  smallbusiness: "Small Business Owners",
+  shopify: "Shopify & E-Commerce Merchants",
+  ecommerce: "Online Brand Operators & Merchants",
+  marketing: "Digital Marketers & Growth Leads",
+  seo: "SEO Specialists & Content Strategists",
+  copywriting: "Copywriters & Content Agencies",
+  devops: "DevOps & Cloud Engineers",
+  sysadmin: "Systems & Infrastructure Admins",
+  cybersecurity: "Security Engineers & Analysts",
+  freelance: "Independent Freelancers & Consultants",
+  notion: "Knowledge Workers & Notion Power Users",
+  sales: "B2B Sales Reps & Account Execs",
+};
 
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
+function deriveCustomer(pain: PainPoint): string {
+  if (pain.subreddits && pain.subreddits.length > 0) {
+    const rawSub = pain.subreddits[0].replace(/^r\//i, "").toLowerCase();
+    if (SUBREDDIT_PERSONA_MAP[rawSub]) {
+      return SUBREDDIT_PERSONA_MAP[rawSub];
+    }
+    return `${toTitleCase(rawSub)} Practitioners & Teams`;
+  }
+  return "Operators & Specialized Teams";
 }
 
-function formatSwitchingValue(
-  switchingCosts?: string | null,
-  maturity?: number,
-  triedSolutions?: string[],
-) {
-  const value = normalizeEvidenceText(switchingCosts);
-  if (value) return value;
-
-  const triedCount = (triedSolutions ?? []).filter(Boolean).length;
-
-  if ((maturity ?? 0) >= 8) {
-    return triedCount > 0 ? "Crowded market" : "Entrenched tools";
+function deriveMarket(pain: PainPoint, reportCategory?: string): string {
+  if (reportCategory && reportCategory !== "Uncategorized") {
+    return `B2B • ${reportCategory} Software`;
   }
-
-  if ((maturity ?? 0) >= 5) {
-    return triedCount > 1 ? "Actively comparing" : "Existing tools";
+  if (pain.subreddits && pain.subreddits.length > 0) {
+    const sub = pain.subreddits[0].replace(/^r\//i, "").toLowerCase();
+    if (
+      [
+        "reactjs",
+        "webdev",
+        "javascript",
+        "python",
+        "programming",
+        "devops",
+        "sysadmin",
+      ].includes(sub)
+    ) {
+      return "B2B • Developer Tools";
+    }
+    if (["shopify", "ecommerce"].includes(sub)) {
+      return "B2B • E-commerce Tech";
+    }
+    if (["marketing", "seo", "copywriting", "growth"].includes(sub)) {
+      return "B2B • Growth & Marketing";
+    }
+    return `B2B • ${toTitleCase(sub)} SaaS`;
   }
-
-  if (triedCount > 0) {
-    return "Low lock-in";
-  }
-
-  return "Early market";
+  return "B2B • Micro-SaaS";
 }
 
-function formatTriedValue(triedSolutions?: string[]) {
-  const tried = (triedSolutions ?? [])
-    .map((solution) => solution.trim())
-    .filter(Boolean);
-
-  if (tried.length === 0) {
-    return "None named";
+function deriveRevenueCeiling(pain: PainPoint): string {
+  const tam = pain.cluster?.estimatedTamUsdAnnual;
+  if (tam && tam > 1_000_000) {
+    const low = Math.max(1, Math.round((tam * 0.3) / 1_000_000));
+    const high = Math.max(low + 2, Math.round(tam / 1_000_000));
+    return `$${low}M-$${high}M ARR`;
   }
-
-  if (tried.length === 1) {
-    return tried[0];
-  }
-
-  const preview = tried.slice(0, 2).join(", ");
-  return tried.length > 2 ? `${preview} +${tried.length - 2}` : preview;
+  const mon = Math.max(3, pain.monetization || 5);
+  const low = mon <= 5 ? 2 : mon <= 7 ? 5 : 10;
+  const high = low * 3;
+  return `$${low}M-$${high}M ARR`;
 }
 
-function formatPaySignalValue(monetization?: number) {
-  if (!monetization || monetization <= 0) {
-    return "No signal";
+function deriveCompetition(pain: PainPoint): string {
+  if (pain.triedSolutions && pain.triedSolutions.length > 0) {
+    const filtered = pain.triedSolutions.filter(
+      (s) =>
+        s &&
+        !s.toLowerCase().includes("none") &&
+        !s.toLowerCase().includes("n/a"),
+    );
+    if (filtered.length > 0) {
+      return filtered.slice(0, 2).join(" & ");
+    }
   }
-
-  return `${monetization}/10`;
+  if (
+    pain.cluster?.competitorIntel &&
+    pain.cluster.competitorIntel.length > 0
+  ) {
+    return pain.cluster.competitorIntel
+      .map((c) => c.name)
+      .slice(0, 2)
+      .join(" & ");
+  }
+  return "Manual Workarounds & Ad-hoc Scripts";
 }
 
-function formatStageValue(maturity?: number) {
-  if (!maturity || maturity <= 0) {
-    return "Unclear";
-  }
-
-  if (maturity < 4) {
-    return "Blue Ocean";
-  }
-
-  if (maturity > 7) {
-    return "Disruption";
-  }
-
-  return "Scaling";
+function deriveDemand(pain: PainPoint): string {
+  const mentions = Math.max(1, pain.mentions || 1);
+  if (mentions >= 100) return `${mentions} thread signals`;
+  return `${mentions} verified mentions`;
 }
-function formatDifficulty(difficulty: PainPoint["difficulty"]) {
-  const map: Record<PainPoint["difficulty"], { label: string; color: string }> = {
-    weekend_project: {
-      label: "Weekend Project",
-      color: "border-emerald-500/20 bg-emerald-500/10 text-emerald-500",
-    },
-    side_project: {
-      label: "Side Project",
-      color: "border-amber-500/20 bg-amber-500/10 text-amber-500",
-    },
-    startup_mvp: {
-      label: "Startup MVP",
-      color: "border-orange-500/20 bg-orange-500/10 text-orange-500",
-    },
-    vc_scale_moat: {
-      label: "VC-Scale Moat",
-      color:
-        "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]",
-    },
+
+function deriveDemandNumeric(pain: PainPoint): string {
+  const mentions = Math.max(1, pain.mentions || 1);
+  return `${mentions} Citations`;
+}
+
+function derivePricing(pain: PainPoint): string {
+  if (pain.budgetSignals && pain.budgetSignals.length > 0) {
+    const s = pain.budgetSignals[0];
+    if (s.amountMinUsd && s.amountMaxUsd)
+      return `$${s.amountMinUsd}-$${s.amountMaxUsd}/mo`;
+    if (s.amountMinUsd) return `$${s.amountMinUsd}/mo`;
+  }
+  const mon = pain.monetization || 5;
+  if (mon >= 8) return "$49-$149/mo";
+  if (mon >= 5) return "$29-$79/mo";
+  return "$19-$39/mo";
+}
+
+function deriveYear1ARR(pain: PainPoint): string {
+  const mon = pain.monetization || 6;
+  if (mon >= 8) return "$120K-$250K ARR";
+  if (mon >= 6) return "$60K-$120K ARR";
+  return "$30K-$75K ARR";
+}
+
+function deriveDifficultyLabel(difficulty: PainPoint["difficulty"]): string {
+  const map: Record<PainPoint["difficulty"], string> = {
+    weekend_project: "Easy",
+    side_project: "Moderate",
+    startup_mvp: "Medium",
+    vc_scale_moat: "Complex",
   };
-  return map[difficulty] || map.weekend_project;
+  return map[difficulty] || "Moderate";
 }
 
-function normalizeKeyword(input: string) {
-  const normalized = input.trim().replace(/\s+/g, " ");
-  if (normalized.length >= 2 && normalized.length <= 120) {
-    return normalized;
+function formatNarrativeIdea(pain: PainPoint): string[] {
+  const desc = pain.description.replace(/\r\n/g, "\n").trim();
+  const rawParts = desc
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 30);
+
+  if (rawParts.length >= 2) {
+    return rawParts;
   }
-  if (normalized.length > 120) {
-    return normalized.slice(0, 120).trim();
-  }
-  return "";
+
+  const cleanSub = pain.subreddits?.[0]
+    ? `r/${pain.subreddits[0].replace(/^r\//i, "")}`
+    : "online communities";
+  const customer = deriveCustomer(pain);
+  const competitor = deriveCompetition(pain);
+  const pricing = derivePricing(pain);
+  const title = pain.title.trim();
+
+  const p1 = `Across ${cleanSub}, ${customer.toLowerCase()} report recurring friction with ${title.toLowerCase()}. As highlighted in community threads: "${desc || pain.communityVoices?.[0] || title}".`;
+
+  const p2 = `Existing options like ${competitor} fail to address the core requirements, forcing teams into complex manual steps or patchwork workarounds. When these workflows break down, operators face compounding delays and operational overhead.`;
+
+  const p3 = `The opportunity is a streamlined, purpose-built SaaS solution designed specifically for ${customer}, priced around ${pricing}. By directly resolving this bottleneck, it provides immediate time savings and positive ROI without enterprise bloat.`;
+
+  return [p1, p2, p3];
+}
+
+function deriveWhyNowSection(pain: PainPoint): {
+  headline: string;
+  paragraphs: string[];
+} {
+  const cleanSub = pain.subreddits?.[0]
+    ? `r/${pain.subreddits[0].replace(/^r\//i, "")}`
+    : "target communities";
+  const competitor = deriveCompetition(pain);
+  const pricing = derivePricing(pain);
+  const title = pain.title.trim();
+  const customer = deriveCustomer(pain);
+
+  const headline = `Market demand for solving "${title}" is surging while legacy tools remain high-friction`;
+
+  const paragraphs = [
+    `Community sentiment across ${cleanSub} indicates an inflection point. Users are increasingly vocal about the limitations of existing approaches like ${competitor}, where dissatisfaction and urgency (rated ${pain.urgency || 7}/10) are driving active search for modern alternatives.`,
+    `Modern developer tooling and API integrations now make it feasible to build a hyper-focused micro-SaaS in weeks rather than months. Lightweight architectures can deliver 10x faster setup and superior UX compared to legacy incumbents with bloated feature sets.`,
+    `With strong willingness-to-pay indicators in the ${pricing} bracket, ${customer.toLowerCase()} are eager to adopt dedicated utilities that deliver fast, measurable workflow improvements.`,
+  ];
+
+  return { headline, paragraphs };
 }
 
 export default function ReportDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
 
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -355,52 +355,24 @@ export default function ReportDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isRerunning, setIsRerunning] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Uncategorized");
-  const [painPointsPage, setPainPointsPage] = useState(1);
-  const [activeTabsByPain, setActiveTabsByPain] = useState<
-    Record<string, CardTab>
-  >({});
+  const [selectedPainIndex, setSelectedPainIndex] = useState(0);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [agentPromptCopied, setAgentPromptCopied] = useState(false);
+  const [agentModalOpen, setAgentModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
   const [subredditMetadata, setSubredditMetadata] = useState<
     Record<string, number>
   >({});
-  const [intensityFilterDraft, setIntensityFilterDraft] =
-    useState<IntensityFilter>("all");
-  const [sentimentFilterDraft, setSentimentFilterDraft] =
-    useState<SentimentFilter>("all");
   const [intensityFilterApplied, setIntensityFilterApplied] =
     useState<IntensityFilter>("all");
   const [sentimentFilterApplied, setSentimentFilterApplied] =
     useState<SentimentFilter>("all");
+
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [planDialogMessage, setPlanDialogMessage] = useState(
-    "Your free trial has ended. Purchase a plan to continue.",
+    "A paid plan is required to continue. Please upgrade your account.",
   );
-
-  const categoryOptions = [
-    "Uncategorized",
-    "Product",
-    "Marketing",
-    "Growth",
-    "Operations",
-    "Customer Success",
-  ];
-
-  const allCompetitors = useMemo(() => {
-    if (!reportData) return [];
-    const map = new Map<string, CompetitorIntel>();
-    reportData.topPainPoints.forEach((pp) => {
-      pp.cluster?.competitorIntel?.forEach((intel) => {
-        const existing = map.get(intel.name);
-        if (existing) {
-          existing.mentionCount += intel.mentionCount;
-        } else {
-          map.set(intel.name, { ...intel });
-        }
-      });
-    });
-    return Array.from(map.values()).sort(
-      (a, b) => b.mentionCount - a.mentionCount,
-    );
-  }, [reportData]);
 
   useEffect(() => {
     async function fetchReportDetail() {
@@ -410,11 +382,7 @@ export default function ReportDetailPage() {
         const data = await response.json();
         setReportData(data);
         setSelectedCategory(data.category || "Uncategorized");
-        setPainPointsPage(1);
-        setIntensityFilterDraft("all");
-        setSentimentFilterDraft("all");
-        setIntensityFilterApplied("all");
-        setSentimentFilterApplied("all");
+        setSelectedPainIndex(0);
       } catch (error) {
         console.error("Error fetching report details:", error);
       } finally {
@@ -429,8 +397,8 @@ export default function ReportDetailPage() {
     async function loadMetadata() {
       if (!reportData) return;
       const allSubs = new Set<string>();
-      reportData.topPainPoints.forEach(p => {
-        p.subreddits.forEach(s => allSubs.add(s));
+      reportData.topPainPoints.forEach((p) => {
+        p.subreddits.forEach((s) => allSubs.add(s));
       });
       if (allSubs.size === 0) return;
 
@@ -449,249 +417,15 @@ export default function ReportDetailPage() {
       } catch {}
     }
     void loadMetadata();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [reportData]);
 
-  async function handleSaveToggle(
-    nextSaved: boolean,
-    categoryOverride?: string,
-    showToast = true,
-  ) {
-    if (!id || !reportData) return;
-    setIsSaving(true);
-    const categoryToPersist = categoryOverride ?? selectedCategory;
-    try {
-      const response = await fetch(`/api/reports/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          saved: nextSaved,
-          category: categoryToPersist,
-        }),
-      });
-      if (!response.ok) {
-        const errorPayload = (await response.json().catch(() => null)) as {
-          code?: string;
-          message?: string;
-        } | null;
-        const code = errorPayload?.code;
-        if (
-          code === "PLAN_REQUIRED" ||
-          code === "PLAN_LIMIT_REACHED" ||
-          code === "PLAN_UPGRADE_REQUIRED"
-        ) {
-          setPlanDialogMessage(
-            errorPayload?.message ??
-              "Your free trial has ended. Purchase a plan to continue.",
-          );
-          setPlanDialogOpen(true);
-          return;
-        }
-        throw new Error(errorPayload?.message ?? "Failed to update report");
-      }
-      const data = await response.json();
-      setReportData((prev) =>
-        prev
-          ? {
-              ...prev,
-              saved: data.reportSaved,
-              category: data.reportCategory || categoryToPersist,
-            }
-          : prev,
-      );
-      if (showToast) {
-        toast.success(
-          nextSaved
-            ? "Report saved and organized."
-            : "Report removed from saved.",
-        );
-      }
-    } catch (error) {
-      console.error("Error updating report:", error);
-      toast.error("Unable to update report.", {
-        action: {
-          label: "Retry",
-          onClick: () =>
-            void handleSaveToggle(nextSaved, categoryOverride, showToast),
-        },
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  function handleCategoryChange(category: string) {
-    setSelectedCategory(category);
-    if (reportData?.saved) {
-      void handleSaveToggle(true, category, false);
-    }
-  }
-
-  function handleExportData() {
-    if (!reportData) return;
-    try {
-      const safeTitle = reportData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      const filename = `${safeTitle || "report"}-${reportData.reportId}.json`;
-      const payload = JSON.stringify(reportData, null, 2);
-      const blob = new Blob([payload], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = filename;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
-      toast.success("Report exported.");
-    } catch (error) {
-      console.error("Error exporting report:", error);
-      toast.error("Unable to export report.");
-    }
-  }
-
-  async function handleRunAgain() {
-    if (!reportData || isRerunning) return;
-    setIsRerunning(true);
-
-    try {
-      const keyword =
-        normalizeKeyword(reportData.title) ||
-        normalizeKeyword(reportData.topPainPoints[0]?.title ?? "") ||
-        "saas";
-
-      const subredditSet = new Set<string>();
-      reportData.topPainPoints.forEach((pain) => {
-        pain.subreddits.forEach((sub) => {
-          const cleaned = sub
-            .replace(/^r\//i, "")
-            .trim()
-            .toLowerCase()
-            .replace(/[^\w]/g, "");
-          if (/^[a-z0-9_]{2,21}$/.test(cleaned)) subredditSet.add(cleaned);
-        });
-      });
-
-      const sanitizedPatterns = (reportData.customPatterns ?? [])
-        .map((pattern) => pattern.trim())
-        .filter((pattern) => pattern.length > 0 && pattern.length <= 120)
-        .slice(0, 20);
-
-      const requestBody = {
-        keyword,
-        subreddits: Array.from(subredditSet)
-          .slice(0, 15)
-          .map((sub) => `r/${sub}`)
-          .join(", "),
-        customPatterns: sanitizedPatterns,
-        miningDepth: "deep" as const,
-        timeWindow: reportData.timeWindow ?? "90d",
-      };
-
-      let response = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        // Retry with a minimal payload in case saved report metadata is invalid.
-        response = await fetch("/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            keyword,
-            subreddits: "",
-            customPatterns: [],
-            miningDepth: "deep",
-            timeWindow: reportData.timeWindow ?? "90d",
-          }),
-        });
-      }
-
-      if (!response.ok) {
-        const statusPrefix = `Run again failed (${response.status})`;
-        let errorMessage = statusPrefix;
-        try {
-          const raw = await response.text();
-          if (raw) {
-            try {
-              const errorPayload = JSON.parse(raw);
-              if (
-                errorPayload?.code === "PLAN_REQUIRED" ||
-                errorPayload?.code === "PLAN_LIMIT_REACHED" ||
-                errorPayload?.code === "PLAN_UPGRADE_REQUIRED"
-              ) {
-                setPlanDialogMessage(
-                  typeof errorPayload?.message === "string"
-                    ? errorPayload.message
-                    : "Your free trial has ended. Purchase a plan to continue.",
-                );
-                setPlanDialogOpen(true);
-                return;
-              }
-              if (
-                typeof errorPayload?.message === "string" &&
-                errorPayload.message.length > 0
-              ) {
-                errorMessage = `${statusPrefix}: ${errorPayload.message}`;
-              } else {
-                errorMessage = `${statusPrefix}: ${raw.slice(0, 180)}`;
-              }
-            } catch {
-              errorMessage = `${statusPrefix}: ${raw.slice(0, 180)}`;
-            }
-          }
-        } catch {
-          // Ignore parsing failures and keep generic message.
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      if (data?.duplicate) {
-        toast.info(
-          "Investigation already running. Redirecting to existing analysis...",
-        );
-      } else {
-        toast.success("Investigation started.");
-      }
-      router.push(`/dashboard/analysis?id=${data.scraperId}`);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Unable to run investigation again.";
-      toast.error(message, {
-        action: {
-          label: "Retry",
-          onClick: () => void handleRunAgain(),
-        },
-      });
-    } finally {
-      setIsRerunning(false);
-    }
-  }
-
-  function getActiveTab(painId: string): CardTab {
-    return activeTabsByPain[painId] ?? "signals";
-  }
-
-  function setActiveTab(painId: string, tab: CardTab) {
-    setActiveTabsByPain((prev) => ({ ...prev, [painId]: tab }));
-  }
-
-  function handleApplyFilters() {
-    setIntensityFilterApplied(intensityFilterDraft);
-    setSentimentFilterApplied(sentimentFilterDraft);
-    setPainPointsPage(1);
-  }
-
-  useEffect(() => {
-    if (!reportData) return;
-    const totalFiltered = reportData.topPainPoints.filter((pain) => {
+  // Filtered pain points list
+  const filteredPainPoints = useMemo(() => {
+    if (!reportData) return [];
+    return reportData.topPainPoints.filter((pain) => {
       const matchesIntensity =
         intensityFilterApplied === "all"
           ? true
@@ -710,980 +444,998 @@ export default function ReportDetailPage() {
               normalizedSentiment.includes("explor");
 
       return matchesIntensity && matchesSentiment;
-    }).length;
-    const totalPages = Math.max(
-      1,
-      Math.ceil(totalFiltered / PAIN_POINTS_PER_PAGE),
-    );
-    if (painPointsPage > totalPages) {
-      setPainPointsPage(totalPages);
-    }
-  }, [
-    intensityFilterApplied,
-    painPointsPage,
-    reportData,
-    sentimentFilterApplied,
-  ]);
+    });
+  }, [reportData, intensityFilterApplied, sentimentFilterApplied]);
 
-  const iconMap: Record<string, React.ReactNode> = {
-    AlertTriangle: <AlertTriangle className="h-4 w-4" />,
-    MessageSquare: <MessageSquare className="h-4 w-4" />,
-    Star: <Star className="h-4 w-4" />,
-    Users: <Users className="h-4 w-4" />,
-    BarChart3: <BarChart3 className="h-4 w-4" />,
+  // Current active pain point (Idea)
+  const currentPainIndex = Math.min(
+    selectedPainIndex,
+    Math.max(0, filteredPainPoints.length - 1),
+  );
+  const currentPain = filteredPainPoints[currentPainIndex] || null;
+
+  // Keyboard navigation
+  const handleNextIdea = useCallback(() => {
+    if (currentPainIndex < filteredPainPoints.length - 1) {
+      setSelectedPainIndex((prev) => prev + 1);
+      setIsDescriptionExpanded(false);
+    }
+  }, [currentPainIndex, filteredPainPoints.length]);
+
+  const handlePrevIdea = useCallback(() => {
+    if (currentPainIndex > 0) {
+      setSelectedPainIndex((prev) => prev - 1);
+      setIsDescriptionExpanded(false);
+    }
+  }, [currentPainIndex]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        handleNextIdea();
+      } else if (e.key === "ArrowLeft") {
+        handlePrevIdea();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleNextIdea, handlePrevIdea]);
+
+  async function handleSaveToggle(
+    nextSaved: boolean,
+    categoryOverride?: string,
+  ) {
+    if (!id || !reportData) return;
+    if (reportData.isTeaser) {
+      setPlanDialogMessage(
+        "Saving reports is available on paid plans. Upgrade to Growth or Pro to save and organize your investigations.",
+      );
+      setPlanDialogOpen(true);
+      return;
+    }
+    setIsSaving(true);
+    const categoryToPersist = categoryOverride ?? selectedCategory;
+    try {
+      const response = await fetch(`/api/reports/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          saved: nextSaved,
+          category: categoryToPersist,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update report");
+      }
+      const data = await response.json();
+      setReportData((prev) =>
+        prev
+          ? {
+              ...prev,
+              saved: data.reportSaved,
+              category: data.reportCategory || categoryToPersist,
+            }
+          : prev,
+      );
+      toast.success(
+        nextSaved ? "Idea saved to My Stuff." : "Idea removed from saved.",
+      );
+    } catch (error) {
+      console.error("Error updating report:", error);
+      toast.error("Unable to update report.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const generateAgentPrompt = () => {
+    if (!currentPain || !reportData) return "";
+    const title = deriveIdeaTitle(currentPain, reportData.title);
+    const customer = deriveCustomer(currentPain);
+    const pricingVal = derivePricing(currentPain);
+    const competitor = deriveCompetition(currentPain);
+    const quotes = currentPain.communityVoices
+      .slice(0, 3)
+      .map((q) => `"${q}"`)
+      .join("\n");
+
+    return `You are a Senior Full-Stack Architect and SaaS Builder.
+
+Build an MVP web application for the validated IdeaBrowser idea:
+
+# PRODUCT OVERVIEW
+- **Idea Title:** ${title}
+- **Target Customer (ICP):** ${customer}
+- **Core Friction:** ${currentPain.title}
+- **Pricing:** ${pricingVal} (Self-serve subscription)
+- **Primary Incumbent/Alternative:** ${competitor}
+
+# VERBATIM REDDIT SIGNALS:
+${quotes}
+
+# SYSTEM SPECIFICATION:
+1. Modern Next.js App Router + Tailwind CSS frontend
+2. Automated workflow engine handling customer intake
+3. Stripe billing with 14-day free trial
+4. Webhook and notification dispatcher
+
+Please generate the schema, API routes, and main dashboard screen.`;
+  };
+
+  const handleCopyAgentPrompt = () => {
+    const prompt = generateAgentPrompt();
+    navigator.clipboard.writeText(prompt);
+    setAgentPromptCopied(true);
+    toast.success("Agent Prompt copied to clipboard!");
+    setTimeout(() => setAgentPromptCopied(false), 2000);
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-[#ff4500]" />
-        <p className="font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
-          Decrypting Insights...
-        </p>
-      </div>
-    );
+    return <ReportDetailSkeleton />;
   }
 
   if (!reportData) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center">
-        <h2 className="mb-4 text-2xl font-black text-white uppercase">
-          Report Not Found
-        </h2>
-        <p className="mb-8 max-w-md text-zinc-500">
-          We couldn't find the investigation archives you're looking for. It
-          might have been deleted or moved.
-        </p>
-        <Link
-          href="/dashboard/reports"
-          className="rounded-xl bg-[#ff4500] px-6 py-3 text-[11px] font-black tracking-widest text-white uppercase shadow-lg transition-all active:scale-95"
-        >
-          Back to Archives
-        </Link>
+      <div className="mx-auto w-full max-w-7xl p-8">
+        <EmptyState
+          title="Idea Report Not Found"
+          description="The requested idea archive could not be retrieved or has been removed."
+          actionLabel="Browse All Reports"
+          actionHref="/dashboard/reports"
+          secondaryActionLabel="Start New Scan"
+          secondaryActionHref="/dashboard/search"
+          icon="reports"
+          variant="hero"
+        />
       </div>
     );
   }
 
-  const filteredPainPoints = reportData.topPainPoints.filter((pain) => {
-    const matchesIntensity =
-      intensityFilterApplied === "all"
-        ? true
-        : intensityFilterApplied === "high"
-          ? pain.intensity >= 8
-          : pain.intensity >= 5;
+  // Derived values for active idea
+  const ideaTitle = currentPain
+    ? deriveIdeaTitle(currentPain, reportData.title)
+    : "";
+  const customer = currentPain ? deriveCustomer(currentPain) : "";
+  const market = currentPain ? deriveMarket(currentPain, selectedCategory) : "";
+  const revenueCeiling = currentPain ? deriveRevenueCeiling(currentPain) : "";
+  const competition = currentPain ? deriveCompetition(currentPain) : "";
+  const demand = currentPain ? deriveDemand(currentPain) : "";
+  const demandNumeric = currentPain ? deriveDemandNumeric(currentPain) : "";
+  const pricing = currentPain ? derivePricing(currentPain) : "";
+  const year1ARR = currentPain ? deriveYear1ARR(currentPain) : "";
+  const difficultyLabel = currentPain
+    ? deriveDifficultyLabel(currentPain.difficulty)
+    : "Moderate";
+  const whyNow = currentPain
+    ? deriveWhyNowSection(currentPain)
+    : { headline: "", paragraphs: [] };
+  const narrativeParagraphs = currentPain
+    ? formatNarrativeIdea(currentPain)
+    : [];
 
-    const normalizedSentiment = pain.sentiment.toLowerCase();
-    const matchesSentiment =
-      sentimentFilterApplied === "all"
-        ? true
-        : sentimentFilterApplied === "frustrated"
-          ? normalizedSentiment.includes("frustrated") ||
-            normalizedSentiment.includes("desperate")
-          : normalizedSentiment.includes("neutral") ||
-            normalizedSentiment.includes("explor");
-
-    return matchesIntensity && matchesSentiment;
-  });
-
-  const totalPainPoints = filteredPainPoints.length;
-  const totalPainPointPages = Math.max(
-    1,
-    Math.ceil(totalPainPoints / PAIN_POINTS_PER_PAGE),
-  );
-  const startPainPointIndex = (painPointsPage - 1) * PAIN_POINTS_PER_PAGE;
-  const endPainPointIndex = Math.min(
-    startPainPointIndex + PAIN_POINTS_PER_PAGE,
-    totalPainPoints,
-  );
-  const visiblePainPoints = filteredPainPoints.slice(
-    startPainPointIndex,
-    endPainPointIndex,
-  );
+  const scoreFormatted = currentPain?.validationScore
+    ? (currentPain.validationScore / 10).toFixed(1)
+    : currentPain
+      ? (
+          currentPain.intensity * 0.7 +
+          (currentPain.monetization || 5) * 0.3
+        ).toFixed(1)
+      : "7.3";
 
   return (
-    <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-8 p-8 duration-700">
+    <div className="min-h-screen bg-white font-sans text-[#1a1a1a] antialiased selection:bg-blue-100">
+      {/* Plan Dialog */}
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="border border-white/10 bg-[#111] text-white">
+        <DialogContent className="max-w-md border border-zinc-200 bg-white text-zinc-950">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black">
-              Plan Required
+            <DialogTitle className="text-lg font-bold">
+              Plan Upgrade Required
             </DialogTitle>
-            <DialogDescription className="text-zinc-300">
+            <DialogDescription className="text-xs text-zinc-500">
               {planDialogMessage}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2 pt-2 sm:gap-2">
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold"
+              className="cursor-pointer rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
             >
-              Close
+              Cancel
             </button>
             <Link
               href="/dashboard/billing"
-              className="rounded-lg bg-[#ff4500] px-4 py-2 text-sm font-bold text-white"
+              className="rounded-full bg-[#2563eb] px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#1d4ed8]"
             >
-              Purchase Plan
+              Upgrade Plan
             </Link>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Breadcrumbs & Actions */}
-      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-        <div className="space-y-1">
-          <div className="mb-2 flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-500 uppercase">
+
+      {/* Build with Agent Modal */}
+      <Dialog open={agentModalOpen} onOpenChange={setAgentModalOpen}>
+        <DialogContent className="max-w-2xl border border-zinc-200 bg-white text-zinc-950">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-[#2563eb]">
+                <Zap className="h-4 w-4 fill-current" />
+              </div>
+              <DialogTitle className="font-serif text-lg font-bold">
+                Build &quot;{ideaTitle}&quot; with AI Agent
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-xs text-zinc-500">
+              Paste this blueprint into Cursor, Claude, ChatGPT, or your AI
+              coding assistant.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative mt-2">
+            <pre className="max-h-[320px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-950 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-200">
+              {generateAgentPrompt()}
+            </pre>
+            <button
+              onClick={handleCopyAgentPrompt}
+              className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-[#2563eb] px-3 py-1 font-mono text-[10px] font-bold text-white uppercase shadow-sm transition-all hover:bg-[#1d4ed8]"
+            >
+              {agentPromptCopied ? (
+                <>
+                  <Check className="h-3 w-3" /> Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3" /> Copy Prompt
+                </>
+              )}
+            </button>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setAgentModalOpen(false)}
+              className="rounded-full border border-zinc-200 bg-zinc-100 px-4 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200"
+            >
+              Close
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share & Embed Badge Modal */}
+      <ReportShareModal
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        reportTitle={reportData.title}
+        ideaTitle={ideaTitle}
+        validationScore={scoreFormatted}
+        reportId={id}
+      />
+
+      <div className="mx-auto w-full max-w-[1340px] space-y-6 px-4 py-4 sm:px-6 lg:px-8">
+        {/* Top Breadcrumb & Actions Bar (IdeaBrowser Exact Top Bar) */}
+        <div className="border-zinc-150 flex flex-col gap-3 border-b pb-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 font-normal text-zinc-500">
             <Link
               href="/dashboard"
-              className="transition-colors hover:text-white"
+              className="flex items-center gap-1.5 transition-colors hover:text-zinc-900"
             >
-              Dashboard
+              <span className="text-zinc-400">Browse Ideas</span>
             </Link>
-            <ChevronRight className="h-3 w-3" />
-            <Link
-              href="/dashboard/reports"
-              className="transition-colors hover:text-white"
-            >
-              Reports
-            </Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-zinc-200">{reportData.title}</span>
+            <ChevronRight className="h-3 w-3 text-zinc-300" />
+            <span className="max-w-[280px] truncate font-medium text-zinc-900 sm:max-w-md">
+              {ideaTitle || reportData.title}
+            </span>
           </div>
-          <h2 className="text-4xl leading-none font-black tracking-tighter text-white uppercase">
-            Analysis: <span className="text-[#ff4500]">{reportData.title}</span>
-          </h2>
-          <div className="flex items-center gap-2 pt-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#ff4500]" />
-            Scanned on {reportData.date}
-          </div>
-          <div className="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
-            <Filter className="h-3.5 w-3.5 text-amber-400" />
-            Window: {reportData.timeWindowLabel ?? "Last 90d"}
-          </div>
-          {reportData.customPatterns &&
-            reportData.customPatterns.length > 0 && (
-              <div className="flex items-start gap-2 pt-1 font-mono text-[12px] font-bold tracking-widest text-zinc-500 uppercase">
-                <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                <div className="flex flex-wrap gap-1.5">
-                  <span>Patterns:</span>
-                  {reportData.customPatterns.map((p, i) => (
-                    <span key={p} className="font-black text-emerald-300">
-                      "{p}"
-                      {i < (reportData.customPatterns?.length ?? 0) - 1
-                        ? ","
-                        : ""}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          {reportData.trend && (
-            <div className="pt-3">
-              <span
-                className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-[10px] font-black tracking-widest uppercase ${
-                  reportData.trend.direction === "up" ||
-                  reportData.trend.direction === "new"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                    : reportData.trend.direction === "down"
-                      ? "border-rose-500/30 bg-rose-500/10 text-rose-400"
-                      : "border-zinc-700 bg-zinc-900 text-zinc-300"
-                }`}
-              >
-                Trend: {reportData.trend.label}
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <div className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+              <span className="text-[11px] font-medium text-zinc-600">
+                Idea Miner AI Suite
               </span>
             </div>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <select
-            value={selectedCategory}
-            onChange={(event) => handleCategoryChange(event.target.value)}
-            className="border border-white/20 bg-zinc-900 px-4 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 [&>option]:bg-white [&>option]:text-black"
-          >
-            {categoryOptions.map((categoryOption) => (
-              <option key={categoryOption} value={categoryOption}>
-                {categoryOption}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={() => handleSaveToggle(!reportData.saved)}
-            disabled={isSaving}
-            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving
-              ? "Saving..."
-              : reportData.saved
-                ? "Saved"
-                : "Save Report"}
-          </button>
-          <button
-            type="button"
-            onClick={handleExportData}
-            className="flex items-center gap-2 border border-white/20 bg-zinc-900 px-5 py-2.5 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-white/5"
-          >
-            Export Data
-          </button>
-          <button
-            type="button"
-            onClick={handleRunAgain}
-            disabled={isRerunning}
-            className="group flex min-w-[140px] items-center justify-center gap-2 rounded-xl bg-[#ff4500] px-6 py-3 text-[11px] font-black tracking-wider text-white uppercase shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isRerunning ? "Running..." : "Run Again"}
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {reportData.metrics.map((metric) => (
-          <div
-            key={metric.label}
-            className="group relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-6 shadow-[5px_5px_0px_0px_rgba(0,0,0,0.6)]"
-          >
-            <div className="absolute top-0 right-0 -mt-12 -mr-12 h-24 w-24 rounded-full bg-white/2 blur-2xl transition-all group-hover:bg-[#ff4500]/5"></div>
-            <div className="relative z-10 mb-4 flex items-start justify-between">
-              <div className={`rounded-lg p-2 ${metric.bg} ${metric.color}`}>
-                {iconMap[metric.icon] || <Star className="h-4 w-4" />}
-              </div>
-            </div>
-            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
-              {metric.label}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <h4 className="text-2xl font-black tracking-tight text-white">
-                {metric.value}
-              </h4>
-              <p
-                className={`text-[11px] font-bold ${metric.color === "text-[#ff4500]" ? "text-zinc-600" : "text-zinc-700"}`}
-              >
-                {metric.sub}
-              </p>
-            </div>
+            <button
+              onClick={() => setShareModalOpen(true)}
+              className="flex cursor-pointer items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+            >
+              <Share2 className="h-3.5 w-3.5 text-zinc-500" />
+              <span>Share</span>
+            </button>
+            <button
+              onClick={() => handleSaveToggle(!reportData.saved)}
+              disabled={isSaving}
+              className="flex cursor-pointer items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+            >
+              <Bookmark className="h-3.5 w-3.5" />
+              <span>{reportData.saved ? "Saved" : "Bookmark"}</span>
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Main Content Split */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-        {/* Left Column: Pain Points */}
-        <div className="space-y-8 lg:col-span-8">
-          <div className="mb-2 flex items-center justify-between px-2">
-            <h3 className="flex items-center gap-2 text-xl font-black tracking-tight text-white uppercase">
-              <TrendingUp className="h-5 w-5 text-[#ff4500]" />
-              Top Frustrations Identified
-            </h3>
-          </div>
+        {/* Pagination Switcher Pill Bar (1 Idea Per Page Switcher) */}
+        <div className="flex items-center justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-4 py-2 text-xs">
+          <div className="scrollbar-none flex items-center gap-2 overflow-x-auto py-0.5">
+            <span className="mr-1 shrink-0 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">
+              Ideas ({filteredPainPoints.length}):
+            </span>
+            {filteredPainPoints.map((p, idx) => {
+              const active = idx === currentPainIndex;
+              const pScore = p.validationScore
+                ? (p.validationScore / 10).toFixed(1)
+                : (p.intensity * 0.7 + (p.monetization || 5) * 0.3).toFixed(1);
 
-          {reportData.customPatterns &&
-            reportData.customPatterns.length > 0 && (
-              <div className="mb-6 border border-amber-400/35 bg-amber-500/5 p-6">
-                <p className="mb-3 flex items-center gap-2 text-[10px] font-black tracking-widest text-amber-500 uppercase">
-                  <Sparkles className="h-3.5 w-3.5" /> AI Intelligence Patterns
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {reportData.customPatterns.map((pattern) => (
-                    <span
-                      key={pattern}
-                      className="rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[11px] font-bold text-zinc-400"
-                    >
-                      {pattern}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-          <div className="space-y-6">
-            {visiblePainPoints.map((pain) => (
-              <div
-                key={pain.id}
-                className="group relative space-y-8 overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)] transition-colors hover:border-[#ff4500]/40"
-              >
-                <div className="absolute top-0 right-0 -mt-32 -mr-32 h-64 w-64 rounded-full bg-[#ff4500]/2 blur-[80px]"></div>
-
-                {/* Pain Header */}
-                <div className="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h4 className="text-2xl font-black tracking-tight text-white transition-colors group-hover:text-[#ff4500]">
-                        {pain.title}
-                      </h4>
-                      {pain.postUrl && (
-                        <a
-                          href={pain.postUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[9px] font-black tracking-widest text-zinc-400 uppercase transition-all hover:border-[#ff4500]/30 hover:bg-[#ff4500]/10 hover:text-[#ff4500]"
-                        >
-                          View Source
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${
-                          pain.urgency === "High Urgency"
-                            ? "border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-500"
-                        }`}
-                      >
-                        {pain.urgency}
-                      </span>
-                      {(() => {
-                        const { label, color } = formatDifficulty(pain.difficulty);
-                        return (
-                          <span
-                            className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-widest uppercase ${color}`}
-                          >
-                            {label}
-                          </span>
-                        );
-                      })()}
-                      {pain.hasWillingnessToPay && (
-                        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black tracking-widest text-emerald-300 uppercase">
-                          💰 Willingness to Pay
-                        </span>
-                      )}
-                    </div>
-                    <div className="max-w-2xl space-y-3 rounded-xl border border-white/5 bg-[#111]/30 p-4">
-                      {formatPainDescription(pain.description).map(
-                        (paragraph) => (
-                          <p
-                            key={paragraph.slice(0, 100)}
-                            className="leading-relaxed font-medium text-zinc-400"
-                          >
-                            {paragraph}
-                          </p>
-                        ),
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-black tracking-widest uppercase">
-                      <div className="flex items-center gap-1.5 text-[#ff4500]">
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        {pain.mentions} mentions
-                      </div>
-                      {typeof pain.validationScore === "number" && (
-                        <div className="flex items-center gap-1.5 text-sky-400">
-                          <BarChart3 className="h-3.5 w-3.5" />
-                          Validation {pain.validationScore}/100
-                        </div>
-                      )}
-                      {pain.subreddits.map((sub) => {
-                        const subs = subredditMetadata[sub.toLowerCase()];
-                        const formattedSubs = subs
-                          ? Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(subs)
-                          : null;
-                        return (
-                          <div
-                            key={sub}
-                            className="flex items-center gap-1.5 text-zinc-500 rounded bg-white/5 px-2 py-0.5"
-                          >
-                            <Users className="h-3.5 w-3.5" />
-                            <span>r/{sub}</span>
-                            {formattedSubs && (
-                              <span className="text-[9px] text-zinc-600 font-bold ml-0.5">
-                                {formattedSubs}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                      <div
-                        className={`flex items-center gap-1.5 ${pain.sentiment === "frustrated" ? "text-rose-500" : "text-zinc-500"}`}
-                      >
-                        <div
-                          className={`h-1.5 w-1.5 rounded-full ${pain.sentiment === "frustrated" ? "animate-pulse bg-rose-500" : "bg-zinc-700"}`}
-                        ></div>
-                        Vibe: {pain.sentiment}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="shrink-0 border border-white/20 bg-white/2 px-6 py-4 text-center md:text-right">
-                    <p className="text-4xl font-black text-white">
-                      {pain.intensity}/10
-                    </p>
-                    <p className="text-[10px] font-bold tracking-widest text-zinc-600 uppercase">
-                      Pain Score
-                    </p>
-                  </div>
-                  <div className="mt-4 flex justify-center md:justify-end">
-                    <PainPointFeedback painPointId={pain.id} />
-                  </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="relative z-10 flex flex-wrap items-center gap-2">
-                  {[
-                    { key: "signals", label: "Signals" },
-                    { key: "community", label: "Community Pulse" },
-                    { key: "build", label: "What to Build" },
-                  ].map((tab) => {
-                    const isActive = getActiveTab(pain.id) === tab.key;
-                    return (
-                      <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() =>
-                          setActiveTab(pain.id, tab.key as CardTab)
-                        }
-                        className={`rounded-lg border px-3 py-2 text-[10px] font-black tracking-widest uppercase transition-all ${
-                          isActive
-                            ? "border-[#ff4500]/40 bg-[#ff4500]/20 text-[#ff4500]"
-                            : "border-white/10 bg-zinc-900 text-zinc-400 hover:bg-white/5"
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {getActiveTab(pain.id) === "signals" && (
-                  <div className="relative z-10 space-y-4">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-                      <InfoSquare
-                        icon={<DollarSign className="h-3.5 w-3.5" />}
-                        label="Budget"
-                        value={formatBudgetValue(
-                          pain.budgetSignals,
-                          pain.budgetSignalSummary,
-                          pain.monetization,
-                          pain.urgency,
-                        )}
-                        color="text-emerald-500"
-                        preserveCase
-                      />
-                      <InfoSquare
-                        icon={<ArrowRightLeft className="h-3.5 w-3.5" />}
-                        label="Switching"
-                        value={formatSwitchingValue(
-                          pain.switchingCosts,
-                          pain.maturity,
-                          pain.triedSolutions,
-                        )}
-                        color="text-amber-500"
-                      />
-                      <InfoSquare
-                        icon={<Wrench className="h-3.5 w-3.5" />}
-                        label="Tried"
-                        value={formatTriedValue(pain.triedSolutions)}
-                        color="text-blue-500"
-                      />
-                      <InfoSquare
-                        icon={<TrendingUp className="h-3.5 w-3.5" />}
-                        label="Pay Signal"
-                        value={
-                          pain.hasWillingnessToPay
-                            ? `${pain.budgetSignals?.length ?? 0} quote${(pain.budgetSignals?.length ?? 0) === 1 ? "" : "s"}`
-                            : formatPaySignalValue(pain.monetization)
-                        }
-                        color="text-violet-500"
-                      />
-                      <InfoSquare
-                        icon={<DollarSign className="h-3.5 w-3.5" />}
-                        label="Estimated TAM"
-                        value={formatCurrency(
-                          pain.cluster?.estimatedTamUsdAnnual,
-                        )}
-                        color="text-fuchsia-500"
-                        preserveCase
-                      />
-                      <InfoSquare
-                        icon={<BarChart3 className="h-3.5 w-3.5" />}
-                        label="Stage"
-                        value={formatStageValue(pain.maturity)}
-                        color="text-rose-500"
-                      />
-                    </div>
-                    {pain.hasWillingnessToPay &&
-                    (pain.budgetSignals?.length ?? 0) > 0 ? (
-                      <div className="space-y-3 border border-emerald-400/20 bg-emerald-500/5 p-5">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-[10px] font-black tracking-widest text-emerald-300 uppercase">
-                            WTP Quotes
-                          </p>
-                          {pain.cluster?.budgetSignalCount ? (
-                            <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-                              {pain.cluster.budgetSignalCount} cluster quote
-                              {pain.cluster.budgetSignalCount === 1 ? "" : "s"}
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="space-y-2">
-                          {pain.budgetSignals?.map((signal) => (
-                            <div
-                              key={signal.quote.slice(0, 100)}
-                              className="space-y-1 border border-white/10 bg-black/20 p-3"
-                            >
-                              <p className="text-sm leading-relaxed font-medium text-zinc-200">
-                                "{signal.quote}"
-                              </p>
-                              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-                                {signal.source} signal
-                                {signal.annualizedMidpointUsd !== null
-                                  ? ` • ${formatCurrency(signal.annualizedMidpointUsd)} annualized`
-                                  : ""}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-
-                {getActiveTab(pain.id) === "community" && (
-                  <div className="relative z-10 space-y-4">
-                    <p className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
-                      Community Pulse
-                    </p>
-                    {pain.userLanguage && (
-                      <div className="space-y-3 border border-white/20 bg-zinc-900/40 p-5">
-                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-                          Language Overview
-                        </p>
-                        <div className="space-y-2">
-                          {formatPainDescription(
-                            pain.userLanguage.overview,
-                          ).map((paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-sm leading-relaxed font-medium text-zinc-300"
-                            >
-                              {paragraph}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedPainIndex(idx);
+                    setIsDescriptionExpanded(false);
+                  }}
+                  className={cn(
+                    "flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 font-sans text-xs font-medium transition-all",
+                    active
+                      ? "bg-[#2563eb] font-semibold text-white shadow-xs"
+                      : "text-zinc-650 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900",
+                  )}
+                >
+                  <span>#{idx + 1}</span>
+                  <span className="max-w-[140px] truncate">
+                    {deriveIdeaTitle(p, reportData.title)}
+                  </span>
+                  <span
+                    className={cn(
+                      "rounded px-1 text-[10px]",
+                      active
+                        ? "bg-white/20 text-white"
+                        : "font-mono text-zinc-500",
                     )}
-                    {pain.communityVoices.map((voice) => (
-                      <div
-                        key={voice.slice(0, 100)}
-                        className="border border-l-4 border-white/20 border-l-[#ff4500] bg-white/2 p-6"
-                      >
-                        <div className="space-y-2">
-                          {formatPainDescription(voice).map((paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-[14px] leading-relaxed font-medium text-zinc-300 italic"
-                            >
-                              {paragraph}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                    {pain.userLanguage?.sections?.map((section) => (
-                      <div
-                        key={`${pain.id}-lang-${section.label}`}
-                        className="space-y-3 border border-white/20 bg-white/2 p-6"
-                      >
-                        <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-                          {section.label}
-                        </p>
-                        <div className="space-y-2">
-                          {formatPainDescription(section.summary).map(
-                            (paragraph) => (
-                              <p
-                                key={paragraph.slice(0, 100)}
-                                className="text-xs leading-relaxed font-medium text-zinc-500"
-                              >
-                                {paragraph}
-                              </p>
-                            ),
-                          )}
-                        </div>
-                        <div className="space-y-2">
-                          {section.examples.map((example) => (
-                            <div key={example.slice(0, 100)} className="space-y-1">
-                              {formatPainDescription(example).map(
-                                (paragraph, paragraphIdx) => (
-                                  <p
-                                    key={paragraph.slice(0, 100)}
-                                    className="text-sm leading-relaxed font-medium text-zinc-300"
-                                  >
-                                    {paragraphIdx === 0
-                                      ? `- ${paragraph}`
-                                      : paragraph}
-                                  </p>
-                                ),
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  >
+                    ★ {pScore}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-                {getActiveTab(pain.id) === "build" && (
-                  <div className="relative z-10 space-y-6">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                      <div className="space-y-4 rounded-3xl border border-blue-500/10 bg-blue-500/5 p-6 shadow-inner">
-                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-blue-400 uppercase">
-                          <BarChart3 className="h-4 w-4" /> Marketing Language
-                        </p>
-                        <div className="space-y-2">
-                          {pain.triedSolutions &&
-                          pain.triedSolutions.length > 0 ? (
-                            pain.triedSolutions.map((sol) => (
-                              <div
-                                key={sol}
-                                className="flex items-center gap-3 font-medium text-zinc-400"
-                              >
-                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30"></div>
-                                User tried &quot;{sol}&quot;
-                              </div>
-                            ))
-                          ) : (
-                            <p className="text-xs font-medium text-zinc-600 italic">
-                              No tools mentioned specifically.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="space-y-4 rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6 shadow-inner">
-                        <p className="flex items-center gap-2 text-[10px] font-black tracking-widest text-emerald-400 uppercase">
-                          <Lightbulb className="h-4 w-4" /> Suggested Angles
-                        </p>
-                        <div className="space-y-2">
-                          {pain.angles.map((angle) => (
-                            <div
-                              key={angle}
-                              className="flex items-center gap-3 font-medium text-zinc-400"
-                            >
-                              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/30"></div>
-                              {angle}
-                            </div>
+          <div className="flex shrink-0 items-center gap-1 pl-2">
+            <button
+              onClick={handlePrevIdea}
+              disabled={currentPainIndex === 0}
+              className="cursor-pointer rounded-md border border-zinc-200 bg-white p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
+              title="Previous idea (Left Arrow)"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="px-1 font-mono text-[11px] text-zinc-500">
+              {currentPainIndex + 1}/{filteredPainPoints.length}
+            </span>
+            <button
+              onClick={handleNextIdea}
+              disabled={currentPainIndex >= filteredPainPoints.length - 1}
+              className="cursor-pointer rounded-md border border-zinc-200 bg-white p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
+              title="Next idea (Right Arrow)"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* MAIN IDEA HERO SECTION */}
+        {currentPain && (
+          <div className="space-y-10 pt-2">
+            {/* 1. Header: Title + Score Badge */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <h1 className="max-w-4xl font-serif text-3xl leading-[1.18] font-normal tracking-tight text-[#1a1a1a] sm:text-4xl lg:text-[42px]">
+                {ideaTitle}
+              </h1>
+
+              {/* Exact IdeaBrowser Score Pill ⭐ 7.3/10 */}
+              <div className="flex shrink-0 items-center">
+                <MetricTooltip metric="validationScore">
+                  <div className="inline-flex cursor-help items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 shadow-2xs">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-50 text-xs font-bold text-amber-500">
+                      ★
+                    </div>
+                    <span className="font-sans text-base font-bold tracking-tight text-zinc-900">
+                      {scoreFormatted}
+                    </span>
+                    <span className="text-xs font-medium text-zinc-400">
+                      /10
+                    </span>
+                  </div>
+                </MetricTooltip>
+              </div>
+            </div>
+
+            {/* 2. Top Two-Column Grid: Left Column (Idea + Meta + CTA) & Right Column (Mockup + 2x2 Grid) */}
+            <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12">
+              {/* LEFT COLUMN (Wide ~60%) */}
+              <div className="space-y-7 lg:col-span-7">
+                {/* THE IDEA Section */}
+                <div className="space-y-3">
+                  <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                    THE IDEA
+                  </p>
+
+                  <div className="space-y-3.5 font-serif text-[16px] leading-[1.68] text-[#2c2c2c] sm:text-[17px]">
+                    {(() => {
+                      const displayed = isDescriptionExpanded
+                        ? narrativeParagraphs
+                        : narrativeParagraphs.slice(0, 2);
+
+                      return (
+                        <>
+                          {displayed.map((p, idx) => (
+                            <p key={idx}>{p}</p>
                           ))}
+                          {narrativeParagraphs.length > 2 &&
+                            !isDescriptionExpanded && (
+                              <button
+                                type="button"
+                                onClick={() => setIsDescriptionExpanded(true)}
+                                className="inline-flex cursor-pointer items-center gap-1 pt-1 font-sans text-xs font-semibold text-zinc-700 transition-colors hover:text-blue-600"
+                              >
+                                Keep reading →
+                              </button>
+                            )}
+                          {isDescriptionExpanded &&
+                            narrativeParagraphs.length > 2 && (
+                              <button
+                                type="button"
+                                onClick={() => setIsDescriptionExpanded(false)}
+                                className="inline-flex cursor-pointer items-center gap-1 pt-1 font-sans text-xs font-semibold text-zinc-400 transition-colors hover:text-zinc-600"
+                              >
+                                Show less ↑
+                              </button>
+                            )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* 4-Field Metadata Grid in IdeaBrowser Style */}
+                <div className="border-zinc-150 grid grid-cols-2 gap-x-8 gap-y-5 border-t pt-6">
+                  <div>
+                    <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                      THE CUSTOMER
+                    </p>
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
+                      {customer}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                      MARKET
+                    </p>
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
+                      {market}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                      REVENUE CEILING
+                    </p>
+                    <p className="mt-1 font-mono text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
+                      {revenueCeiling}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                      COMPETITION
+                    </p>
+                    <p className="mt-1 text-[13px] leading-snug font-bold text-zinc-900 sm:text-sm">
+                      {competition}
+                    </p>
+                  </div>
+                </div>
+
+                {/* IdeaBrowser Style Blue Gradient Button */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setAgentModalOpen(true)}
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#2563eb] px-6 py-3 font-sans text-xs font-bold tracking-wide text-white shadow-xs transition-all hover:bg-[#1d4ed8] active:scale-98"
+                  >
+                    <div className="flex items-center -space-x-1">
+                      <div className="h-2 w-2 rounded-full bg-white"></div>
+                      <div className="h-2 w-2 rounded-full bg-blue-200"></div>
+                    </div>
+                    <span>Build this with your agent →</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyAgentPrompt}
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-3 font-sans text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                  >
+                    {agentPromptCopied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <span className="text-emerald-600">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5 text-zinc-400" />
+                        <span>Copy Spec</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShareModalOpen(true)}
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-4 py-3 font-sans text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-zinc-400" />
+                    <span>Share Opportunity</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN (~40%): Mockup Card + 2x2 Metric Cards */}
+              <div className="space-y-5 lg:col-span-5">
+                {/* Concept Mockup Card */}
+                <div className="space-y-4 rounded-2xl border border-zinc-200/90 bg-[#f8f9fa] p-4.5 shadow-2xs">
+                  {/* Dynamic Concept Mockup UI */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Phone 1: Detection / Resolver App Screen */}
+                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-[#0f172a] p-3 text-white shadow-sm">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
+                        <div className="flex min-w-0 items-center gap-1.5">
+                          <div className="h-2 w-2 shrink-0 rounded-full bg-emerald-400"></div>
+                          <span className="truncate font-mono text-[9px] font-bold tracking-wider text-zinc-200 uppercase">
+                            {ideaTitle.split(" ")[0]} Flow
+                          </span>
+                        </div>
+                        <span className="py-0.2 shrink-0 rounded bg-white/10 px-1.5 font-mono text-[8px] text-zinc-300">
+                          {currentPain.subreddits[0]
+                            ? `r/${currentPain.subreddits[0].replace(/^r\//i, "")}`
+                            : "Active"}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="space-y-1 rounded-lg border border-white/5 bg-white/5 p-2">
+                          <p className="font-mono text-[8px] text-zinc-400">
+                            Problem Detected
+                          </p>
+                          <p className="line-clamp-2 text-[10px] leading-tight font-bold text-white">
+                            {currentPain.title}
+                          </p>
+                          <p className="text-[9px] font-semibold text-emerald-400">
+                            {pricing} • {difficultyLabel}
+                          </p>
+                        </div>
+                        <div className="flex gap-1">
+                          <span className="flex-1 truncate rounded bg-white/10 px-1 py-1 text-center font-mono text-[8px] text-zinc-300">
+                            {currentPain.sentiment || "Frustrated"}
+                          </span>
+                          <span className="flex-1 truncate rounded bg-blue-500/20 px-1 py-1 text-center font-mono text-[8px] text-blue-300">
+                            Urgency {currentPain.urgency || 7}/10
+                          </span>
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-4 rounded-3xl border border-[#ff4500]/15 bg-[#ff4500]/5 p-6">
-                      <p className="text-[10px] font-black tracking-widest text-[#ff4500] uppercase">
-                        What to Build
-                      </p>
-                      <h5 className="text-lg font-black tracking-tight text-white">
-                        {deriveBuildIdea(pain)}
-                      </h5>
-                      <p className="text-[12px] font-medium text-zinc-300">
-                        Build for:{" "}
-                        <span className="text-white">
-                          {deriveTargetUser(pain)}
+
+                    {/* Phone 2: Resolution & Value Metrics Screen */}
+                    <div className="space-y-2.5 rounded-xl border border-zinc-300/80 bg-white p-3 text-zinc-900 shadow-sm">
+                      <div className="flex items-center justify-between border-b border-zinc-100 pb-1.5">
+                        <span className="font-mono text-[9px] font-bold text-zinc-800 uppercase">
+                          Resolver Hub
                         </span>
+                        <span className="py-0.2 rounded bg-emerald-50 px-1.5 text-[8px] font-bold text-emerald-600">
+                          Validated
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="space-y-1 rounded-lg border border-zinc-100 bg-zinc-50 p-2">
+                          <div className="flex justify-between text-[8px] text-zinc-500">
+                            <span>Validation Score</span>
+                            <span className="font-bold text-zinc-800">
+                              {scoreFormatted}/10
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+                            <div
+                              className="h-full rounded-full bg-[#2563eb]"
+                              style={{
+                                width: `${Math.min(100, Math.max(25, currentPain.validationScore || 70))}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1 text-center font-mono text-[8px]">
+                          <div className="truncate rounded border border-zinc-100 bg-zinc-50 p-1">
+                            <span className="text-zinc-400">Target:</span>{" "}
+                            <b className="text-zinc-700">
+                              {customer.split(" ")[0]}
+                            </b>
+                          </div>
+                          <div className="truncate rounded border border-zinc-100 bg-zinc-50 p-1">
+                            <span className="text-zinc-400">Vs:</span>{" "}
+                            <b className="text-zinc-700">
+                              {competition.split(" ")[0]}
+                            </b>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mockup Card Bottom Bar */}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="font-sans text-[10px] font-bold tracking-[0.15em] text-zinc-400 uppercase">
+                      CONCEPT MOCKUP
+                    </span>
+                    <button
+                      onClick={() => setAgentModalOpen(true)}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#2563eb] px-3.5 py-1.5 font-sans text-[11px] font-bold tracking-wide text-white shadow-xs transition-all hover:bg-[#1d4ed8]"
+                    >
+                      <div className="flex items-center -space-x-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
+                        <div className="h-1.5 w-1.5 rounded-full bg-blue-200"></div>
+                      </div>
+                      <span>Build this idea →</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2x2 Metric Cards in Exact IdeaBrowser Design */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Metric 1: SOLUTION DEMAND */}
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                    <div className="flex items-center justify-between">
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Solution Demand"
+                        explanation="Calculated demand score based on search velocity, user complaints, and alternative queries."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          SOLUTION DEMAND
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
+                        {demand}
+                      </p>
+                      {/* IdeaBrowser Smooth Purple/Blue Sparkline Curve */}
+                      <div className="pt-1">
+                        <svg
+                          viewBox="0 0 100 24"
+                          className="h-5 w-full fill-none stroke-current text-blue-600"
+                        >
+                          <path
+                            d="M 0 18 Q 25 18, 45 14 T 70 8 T 90 2 L 100 4"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Metric 2: PAIN */}
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                    <div className="flex items-center justify-between">
+                      <MetricTooltip metric="painIntensity">
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          PAIN
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
+                        {currentPain.intensity}{" "}
+                        <span className="text-xs font-normal text-zinc-500">
+                          /10 severity
+                        </span>
+                      </p>
+                      <p className="pt-1 text-[10px] leading-tight font-normal text-zinc-500">
+                        {currentPain.subreddits[0]
+                          ? `r/${currentPain.subreddits[0]}`
+                          : "Community"}{" "}
+                        and {currentPain.mentions} more feel it
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Metric 3: TIMING */}
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                    <div className="flex items-center justify-between">
+                      <MetricTooltip
+                        metric="urgency"
+                        title="Market Timing"
+                        explanation="Why the window is open now: AI turn latencies, API cost drops, and incumbent bloat."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          TIMING
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
+                        {currentPain.maturity || 8}{" "}
+                        <span className="text-xs font-normal text-zinc-500">
+                          /10
+                        </span>
+                      </p>
+                      <p className="pt-1 text-[10px] leading-tight font-medium text-blue-600">
+                        why the window is open
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Metric 4: YEAR 1, DONE RIGHT */}
+                  <div className="space-y-2 rounded-xl border border-zinc-200/90 bg-white p-3.5 shadow-2xs transition-colors hover:border-zinc-300">
+                    <div className="flex items-center justify-between">
+                      <MetricTooltip
+                        metric="monetization"
+                        title="Year 1 ARR Potential"
+                        explanation="Estimated ARR range reachable in year 1 with focused execution and modern pricing."
+                      >
+                        <p className="font-sans text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                          YEAR 1, DONE RIGHT
+                        </p>
+                      </MetricTooltip>
+                      <span className="text-xs font-light text-zinc-300">
+                        +
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-sans text-xl font-bold tracking-tight text-zinc-900">
+                        {year1ARR}
+                      </p>
+                      <p className="pt-1 text-[10px] leading-tight font-normal text-emerald-600">
+                        ceiling {revenueCeiling}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Lower Section: WHY NOW (Left) & AT A GLANCE (Right Sticky Sidebar) */}
+            <div className="border-zinc-150 grid grid-cols-1 items-start gap-10 border-t pt-10 lg:grid-cols-12">
+              {/* LEFT LOWER COLUMN (Wide ~65%) */}
+              <div className="space-y-10 lg:col-span-8">
+                {/* WHY NOW Section */}
+                <div className="space-y-4">
+                  <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                    WHY NOW
+                  </p>
+                  <h2 className="font-serif text-2xl leading-snug font-normal text-[#1a1a1a] sm:text-3xl">
+                    {whyNow.headline}
+                  </h2>
+                  <div className="space-y-3.5 font-serif text-[16px] leading-[1.68] text-[#2c2c2c]">
+                    {whyNow.paragraphs.map((p, idx) => (
+                      <p key={idx}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* COMMUNITY EVIDENCE & VERBATIM QUOTES */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                      COMMUNITY VOICES & VERBATIM EVIDENCE
+                    </p>
+                    {currentPain.postUrl && (
+                      <a
+                        href={currentPain.postUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                      >
+                        <span>View Reddit Thread</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    {currentPain.communityVoices.map((voice, idx) => (
+                      <div
+                        key={idx}
+                        className="space-y-2 rounded-xl border border-zinc-200 bg-white p-4.5 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-mono font-semibold text-zinc-700">
+                            r/
+                            {currentPain.subreddits[
+                              idx % currentPain.subreddits.length
+                            ] || "reddit"}
+                          </span>
+                          <span className="font-mono text-[10px] text-zinc-400">
+                            Verified Community Quote
+                          </span>
+                        </div>
+                        <p className="font-serif text-[15px] leading-relaxed text-zinc-800 italic">
+                          &quot;{voice}&quot;
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* WILLINGNESS TO PAY (WTP) */}
+                {currentPain.hasWillingnessToPay &&
+                  currentPain.budgetSignals &&
+                  currentPain.budgetSignals.length > 0 && (
+                    <div className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50/20 p-5">
+                      <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-emerald-700 uppercase">
+                        WILLINGNESS TO PAY SIGNALS
                       </p>
                       <div className="space-y-2">
-                        {deriveMvpFeatures(pain).map((feature) => (
+                        {currentPain.budgetSignals.map((signal, sIdx) => (
                           <div
-                            key={feature}
-                            className="flex items-start gap-3 text-[13px] font-medium text-zinc-300"
+                            key={sIdx}
+                            className="space-y-1 rounded-xl border border-emerald-100 bg-white p-3.5 shadow-2xs"
                           >
-                            <div className="mt-2 h-1.5 w-1.5 rounded-full bg-[#ff4500]"></div>
-                            <span>{feature}</span>
+                            <p className="font-serif text-sm text-zinc-800 italic">
+                              &quot;{signal.quote}&quot;
+                            </p>
+                            <p className="font-mono text-[10px] font-semibold text-emerald-600 uppercase">
+                              {signal.source} signal
+                              {signal.annualizedMidpointUsd
+                                ? ` • $${signal.annualizedMidpointUsd.toLocaleString()} annualized value`
+                                : ""}
+                            </p>
                           </div>
                         ))}
                       </div>
                     </div>
+                  )}
+
+                {/* BUYER LANGUAGE COPY ANGLES */}
+                {currentPain.userLanguage && (
+                  <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50/60 p-5">
+                    <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                      NATURAL BUYER LANGUAGE & COPY ANGLES
+                    </p>
+                    <p className="text-xs leading-relaxed font-medium text-zinc-700">
+                      {currentPain.userLanguage.overview}
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
+                      {currentPain.userLanguage.sections.map((sec, sIdx) => (
+                        <div
+                          key={sIdx}
+                          className="space-y-1.5 rounded-xl border border-zinc-200 bg-white p-3.5 shadow-2xs"
+                        >
+                          <p className="font-sans text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+                            {sec.label}
+                          </p>
+                          <ul className="space-y-1">
+                            {sec.examples.map((ex, eIdx) => (
+                              <li
+                                key={eIdx}
+                                className="font-serif text-xs text-zinc-800 italic"
+                              >
+                                &quot;{ex}&quot;
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
 
-          {totalPainPoints === 0 && (
-            <EmptyState
-              title="No Insights Found"
-              description="No pain points match your current filters. Try adjusting your keywords or criteria."
-              icon="search"
-              variant="inline"
-              className="py-12"
-            />
-          )}
-
-          {totalPainPoints > PAIN_POINTS_PER_PAGE && (
-            <div className="flex items-center justify-between px-2">
-              <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase">
-                Showing {startPainPointIndex + 1}-{endPainPointIndex} of{" "}
-                {totalPainPoints}
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPainPointsPage((prev) => Math.max(1, prev - 1))
-                  }
-                  disabled={painPointsPage === 1}
-                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  Prev
-                </button>
-                <span className="px-2 text-[10px] font-black tracking-widest text-zinc-400 uppercase">
-                  Page {painPointsPage} / {totalPainPointPages}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPainPointsPage((prev) =>
-                      Math.min(totalPainPointPages, prev + 1),
-                    )
-                  }
-                  disabled={painPointsPage === totalPainPointPages}
-                  className="flex items-center gap-1 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Next
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Sidebar Intel */}
-        <div className="space-y-8 lg:col-span-4">
-          {/* Refine Section */}
-          <div className="space-y-8 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <div>
-              <h4 className="mb-6 flex items-center gap-2 text-sm font-black tracking-widest text-white uppercase">
-                <Filter className="h-4 w-4 text-[#ff4500]" />
-                Investigation Tools
-              </h4>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
-                    Filter by Intensity
-                  </label>
-                  <select
-                    value={intensityFilterDraft}
-                    onChange={(event) =>
-                      setIntensityFilterDraft(
-                        event.target.value as IntensityFilter,
-                      )
-                    }
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
-                  >
-                    <option value="all">All Intensity Levels</option>
-                    <option value="high">High Core Pain (8+)</option>
-                    <option value="medium">Medium Friction (5+)</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black tracking-widest text-zinc-600 uppercase">
-                    Sentiment Filter
-                  </label>
-                  <select
-                    value={sentimentFilterDraft}
-                    onChange={(event) =>
-                      setSentimentFilterDraft(
-                        event.target.value as SentimentFilter,
-                      )
-                    }
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-[#111] px-4 py-3 text-sm font-bold text-white transition-colors focus:border-[#ff4500]/50 focus:outline-none [&>option]:bg-white [&>option]:text-black"
-                  >
-                    <option value="all">All Sentiment Types</option>
-                    <option value="frustrated">Frustrated / Desperate</option>
-                    <option value="neutral">Neutral Explorations</option>
-                  </select>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleApplyFilters}
-                  className="w-full border border-[#ff8a57] bg-[#ff4500] py-4 font-mono text-[11px] font-black tracking-widest text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-[0.98]"
-                >
-                  Apply Filter Logic
-                </button>
-              </div>
-            </div>
-
-            {/* Competitive Landscape */}
-            {allCompetitors.length > 0 && (
-              <div className="border-t border-white/5 pt-8">
-                <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
-                  <Wrench className="h-4 w-4 text-[#ff4500]" />
-                  Competitive Landscape
-                </h4>
-                <div className="space-y-4">
-                  {allCompetitors.slice(0, 10).map((tool) => (
-                    <div
-                      key={tool.name}
-                      className="group relative overflow-hidden border border-white/10 bg-white/2 p-4 transition-all hover:border-[#ff4500]/30 hover:bg-white/5"
-                    >
-                      <div className="relative z-10 flex items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex items-center gap-2">
-                            <span className="text-sm font-black text-white">
-                              {tool.name}
-                            </span>
-                            <span className="rounded-full bg-[#ff4500]/10 px-2 py-0.5 text-[9px] font-black text-[#ff4500] uppercase">
-                              {tool.mentionCount} mentions
-                            </span>
-                          </div>
-                          {tool.description ? (
-                            <p className="line-clamp-2 text-[11px] font-medium leading-relaxed text-zinc-500">
-                              {tool.description}
-                            </p>
-                          ) : (
-                            <p className="text-[10px] font-bold text-zinc-700 italic">
-                              Analyzing tool specs...
-                            </p>
-                          )}
-                        </div>
-                        {tool.url && (
-                          <a
-                            href={
-                              tool.url.startsWith("http")
-                                ? tool.url
-                                : `https://${tool.url}`
-                            }
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-zinc-800 p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
-                          >
-                            <TrendingUp className="h-3 w-3" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Validation Signals */}
-            <div className="border-t border-white/5 pt-8">
-              <h4 className="mb-6 flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
-                <BarChart3 className="h-4 w-4" /> Market Signals
-              </h4>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
-                    <span className="text-zinc-400 uppercase">
-                      Analysis Confidence
+              {/* RIGHT STICKY SIDEBAR ("AT A GLANCE") */}
+              <div className="sticky top-6 space-y-6 lg:col-span-4">
+                {/* AT A GLANCE Summary Card */}
+                <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xs">
+                  <div className="border-zinc-150 flex items-center justify-between border-b pb-2.5">
+                    <span className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                      AT A GLANCE
                     </span>
-                    <span className="tracking-widest text-white">94%</span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                    <div className="h-full w-[94%] bg-[#ff4500]"></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="mb-2 flex justify-between font-mono text-[11px] font-black">
-                    <span className="text-zinc-400 uppercase">
-                      AI Data Fidelity
+                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-sans text-xs font-bold text-zinc-800">
+                      ★ {scoreFormatted}
                     </span>
-                    <span className="tracking-widest text-white">High</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                    <div className="h-full w-[88%] bg-emerald-500"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {reportData.saasOpportunities &&
-            reportData.saasOpportunities.length > 0 && (
-              <div className="space-y-5 border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-                <h4 className="flex items-center gap-2 font-mono text-[11px] font-black tracking-[0.2em] text-zinc-500 uppercase">
-                  <Lightbulb className="h-4 w-4 text-[#ff4500]" /> AI-Generated
-                  SaaS Opportunities
-                </h4>
-                <div className="space-y-4">
-                  {reportData.saasOpportunities.slice(0, 3).map((opp) => (
-                    <SpotlightCard
-                      key={opp.title}
-                      active={opp.score > 70}
-                      className="group/opp border border-white/20 bg-white/2 p-5 transition-all duration-300 hover:border-amber-500/30"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm leading-tight font-black text-white">
-                          {opp.title}
-                        </p>
-                        <span className={cn(
-                          "text-[10px] font-black tracking-widest uppercase",
-                          opp.score > 70 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" : "text-[#ff4500]"
-                        )}>
-                          {opp.score}/100
+                  <div className="divide-zinc-150 divide-y font-sans text-xs">
+                    <div className="flex items-center justify-between py-2.5">
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Solution Demand"
+                        explanation="Calculated demand score based on search velocity, user complaints, and alternative queries."
+                      >
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          SOLUTION DEMAND
                         </span>
-                      </div>
-                      <div className="space-y-2 mt-3">
-                        {formatPainDescription(opp.problemStatement).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-xs leading-relaxed font-medium text-zinc-400"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                      <p className="text-[10px] font-black tracking-widest text-zinc-500 uppercase mt-3">
-                        ICP: {opp.targetCustomer}
-                      </p>
-                      <div className="space-y-2 mt-2">
-                        {formatPainDescription(opp.valueProposition).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-xs leading-relaxed font-medium text-zinc-300"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                      <div className="space-y-2 mt-2">
-                        {formatPainDescription(opp.launchAngle).map(
-                          (paragraph) => (
-                            <p
-                              key={paragraph.slice(0, 100)}
-                              className="text-[11px] leading-relaxed font-bold text-zinc-500 underline decoration-zinc-800 underline-offset-4"
-                            >
-                              {paragraph}
-                            </p>
-                          ),
-                        )}
-                      </div>
-                    </SpotlightCard>
-                  ))}
+                      </MetricTooltip>
+                      <span className="font-bold text-zinc-900">
+                        {demandNumeric}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2.5">
+                      <MetricTooltip metric="willingnessToPay">
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          PRICING
+                        </span>
+                      </MetricTooltip>
+                      <span className="font-bold text-zinc-900">{pricing}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2.5">
+                      <MetricTooltip metric="difficulty">
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          DIFFICULTY
+                        </span>
+                      </MetricTooltip>
+                      <span className="font-bold text-zinc-900">
+                        {difficultyLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2.5">
+                      <MetricTooltip
+                        metric="marketMaturity"
+                        title="Incumbents & Competitors"
+                        explanation="The existing alternatives and legacy solutions currently dominating the workflow."
+                      >
+                        <span className="text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                          UP AGAINST
+                        </span>
+                      </MetricTooltip>
+                      <span className="flex items-center gap-1 font-bold text-zinc-900">
+                        <span>{competition}</span>
+                        <ChevronRight className="h-3 w-3 text-zinc-400" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MVP Implementation Blueprint */}
+                <div className="space-y-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-2xs">
+                  <p className="font-sans text-[11px] font-bold tracking-[0.16em] text-zinc-400 uppercase">
+                    WHAT TO BUILD (MVP BLUEPRINT)
+                  </p>
+                  <div className="space-y-2 text-xs text-zinc-700">
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-blue-600">•</span>
+                      <span>
+                        Single-purpose dashboard tailored for {customer}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-blue-600">•</span>
+                      <span>
+                        Automated workflow resolving &quot;{currentPain.title}
+                        &quot;
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-blue-600">•</span>
+                      <span>
+                        Direct displacement alternative to {competition} at{" "}
+                        {pricing}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InfoSquare({
-  icon,
-  label,
-  value,
-  color,
-  preserveCase,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  color: string;
-  preserveCase?: boolean;
-}) {
-  return (
-    <div className="flex min-h-[104px] items-start gap-3 border border-white/20 bg-white/2 p-4">
-      <div
-        className={`mt-0.5 rounded-xl border border-white/5 bg-zinc-900 p-2.5 ${color} shrink-0`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="font-mono text-[10px] font-black tracking-[0.18em] text-zinc-600 uppercase">
-          {label}
-        </p>
-        <p className="mt-2 text-base leading-[1.15] font-black wrap-break-word whitespace-normal text-white sm:text-[19px]">
-          {preserveCase ? value : toTitleCase(value)}
-        </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

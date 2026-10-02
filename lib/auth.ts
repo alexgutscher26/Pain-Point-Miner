@@ -8,7 +8,7 @@ import {
   oneTimeToken,
   username,
 } from "better-auth/plugins";
-import { sentinel } from "@better-auth/infra";
+import { dash, sentinel } from "@better-auth/infra";
 import { stripe as stripePlugin } from "@better-auth/stripe";
 import Stripe from "stripe";
 import { db } from "./db";
@@ -31,12 +31,19 @@ const stripeSubscriptionEnabled =
   Boolean(stripePriceProMonthly);
 const usernamePluginEnabled = process.env.USERNAME_PLUGIN_ENABLED === "true";
 const sentinelApiUrl = process.env.BETTER_AUTH_API_URL;
-const sentinelKvUrl = process.env.BETTER_AUTH_KV_URL;
+const sentinelKvUrl =
+  process.env.BETTER_AUTH_IDENTIFY_URL || process.env.BETTER_AUTH_KV_URL;
 const sentinelApiKey = process.env.BETTER_AUTH_API_KEY;
 const sentinelEnabled =
   Boolean(sentinelApiUrl && /^https?:\/\//i.test(sentinelApiUrl)) &&
   Boolean(sentinelKvUrl) &&
   Boolean(sentinelApiKey);
+
+const githubClientId =
+  process.env.GITHUB_CLIENT_ID || process.env.AUTH_GITHUB_ID;
+const githubClientSecret =
+  process.env.GITHUB_CLIENT_SECRET || process.env.AUTH_GITHUB_SECRET;
+const githubOAuthEnabled = Boolean(githubClientId && githubClientSecret);
 
 import * as schema from "./db/schema";
 import * as relations from "./db/relations";
@@ -53,6 +60,9 @@ export const auth = betterAuth({
   session: {
     expiresIn: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
+    cookieCache: {
+      enabled: false,
+    },
   },
   user: {
     additionalFields: {
@@ -64,12 +74,33 @@ export const auth = betterAuth({
       stripeCustomerId: { type: "string" },
     },
   },
+  ...(githubOAuthEnabled
+    ? {
+        socialProviders: {
+          github: {
+            clientId: githubClientId!,
+            clientSecret: githubClientSecret!,
+            scope: ["user:email", "read:user"],
+            mapProfileToUser: (profile) => {
+              return {
+                email:
+                  profile.email ||
+                  (profile.login
+                    ? `${profile.login}@users.noreply.github.com`
+                    : `${profile.id}@users.noreply.github.com`),
+                name: profile.name || profile.login || "GitHub User",
+                image: profile.avatar_url,
+              };
+            },
+          },
+        },
+      }
+    : {}),
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data, request) {
-      const { sendResetPasswordEmailProgrammatically } = await import(
-        "./loops/service"
-      );
+      const { sendResetPasswordEmailProgrammatically } =
+        await import("./loops/service");
       await sendResetPasswordEmailProgrammatically(data.user.email, data.url);
     },
   },
@@ -119,6 +150,14 @@ export const auth = betterAuth({
               const trimmed = value.trim();
               return trimmed.length >= 2 && trimmed.length <= 40;
             },
+          }),
+        ]
+      : []),
+    ...(sentinelApiKey
+      ? [
+          dash({
+            apiKey: sentinelApiKey,
+            ...(sentinelApiUrl ? { apiUrl: sentinelApiUrl } : {}),
           }),
         ]
       : []),
@@ -185,12 +224,19 @@ export const auth = betterAuth({
       if (ctx.path === "/sign-up/email" && ctx.context.returned) {
         const body = ctx.body as { email?: string; name?: string };
         if (body.email) {
-          const { syncUserToLoops, sendWelcomeEmailProgrammatically } = await import("./loops/service");
+          const { syncUserToLoops, sendWelcomeEmailProgrammatically } =
+            await import("./loops/service");
           await syncUserToLoops(body.email, body.name);
 
           const firstName = body.name ? body.name.split(" ")[0] : "there";
-          const scanUrl = process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/search` : "https://threddiq.com/dashboard/search";
-          await sendWelcomeEmailProgrammatically(body.email, firstName, scanUrl);
+          const scanUrl = process.env.NEXT_PUBLIC_APP_URL
+            ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/search`
+            : "https://threddiq.com/dashboard/search";
+          await sendWelcomeEmailProgrammatically(
+            body.email,
+            firstName,
+            scanUrl,
+          );
         }
       }
     }),
@@ -256,3 +302,48 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+
+export function sanitizeAuthHeaders(
+  inputHeaders?: Headers | HeadersInit | null,
+): Headers {
+  const headers = new Headers(inputHeaders ?? undefined);
+  const cookie = headers.get("cookie");
+  if (!cookie) return headers;
+
+  const cookies = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .filter(Boolean);
+  const sanitized = cookies.filter((c) => {
+    const eqIdx = c.indexOf("=");
+    if (eqIdx === -1) return true;
+    const name = c.slice(0, eqIdx).trim();
+
+    // Strip out session_data cookie which causes base64 decode issues when stale/mismatched
+    if (name.includes("session_data")) {
+      return false;
+    }
+    return true;
+  });
+
+  headers.set("cookie", sanitized.join("; "));
+  return headers;
+}
+
+export async function getServerSession(
+  customHeaders?: Headers | HeadersInit | null,
+) {
+  try {
+    let requestHeaders = customHeaders ? new Headers(customHeaders) : null;
+    if (!requestHeaders) {
+      const { headers } = await import("next/headers");
+      requestHeaders = await headers();
+    }
+    const cleanHeaders = sanitizeAuthHeaders(requestHeaders);
+    return await auth.api.getSession({
+      headers: cleanHeaders,
+    });
+  } catch {
+    return null;
+  }
+}
