@@ -4,8 +4,12 @@
   "title": "I am so sick of Excel for tracking my inventory. It's a mess.",
   "selftext": "I run a small e-commerce shop selling vintage watches. I've tried using Excel/Google Sheets to track my inventory, but it's impossible to handle different conditions, serial numbers, and multiple sales channels (Etsy + eBay). Anyone have a better way?",
   "comments": [
-    { "body": "Same here. I lost two watches last month because of a sheet error." },
-    { "body": "I'd pay a monthly fee if something just integrated with Etsy and eBay properly without costing $500/month." }
+    {
+      "body": "Same here. I lost two watches last month because of a sheet error."
+    },
+    {
+      "body": "I'd pay a monthly fee if something just integrated with Etsy and eBay properly without costing $500/month."
+    }
   ],
   "expected": [
     {

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { extractPainPoints } from "@/lib/ai";
+import {
+  extractPainPoints,
+  getModelForDepth,
+  AI_MODELS,
+  AI_MODEL_LABELS,
+} from "@/lib/ai";
 
 describe("extractPainPoints", () => {
   const originalEnv = process.env;
@@ -16,7 +21,7 @@ describe("extractPainPoints", () => {
   beforeEach(() => {
     process.env = { ...originalEnv };
     process.env.OPENROUTER_API_KEY = "test_key";
-    vi.stubGlobal("fetch", vi.fn());
+    global.fetch = vi.fn() as any;
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -56,7 +61,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -66,11 +71,20 @@ describe("extractPainPoints", () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       ...mockPainPoint,
+      confidenceScore: 0.7,
+      targetUser: undefined,
+      competingProducts: [],
+      willingnessToPay: "unknown",
+      featureRequested: undefined,
       url: mockPost.url,
       author: mockPost.author,
       subreddit: mockPost.subreddit,
       budget: [],
       triedSolutions: [],
+      schemaVersion: 2,
+      promptVersion: "v1",
+      rawResponse: `\`\`\`json\n[${JSON.stringify(mockPainPoint)}]\n\`\`\``,
+      originalLanguage: "en",
     });
   });
 
@@ -97,7 +111,7 @@ describe("extractPainPoints", () => {
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
@@ -107,16 +121,180 @@ describe("extractPainPoints", () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       ...mockPainPoint,
+      confidenceScore: 0.7,
+      targetUser: undefined,
+      competingProducts: [],
+      willingnessToPay: "unknown",
+      featureRequested: undefined,
       url: mockPost.url,
       author: mockPost.author,
       subreddit: mockPost.subreddit,
       budget: [],
       triedSolutions: ["Solution A"],
+      schemaVersion: 2,
+      promptVersion: "v1",
+      rawResponse: JSON.stringify({ painPoints: [mockPainPoint] }),
+      originalLanguage: "en",
     });
   });
 
-  it("should catch fetch error when response is not ok and return empty array", async () => {
+  it("should detect non-English originalLanguage and return English extracted pain points", async () => {
+    const spanishPost = {
+      title: "El software de facturación actual es demasiado lento y complejo",
+      selftext:
+        "Estamos perdiendo clientes porque la sincronización de inventario falla constantemente.",
+      url: "https://reddit.com/r/espanol/456",
+      author: "usuario_es",
+      subreddit: "espanol",
+      comments: [],
+    };
+
+    const mockExtractedSpanish = {
+      title: "Billing Software Inefficiency and Inventory Sync Failure",
+      body: "Businesses are losing customers due to persistent inventory synchronization failures and slow invoicing software.",
+      targetUser: "Small Business Owner",
+      competingProducts: ["FacturaDirecta"],
+      willingnessToPay: "paid_signal",
+      featureRequested:
+        "Automated real-time inventory sync and streamlined invoicing",
+      originalLanguage: "es",
+      confidenceScore: 0.9,
+      painIntensity: 8,
+      urgency: 8,
+      monetizationScore: 8,
+      marketMaturity: 6,
+      budget: [],
+      triedSolutions: [],
+      sentiment: "frustrated",
+      difficulty: "side_project",
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ painPoints: [mockExtractedSpanish] }),
+          },
+        },
+      ],
+    };
+
     vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(spanishPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].originalLanguage).toBe("es");
+    expect(result[0].title).toBe(
+      "Billing Software Inefficiency and Inventory Sync Failure",
+    );
+    expect(result[0].targetUser).toBe("Small Business Owner");
+  });
+
+  it("should extract confidenceScore, targetUser, competingProducts, willingnessToPay, and featureRequested", async () => {
+    const mockPainPoint = {
+      title: "DevOps Pipeline Breakage",
+      body: "CI/CD builds frequently timeout and fail silently.",
+      painIntensity: 9,
+      urgency: 8,
+      monetizationScore: 8,
+      marketMaturity: 7,
+      confidenceScore: 0.92,
+      targetUser: "enterprise IT manager",
+      competingProducts: ["Jenkins", "CircleCI"],
+      willingnessToPay: "paid_signal",
+      featureRequested:
+        "Automated timeout alerts and dead-letter queue retries",
+      sentiment: "frustrated",
+      triedSolutions: ["GitHub Actions"],
+      budget: [],
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ painPoints: [mockPainPoint] }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(mockPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].confidenceScore).toBe(0.92);
+    expect(result[0].targetUser).toBe("enterprise IT manager");
+    expect(result[0].competingProducts).toEqual(["Jenkins", "CircleCI"]);
+    expect(result[0].willingnessToPay).toBe("paid_signal");
+    expect(result[0].featureRequested).toBe(
+      "Automated timeout alerts and dead-letter queue retries",
+    );
+  });
+
+  it("should filter out low-confidence extractions (< 0.3)", async () => {
+    const highConfPoint = {
+      title: "High Confidence Issue",
+      body: "Very clear detailed bug.",
+      painIntensity: 8,
+      urgency: 7,
+      monetizationScore: 8,
+      marketMaturity: 5,
+      confidenceScore: 0.85,
+      targetUser: "solo founder",
+      sentiment: "frustrated",
+      triedSolutions: [],
+      budget: [],
+    };
+
+    const lowConfPoint = {
+      title: "Low Confidence Vague Complaint",
+      body: "Something might be slow occasionally.",
+      painIntensity: 2,
+      urgency: 1,
+      monetizationScore: 1,
+      marketMaturity: 2,
+      confidenceScore: 0.2,
+      targetUser: "casual lurker",
+      sentiment: "neutral",
+      triedSolutions: [],
+      budget: [],
+    };
+
+    const mockResponse = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              painPoints: [highConfPoint, lowConfPoint],
+            }),
+          },
+        },
+      ],
+    };
+
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResponse),
+    } as Response);
+
+    const result = await extractPainPoints(mockPost);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("High Confidence Issue");
+    expect(result[0].confidenceScore).toBe(0.85);
+  });
+
+  it("should catch fetch error when response is not ok and return empty array", async () => {
+    (fetch as any).mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: "Internal Server Error",
@@ -134,34 +312,98 @@ describe("extractPainPoints", () => {
       "Error in AI extraction:",
       expect.objectContaining({
         message: expect.stringContaining(
-          "OpenRouter API error: 500 Internal Server Error - API is down",
+          "All models in fallback chain failed to produce a valid response",
         ),
       }),
     );
   });
 
-  it("should catch JSON parse error for malformed response and return empty array", async () => {
+  it("should strip <think> tokens from reasoning models (like DeepSeek R1) and parse JSON cleanly", async () => {
+    const mockPainPoint = {
+      title: "Reasoning Model Extracted Pain",
+      body: "Pain point extracted after deep chain-of-thought.",
+      painIntensity: 9,
+      urgency: 8,
+      monetizationScore: 9,
+      marketMaturity: 6,
+      sentiment: "desperate",
+      triedSolutions: [],
+      budget: [],
+    };
+
     const mockResponse = {
       choices: [
         {
           message: {
-            content: "This is not valid JSON",
+            content: `<think>
+I need to analyze this thread carefully.
+The user is having severe issues with their pipeline.
+Let's extract the root cause.
+</think>
+\`\`\`json
+{
+  "painPoints": [${JSON.stringify(mockPainPoint)}]
+}
+\`\`\``,
           },
         },
       ],
     };
 
-    vi.mocked(fetch).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     } as Response);
 
     const result = await extractPainPoints(mockPost);
 
-    expect(result).toEqual([]);
-    expect(console.error).toHaveBeenCalledWith(
-      "Error in AI extraction:",
-      expect.any(Error), // now throws Error("No JSON object found in AI response")
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("Reasoning Model Extracted Pain");
+    expect(result[0].painIntensity).toBe(9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getModelForDepth — routing logic
+// ---------------------------------------------------------------------------
+describe("getModelForDepth", () => {
+  it("routes basic depth to Gemini 2.0 Flash", () => {
+    expect(getModelForDepth("basic")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
+  it("routes deep depth to Gemini 2.0 Flash (cost reduction)", () => {
+    expect(getModelForDepth("deep")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
+  it("routes advanced depth to Gemini 2.0 Flash (cost reduction)", () => {
+    expect(getModelForDepth("advanced")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
+  it("routes ultra depth to Gemini 2.0 Flash", () => {
+    expect(getModelForDepth("ultra")).toBe(AI_MODELS.GEMINI_FLASH);
+  });
+
+  it("respects a valid modelOverride regardless of depth", () => {
+    expect(getModelForDepth("basic", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
     );
+    expect(getModelForDepth("deep", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
+    expect(getModelForDepth("ultra", AI_MODELS.GEMINI_FLASH)).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
+  });
+
+  it("ignores an invalid modelOverride and falls back to Gemini Flash", () => {
+    expect(getModelForDepth("deep", "invalid/model-xyz")).toBe(
+      AI_MODELS.GEMINI_FLASH,
+    );
+  });
+
+  it("AI_MODEL_LABELS has a human-readable label for every model", () => {
+    for (const modelId of Object.values(AI_MODELS)) {
+      expect(AI_MODEL_LABELS[modelId]).toBeTruthy();
+    }
   });
 });
