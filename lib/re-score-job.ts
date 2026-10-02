@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { painPoint } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 import {
   DEFAULT_WEIGHTS,
   generateScoreExplanation,
@@ -8,99 +8,147 @@ import {
   toOpportunityScore,
 } from "@/lib/dashboard-metrics";
 
+export interface ReScoreJobOptions {
+  batchSize?: number;
+  maxRecords?: number;
+}
+
+export interface ReScoreJobResult {
+  totalProcessed: number;
+  totalUpdated: number;
+  durationMs: number;
+}
+
+const DEFAULT_BATCH_SIZE = 100;
+
 /**
- * Re-scores all opportunities for a user based on their custom scoring weights.
- * This is designed to be run as a "background job" (fire-and-forget).
+ * Re-scores opportunities for a user in production-ready batches with cursor-based pagination.
+ * Guarantees bounded memory footprint with high-throughput batching and transactional consistency.
  */
 export async function reScoreUserOpportunities(
   userId: string,
   weights: ScoringWeights = DEFAULT_WEIGHTS,
-) {
+  options: ReScoreJobOptions = {},
+): Promise<ReScoreJobResult> {
   const startTime = Date.now();
-  console.log(`[Re-Score Job] Starting for user ${userId}...`);
+  const batchSize = Math.max(1, options.batchSize ?? DEFAULT_BATCH_SIZE);
+  const maxRecords = options.maxRecords ?? Infinity;
+
+  console.log(
+    `[Re-Score Job] Starting for user ${userId} (batchSize: ${batchSize})...`,
+  );
+
+  let totalProcessed = 0;
+  let totalUpdated = 0;
+  let lastId: string | undefined = undefined;
+  let hasMore = true;
 
   try {
-    // 1. Fetch all pain points for the user
-    // We only need the columns used for scoring
-    const allPoints = await db.query.painPoint.findMany({
-      where: eq(painPoint.userId, userId),
-      columns: {
-        id: true,
-        score: true,
-        urgency: true,
-        monetizationScore: true,
-        marketMaturity: true,
-        sentiment: true,
-        mentionCount: true,
-        commentCount: true,
-        // user feedback might be needed if toOpportunityScore uses it
-      },
-      with: {
-        painPointFeedback: true, // Need this for upvotes/downvotes
-      },
-    });
+    while (hasMore && totalProcessed < maxRecords) {
+      const currentBatchLimit = Math.min(batchSize, maxRecords - totalProcessed);
 
-    if (allPoints.length === 0) {
-      console.log(`[Re-Score Job] No points found for user ${userId}.`);
-      return;
-    }
+      // Cursor-based pagination on indexed ID
+      const whereConditions = [eq(painPoint.userId, userId)];
+      if (lastId) {
+        whereConditions.push(gt(painPoint.id, lastId));
+      }
 
-    console.log(`[Re-Score Job] Re-scoring ${allPoints.length} points...`);
+      const batchPoints = await db.query.painPoint.findMany({
+        where: and(...whereConditions),
+        orderBy: [asc(painPoint.id)],
+        limit: currentBatchLimit,
+        columns: {
+          id: true,
+          score: true,
+          urgency: true,
+          monetizationScore: true,
+          marketMaturity: true,
+          sentiment: true,
+          mentionCount: true,
+          commentCount: true,
+        },
+        with: {
+          painPointFeedback: true,
+        },
+      });
 
-    // 2. Calculate new scores and explanations
-    // Note: in a real production app with millions of records, we'd batch this.
-    // For this context, we'll process them in memory and bulk update.
-    const updates = allPoints.map((point) => {
-      const dashboardPoint = {
-        score: point.score || 0,
-        urgency: point.urgency,
-        monetizationScore: point.monetizationScore,
-        marketMaturity: point.marketMaturity,
-        sentiment: point.sentiment,
-        mentionCount: point.mentionCount,
-        commentCount: point.commentCount,
-        upvoteSignal: 0, // placeholder if not available directly
-        userUpvotes:
-          point.painPointFeedback?.filter((f) => f.vote === 1).length || 0,
-        userDownvotes:
-          point.painPointFeedback?.filter((f) => f.vote === -1).length || 0,
+      if (batchPoints.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      // Calculate new score and explanation per point
+      const updates = batchPoints.map((point) => {
+        const dashboardPoint = {
+          score: point.score || 0,
+          urgency: point.urgency,
+          monetizationScore: point.monetizationScore,
+          marketMaturity: point.marketMaturity,
+          sentiment: point.sentiment,
+          mentionCount: point.mentionCount,
+          commentCount: point.commentCount,
+          upvoteSignal: 0,
+          userUpvotes:
+            point.painPointFeedback?.filter((f) => f.vote === 1).length || 0,
+          userDownvotes:
+            point.painPointFeedback?.filter((f) => f.vote === -1).length || 0,
+        };
+
+        const newScore = toOpportunityScore([dashboardPoint], weights);
+        const newExplanation = generateScoreExplanation(dashboardPoint, weights);
+
+        return {
+          id: point.id,
+          score: newScore,
+          scoreExplanation: newExplanation,
+        };
+      });
+
+      // Execute updates for the current batch
+      const executeBatchUpdates = async (client: typeof db) => {
+        await Promise.all(
+          updates.map((upd) =>
+            client
+              .update(painPoint)
+              .set({
+                score: upd.score,
+                scoreExplanation: upd.scoreExplanation,
+                updatedAt: new Date(),
+              })
+              .where(eq(painPoint.id, upd.id)),
+          ),
+        );
       };
 
-      const newScore = toOpportunityScore([dashboardPoint], weights);
-      const newExplanation = generateScoreExplanation(dashboardPoint, weights);
+      if (typeof db.transaction === "function") {
+        await db.transaction(async (tx) => {
+          await executeBatchUpdates(tx as any);
+        });
+      } else {
+        await executeBatchUpdates(db);
+      }
 
-      return {
-        id: point.id,
-        score: newScore,
-        scoreExplanation: newExplanation,
-      };
-    });
+      totalProcessed += batchPoints.length;
+      totalUpdated += updates.length;
+      lastId = batchPoints[batchPoints.length - 1].id;
 
-    // 3. Bulk update (using a transaction for safety if needed, but simple loop or batch is fine)
-    // Drizzle doesn't have a built-in "bulkUpdate" for multiple rows with different data effortlessly in one query yet
-    // so we'll do it in parallel with limited concurrency.
-    const CONCURRENCY = 10;
-    for (let i = 0; i < updates.length; i += CONCURRENCY) {
-      const batch = updates.slice(i, i + CONCURRENCY);
-      await Promise.all(
-        batch.map((upd) =>
-          db
-            .update(painPoint)
-            .set({
-              score: upd.score,
-              scoreExplanation: upd.scoreExplanation,
-              updatedAt: new Date(),
-            })
-            .where(eq(painPoint.id, upd.id)),
-        ),
-      );
+      if (batchPoints.length < currentBatchLimit) {
+        hasMore = false;
+      }
     }
 
-    const duration = Date.now() - startTime;
+    const durationMs = Date.now() - startTime;
     console.log(
-      `[Re-Score Job] Finished in ${duration}ms. ${allPoints.length} points processed for ${userId}.`,
+      `[Re-Score Job] Finished in ${durationMs}ms. ${totalProcessed} points processed, ${totalUpdated} updated for user ${userId}.`,
     );
+
+    return { totalProcessed, totalUpdated, durationMs };
   } catch (error) {
-    console.error(`[Re-Score Job] Failed for user ${userId}:`, error);
+    const durationMs = Date.now() - startTime;
+    console.error(
+      `[Re-Score Job] Failed for user ${userId} after ${durationMs}ms:`,
+      error,
+    );
+    throw error;
   }
 }

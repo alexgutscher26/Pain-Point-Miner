@@ -8,7 +8,7 @@ export function AuthLogo({ className }: { className?: string }) {
         <div className="flex size-8 items-center justify-center rounded bg-[#ff4500] shadow-[0_4px_15px_rgba(255,69,0,0.5)]">
           <LogoIcon className="h-5 w-5 text-white" />
         </div>
-        <span className="text-xl font-bold tracking-tight text-white">
+        <span className="text-xl font-bold tracking-tight text-zinc-900">
           ThreddIQ
         </span>
       </Link>
