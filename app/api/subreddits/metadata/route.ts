@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApiContext } from "@/lib/api-auth";
 import { db } from "@/lib/db";
 import { subredditCache } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { getSubredditMetadataBulk } from "@/lib/reddit";
 
 export async function GET(req: Request) {
@@ -54,22 +54,25 @@ export async function GET(req: Request) {
       };
 
       validCache.set(normalizedName, record);
+      recordsToInsert.push(record);
+    }
 
+    if (recordsToInsert.length > 0) {
       try {
         await db
           .insert(subredditCache)
-          .values(record)
+          .values(recordsToInsert)
           .onConflictDoUpdate({
             target: subredditCache.name,
             set: {
-              subscriberCount: record.subscriberCount,
-              description: record.description,
-              activeUsers: record.activeUsers,
-              cachedAt: record.cachedAt,
+              subscriberCount: sql`EXCLUDED."subscriberCount"`,
+              description: sql`EXCLUDED.description`,
+              activeUsers: sql`EXCLUDED."activeUsers"`,
+              cachedAt: sql`EXCLUDED."cachedAt"`,
             },
           });
       } catch (err) {
-        console.error("Failed to upsert subredditCache", err);
+        console.error("Failed to bulk upsert subredditCache", err);
       }
     }
   }

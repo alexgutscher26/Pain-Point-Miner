@@ -45,6 +45,8 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: fake_secret_key
+          LOOPS_API_KEY: fake_loops_key
 
       - name: Start Application Server
         run: bun run start &
@@ -53,6 +55,8 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           BETTER_AUTH_SECRET: secret
           BETTER_AUTH_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: fake_secret_key
+          LOOPS_API_KEY: fake_loops_key
 
       - name: Lighthouse Check
         uses: treosh/lighthouse-ci-action@v12
