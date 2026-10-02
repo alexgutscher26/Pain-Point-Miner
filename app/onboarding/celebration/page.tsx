@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { completeOnboardingAction } from "../actions";
 
 export default function OnboardingCelebration() {

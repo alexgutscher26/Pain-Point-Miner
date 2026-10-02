@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Sparkles,
   ArrowRight,
@@ -10,22 +10,15 @@ import {
   Sliders,
   CheckCircle2,
   Lock,
-  Layers,
   Clock,
-  Zap,
-  Flame,
-  ShieldAlert,
   Compass,
 } from "lucide-react";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
 import {
-  DEFAULT_TIME_WINDOW,
   getTimeWindowLabel,
   type TimeWindow,
 } from "@/lib/time-window";
 import { cn } from "@/lib/utils";
-import { ScanPresetsModal } from "@/components/dashboard/scan-presets-modal";
-import { type ScanPreset } from "@/lib/scan-presets";
 
 export interface ScanWizardProps {
   keyword: string;
@@ -252,16 +245,6 @@ export function ScanWizard({
                 <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                 <span>Or choose a high-converting niche template:</span>
               </p>
-              <ScanPresetsModal
-                onSelectPreset={(p: ScanPreset) => {
-                  setKeyword(p.keyword);
-                  setSubreddits(p.subreddits.join(", "));
-                  setMiningDepth(p.miningDepth);
-                  setTimeWindow(p.timeWindow);
-                  if (p.customPatterns)
-                    setCustomPatterns(p.customPatterns.join(", "));
-                }}
-              />
             </div>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {TOPIC_PRESETS.map((preset) => (
@@ -446,13 +429,7 @@ export function ScanWizard({
                     <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2 font-mono text-[10px] text-zinc-400">
                       <span>{preset.postsPerSub} posts/sub</span>
                       <span className="font-bold text-amber-400">
-                        {d === "basic"
-                          ? "0.5 CR"
-                          : d === "deep"
-                            ? "2 CR"
-                            : d === "advanced"
-                              ? "5 CR"
-                              : "10 CR"}
+                        {preset.estimatedCredits} CR
                       </span>
                     </div>
                   </button>

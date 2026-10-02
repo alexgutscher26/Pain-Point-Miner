@@ -14,9 +14,14 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/ai", () => ({
-  extractPainPoints: vi.fn(),
-}));
+vi.mock("@/lib/ai", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai")>();
+  return {
+    ...actual,
+    extractPainPoints: vi.fn(),
+    extractPainPointsBatch: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/reddit", () => ({
   filterPostsByProblemPatterns: vi.fn(),

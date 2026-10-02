@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { scraper, scraperRun, userPreferences } from "@/lib/db/schema";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
@@ -496,6 +496,7 @@ export async function POST(req: Request) {
         timeWindow,
         userId,
         workspaceId,
+        requestId: correlationId,
         maxPostsPerSubreddit:
           miningDepth === "advanced" ? 400 : miningDepth === "deep" ? 250 : 120, // Keep these high for actual results
         processingLimit:

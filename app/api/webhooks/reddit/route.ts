@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { scraper, user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { fetchComments } from "@/lib/reddit";
+import { fetchComments, fetchSingleRedditPost, type RedditPost } from "@/lib/reddit";
 import { processSinglePost } from "@/lib/mining-runner";
 import { type MiningDepth } from "@/lib/plan-gating";
 
@@ -45,6 +45,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing subreddit" }, { status: 400 });
     }
 
+    const normalizedSubreddit = String(subreddit).trim().toLowerCase().replace(/^r\//i, "");
+    const SUBREDDIT_NAME_RE = /^[a-z0-9_]{3,21}$/;
+    if (!SUBREDDIT_NAME_RE.test(normalizedSubreddit)) {
+      return NextResponse.json({ error: "Invalid subreddit" }, { status: 400 });
+    }
+
     // 2. Extract postId from link if not provided
     if (!postId && link) {
       const match = link.match(/\/comments\/([^/?]+)/);
@@ -56,6 +62,12 @@ export async function POST(req: NextRequest) {
         { error: "Could not identify postId" },
         { status: 400 },
       );
+    }
+
+    postId = String(postId).trim();
+    const REDDIT_POST_ID_RE = /^[a-z0-9]{5,10}$/i;
+    if (!REDDIT_POST_ID_RE.test(postId)) {
+      return NextResponse.json({ error: "Invalid postId" }, { status: 400 });
     }
 
     // 3. Resolve Scraper and User Context
@@ -73,30 +85,39 @@ export async function POST(req: NextRequest) {
 
     const anonymize = userRecord?.anonymizeRedditUsernames ?? false;
 
-    // 4. Fetch the full post and comments from Reddit to ensure AI context
-    // We only need the post instance; fetchSubredditPostsMultiSort is overkill here,
-    // so we build a minimal RedditPost object and then fetch its comments.
-    const comments = await fetchComments(postId, subreddit, {
-      maxDepth: 50,
-      maxComments: 100,
-    });
+    // 4. Fetch the real post and its comments from Reddit
+    const [fetchedPost, comments] = await Promise.all([
+      fetchSingleRedditPost(postId, normalizedSubreddit),
+      fetchComments(postId, normalizedSubreddit, {
+        maxDepth: 50,
+        maxComments: 100,
+      }),
+    ]);
 
-    // Mock the post object; processSinglePost only really uses id, title, selftext, url, author, subreddit
-    const postMock = {
+    const post: RedditPost = fetchedPost ?? {
       id: postId,
       title: payload.title || "Post from Webhook",
       selftext: payload.body || payload.selftext || "",
-      url: link || `https://www.reddit.com/comments/${postId}`,
+      url: link || `https://www.reddit.com/r/${normalizedSubreddit}/comments/${postId}`,
       author: payload.author || "unknown",
-      subreddit,
-      score: payload.score || 0,
+      subreddit: normalizedSubreddit,
+      score: payload.score ?? 0,
       num_comments: comments.length,
       created_utc: payload.created_utc || Math.floor(Date.now() / 1000),
+      is_self: true,
     };
+
+    // If webhook provided explicit overrides or fetched post was partial
+    if (!post.title && payload.title) {
+      post.title = payload.title;
+    }
+    if (!post.selftext && (payload.body || payload.selftext)) {
+      post.selftext = payload.body || payload.selftext;
+    }
 
     // 5. Process the post through the standard mining pipeline
     const count = await processSinglePost({
-      post: postMock,
+      post,
       comments,
       scraperId,
       userId: scraperRecord.userId,

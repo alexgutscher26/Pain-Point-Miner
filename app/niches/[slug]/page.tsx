@@ -4,18 +4,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { getPreminedNiche, getAllPreminedNiches } from "@/lib/premined-niches";
+import { getPreminedNiche, getAllPreminedNiches, getRelatedNiches } from "@/lib/premined-niches";
 import { constructMetadata, siteConfig, siteUrl } from "@/lib/seo";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
+  ArrowRight,
   Flame,
   DollarSign,
   Search,
   AlertCircle,
   Sparkles,
+  Target,
+  CheckCircle2,
+  Tag,
+  ShieldCheck,
 } from "lucide-react";
 
 interface NichePageProps {
@@ -166,6 +171,83 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
             </div>
           </div>
 
+          {/* Persona & Strategic Positioning */}
+          {(niche.targetPersona || niche.suggestedPricePoint || niche.moatStrategy) && (
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {niche.targetPersona && (
+                <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-bold text-zinc-800">
+                    <Target className="h-4 w-4 text-[#ff4500]" />
+                    Target Buyer Persona
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600">
+                    {niche.targetPersona}
+                  </p>
+                </div>
+              )}
+
+              {niche.suggestedPricePoint && (
+                <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-bold text-zinc-800">
+                    <DollarSign className="h-4 w-4 text-emerald-600" />
+                    Suggested Price Point
+                  </div>
+                  <p className="mt-2 text-xs font-semibold text-emerald-700">
+                    {niche.suggestedPricePoint}
+                  </p>
+                </div>
+              )}
+
+              {niche.moatStrategy && (
+                <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-bold text-zinc-800">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    Defensible Moat
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-600">
+                    {niche.moatStrategy}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Validation Signals */}
+          {niche.validationSignals && niche.validationSignals.length > 0 && (
+            <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5">
+              <h3 className="flex items-center gap-2 text-xs font-bold text-emerald-950 uppercase tracking-wider">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                Community Validation Signals
+              </h3>
+              <ul className="mt-2.5 space-y-1.5">
+                {niche.validationSignals.map((signal, sIdx) => (
+                  <li key={sIdx} className="flex items-start gap-2 text-xs text-emerald-900">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                    <span>{signal}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Trending Keywords */}
+          {niche.trendingKeywords && niche.trendingKeywords.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1 text-xs font-semibold text-zinc-500">
+                <Tag className="h-3.5 w-3.5" />
+                High-Signal Search Phrases:
+              </span>
+              {niche.trendingKeywords.map((kw, kwIdx) => (
+                <span
+                  key={kwIdx}
+                  className="rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 text-xs text-zinc-700 shadow-xs"
+                >
+                  "{kw}"
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Market Overview & Blueprint */}
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs">
@@ -255,6 +337,57 @@ export default async function NicheDetailPage({ params }: NichePageProps) {
               ))}
             </div>
           </div>
+
+          {/* Related Niches Section */}
+          {(() => {
+            const related = getRelatedNiches(niche.slug, 3);
+            if (related.length === 0) return null;
+            return (
+              <div className="mt-14">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold tracking-tight text-zinc-900">
+                    Related Pre-Mined Niches
+                  </h3>
+                  <Link
+                    href="/niches"
+                    className="text-xs font-semibold text-[#ff4500] hover:underline"
+                  >
+                    View All {getAllPreminedNiches().length} Niches &rarr;
+                  </Link>
+                </div>
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  {related.map((rel) => (
+                    <Link
+                      key={rel.slug}
+                      href={`/niches/${rel.slug}`}
+                      className="group flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-orange-300 hover:shadow-md"
+                    >
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                          {rel.category}
+                        </span>
+                        <h4 className="mt-1.5 text-sm font-bold text-zinc-900 group-hover:text-[#ff4500]">
+                          {rel.title}
+                        </h4>
+                        <p className="mt-1 line-clamp-2 text-xs text-zinc-600">
+                          {rel.tagline}
+                        </p>
+                      </div>
+                      <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-xs font-semibold">
+                        <span className="flex items-center gap-1 text-[#ff4500]">
+                          <Flame className="h-3 w-3 fill-[#ff4500]" />
+                          {rel.opportunityScore}/100
+                        </span>
+                        <span className="flex items-center text-zinc-500 group-hover:text-[#ff4500]">
+                          Explore <ArrowRight className="ml-1 h-3 w-3" />
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Action Banner */}
           <div className="mt-12 rounded-3xl bg-zinc-900 p-8 text-center text-white shadow-xl">

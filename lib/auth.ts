@@ -8,7 +8,7 @@ import {
   oneTimeToken,
   username,
 } from "better-auth/plugins";
-import { sentinel } from "@better-auth/infra";
+import { dash, sentinel } from "@better-auth/infra";
 import { stripe as stripePlugin } from "@better-auth/stripe";
 import Stripe from "stripe";
 import { db } from "./db";
@@ -31,7 +31,8 @@ const stripeSubscriptionEnabled =
   Boolean(stripePriceProMonthly);
 const usernamePluginEnabled = process.env.USERNAME_PLUGIN_ENABLED === "true";
 const sentinelApiUrl = process.env.BETTER_AUTH_API_URL;
-const sentinelKvUrl = process.env.BETTER_AUTH_KV_URL;
+const sentinelKvUrl =
+  process.env.BETTER_AUTH_IDENTIFY_URL || process.env.BETTER_AUTH_KV_URL;
 const sentinelApiKey = process.env.BETTER_AUTH_API_KEY;
 const sentinelEnabled =
   Boolean(sentinelApiUrl && /^https?:\/\//i.test(sentinelApiUrl)) &&
@@ -149,6 +150,14 @@ export const auth = betterAuth({
               const trimmed = value.trim();
               return trimmed.length >= 2 && trimmed.length <= 40;
             },
+          }),
+        ]
+      : []),
+    ...(sentinelApiKey
+      ? [
+          dash({
+            apiKey: sentinelApiKey,
+            ...(sentinelApiUrl ? { apiUrl: sentinelApiUrl } : {}),
           }),
         ]
       : []),

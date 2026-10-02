@@ -5,11 +5,9 @@ import { Footer } from "@/components/landing/Footer";
 import {
   Code,
   ArrowRight,
-  TrendingDown,
   Lock,
   Layers,
   Zap,
-  Activity,
   AlertOctagon,
 } from "lucide-react";
 import Link from "next/link";

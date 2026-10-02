@@ -7,6 +7,7 @@ import {
   siteConfig,
   siteUrl,
 } from "@/lib/seo";
+import { safeJsonLd } from "@/components/seo/json-ld";
 
 describe("SEO System", () => {
   it("generates a comprehensive dynamic sitemap covering all core public sections", () => {
@@ -90,6 +91,20 @@ describe("SEO System", () => {
       `AI Pain Point Mining | ${siteConfig.name}`,
     );
     expect(meta.openGraph?.url).toBe(`${siteUrl}/features/pain-point-mining`);
-    expect(meta.twitter?.card).toBe("summary_large_image");
+    expect((meta.twitter as { card?: string })?.card).toBe(
+      "summary_large_image",
+    );
+  });
+
+  it("sanitizes JSON-LD script content against HTML injection", () => {
+    const payload = {
+      title: "</script><script>alert('xss')</script>",
+      html: "<b>Bold & Strong</b>",
+    };
+
+    const sanitized = safeJsonLd(payload);
+    expect(sanitized).not.toContain("</script>");
+    expect(sanitized).toContain("\\u003c/script\\u003e");
+    expect(sanitized).toContain("\\u0026");
   });
 });

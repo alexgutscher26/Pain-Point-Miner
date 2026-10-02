@@ -10,7 +10,6 @@ import {
   Target,
   Users,
   ArrowRight,
-  Lightbulb,
   CheckCircle2,
   AlertTriangle,
 } from "lucide-react";

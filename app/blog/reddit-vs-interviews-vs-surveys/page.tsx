@@ -4,14 +4,8 @@ import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import {
   Search,
-  MessageCircle,
-  ClipboardList,
   ArrowRight,
-  CheckCircle2,
   AlertTriangle,
-  TrendingUp,
-  DollarSign,
-  Users,
   Target,
   Lightbulb,
 } from "lucide-react";

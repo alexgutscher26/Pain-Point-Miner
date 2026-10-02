@@ -6,10 +6,6 @@ import {
   Search,
   ArrowRight,
   Users,
-  MessageCircle,
-  TrendingUp,
-  Lightbulb,
-  BarChart3,
   Zap,
 } from "lucide-react";
 import Link from "next/link";

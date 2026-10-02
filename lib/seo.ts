@@ -38,6 +38,16 @@ export const siteConfig = {
     "customer discovery tool",
     "reddit for marketers",
     "find business ideas on reddit",
+    "saas idea generator",
+    "saas opportunity analysis",
+    "saas market research",
+    "reddit keyword research",
+    "customer discovery tool",
+    "reddit for marketers",
+    "find business ideas on reddit",
+    "saas idea generator",
+    "saas opportunity analysis",
+    "saas market research",
   ],
 } as const;
 

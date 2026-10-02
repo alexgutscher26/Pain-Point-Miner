@@ -3,13 +3,9 @@ import type { Metadata } from "next";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import {
-  Search,
   ArrowRight,
   DollarSign,
-  TrendingUp,
-  Shield,
   CreditCard,
-  PieChart,
   Zap,
 } from "lucide-react";
 import Link from "next/link";

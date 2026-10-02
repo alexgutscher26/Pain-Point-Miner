@@ -28,6 +28,7 @@ const resources = [
 ];
 
 const blogPosts = [
+  "solving-customer-pain-points-saas-blueprint",
   "reddit-vs-interviews-vs-surveys",
   "id-pay-for-this-test",
   "why-validated-ideas-still-fail",

@@ -1,3 +1,28 @@
+export type NicheCategory =
+  | "E-Commerce"
+  | "B2B SaaS"
+  | "Creator Economy"
+  | "Real Estate"
+  | "Agency & Services"
+  | "DevTools & Tech"
+  | "Healthcare & MedTech"
+  | "Fintech & Billing"
+  | "Legal & Compliance"
+  | "Local Business & Contractors";
+
+export type ProjectDifficulty =
+  | "weekend_project"
+  | "side_project"
+  | "startup_mvp"
+  | "vc_scale_moat";
+
+export type PainSentiment =
+  | "frustrated"
+  | "desperate"
+  | "angry"
+  | "curious"
+  | "neutral";
+
 export interface PreminedPainPoint {
   title: string;
   body: string;
@@ -5,42 +30,35 @@ export interface PreminedPainPoint {
   urgency: number; // 1-10
   monetizationScore: number; // 1-10
   marketMaturity: number; // 1-10
-  difficulty:
-    | "weekend_project"
-    | "side_project"
-    | "startup_mvp"
-    | "vc_scale_moat";
-  sentiment: "frustrated" | "desperate" | "angry" | "curious" | "neutral";
+  difficulty: ProjectDifficulty;
+  sentiment: PainSentiment;
   willingnessToPayQuote?: string;
   triedSolutions: string[];
   sampleQuote: string;
   sourceSubreddit: string;
+  urgencyTriggers?: string[];
+  featureRequested?: string;
 }
 
 export interface PreminedNiche {
   slug: string;
   title: string;
   tagline: string;
-  category:
-    | "E-Commerce"
-    | "B2B SaaS"
-    | "Creator Economy"
-    | "Real Estate"
-    | "Agency & Services"
-    | "DevTools & Tech";
+  category: NicheCategory;
   subreddits: string[];
   opportunityScore: number; // 0-100
   urgencyScore: number; // 0-100
   monetizationScore: number; // 0-100
   estimatedTam: string;
-  recommendedDifficulty:
-    | "weekend_project"
-    | "side_project"
-    | "startup_mvp"
-    | "vc_scale_moat";
+  recommendedDifficulty: ProjectDifficulty;
   marketOverview: string;
   solutionBlueprint: string;
   topPainPoints: PreminedPainPoint[];
+  trendingKeywords?: string[];
+  targetPersona?: string;
+  suggestedPricePoint?: string;
+  validationSignals?: string[];
+  moatStrategy?: string;
 }
 
 export const PREMINED_NICHES: PreminedNiche[] = [
@@ -56,6 +74,15 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 96,
     estimatedTam: "$1.4B / year",
     recommendedDifficulty: "startup_mvp",
+    targetPersona: "D2C Brand Owners & Shopify Plus Store Managers ($1M-$10M GMV)",
+    suggestedPricePoint: "$49 - $149 / month",
+    trendingKeywords: ["app stack bloat", "pagespeed shopify", "cart drawer conflict", "inventory sync delay"],
+    validationSignals: [
+      "Over 400 monthly Reddit threads lamenting PageSpeed score drops from multi-app script tags",
+      "High willingness-to-pay ($99+/mo) for consolidated all-in-one store utility suites",
+      "Black Friday inventory desync complaints causing thousands in chargebacks",
+    ],
+    moatStrategy: "Zero-dependency Shopify Theme App Extension with unified serverless backend caching.",
     marketOverview:
       "Shopify merchants frequently complain about 'app stacking': installing 10+ single-purpose apps (bundles, upsells, reviews, email popups, inventory alerts) that each charge $20-$50/mo, inject heavy Javascript scripts, and crash during seasonal traffic spikes.",
     solutionBlueprint:
@@ -80,6 +107,8 @@ export const PREMINED_NICHES: PreminedNiche[] = [
         sampleQuote:
           "Every app leaves zombie script tags even after you uninstall it. Our bounce rate doubled after adding 4 upsell plugins.",
         sourceSubreddit: "shopify",
+        urgencyTriggers: ["Google Core Web Vitals penalties", "Paid ad CPA doubling on mobile"],
+        featureRequested: "Unified script tag manager and embedded theme app block suite",
       },
       {
         title: "Inventory Syncing Failures Across TikTok Shop and Shopify",
@@ -100,6 +129,7 @@ export const PREMINED_NICHES: PreminedNiche[] = [
         sampleQuote:
           "TikTok Shop sold 45 units that were already sold out on Shopify. Customers are furious and leaving 1-star reviews.",
         sourceSubreddit: "ecommerce",
+        urgencyTriggers: ["Stockout chargeback risk", "Account suspension on TikTok Shop"],
       },
     ],
   },
@@ -115,6 +145,14 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 90,
     estimatedTam: "$2.8B / year",
     recommendedDifficulty: "startup_mvp",
+    targetPersona: "Airbnb Superhosts & Independent Landlords (3-20 Doors)",
+    suggestedPricePoint: "$19 - $79 / month",
+    trendingKeywords: ["cleaner no show", "airbnb turnover dispatch", "contractor receipts text", "damage claim photos"],
+    validationSignals: [
+      "No-show cleaners leading to immediate guest refund demands ($300-$1000/incident)",
+      "Tax season panic due to disorganized SMS repair invoices from plumbers and handymen",
+    ],
+    moatStrategy: "GPS-verified time-stamped photo capture engine built for non-technical cleaners.",
     marketOverview:
       "Independent landlords (1-10 units) and Airbnb co-hosts are stuck between overpriced enterprise software (AppFolio, Yardi) and messy SMS/WhatsApp threads with cleaners, plumbers, and handymen.",
     solutionBlueprint:
@@ -175,6 +213,13 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 84,
     estimatedTam: "$420M / year",
     recommendedDifficulty: "weekend_project",
+    targetPersona: "Digital Product Creators & Notion Template Consultants",
+    suggestedPricePoint: "$29 - $59 / month",
+    trendingKeywords: ["notion template update without wiping", "protect notion link", "gumroad template piracy"],
+    validationSignals: [
+      "Creators forced to record manual Loom videos whenever formulas update",
+      "Buyers unwilling to purchase new template versions due to migration dread",
+    ],
     marketOverview:
       "Notion creators sell millions in templates on Gumroad/LemonSqueezy, but buyers duplicate and redistribute links illegally, and creators have no way to push bug fixes or template updates to existing buyers without them starting from scratch.",
     solutionBlueprint:
@@ -214,14 +259,21 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 92,
     estimatedTam: "$1.9B / year",
     recommendedDifficulty: "side_project",
+    targetPersona: "AI Agency Founders & No-Code Automation Freelancers",
+    suggestedPricePoint: "$49 - $199 / month",
+    trendingKeywords: ["n8n silent fail", "make webhook dead letter", "llm client hallucination sentry", "retrying failed execution"],
+    validationSignals: [
+      "Agencies losing retainers over 3-day unalerted webhook disconnects",
+      "LLMs outputting incorrect pricing or hallucinations in automated customer replies",
+    ],
+    moatStrategy: "Zero-latency webhook proxy with automated retry queues and output guardrail sentiment scoring.",
     marketOverview:
       "Thousands of new AI agencies are deploying automated chatbots, lead triage, and voice agents for dental offices, roofers, and law firms. When an API breaks or an LLM outputs wrong pricing, the agency owner gets panicked calls.",
     solutionBlueprint:
       "An 'LLM Workflow Sentry & Guardrail Hub' providing instant dead-letter alerting for n8n/Make pipelines, automated PII scrubbing, and sentiment failover routing before emails reach end clients.",
     topPainPoints: [
       {
-        title:
-          "Silent Webhook Failures In Make/Zapier Ruining Client Retainers",
+        title: "Silent Webhook Failures In Make/Zapier Ruining Client Retainers",
         body: "A client's CRM webhook expires or payload format changes silently, causing 3 days of high-value leads to vanish into a void without alerts.",
         painIntensity: 10,
         urgency: 10,
@@ -254,6 +306,13 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 98,
     estimatedTam: "$3.5B / year",
     recommendedDifficulty: "startup_mvp",
+    targetPersona: "Outbound SDR Leaders & Lead Gen Agency Operators",
+    suggestedPricePoint: "$79 - $299 / month",
+    trendingKeywords: ["google spam update 2026", "cold email dmarc error", "inbox warming spam trap", "secondary domain burnt"],
+    validationSignals: [
+      "Strict 2025/2026 ESP spam thresholds causing instant domain blocklisting",
+      "Sales teams spending 4+ hours per client configuring DNS records manually",
+    ],
     marketOverview:
       "Recent Google & Yahoo spam filtering rules have disrupted traditional mass cold email. Sales reps and lead gen agencies are constantly burning through $10 Google Workspace accounts, DNS setups, and SPF/DKIM/DMARC configurations.",
     solutionBlueprint:
@@ -293,6 +352,9 @@ export const PREMINED_NICHES: PreminedNiche[] = [
     monetizationScore: 95,
     estimatedTam: "$4.1B / year",
     recommendedDifficulty: "startup_mvp",
+    targetPersona: "B2B Account Executives & Founder-Led Sales Teams",
+    suggestedPricePoint: "$99 - $399 / month",
+    trendingKeywords: ["apollo outdated phone", "live intent signal", "job change alert sales", "b2b trigger scraping"],
     marketOverview:
       "Static contact databases have low response rates (under 1%). B2B SDRs want live buying signals: hiring spikes in specific departments, newly installed tech stack plugins, and LinkedIn job changes.",
     solutionBlueprint:
@@ -667,12 +729,452 @@ export const PREMINED_NICHES: PreminedNiche[] = [
       },
     ],
   },
+  {
+    slug: "medical-practices",
+    title: "Private Medical & Dental Patient Intake & No-Shows",
+    tagline:
+      "Solo clinics and dental practices losing $80k+/yr to missed appointments and illegible paper medical history forms.",
+    category: "Healthcare & MedTech",
+    subreddits: ["Dentistry", "medicine", "healthIT"],
+    opportunityScore: 96,
+    urgencyScore: 95,
+    monetizationScore: 98,
+    estimatedTam: "$4.5B / year",
+    recommendedDifficulty: "startup_mvp",
+    targetPersona: "Private Practice Doctors, Dentists, & Clinic Office Managers",
+    suggestedPricePoint: "$149 - $399 / month",
+    trendingKeywords: ["dental patient no show fee", "hipaa intake form tablet", "ehr insurance verification delay", "unconfirmed appointments"],
+    validationSignals: [
+      "Average private practice loses $200 per open chair hour due to last-minute cancellations",
+      "Staff spending 2.5 hours every morning calling patients to manually confirm insurance numbers",
+    ],
+    moatStrategy: "HIPAA-compliant zero-knowledge SMS bridge with automated insurance card OCR pre-check.",
+    marketOverview:
+      "Independent health clinics still rely on clipboards and manual phone call confirmations. When patients don't show up or insurance eligibility fails at the front desk, the practice absorbs full doctor downtime.",
+    solutionBlueprint:
+      "A 'HIPAA-Compliant Smart Waiting Room & 2-Way SMS Waitlist Filler' that verifies insurance eligibility via OCR 24h prior, collects digital signatures on mobile, and automatically blasts open cancelled slots to waitlisted patients.",
+    topPainPoints: [
+      {
+        title: "Same-Day Cancellations Leaving Empty Doctor & Hygienist Chairs",
+        body: "Patients cancel 2 hours before appointments, leaving expensive medical staff idle with zero time to manually call 30 people on a paper waiting list.",
+        painIntensity: 10,
+        urgency: 10,
+        monetizationScore: 10,
+        marketMaturity: 7,
+        difficulty: "startup_mvp",
+        sentiment: "desperate",
+        willingnessToPayQuote:
+          "Each empty dental chair costs us $250/hr. If software filled just 4 open slots a month, I'd write a $200/mo check without blinking.",
+        triedSolutions: [
+          "Front desk staff cold-calling waitlists",
+          "Automated robocalls (patients block them)",
+          "Overbooking and crowding the lobby",
+        ],
+        sampleQuote:
+          "We had 3 cancellations on a Friday morning. That was a $1,400 direct loss in provider billings.",
+        sourceSubreddit: "Dentistry",
+        urgencyTriggers: ["Doctor idle wage overhead", "Clinic margin compression"],
+      },
+      {
+        title: "Illegible Paper Intake Forms Causing Billing & Insurance Rejections",
+        body: "Front desk staff spend 15 minutes typing handwritten medical history and policy numbers into the EHR, resulting in rejected claims due to typos.",
+        painIntensity: 8,
+        urgency: 8,
+        monetizationScore: 9,
+        marketMaturity: 6,
+        difficulty: "side_project",
+        sentiment: "frustrated",
+        willingnessToPayQuote:
+          "We get 12 claims rejected every week just from mistyped member IDs. Need a clean mobile intake app.",
+        triedSolutions: ["PDF forms sent via email", "Lobby iPads with buggy browser forms"],
+        sampleQuote:
+          "Half the patients write in cursive. Our biller guessed an '8' instead of a 'B' and the claim sat in pending for 45 days.",
+        sourceSubreddit: "healthIT",
+      },
+    ],
+  },
+  {
+    slug: "contractor-dispatch",
+    title: "Field Service & HVAC Subcontractor Dispatch",
+    tagline:
+      "Roofing, plumbing, and HVAC owners losing $5k jobs because quotes take 48 hours and subcontractors miss appointments.",
+    category: "Local Business & Contractors",
+    subreddits: ["HVAC", "Plumbing", "Roofing", "Contractor"],
+    opportunityScore: 93,
+    urgencyScore: 94,
+    monetizationScore: 95,
+    estimatedTam: "$3.2B / year",
+    recommendedDifficulty: "startup_mvp",
+    targetPersona: "HVAC, Plumbing, & Roofing Business Owners (2-15 Field Techs)",
+    suggestedPricePoint: "$99 - $249 / month",
+    trendingKeywords: ["hvac estimate follow up", "field service text dispatch", "jobber too expensive", "contractor quote ghosting"],
+    validationSignals: [
+      "Homeowners award 70% of emergency HVAC/plumbing jobs to the first contractor who sends a firm itemized quote",
+      "Trades owners losing track of unaccepted estimates totaling $50,000+ every month",
+    ],
+    moatStrategy: "Instant voice-to-estimate WhatsApp bot tailored for greasy hands on job sites.",
+    marketOverview:
+      "Trades contractors (HVAC, electricians, roofers) are hands-on in the field all day. They scribble measurements on cardboard boxes, forget to send quotes until Sunday night, and lose high-ticket jobs to bigger competitors with dedicated sales dispatchers.",
+    solutionBlueprint:
+      "A voice-first 'Job Site Voice-to-Quote & Auto-Followup SMS' tool where technicians speak job details into their phone, generating a branded digital proposal with financing options sent to the homeowner within 5 minutes.",
+    topPainPoints: [
+      {
+        title: "Losing $8,000 System Replacement Quotes Due to 48-Hour Delay",
+        body: "Technicians measure furnace specs on Wednesday, but the owner doesn't send the formal PDF quote until Friday. By then, the homeowner has signed with a same-day competitor.",
+        painIntensity: 9,
+        urgency: 10,
+        monetizationScore: 10,
+        marketMaturity: 6,
+        difficulty: "startup_mvp",
+        sentiment: "angry",
+        willingnessToPayQuote:
+          "If I can send an itemized estimate from my truck before pulling out of the driveway, that's worth $150/month easily.",
+        triedSolutions: [
+          "Jobber / Housecall Pro (too bulky on mobile)",
+          "Paper invoice pads",
+          "Typing in Word docs late at night",
+        ],
+        sampleQuote:
+          "Called a customer with the estimate on Monday and they said: 'Sorry, the other guy emailed me a quote in 20 minutes and already did the install.'",
+        sourceSubreddit: "HVAC",
+      },
+    ],
+  },
+  {
+    slug: "compliance-contract-review",
+    title: "B2B Vendor Contract Redlining & SOC2 Evidence",
+    tagline:
+      "Growth-stage SaaS founders spending $600/hr on external lawyers for routine customer master services agreements (MSAs).",
+    category: "Legal & Compliance",
+    subreddits: ["startups", "SaaS", "legaladviceofftopic"],
+    opportunityScore: 92,
+    urgencyScore: 90,
+    monetizationScore: 96,
+    estimatedTam: "$2.6B / year",
+    recommendedDifficulty: "startup_mvp",
+    targetPersona: "B2B SaaS Founders, VP Sales, & In-House Legal Operations",
+    suggestedPricePoint: "$199 - $599 / month",
+    trendingKeywords: ["msa redline delay sales", "indemnification clause saas", "soc2 vendor assessment fatigue", "enterprise legal review bottleneck"],
+    validationSignals: [
+      "Enterprise deals stalled in legal procurement for 6-8 weeks over standard liability cap clauses",
+      "Startups spending $10k+ quarterly on outside counsel for simple NDA and MSA redlines",
+    ],
+    marketOverview:
+      "When a startup closes enterprise customers, the buyer's procurement team sends a 40-page contract redline. Founders either pay $600/hr to outside law firms or blindly sign aggressive unlimited liability and warranty clauses.",
+    solutionBlueprint:
+      "A domain-specific 'SaaS Contract Copilot & Redline Guardrail' that flags non-standard indemnity terms against market standards, suggests pre-approved fallback clauses, and generates side-by-side risk scorecards in seconds.",
+    topPainPoints: [
+      {
+        title: "Enterprise Deal Stalled 6 Weeks Over Routine MSA Redlines",
+        body: "A $50k ARR customer contract is held hostage in procurement review because the legal team demands uncapped liability and custom IP indemnification.",
+        painIntensity: 9,
+        urgency: 9,
+        monetizationScore: 10,
+        marketMaturity: 5,
+        difficulty: "startup_mvp",
+        sentiment: "frustrated",
+        willingnessToPayQuote:
+          "Outside legal counsel billed us $4,200 just to mark up one customer contract. A software tool that flags high-risk clauses is worth $300/mo.",
+        triedSolutions: [
+          "Manual reading line-by-line",
+          "Generic ChatGPT (misses jurisdictional nuance)",
+          "Outside corporate lawyers",
+        ],
+        sampleQuote:
+          "Our quarterly revenue target slipped into next quarter because procurement was arguing over Section 11.4 for 38 days.",
+        sourceSubreddit: "SaaS",
+      },
+    ],
+  },
+  {
+    slug: "freelance-finances",
+    title: "Cross-Border Freelance Multi-Currency Invoicing",
+    tagline:
+      "International consultants and remote contractors losing 5-8% on hidden bank FX spreads and delayed SWIFT wires.",
+    category: "Fintech & Billing",
+    subreddits: ["digitalnomad", "freelance", "personalfinance"],
+    opportunityScore: 91,
+    urgencyScore: 89,
+    monetizationScore: 93,
+    estimatedTam: "$1.8B / year",
+    recommendedDifficulty: "side_project",
+    targetPersona: "Global Remote Freelancers, Agencies, & Digital Nomads",
+    suggestedPricePoint: "$19 - $49 / month",
+    trendingKeywords: ["wise business fee hike", "swift wire missing 2 weeks", "freelance tax cross border withholding", "client wont pay international wire"],
+    validationSignals: [
+      "Contractors losing $300-$800 per invoice to intermediary correspondent banking fees",
+      "Clients refusing to pay invoices that require international wire fees",
+    ],
+    marketOverview:
+      "Freelancers working with international clients face high wire fees ($45 per wire), 3-5% currency conversion markups, and delayed payment reconciliations across Stripe, PayPal, and Wise.",
+    solutionBlueprint:
+      "A 'Local Currency Invoice Portal' providing localized virtual IBAN/ACH deposit routing, automated payment tracking, and one-click W-8BEN compliance certificate generation.",
+    topPainPoints: [
+      {
+        title: "Intermediary Banks Taking $50 Unexplained Deductions on SWIFT Wires",
+        body: "A freelancer bills $3,000 to a US client, but receives only $2,870 in their local European or Asian account due to opaque intermediary correspondent bank charges.",
+        painIntensity: 8,
+        urgency: 8,
+        monetizationScore: 9,
+        marketMaturity: 7,
+        difficulty: "side_project",
+        sentiment: "angry",
+        willingnessToPayQuote:
+          "I lose $250 every month to wire fees and bad FX rates. I would pay $20/mo for a tool that gives clients a native domestic ACH account.",
+        triedSolutions: ["PayPal (horrible 4% FX fee)", "Direct wire transfers", "Wise Personal"],
+        sampleQuote:
+          "Neither my bank nor the client's bank can tell me where the missing $65 went during the wire transfer.",
+        sourceSubreddit: "digitalnomad",
+      },
+    ],
+  },
+  {
+    slug: "ai-code-auditing",
+    title: "AI-Generated Code Vulnerability & Dependency Hygiene",
+    tagline:
+      "Software teams merging thousands of lines of Cursor/Copilot code containing hallucinated npm packages and license leaks.",
+    category: "DevTools & Tech",
+    subreddits: ["programming", "devops", "netsec", "node"],
+    opportunityScore: 94,
+    urgencyScore: 92,
+    monetizationScore: 95,
+    estimatedTam: "$2.9B / year",
+    recommendedDifficulty: "startup_mvp",
+    targetPersona: "Engineering Managers, Tech Leads, & AppSec Engineers",
+    suggestedPricePoint: "$79 - $299 / month",
+    trendingKeywords: ["hallucinated package attack", "cursor ai security scan", "ai code hallucinated library", "npm typo squatting ai"],
+    validationSignals: [
+      "Security researchers demonstrating hallucinated package takeovers across LLM coding assistants",
+      "Tech leads overwhelmed by massive PR diffs generated by junior devs using AI tools",
+    ],
+    moatStrategy: "Deterministic AST scanner cross-referencing public package registries and copyleft licenses.",
+    marketOverview:
+      "Developers are shipping code 3x faster with AI assistants, but LLMs regularly import non-existent packages (slingshot attacks), hardcode secrets, and pull in copyleft GPL code into proprietary codebases.",
+    solutionBlueprint:
+      "A 'PR Sentinel for AI Code' that runs in GitHub Actions, verifies every imported package exists and was published >30 days ago, detects subtle auth bypasses, and enforces strict architecture guidelines.",
+    topPainPoints: [
+      {
+        title: "AI Suggesting Hallucinated Package Names Vulnerable to Hijacking",
+        body: "An engineer copies an AI-generated snippet containing `import { secureJwt } from 'express-jwt-safe-v2'` which doesn't exist yet, opening a supply-chain attack vector.",
+        painIntensity: 9,
+        urgency: 9,
+        monetizationScore: 10,
+        marketMaturity: 4,
+        difficulty: "startup_mvp",
+        sentiment: "frustrated",
+        willingnessToPayQuote:
+          "One supply-chain compromise would kill our enterprise SOC2 audit. We would pay $199/month for instant PR blocking of hallucinated packages.",
+        triedSolutions: ["Snyk (doesn't catch hallucinated imports)", "Manual PR code review"],
+        sampleQuote:
+          "Found a junior dev merged an AI-suggested helper library that someone registered on npm 2 hours earlier. Terrifying.",
+        sourceSubreddit: "netsec",
+      },
+    ],
+  },
+  {
+    slug: "ecom-returns-logistics",
+    title: "E-Commerce Return Logistics & Restocking Dispute Management",
+    tagline:
+      "Online apparel and electronics retailers losing 20% margin to 'wardrobing' return fraud and chaotic warehouse RMA processing.",
+    category: "E-Commerce",
+    subreddits: ["ecommerce", "shopify", "FulfillmentByAmazon"],
+    opportunityScore: 93,
+    urgencyScore: 91,
+    monetizationScore: 94,
+    estimatedTam: "$3.7B / year",
+    recommendedDifficulty: "startup_mvp",
+    targetPersona: "E-Commerce Founders & Operations Directors ($2M-$20M GMV)",
+    suggestedPricePoint: "$129 - $399 / month",
+    trendingKeywords: ["return fraud wardrobing", "loop returns too expensive", "restocking fee dispute chargeback", "rma warehouse barcode"],
+    marketOverview:
+      "Return rates in online retail are at an all-time high (25-35%). Small brands lose thousands when customers return empty boxes, worn garments, or claim items never arrived while Loop Returns charges high enterprise fees.",
+    solutionBlueprint:
+      "A 'Fraud-Shield Return Portal' that grades customer return history, requires photo verification for high-value items, automatically offers store credit bonuses instead of cash refunds, and prints dynamic warehouse scan labels.",
+    topPainPoints: [
+      {
+        title: "Serial Returners Abusing Free Returns & Wardrobing Products",
+        body: "Shoppers buy 5 designer dresses for a Saturday wedding and return all 5 on Monday with tags cut or makeup stains, leaving the merchant with unsellable inventory.",
+        painIntensity: 9,
+        urgency: 9,
+        monetizationScore: 9,
+        marketMaturity: 7,
+        difficulty: "startup_mvp",
+        sentiment: "angry",
+        willingnessToPayQuote:
+          "We lose $60,000/year to return fraud. A tool that stops serial offenders and converts 30% of returns to gift cards is worth $250/mo.",
+        triedSolutions: ["Manual return email approvals", "Loop Returns (expensive)", "No-returns policy (kills conversion)"],
+        sampleQuote:
+          "Customer returned a box with a bottle of water inside to match the shipping weight and Shopify auto-refunded them $400.",
+        sourceSubreddit: "ecommerce",
+      },
+    ],
+  },
+  {
+    slug: "youtube-sponsorships",
+    title: "YouTube Creator Sponsorship CRM & Ad Cue Optimization",
+    tagline:
+      "Video creators with 50k-500k subscribers losing $15k per month in un-monetized mid-rolls and chaotic sponsor contracts.",
+    category: "Creator Economy",
+    subreddits: ["YouTubers", "PartneredYoutube", "videography"],
+    opportunityScore: 90,
+    urgencyScore: 86,
+    monetizationScore: 91,
+    estimatedTam: "$920M / year",
+    recommendedDifficulty: "side_project",
+    targetPersona: "Full-Time YouTubers & Channel Production Managers",
+    suggestedPricePoint: "$39 - $99 / month",
+    trendingKeywords: ["sponsor cpm calculator youtube", "agency taking 30% cut", "mid roll ad placement retention", "youtube contract redline"],
+    marketOverview:
+      "Mid-sized YouTubers receive dozens of shady inbound brand deal emails daily. They don't know their fair market CPM rate, let talent agencies take 30% cuts, and manually calculate mid-roll timestamps where viewer drop-off is lowest.",
+    solutionBlueprint:
+      "A dedicated 'Creator Brand Deal Desk' that parses sponsor inbound pitches, calculates fair dynamic CPMs based on 30-day median views, provides boilerplate video insertion agreements, and recommends exact retention valleys for ad placement.",
+    topPainPoints: [
+      {
+        title: "Under-Pricing Channel Sponsorships Due to Opaque Market Rates",
+        body: "A YouTuber with 100k views per video signs a flat $1,000 sponsor deal, unaware that industry CPM for their tech niche is $35 ($3,500 value).",
+        painIntensity: 8,
+        urgency: 8,
+        monetizationScore: 9,
+        marketMaturity: 4,
+        difficulty: "weekend_project",
+        sentiment: "frustrated",
+        willingnessToPayQuote:
+          "I left $10k on the table last year because I didn't know how to negotiate with brands. Would pay $49/mo for an automated rate card calculator.",
+        triedSolutions: ["Asking other creators in Discord", "Talent management agencies", "Guessing"],
+        sampleQuote:
+          "Sponsor accepted my $800 quote in 4 minutes flat. That's when I knew I massively undercharged them.",
+        sourceSubreddit: "PartneredYoutube",
+      },
+    ],
+  },
 ];
 
+/**
+ * Find a premined niche by slug.
+ */
 export function getPreminedNiche(slug: string): PreminedNiche | undefined {
   return PREMINED_NICHES.find((n) => n.slug === slug);
 }
 
+/**
+ * Get all available premined niches.
+ */
 export function getAllPreminedNiches(): PreminedNiche[] {
   return PREMINED_NICHES;
+}
+
+/**
+ * Filter niches by category.
+ */
+export function getPreminedNichesByCategory(
+  category: NicheCategory,
+): PreminedNiche[] {
+  return PREMINED_NICHES.filter((n) => n.category === category);
+}
+
+/**
+ * Filter niches by project difficulty.
+ */
+export function getPreminedNichesByDifficulty(
+  difficulty: ProjectDifficulty,
+): PreminedNiche[] {
+  return PREMINED_NICHES.filter((n) => n.recommendedDifficulty === difficulty);
+}
+
+/**
+ * Search niches by keyword across title, tagline, subreddits, category, and pain points.
+ */
+export function searchPreminedNiches(query: string): PreminedNiche[] {
+  const q = query.toLowerCase().trim();
+  if (!q) return PREMINED_NICHES;
+
+  return PREMINED_NICHES.filter((niche) => {
+    if (niche.title.toLowerCase().includes(q)) return true;
+    if (niche.tagline.toLowerCase().includes(q)) return true;
+    if (niche.category.toLowerCase().includes(q)) return true;
+    if (niche.subreddits.some((s) => s.toLowerCase().includes(q))) return true;
+    if (niche.trendingKeywords?.some((k) => k.toLowerCase().includes(q))) return true;
+    if (niche.targetPersona?.toLowerCase().includes(q)) return true;
+    if (
+      niche.topPainPoints.some(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.body.toLowerCase().includes(q) ||
+          p.sampleQuote.toLowerCase().includes(q),
+      )
+    ) {
+      return true;
+    }
+    return false;
+  });
+}
+
+/**
+ * Get the top opportunity niches ordered by opportunityScore descending.
+ */
+export function getTopOpportunityNiches(limit = 6): PreminedNiche[] {
+  return [...PREMINED_NICHES]
+    .sort((a, b) => b.opportunityScore - a.opportunityScore)
+    .slice(0, Math.max(1, limit));
+}
+
+/**
+ * Get related niches sharing category or similar subreddits.
+ */
+export function getRelatedNiches(slug: string, limit = 3): PreminedNiche[] {
+  const current = getPreminedNiche(slug);
+  if (!current) return [];
+
+  return PREMINED_NICHES.filter((n) => n.slug !== slug)
+    .map((n) => {
+      let score = 0;
+      if (n.category === current.category) score += 5;
+      const sharedSubs = n.subreddits.filter((s) =>
+        current.subreddits.includes(s),
+      ).length;
+      score += sharedSubs * 3;
+      if (n.recommendedDifficulty === current.recommendedDifficulty) score += 2;
+      return { niche: n, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, Math.max(1, limit))
+    .map((item) => item.niche);
+}
+
+/**
+ * Get aggregate statistics across the entire premined intelligence library.
+ */
+export function getPreminedNicheStats(): {
+  totalNiches: number;
+  totalPainPoints: number;
+  averageOpportunityScore: number;
+  averageUrgencyScore: number;
+  categories: Record<string, number>;
+} {
+  const totalNiches = PREMINED_NICHES.length;
+  const totalPainPoints = PREMINED_NICHES.reduce(
+    (acc, n) => acc + n.topPainPoints.length,
+    0,
+  );
+  const totalOppScore = PREMINED_NICHES.reduce(
+    (acc, n) => acc + n.opportunityScore,
+    0,
+  );
+  const totalUrgScore = PREMINED_NICHES.reduce(
+    (acc, n) => acc + n.urgencyScore,
+    0,
+  );
+
+  const categories: Record<string, number> = {};
+  for (const n of PREMINED_NICHES) {
+    categories[n.category] = (categories[n.category] ?? 0) + 1;
+  }
+
+  return {
+    totalNiches,
+    totalPainPoints,
+    averageOpportunityScore: totalNiches > 0 ? Math.round(totalOppScore / totalNiches) : 0,
+    averageUrgencyScore: totalNiches > 0 ? Math.round(totalUrgScore / totalNiches) : 0,
+    categories,
+  };
 }

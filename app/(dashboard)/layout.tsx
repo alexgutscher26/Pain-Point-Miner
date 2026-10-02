@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { auth, getServerSession } from "@/lib/auth";
+import {  getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -62,11 +62,11 @@ export default async function DashboardLayout({
   });
   const planLabel = `${plan.charAt(0).toUpperCase()}${plan.slice(1)} Plan`;
   const upgradeMessage =
-    plan === "pro"
+    plan === "professional"
       ? "You have full access to all features."
-      : plan === "growth"
-        ? "Upgrade to Pro for unlimited scans and deep analysis."
-        : "Upgrade to Growth or Pro for advanced features.";
+      : plan === "founder"
+        ? "Upgrade to Professional for unlimited subreddits and ultra deep analysis."
+        : "Upgrade to Founder or Professional for higher limits.";
 
   const monthlyScansUsed = await getMonthlyScanUsage(session.user.id);
   const { monthlyScansLimit } = getMonthlyUsageSummary(plan, monthlyScansUsed);
@@ -161,15 +161,12 @@ export default async function DashboardLayout({
               userName={session.user.name ?? "Founder"}
               planLabel={planLabel}
             />
-            <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-emerald-700 uppercase max-sm:hidden">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
-              System Active
-            </div>
             <div className="flex items-center gap-2 font-mono text-xs font-bold tracking-wider text-zinc-500 uppercase sm:hidden">
               <LayoutDashboard className="h-3.5 w-3.5" />
               Dashboard
             </div>
           </div>
+
           <div className="flex items-center gap-3 sm:gap-6">
             <Link
               href="/dashboard/search"

@@ -78,9 +78,7 @@ export async function GET(req: Request) {
       ? Date.now() - latestRun.startedAt.getTime()
       : 0;
     const status =
-      isNonTerminal && runAgeMs > STALE_RUN_THRESHOLD_MS
-        ? "failed"
-        : rawStatus;
+      isNonTerminal && runAgeMs > STALE_RUN_THRESHOLD_MS ? "failed" : rawStatus;
 
     return apiJson(
       {

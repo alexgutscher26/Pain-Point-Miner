@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { fetchComments } from "@/lib/reddit";
+import { fetchComments, fetchSingleRedditPost } from "@/lib/reddit";
 
 const mockCommentData = [
   {}, // First element is usually post data, we ignore it based on current logic
@@ -172,5 +172,57 @@ describe("fetchComments", () => {
     const comments = await fetchComments("testsub", "testpost");
     expect(comments).toHaveLength(1);
     expect(comments[0].id).toBe("pp1");
+  });
+});
+
+describe("fetchSingleRedditPost", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("fetches and parses a single post from Reddit JSON response", async () => {
+    const mockPostListing = [
+      {
+        data: {
+          children: [
+            {
+              data: {
+                id: "post123",
+                title: "Real Reddit Thread Title",
+                selftext: "Detailed description of a painful problem",
+                author: "reddit_user_42",
+                score: 156,
+                subreddit: "saas",
+                permalink: "/r/saas/comments/post123/real_reddit_thread_title/",
+                num_comments: 45,
+                created_utc: 1700000000,
+                is_self: true,
+              },
+            },
+          ],
+        },
+      },
+      { data: { children: [] } },
+    ];
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockPostListing),
+    });
+
+    const post = await fetchSingleRedditPost("post123", "saas");
+    expect(post).not.toBeNull();
+    expect(post?.id).toBe("post123");
+    expect(post?.title).toBe("Real Reddit Thread Title");
+    expect(post?.selftext).toBe("Detailed description of a painful problem");
+    expect(post?.author).toBe("reddit_user_42");
+    expect(post?.score).toBe(156);
+    expect(post?.subreddit).toBe("saas");
+    expect(post?.num_comments).toBe(45);
+  });
+
+  it("returns null for invalid subreddit format", async () => {
+    const post = await fetchSingleRedditPost("post123", "");
+    expect(post).toBeNull();
   });
 });

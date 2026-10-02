@@ -8,7 +8,6 @@ import {
   Target,
   BarChart3,
   Lightbulb,
-  Users,
   ArrowRight,
   MessageCircle,
 } from "lucide-react";

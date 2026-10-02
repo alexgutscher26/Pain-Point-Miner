@@ -14,14 +14,25 @@ describe("plan-resolver", () => {
     expect(result.ltdTier).toBe("none");
   });
 
-  it("grants access to growth plan users", () => {
+  it("grants access to founder plan users", () => {
     const result = resolvePlanAccessState({
       userId: "user_1",
-      plan: "growth",
+      plan: "founder",
       ltdTier: "none",
     });
 
-    expect(result.plan).toBe("growth");
+    expect(result.plan).toBe("founder");
+    expect(result.planPurchaseRequired).toBe(false);
+  });
+
+  it("grants access to professional plan users", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "professional",
+      ltdTier: "none",
+    });
+
+    expect(result.plan).toBe("professional");
     expect(result.planPurchaseRequired).toBe(false);
   });
 

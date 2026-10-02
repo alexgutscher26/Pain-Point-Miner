@@ -10,7 +10,6 @@ import {
   BarChart3,
   Rocket,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { completeOnboardingAction } from "../actions";
 

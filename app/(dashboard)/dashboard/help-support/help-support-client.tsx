@@ -12,8 +12,6 @@ import {
   Settings,
   ChevronDown,
   X,
-  Sparkles,
-  RefreshCw,
 } from "lucide-react";
 
 interface QuickAction {

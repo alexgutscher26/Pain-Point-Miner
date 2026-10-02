@@ -3,14 +3,12 @@ import type { Metadata } from "next";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import {
-  Search,
   ArrowRight,
   Brain,
   BarChart3,
   TrendingUp,
   Target,
   MessageCircle,
-  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

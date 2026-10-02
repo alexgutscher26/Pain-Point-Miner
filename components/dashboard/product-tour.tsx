@@ -6,12 +6,10 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
-  Compass,
   Search,
   BookOpen,
   Bookmark,
   Shield,
-  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

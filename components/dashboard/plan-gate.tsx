@@ -35,7 +35,7 @@ export interface PlanGateProps {
 
 export function PlanGate({
   children,
-  minPlan = "pro",
+  minPlan = "professional",
   feature,
   currentPlan,
   variant = "card",

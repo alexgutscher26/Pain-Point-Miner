@@ -1,9 +1,6 @@
 import {
   currentUA,
   rotateUA,
-  getSubredditFromUrl,
-  isSubredditThrottled,
-  consecutive429CountMap,
   logRateLimitEvent,
 } from "./throttle";
 
@@ -12,6 +9,15 @@ export const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET?.trim();
 export const DEFAULT_TIMEOUT_MS = 15_000;
 export const MAX_RETRIES = 3;
 export const TOKEN_EXPIRY_SAFETY_SECONDS = 30;
+
+export function getRedditRateLimitDelayMs(): number {
+  const envVal = process.env.REDDIT_RATE_LIMIT_DELAY_MS;
+  if (envVal) {
+    const parsed = parseInt(envVal, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return 0;
+}
 
 export type RedditTokenResponse = {
   access_token?: string;
@@ -59,18 +65,27 @@ export async function fetchWithRetry(
     const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
     try {
-      const subreddit = getSubredditFromUrl(url);
-      if (subreddit && isSubredditThrottled(subreddit)) {
-        throw new Error(`Subreddit r/${subreddit} is currently rate-limited.`);
-      }
+      const defaultHeaders = {
+        "User-Agent": currentUA,
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+      };
+
+      const customHeaders =
+        init.headers instanceof Headers
+          ? Object.fromEntries(init.headers.entries())
+          : (init.headers as Record<string, string>) || {};
 
       const response = await fetch(url, {
         ...init,
+        headers: {
+          ...defaultHeaders,
+          ...customHeaders,
+        },
         signal: controller.signal,
       });
 
       if (response.ok) {
-        if (subreddit) consecutive429CountMap.set(subreddit, 0);
         return response;
       }
 
@@ -85,7 +100,7 @@ export async function fetchWithRetry(
       }
 
       if (response.status === 403) {
-        // Rotate UA and update the headers for the next attempt
+        // Rotate UA and update headers for the next attempt
         const nextUA = rotateUA();
         if (init.headers instanceof Headers) {
           init.headers.set("User-Agent", nextUA);
@@ -116,7 +131,7 @@ export async function fetchWithRetry(
       clearTimeout(timeout);
     }
 
-    await sleep(500 * (attempt + 1));
+    await sleep(400 * (attempt + 1));
   }
 
   throw lastError instanceof Error
@@ -150,6 +165,34 @@ export async function getRedditAccessToken(
 
   activeTokenPromise = (async () => {
     try {
+      // Layer 2: Check persistent DB cache across requests/processes
+      if (!forceRefresh) {
+        try {
+          const { db } = await import("../db");
+          const { redditOAuthCache } = await import("../db/schema");
+
+          const minExpiry = new Date(
+            Date.now() + TOKEN_EXPIRY_SAFETY_SECONDS * 1000,
+          );
+          const dbCached = await db.query.redditOAuthCache.findFirst({
+            where: (t, { and, eq, gt }) =>
+              and(eq(t.key, creds.clientId), gt(t.expiresAt, minExpiry)),
+          });
+
+          if (dbCached?.token) {
+            cachedToken = {
+              token: dbCached.token,
+              expiresAtEpochSeconds: Math.floor(
+                dbCached.expiresAt.getTime() / 1000,
+              ),
+            };
+            return cachedToken.token;
+          }
+        } catch {
+          // Gracefully continue to API token fetch if DB table is unavailable
+        }
+      }
+
       const basicAuth = Buffer.from(
         `${creds.clientId}:${creds.clientSecret}`,
       ).toString("base64");
@@ -198,11 +241,36 @@ export async function getRedditAccessToken(
       }
 
       const expiresIn = payload.expires_in ?? 3_600;
+      const expiresAt = new Date(Date.now() + Math.max(60, expiresIn) * 1000);
       cachedToken = {
         token: payload.access_token,
-        expiresAtEpochSeconds:
-          Math.floor(Date.now() / 1_000) + Math.max(60, expiresIn),
+        expiresAtEpochSeconds: Math.floor(expiresAt.getTime() / 1000),
       };
+
+      // Persist token in DB cache across requests
+      try {
+        const { db } = await import("../db");
+        const { redditOAuthCache } = await import("../db/schema");
+        await db
+          .insert(redditOAuthCache)
+          .values({
+            key: creds.clientId,
+            token: payload.access_token,
+            expiresAt,
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: redditOAuthCache.key,
+            set: {
+              token: payload.access_token,
+              expiresAt,
+              updatedAt: new Date(),
+            },
+          });
+      } catch (dbErr) {
+        // Silently continue if DB logging fails
+      }
+
       return cachedToken.token;
     } finally {
       activeTokenPromise = null;
@@ -219,6 +287,11 @@ export async function fetchRedditResponse(
   url: string,
   retriesOnAuthFailure = 1,
 ): Promise<Response> {
+  const delayMs = getRedditRateLimitDelayMs();
+  if (delayMs > 0) {
+    await sleep(delayMs);
+  }
+
   const authToken = await getRedditAccessToken();
 
   if (authToken) {

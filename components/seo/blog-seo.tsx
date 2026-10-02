@@ -1,4 +1,3 @@
-import React from "react";
 import { BlogPostJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { siteUrl } from "@/lib/seo";
 

@@ -203,7 +203,7 @@ export function useMiningStream(scraperId: string | null) {
     connectSSE();
 
     return cleanup;
-  }, [scraperId, cleanup, startPollingFallback]);
+  }, [scraperId, cleanup, startPollingFallback, CLIENT_STALE_THRESHOLD_MS]);
 
   return {
     ...state,
