@@ -13,10 +13,11 @@ export async function GET(req: Request) {
   const namesQuery = url.searchParams.get("names");
   if (!namesQuery) return NextResponse.json({ subreddits: [] });
 
+  const SUBREDDIT_NAME_RE = /^[a-z0-9_]{3,21}$/;
   const names = namesQuery
     .split(",")
     .map((n) => n.trim().toLowerCase().replace(/^r\//i, ""))
-    .filter(Boolean);
+    .filter((n) => SUBREDDIT_NAME_RE.test(n));
 
   if (names.length === 0) return NextResponse.json({ subreddits: [] });
 
