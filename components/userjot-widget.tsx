@@ -60,58 +60,92 @@ function getUserJotIdentity(user: Pick<User, "id" | "email" | "name">) {
   };
 }
 
+import {
+  getCookiePreferences,
+  COOKIE_CONSENT_EVENT,
+  type CookiePreferences,
+} from "@/lib/cookie-consent";
+
 export function UserJotWidget({
   user,
 }: {
   user?: Pick<User, "id" | "email" | "name"> | null;
 }) {
   useEffect(() => {
-    ensureQueueShim();
+    // Only load if user granted consent for support widgets
+    const hasConsent = getCookiePreferences().support;
 
-    const initialize = () => {
-      if (window.__userJotInitialized) {
+    const loadWidget = () => {
+      // Clear stale identify keys to prevent UserJot SDK from attempting unsanctioned token sync
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          const keysToClean = ["uj_userId", "uj_identifyHash"];
+          for (const key of keysToClean) {
+            const val = window.localStorage.getItem(key);
+            if (val === "" || val !== null) {
+              window.localStorage.removeItem(key);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to sanitize UserJot localStorage keys:", e);
+      }
+
+      ensureQueueShim();
+
+      const initialize = () => {
+        if (window.__userJotInitialized) {
+          return;
+        }
+
+        const userJot = window.uj;
+
+        if (
+          userJot &&
+          "init" in userJot &&
+          typeof userJot.init === "function"
+        ) {
+          userJot.init(USERJOT_APP_ID, {
+            widget: true,
+            position: "right",
+            theme: "auto",
+          });
+
+          window.__userJotInitialized = true;
+        }
+      };
+
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        `script[src="${USERJOT_SRC}"]`,
+      );
+
+      if (existingScript) {
+        initialize();
         return;
       }
 
-      const userJot = window.uj;
+      const script = document.createElement("script");
+      script.src = USERJOT_SRC;
+      script.type = "module";
+      script.async = true;
+      script.onload = initialize;
+      document.head.appendChild(script);
+    };
 
-      if (userJot && "init" in userJot && typeof userJot.init === "function") {
-        userJot.init(USERJOT_APP_ID, {
-          widget: true,
-          position: "right",
-          theme: "auto",
-        });
+    if (hasConsent) {
+      loadWidget();
+    }
 
-        if (
-          user &&
-          "identify" in userJot &&
-          typeof userJot.identify === "function"
-        ) {
-          userJot.identify(getUserJotIdentity(user));
-        }
-
-        window.__userJotInitialized = true;
+    const handleConsentChange = (e: Event) => {
+      const customEvent = e as CustomEvent<CookiePreferences>;
+      if (customEvent.detail?.support) {
+        loadWidget();
       }
     };
 
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      `script[src="${USERJOT_SRC}"]`,
-    );
-
-    if (existingScript) {
-      initialize();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = USERJOT_SRC;
-    script.type = "module";
-    script.async = true;
-    script.onload = initialize;
-    document.head.appendChild(script);
-
+    window.addEventListener(COOKIE_CONSENT_EVENT, handleConsentChange);
     return () => {
-      script.onload = null;
+      window.removeEventListener(COOKIE_CONSENT_EVENT, handleConsentChange);
     };
   }, [user]);
 
