@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
-import { and, eq, desc, gte } from "drizzle-orm";
+import {
+  scraper,
+  scraperRun,
+  painPointComment,
+  painPointFeedback,
+} from "@/lib/db/schema";
+import { and, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 import { apiError, apiJson } from "@/lib/api-error";
 import { requireApiContext, workspaceScope } from "@/lib/api-auth";
 import { normalizeRunStatus } from "@/lib/run-status";
@@ -36,20 +41,23 @@ export async function GET(req: Request) {
     });
     const entitlements = getPlanEntitlements(plan);
 
-    let whereClause = and(
-      eq(scraper.userId, userId),
-      workspaceScope(scraper.workspaceId, workspaceId),
-    );
+    const fromDate =
+      days && days !== "all"
+        ? (() => {
+            const d = new Date();
+            d.setDate(d.getDate() - parseInt(days));
+            return d;
+          })()
+        : null;
 
-    if (days && days !== "all") {
-      const date = new Date();
-      date.setDate(date.getDate() - parseInt(days));
-      whereClause = and(whereClause, gte(scraper.createdAt, date));
-    }
-
-    // Get all scrapers for the user
-    const reportsRes = await db.query.scraper.findMany({
-      where: whereClause,
+    // Fetch scrapers for the current user and workspace
+    const scraperRows = await db.query.scraper.findMany({
+      where: and(
+        eq(scraper.userId, userId),
+        workspaceScope(scraper.workspaceId, workspaceId),
+        isNull(scraper.deletedAt),
+        fromDate ? gte(scraper.createdAt, fromDate) : undefined,
+      ),
       orderBy: [desc(scraper.createdAt)],
       with: {
         scraperRuns: {
@@ -67,39 +75,49 @@ export async function GET(req: Request) {
             commentCount: true,
             mentionCount: true,
           },
-          with: {
-            painPointComments: {
-              columns: {
-                score: true,
-              },
-              orderBy: (comment, { desc }) => [desc(comment.score)],
-              limit: 5,
-            },
-            painPointFeedback: {
-              columns: {
-                vote: true,
-              },
-            },
-          },
         },
       },
     });
 
-    const trendHistoryRows = await db.query.scraper.findMany({
-      where: and(
-        eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId),
-      ),
-      orderBy: [desc(scraper.createdAt)],
-      with: {
-        painPoints: {
-          columns: { id: true },
-        },
-      },
-    });
+    // Batch fetch feedback votes for all pain points across all scrapers
+    const allPainPointIds = scraperRows.flatMap(
+      (r) => r.painPoints?.map((pp) => pp.id) ?? [],
+    );
+    const feedbackRows =
+      allPainPointIds.length > 0
+        ? await db
+            .select()
+            .from(painPointFeedback)
+            .where(inArray(painPointFeedback.painPointId, allPainPointIds))
+        : [];
+    const feedbackByPainPointId = new Map<string, Array<{ vote: number }>>();
+    for (const fb of feedbackRows) {
+      const arr = feedbackByPainPointId.get(fb.painPointId) ?? [];
+      arr.push({ vote: fb.vote });
+      feedbackByPainPointId.set(fb.painPointId, arr);
+    }
 
+    // Batch fetch top comment scores for all pain points
+    const commentRows =
+      allPainPointIds.length > 0
+        ? await db
+            .select()
+            .from(painPointComment)
+            .where(inArray(painPointComment.painPointId, allPainPointIds))
+            .orderBy(desc(painPointComment.score))
+        : [];
+    const commentsByPainPointId = new Map<string, Array<{ score: number }>>();
+    for (const c of commentRows) {
+      const arr = commentsByPainPointId.get(c.painPointId) ?? [];
+      if (arr.length < 5) {
+        arr.push({ score: c.score });
+        commentsByPainPointId.set(c.painPointId, arr);
+      }
+    }
+
+    // Trend history
     const trendInsights = buildLatestTrendInsights(
-      trendHistoryRows
+      scraperRows
         .map((row) => {
           const keyword = row.keywords?.[0]?.trim().toLowerCase();
           if (!keyword) return null;
@@ -117,40 +135,26 @@ export async function GET(req: Request) {
       trendInsights.map((trend) => [trend.key, trend]),
     );
 
-    let formattedReports = (reportsRes as any[]).map((r) => {
+    let formattedReports = scraperRows.map((r) => {
+      const pps = r.painPoints || [];
       const latestRun = r.scraperRuns?.[0];
-      const pps = (r.painPoints || []) as Array<{
-        score: number;
-        urgency: number;
-        monetizationScore: number;
-        marketMaturity: number;
-        sentiment: string | null;
-        commentCount: number;
-        mentionCount: number;
-        painPointComments?: Array<{ score: number }>;
-        painPointFeedback?: Array<{ vote: number }>;
-      }>;
       const keywordKey = (r.keywords?.[0] || "").trim().toLowerCase();
       const trend = keywordKey ? trendByKeyword.get(keywordKey) : undefined;
-      const enrichedPainPoints = pps.map((point) => {
-        const topCommentScores = (point.painPointComments ?? [])
-          .map((comment) => comment.score ?? 0)
+      const enrichedPainPoints = pps.map((point: any) => {
+        const pointComments = commentsByPainPointId.get(point.id) ?? [];
+        const pointFeedback = feedbackByPainPointId.get(point.id) ?? [];
+        const topCommentScores = pointComments
+          .map((c) => c.score ?? 0)
           .slice(0, 3);
         const upvoteSignal =
           topCommentScores.length > 0
             ? Math.round(
-                topCommentScores.reduce(
-                  (sum, score) => sum + Math.max(0, score),
-                  0,
-                ) / topCommentScores.length,
+                topCommentScores.reduce((sum, s) => sum + Math.max(0, s), 0) /
+                  topCommentScores.length,
               )
             : 0;
-        const userUpvotes = (point.painPointFeedback ?? []).filter(
-          (v) => v.vote === 1,
-        ).length;
-        const userDownvotes = (point.painPointFeedback ?? []).filter(
-          (v) => v.vote === -1,
-        ).length;
+        const userUpvotes = pointFeedback.filter((v) => v.vote === 1).length;
+        const userDownvotes = pointFeedback.filter((v) => v.vote === -1).length;
 
         return {
           ...point,

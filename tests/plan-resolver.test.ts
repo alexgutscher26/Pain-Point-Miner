@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolvePlanAccessState } from "@/lib/plan-resolver";
 
 describe("plan-resolver", () => {
-  it("requires a paid plan for starter users without LTD", () => {
+  it("grants access to starter users without requiring immediate purchase", () => {
     const result = resolvePlanAccessState({
       userId: "user_1",
       plan: "starter",
@@ -10,18 +10,29 @@ describe("plan-resolver", () => {
     });
 
     expect(result.plan).toBe("starter");
-    expect(result.planPurchaseRequired).toBe(true);
+    expect(result.planPurchaseRequired).toBe(false);
     expect(result.ltdTier).toBe("none");
   });
 
-  it("grants access to growth plan users", () => {
+  it("grants access to founder plan users", () => {
     const result = resolvePlanAccessState({
       userId: "user_1",
-      plan: "growth",
+      plan: "founder",
       ltdTier: "none",
     });
 
-    expect(result.plan).toBe("growth");
+    expect(result.plan).toBe("founder");
+    expect(result.planPurchaseRequired).toBe(false);
+  });
+
+  it("grants access to professional plan users", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "professional",
+      ltdTier: "none",
+    });
+
+    expect(result.plan).toBe("professional");
     expect(result.planPurchaseRequired).toBe(false);
   });
 
@@ -47,5 +58,17 @@ describe("plan-resolver", () => {
     expect(result.plan).toBe("starter");
     expect(result.planPurchaseRequired).toBe(false);
     expect(result.ltdTier).toBe("professional");
+  });
+
+  it("grants access to starter plan users if they have an active subscription", () => {
+    const result = resolvePlanAccessState({
+      userId: "user_1",
+      plan: "starter",
+      ltdTier: "none",
+      hasActiveSubscription: true,
+    });
+
+    expect(result.plan).toBe("starter");
+    expect(result.planPurchaseRequired).toBe(false);
   });
 });

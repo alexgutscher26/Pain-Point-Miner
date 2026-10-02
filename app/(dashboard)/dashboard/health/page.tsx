@@ -1,12 +1,10 @@
 import { ScraperHealthDashboard } from "@/components/dashboard/scraper-health-dashboard";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function ScraperHealthPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession(await headers());
 
   if (!session) {
     redirect("/sign-in");

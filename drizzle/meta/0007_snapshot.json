@@ -1,6 +1,6 @@
 {
-  "id": "a7dc5672-cbfb-4dcc-bd30-6ba91e92e6aa",
-  "prevId": "a603b726-3018-42fe-b6dc-83539e049e4e",
+  "id": "35733f5f-8574-4d75-a049-eed98e2ddf36",
+  "prevId": "a14ba9b7-ed01-48e0-a6cd-347a4ce3c0f5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -14,50 +14,50 @@
           "primaryKey": true,
           "notNull": true
         },
-        "accountId": {
-          "name": "accountId",
+        "account_id": {
+          "name": "account_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "providerId": {
-          "name": "providerId",
+        "provider_id": {
+          "name": "provider_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "accessToken": {
-          "name": "accessToken",
+        "access_token": {
+          "name": "access_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "refreshToken": {
-          "name": "refreshToken",
+        "refresh_token": {
+          "name": "refresh_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "idToken": {
-          "name": "idToken",
+        "id_token": {
+          "name": "id_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "accessTokenExpiresAt": {
-          "name": "accessTokenExpiresAt",
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
         },
-        "refreshTokenExpiresAt": {
-          "name": "refreshTokenExpiresAt",
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
@@ -74,14 +74,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
@@ -93,12 +93,8 @@
           "name": "account_userId_fkey",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -246,6 +242,192 @@
         },
         "updatedAt": {
           "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_usage": {
+      "name": "ai_usage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "modelId": {
+          "name": "modelId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inputTokens": {
+          "name": "inputTokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "outputTokens": {
+          "name": "outputTokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "costUsd": {
+          "name": "costUsd",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "scraperId": {
+          "name": "scraperId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "runId": {
+          "name": "runId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "ai_usage_userId_createdAt_idx": {
+          "name": "ai_usage_userId_createdAt_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "createdAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ai_usage_modelId_createdAt_idx": {
+          "name": "ai_usage_modelId_createdAt_idx",
+          "columns": [
+            {
+              "expression": "modelId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "createdAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ai_usage_runId_idx": {
+          "name": "ai_usage_runId_idx",
+          "columns": [
+            {
+              "expression": "runId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ai_usage_userId_fkey": {
+          "name": "ai_usage_userId_fkey",
+          "tableFrom": "ai_usage",
+          "tableTo": "user",
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "ai_usage_runId_fkey": {
+          "name": "ai_usage_runId_fkey",
+          "tableFrom": "ai_usage",
+          "tableTo": "scraper_run",
+          "columnsFrom": ["runId"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.changelog": {
+      "name": "changelog",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appliedAt": {
+          "name": "appliedAt",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true,
@@ -481,12 +663,8 @@
           "name": "keyword_stat_scraperId_fkey",
           "tableFrom": "keyword_stat",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -494,12 +672,8 @@
           "name": "keyword_stat_userId_fkey",
           "tableFrom": "keyword_stat",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -546,6 +720,13 @@
         },
         "score": {
           "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "upvoteCount": {
+          "name": "upvoteCount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -709,6 +890,20 @@
           "primaryKey": false,
           "notNull": false
         },
+        "sourceType": {
+          "name": "sourceType",
+          "type": "PainPointSourceType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'post'"
+        },
+        "redditPostId": {
+          "name": "redditPostId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "difficulty": {
           "name": "difficulty",
           "type": "PainPointDifficulty",
@@ -741,7 +936,7 @@
               "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "text_ops"
+              "opclass": "timestamp_ops"
             }
           ],
           "isUnique": false,
@@ -757,7 +952,7 @@
               "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "timestamp_ops"
+              "opclass": "text_ops"
             },
             {
               "expression": "createdAt",
@@ -813,6 +1008,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "pain_point_tags_idx": {
+          "name": "pain_point_tags_idx",
+          "columns": [
+            {
+              "expression": "tags",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -820,12 +1030,8 @@
           "name": "pain_point_scraperId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -833,12 +1039,8 @@
           "name": "pain_point_userId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -846,12 +1048,8 @@
           "name": "pain_point_workspaceId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -859,12 +1057,8 @@
           "name": "pain_point_clusterId_fkey",
           "tableFrom": "pain_point",
           "tableTo": "pain_point_cluster",
-          "columnsFrom": [
-            "clusterId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["clusterId"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "cascade"
         }
@@ -933,6 +1127,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": 1
+        },
+        "memberCount": {
+          "name": "memberCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         },
         "estimatedTamUsdAnnual": {
           "name": "estimatedTamUsdAnnual",
@@ -1013,7 +1214,7 @@
               "isExpression": false,
               "asc": true,
               "nulls": "last",
-              "opclass": "timestamp_ops"
+              "opclass": "text_ops"
             },
             {
               "expression": "lastMatchedAt",
@@ -1034,12 +1235,8 @@
           "name": "pain_point_cluster_userId_fkey",
           "tableFrom": "pain_point_cluster",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1047,12 +1244,8 @@
           "name": "pain_point_cluster_workspaceId_fkey",
           "tableFrom": "pain_point_cluster",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1125,12 +1318,8 @@
           "name": "pain_point_comment_painPointId_fkey",
           "tableFrom": "pain_point_comment",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1269,7 +1458,10 @@
           "isUnique": false,
           "concurrently": false,
           "method": "hnsw",
-          "with": {}
+          "with": {
+            "m": 24,
+            "ef_construction": 200
+          }
         }
       },
       "foreignKeys": {
@@ -1277,12 +1469,8 @@
           "name": "pain_point_embedding_painPointId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1290,12 +1478,8 @@
           "name": "pain_point_embedding_userId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1303,12 +1487,8 @@
           "name": "pain_point_embedding_workspaceId_fkey",
           "tableFrom": "pain_point_embedding",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1383,12 +1563,8 @@
           "name": "pain_point_feedback_painPointId_fkey",
           "tableFrom": "pain_point_feedback",
           "tableTo": "pain_point",
-          "columnsFrom": [
-            "painPointId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["painPointId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1396,12 +1572,8 @@
           "name": "pain_point_feedback_userId_fkey",
           "tableFrom": "pain_point_feedback",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1472,12 +1644,8 @@
           "name": "purchased_credits_userId_fkey",
           "tableFrom": "purchased_credits",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1663,6 +1831,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "lastSuccessfulRunAt": {
+          "name": "lastSuccessfulRunAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -1818,12 +1992,8 @@
           "name": "scraper_userId_fkey",
           "tableFrom": "scraper",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1831,12 +2001,8 @@
           "name": "scraper_workspaceId_fkey",
           "tableFrom": "scraper",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1934,12 +2100,8 @@
           "name": "scraper_post_runId_fkey",
           "tableFrom": "scraper_post",
           "tableTo": "scraper_run",
-          "columnsFrom": [
-            "runId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["runId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1957,7 +2119,7 @@
         "id": {
           "name": "id",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "scraperId": {
@@ -2116,12 +2278,219 @@
           "name": "scraper_run_scraperId_fkey",
           "tableFrom": "scraper_run",
           "tableTo": "scraper",
-          "columnsFrom": [
-            "scraperId"
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "scraper_run_pkey": {
+          "name": "scraper_run_pkey",
+          "columns": ["id", "startedAt"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.scraper_run_event": {
+      "name": "scraper_run_event",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "runId": {
+          "name": "runId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phase": {
+          "name": "phase",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startedAt": {
+          "name": "startedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "finishedAt": {
+          "name": "finishedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metrics": {
+          "name": "metrics",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "scraper_run_event_runId_phase_idx": {
+          "name": "scraper_run_event_runId_phase_idx",
+          "columns": [
+            {
+              "expression": "runId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "phase",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "columnsTo": [
-            "id"
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "scraper_run_event_runId_fkey": {
+          "name": "scraper_run_event_runId_fkey",
+          "tableFrom": "scraper_run_event",
+          "tableTo": "scraper_run",
+          "columnsFrom": ["runId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.scraper_run_summary": {
+      "name": "scraper_run_summary",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "scraperId": {
+          "name": "scraperId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "workspaceId": {
+          "name": "workspaceId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "month": {
+          "name": "month",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "runsCount": {
+          "name": "runsCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalPostsFetched": {
+          "name": "totalPostsFetched",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalPostsMatched": {
+          "name": "totalPostsMatched",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalCommentsFetched": {
+          "name": "totalCommentsFetched",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalNewPainPoints": {
+          "name": "totalNewPainPoints",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalCost": {
+          "name": "totalCost",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "scraper_run_summary_scraperId_month_key": {
+          "name": "scraper_run_summary_scraperId_month_key",
+          "columns": [
+            {
+              "expression": "scraperId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "month",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "scraper_run_summary_scraperId_fkey": {
+          "name": "scraper_run_summary_scraperId_fkey",
+          "tableFrom": "scraper_run_summary",
+          "tableTo": "scraper",
+          "columnsFrom": ["scraperId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2142,8 +2511,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "expiresAt": {
-          "name": "expiresAt",
+        "expires_at": {
+          "name": "expires_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
@@ -2154,32 +2523,32 @@
           "primaryKey": false,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "ipAddress": {
-          "name": "ipAddress",
+        "ip_address": {
+          "name": "ip_address",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "userAgent": {
-          "name": "userAgent",
+        "user_agent": {
+          "name": "user_agent",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -2208,12 +2577,8 @@
           "name": "session_userId_fkey",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2578,9 +2943,7 @@
         "tool_slug_unique": {
           "name": "tool_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -2609,8 +2972,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "emailVerified": {
-          "name": "emailVerified",
+        "email_verified": {
+          "name": "email_verified",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true
@@ -2621,14 +2984,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "displayUsername": {
-          "name": "displayUsername",
+        "display_username": {
+          "name": "display_username",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "stripeCustomerId": {
-          "name": "stripeCustomerId",
+        "stripe_customer_id": {
+          "name": "stripe_customer_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -2639,27 +3002,27 @@
           "primaryKey": false,
           "notNull": false
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "anonymizeRedditUsernames": {
-          "name": "anonymizeRedditUsernames",
+        "anonymize_reddit_usernames": {
+          "name": "anonymize_reddit_usernames",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
           "default": false
         },
-        "deletedAt": {
-          "name": "deletedAt",
+        "deleted_at": {
+          "name": "deleted_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
@@ -2671,20 +3034,50 @@
           "notNull": true,
           "default": "'user'"
         },
-        "ltdTier": {
-          "name": "ltdTier",
+        "ltd_tier": {
+          "name": "ltd_tier",
           "type": "LtdTier",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
           "default": "'none'"
         },
-        "ltdPricePaid": {
-          "name": "ltdPricePaid",
+        "ltd_price_paid": {
+          "name": "ltd_price_paid",
           "type": "double precision",
           "primaryKey": false,
           "notNull": false,
           "default": 0
+        },
+        "last_login_method": {
+          "name": "last_login_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "plan": {
+          "name": "plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referral_code": {
+          "name": "referral_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referred_by_id": {
+          "name": "referred_by_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referral_activated_at": {
+          "name": "referral_activated_at",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -2722,6 +3115,91 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_notification_preferences": {
+      "name": "user_notification_preferences",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weeklyDigest": {
+          "name": "weeklyDigest",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "scanCompleteAlerts": {
+          "name": "scanCompleteAlerts",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "thresholdNotifications": {
+          "name": "thresholdNotifications",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "user_notification_preferences_userId_key": {
+          "name": "user_notification_preferences_userId_key",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_notification_preferences_userId_fkey": {
+          "name": "user_notification_preferences_userId_fkey",
+          "tableFrom": "user_notification_preferences",
+          "tableTo": "user",
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -2795,6 +3273,12 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
+        },
+        "custom_api_key": {
+          "name": "custom_api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -2820,12 +3304,8 @@
           "name": "user_preferences_userId_fkey",
           "tableFrom": "user_preferences",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -2858,20 +3338,20 @@
           "primaryKey": false,
           "notNull": true
         },
-        "expiresAt": {
-          "name": "expiresAt",
+        "expires_at": {
+          "name": "expires_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
@@ -2931,6 +3411,12 @@
           "type": "timestamp (3)",
           "primaryKey": false,
           "notNull": false
+        },
+        "plan": {
+          "name": "plan",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -2956,12 +3442,8 @@
           "name": "workspace_ownerId_fkey",
           "tableFrom": "workspace",
           "tableTo": "user",
-          "columnsFrom": [
-            "ownerId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ownerId"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
@@ -3045,12 +3527,8 @@
           "name": "workspace_member_workspaceId_fkey",
           "tableFrom": "workspace_member",
           "tableTo": "workspace",
-          "columnsFrom": [
-            "workspaceId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspaceId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -3058,12 +3536,8 @@
           "name": "workspace_member_userId_fkey",
           "tableFrom": "workspace_member",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -3079,11 +3553,7 @@
     "public.LtdTier": {
       "name": "LtdTier",
       "schema": "public",
-      "values": [
-        "none",
-        "founder",
-        "professional"
-      ]
+      "values": ["none", "founder", "professional"]
     },
     "public.PainPointDifficulty": {
       "name": "PainPointDifficulty",
@@ -3095,21 +3565,115 @@
         "vc_scale_moat"
       ]
     },
+    "public.PainPointSourceType": {
+      "name": "PainPointSourceType",
+      "schema": "public",
+      "values": ["post", "comment", "cross_post"]
+    },
     "public.ScraperStatus": {
       "name": "ScraperStatus",
       "schema": "public",
-      "values": [
-        "running",
-        "paused",
-        "error"
-      ]
+      "values": ["running", "paused", "error"]
     }
   },
   "schemas": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
+  "views": {
+    "public.dashboard_opportunity_mv": {
+      "columns": {
+        "scraper_id": {
+          "name": "scraper_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "workspace_id": {
+          "name": "workspace_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keywords": {
+          "name": "keywords",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "report_saved": {
+          "name": "report_saved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "report_category": {
+          "name": "report_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "report_saved_at": {
+          "name": "report_saved_at",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_run_status": {
+          "name": "latest_run_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_run_started_at": {
+          "name": "latest_run_started_at",
+          "type": "timestamp (3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_posts_fetched": {
+          "name": "latest_posts_fetched",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pain_point_count": {
+          "name": "pain_point_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pain_points": {
+          "name": "pain_points",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "name": "dashboard_opportunity_mv",
+      "schema": "public",
+      "isExisting": true,
+      "materialized": true
+    }
+  },
   "_meta": {
     "columns": {},
     "schemas": {},
