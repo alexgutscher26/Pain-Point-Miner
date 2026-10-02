@@ -45,6 +45,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing subreddit" }, { status: 400 });
     }
 
+    const normalizedSubreddit = String(subreddit).trim().toLowerCase().replace(/^r\//i, "");
+    const SUBREDDIT_NAME_RE = /^[a-z0-9_]{3,21}$/;
+    if (!SUBREDDIT_NAME_RE.test(normalizedSubreddit)) {
+      return NextResponse.json({ error: "Invalid subreddit" }, { status: 400 });
+    }
+
     // 2. Extract postId from link if not provided
     if (!postId && link) {
       const match = link.match(/\/comments\/([^/?]+)/);
@@ -56,6 +62,12 @@ export async function POST(req: NextRequest) {
         { error: "Could not identify postId" },
         { status: 400 },
       );
+    }
+
+    postId = String(postId).trim();
+    const REDDIT_POST_ID_RE = /^[a-z0-9]{5,10}$/i;
+    if (!REDDIT_POST_ID_RE.test(postId)) {
+      return NextResponse.json({ error: "Invalid postId" }, { status: 400 });
     }
 
     // 3. Resolve Scraper and User Context
@@ -75,8 +87,8 @@ export async function POST(req: NextRequest) {
 
     // 4. Fetch the real post and its comments from Reddit
     const [fetchedPost, comments] = await Promise.all([
-      fetchSingleRedditPost(postId, subreddit),
-      fetchComments(postId, subreddit, {
+      fetchSingleRedditPost(postId, normalizedSubreddit),
+      fetchComments(postId, normalizedSubreddit, {
         maxDepth: 50,
         maxComments: 100,
       }),
@@ -86,9 +98,9 @@ export async function POST(req: NextRequest) {
       id: postId,
       title: payload.title || "Post from Webhook",
       selftext: payload.body || payload.selftext || "",
-      url: link || `https://www.reddit.com/r/${subreddit}/comments/${postId}`,
+      url: link || `https://www.reddit.com/r/${normalizedSubreddit}/comments/${postId}`,
       author: payload.author || "unknown",
-      subreddit,
+      subreddit: normalizedSubreddit,
       score: payload.score ?? 0,
       num_comments: comments.length,
       created_utc: payload.created_utc || Math.floor(Date.now() / 1000),

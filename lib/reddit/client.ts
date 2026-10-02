@@ -1458,9 +1458,10 @@ export async function getSubredditMetadataBulk(
 ): Promise<SubredditSuggestion[]> {
   const results: SubredditSuggestion[] = [];
 
+  const SUBREDDIT_NAME_RE = /^[a-z0-9_]{3,21}$/;
   for (const rawSub of subreddits) {
     const sub = rawSub.replace(/^r\//i, "").trim().toLowerCase();
-    if (!sub) continue;
+    if (!sub || !SUBREDDIT_NAME_RE.test(sub)) continue;
 
     try {
       const url = `https://www.reddit.com/r/${sub}/about.json`;
