@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireApiContext } from "@/lib/api-auth";
-import { z } from "zod";
 import { db } from "@/lib/db";
 import { subredditCache } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { getSubredditMetadataBulk } from "@/lib/reddit";
 
 export async function GET(req: Request) {
@@ -14,10 +13,11 @@ export async function GET(req: Request) {
   const namesQuery = url.searchParams.get("names");
   if (!namesQuery) return NextResponse.json({ subreddits: [] });
 
+  const SUBREDDIT_NAME_RE = /^[a-z0-9_]{3,21}$/;
   const names = namesQuery
     .split(",")
     .map((n) => n.trim().toLowerCase().replace(/^r\//i, ""))
-    .filter(Boolean);
+    .filter((n) => SUBREDDIT_NAME_RE.test(n));
 
   if (names.length === 0) return NextResponse.json({ subreddits: [] });
 
@@ -40,10 +40,10 @@ export async function GET(req: Request) {
   if (missing.length > 0) {
     // 2. Fetch from reddit
     const freshData = await getSubredditMetadataBulk(missing);
-    
+
     for (const data of freshData) {
       const normalizedName = data.name.toLowerCase();
-      
+
       const record = {
         name: normalizedName,
         subscriberCount: data.subscribers,
@@ -52,24 +52,27 @@ export async function GET(req: Request) {
         category: null, // could extract from metadata if reddit provides it
         cachedAt: new Date(),
       };
-      
-      validCache.set(normalizedName, record);
 
+      validCache.set(normalizedName, record);
+      recordsToInsert.push(record);
+    }
+
+    if (recordsToInsert.length > 0) {
       try {
         await db
           .insert(subredditCache)
-          .values(record)
+          .values(recordsToInsert)
           .onConflictDoUpdate({
             target: subredditCache.name,
             set: {
-              subscriberCount: record.subscriberCount,
-              description: record.description,
-              activeUsers: record.activeUsers,
-              cachedAt: record.cachedAt,
+              subscriberCount: sql`EXCLUDED."subscriberCount"`,
+              description: sql`EXCLUDED.description`,
+              activeUsers: sql`EXCLUDED."activeUsers"`,
+              cachedAt: sql`EXCLUDED."cachedAt"`,
             },
           });
       } catch (err) {
-        console.error("Failed to upsert subredditCache", err);
+        console.error("Failed to bulk upsert subredditCache", err);
       }
     }
   }

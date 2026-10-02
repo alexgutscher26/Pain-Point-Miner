@@ -1,9 +1,9 @@
 export type DashboardPainPoint = {
   score: number;
-  urgency: number | null;
-  monetizationScore: number | null;
-  marketMaturity: number | null;
-  sentiment: string | null;
+  urgency?: number | null;
+  monetizationScore?: number | null;
+  marketMaturity?: number | null;
+  sentiment?: string | null;
   mentionCount?: number | null;
   commentCount?: number | null;
   upvoteSignal?: number | null;
@@ -123,8 +123,9 @@ export function toOpportunityScore(
 
     const base =
       (weightedSum * 10 + feedbackBoost + feedbackPenalty) * modifier;
+    const validationBonus = (validation / 100) * 15;
 
-    return base * 0.75 + validation * 0.25;
+    return base + validationBonus;
   });
 
   const average = Math.round(
