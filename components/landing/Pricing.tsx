@@ -2,483 +2,430 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Magnet, RotateCw, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  ShieldCheck,
+  Zap,
+  Lock,
+  Gem,
+  Layers,
+} from "lucide-react";
 
 export function Pricing() {
-  const [isYearly, setIsYearly] = useState(false);
-
-  const getPricing = (monthly: number) => {
-    if (!isYearly) {
-      return {
-        displayPrice: `$${monthly}`,
-        suffix: "/month",
-        detail: null,
-      };
-    }
-
-    const yearlyTotal = monthly * 10;
-    const yearlyMonthlyEquivalent = yearlyTotal / 12;
-    const formattedEquivalent = Number.isInteger(yearlyMonthlyEquivalent)
-      ? yearlyMonthlyEquivalent.toString()
-      : yearlyMonthlyEquivalent.toFixed(2).replace(/\.?0+$/, "");
-
-    return {
-      displayPrice: `$${formattedEquivalent}`,
-      suffix: "/month",
-      detail: `$${yearlyTotal} billed yearly`,
-    };
-  };
-
-  const starterPricing = getPricing(15);
-  const growthPricing = getPricing(29);
-  const proPricing = getPricing(69);
+  const [showFeatureMatrix, setShowFeatureMatrix] = useState(false);
 
   return (
     <section
-      className="flex w-full flex-col items-center border-y-2 border-white/[0.03] bg-[#111] px-4 py-24 sm:px-6 sm:py-32"
+      className="relative mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-16 sm:px-6 sm:py-24"
       id="pricing"
     >
-      <div className="mb-12 max-w-2xl text-center">
-        <h2 className="mb-4 text-[11px] font-extrabold tracking-widest text-[#ff4500] uppercase">
-          PRICING
+      {/* Background ambient lighting effects */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center overflow-hidden">
+        <div className="h-[420px] w-[620px] rounded-full bg-radial from-[#ff4500]/10 via-amber-500/5 to-transparent blur-3xl" />
+      </div>
+
+      {/* Header Section */}
+      <div className="mb-12 flex max-w-2xl flex-col items-center text-center">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/80 bg-amber-50/80 px-3.5 py-1 text-xs font-semibold text-amber-900 shadow-2xs backdrop-blur-md dark:border-amber-700/50 dark:bg-amber-950/60 dark:text-amber-200">
+          <Zap className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+          <span>Exclusive Lifetime Access · No Monthly Subscriptions</span>
+        </div>
+        <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          Pay once. Mine customer demand forever.
         </h2>
-        <h3 className="mb-6 text-[40px] leading-[1.1] font-extrabold tracking-[-0.02em] text-[#f4f4f5] md:text-[56px]">
-          Pricing Plans
-        </h3>
-        <p className="mb-10 text-[17px] font-medium text-zinc-400">
-          Scale your market research as you grow from idea to product.
+        <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
+          Secure early-adopter lifetime access with recurring monthly scan
+          credits that automatically refresh every year. Zero recurring monthly
+          invoices.
         </p>
-
-        <div className="mb-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/5 bg-[#1a1a1a] p-1.5 shadow-inner sm:rounded-full">
-          <button
-            type="button"
-            onClick={() => setIsYearly(false)}
-            className={`rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${!isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
-          >
-            Monthly
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsYearly(true)}
-            className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-extrabold shadow-sm transition-all sm:px-8 sm:text-[14px] ${isYearly ? "border border-[#ff4500]/20 bg-[#ff4500]/10 text-[#ff4500]" : "border border-transparent text-zinc-400 hover:text-white"}`}
-          >
-            Yearly{" "}
-            <span className="text-[10px] font-black tracking-wider text-[#ff4500] uppercase">
-              Save 2 months
-            </span>
-          </button>
-        </div>
       </div>
 
-      <div className="mb-12 grid w-full max-w-[1100px] grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
-        {/* Starter Plan */}
-        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
-          <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">
-              Starter
-            </h3>
-            <p className="mb-6 text-[13px] font-medium text-zinc-500">
-              Perfect for founders exploring early ideas.
-            </p>
-            <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
-                {starterPricing.displayPrice}
-              </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
-                {starterPricing.suffix}
-              </span>
+      {/* ── LIFETIME DEAL (LTD) VIEW ── */}
+      <div className="mb-12 w-full max-w-5xl">
+        {/* Urgent Allocation Banner */}
+        <div className="mb-8 rounded-3xl border border-amber-300/60 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-transparent p-5 backdrop-blur-md dark:border-amber-400/20 dark:from-amber-950/30">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm">
+                <Gem className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-zinc-900 sm:text-base dark:text-white">
+                  Early-Founder Lifetime Allocation
+                </h4>
+                <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                  Pay once, unlock monthly recurring scan credits that
+                  automatically renew every year for life.
+                </p>
+              </div>
             </div>
-            {starterPricing.detail ? (
-              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
-                {starterPricing.detail}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="relative z-10 mb-8 w-full flex-1 px-8">
-            <SectionHeader
-              icon={<Magnet className="h-3.5 w-3.5" />}
-              label="INBOUND"
-            />
-            <ul className="mb-8 space-y-4">
-              <FeatureItem label="10 Reddit scans per month" />
-              <FeatureItem label="Up to 3 subreddits per search" />
-              <FeatureItem label="Access to top Reddit posts" />
-            </ul>
-
-            <SectionHeader
-              icon={<RotateCw className="h-3.5 w-3.5" />}
-              label="ENGAGE"
-            />
-            <ul className="space-y-4">
-              <FeatureItem label="Basic pain-point extraction" />
-              <FeatureItem label="Mention count insights" />
-              <FeatureItem label="Export basic report" />
-              <FeatureItem label="Email support" />
-            </ul>
-          </div>
-
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
-            <Link
-              href={`/sign-up?plan=starter&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
-            >
-              Get Started
-            </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
-              Best for:
-            </p>
-            <p className="text-[13px] leading-tight font-medium text-zinc-300">
-              Early-stage founders validating first ideas.
-            </p>
-          </div>
-        </div>
-
-        {/* Growth Plan - Featured */}
-        <div className="group relative z-20 flex flex-col overflow-hidden rounded-2xl border-2 border-[#ff4500]/40 bg-[#141414] shadow-[0_0_40px_rgba(255,69,0,0.1)] lg:scale-105">
-          <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-white/20 bg-linear-to-r from-[#ff4500] to-[#ff571a] px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg">
-            <span className="text-[12px]">⭐</span> Most Popular
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#ff4500]/5 to-transparent"></div>
-
-          <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">
-              Growth
-            </h3>
-            <p className="mb-6 text-[13px] font-medium text-zinc-500">
-              For builders actively researching markets.
-            </p>
-            <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
-                {growthPricing.displayPrice}
-              </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
-                {growthPricing.suffix}
-              </span>
+            <div className="shrink-0 rounded-full border border-amber-400/40 bg-amber-100 px-4 py-1.5 font-mono text-xs font-bold text-amber-900 dark:bg-amber-950/80 dark:text-amber-200">
+              🔒 Limited Early-Bird Cohort
             </div>
-            {growthPricing.detail ? (
-              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
-                {growthPricing.detail}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="relative z-10 mb-8 w-full flex-1 px-8">
-            <SectionHeader
-              icon={<Magnet className="h-3.5 w-3.5" />}
-              label="INBOUND"
-              spotlight
-            />
-            <ul className="mb-8 space-y-4">
-              <FeatureItem label="50 Reddit scans per month" />
-              <FeatureItem label="Up to 10 subreddits per search" />
-              <FeatureItem label="Everything in Starter" />
-            </ul>
-
-            <SectionHeader
-              icon={<RotateCw className="h-3.5 w-3.5" />}
-              label="ENGAGE"
-              spotlight
-            />
-            <ul className="space-y-4">
-              <FeatureItem label="Advanced pain-point clustering" />
-              <FeatureItem label="Opportunity scoring" />
-              <FeatureItem label="Sentiment analysis" />
-              <FeatureItem label="Save and organize reports" />
-              <FeatureItem label="Export full insights" />
-              <FeatureItem label="Priority processing" />
-            </ul>
-          </div>
-
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-[#ff4500]/5 p-8 pt-6">
-            <Link
-              href={`/sign-up?plan=growth&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#ff4500] bg-[#ff4500] text-[14px] font-extrabold text-black shadow-lg shadow-[#ff4500]/20 transition-all hover:bg-[#ff571a]"
-            >
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-[#ff4500] uppercase">
-              Best for:
-            </p>
-            <p className="text-[13px] leading-tight font-semibold text-zinc-300">
-              Indie hackers and SaaS founders building products.
-            </p>
           </div>
         </div>
 
-        {/* Pro Plan */}
-        <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-white/5 bg-[#141414] shadow-2xl transition-all hover:border-[#ff4500]/20">
-          <div className="relative z-10 p-8 pb-6">
-            <h3 className="mb-2 text-[19px] font-extrabold text-white">Pro</h3>
-            <p className="mb-6 text-[13px] font-medium text-zinc-500">
-              For teams doing serious market research.
-            </p>
-            <div className="mb-6 flex items-baseline gap-1.5">
-              <span className="text-[44px] leading-none font-extrabold tracking-tight text-white">
-                {proPricing.displayPrice}
-              </span>
-              <span className="text-[14px] font-semibold text-zinc-400">
-                {proPricing.suffix}
-              </span>
-            </div>
-            {proPricing.detail ? (
-              <p className="-mt-3 text-[12px] font-semibold text-zinc-500">
-                {proPricing.detail}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="relative z-10 mb-8 w-full flex-1 px-8">
-            <SectionHeader
-              icon={<Magnet className="h-3.5 w-3.5" />}
-              label="INBOUND"
-            />
-            <ul className="mb-8 space-y-4">
-              <FeatureItem label="Unlimited Reddit scans" />
-              <FeatureItem label="Analyze unlimited subreddits" />
-              <FeatureItem label="Everything in Growth" />
-            </ul>
-
-            <SectionHeader
-              icon={<RotateCw className="h-3.5 w-3.5" />}
-              label="ENGAGE"
-            />
-            <ul className="space-y-4">
-              <FeatureItem label="Deep Reddit thread analysis" />
-              <FeatureItem label="AI-generated SaaS opportunities" />
-              <FeatureItem label="Trend detection & tracking" />
-              <FeatureItem label="Team workspace (coming soon)" />
-              <FeatureItem label="API access (coming soon)" />
-              <FeatureItem label="Priority support" />
-            </ul>
-          </div>
-
-          <div className="relative z-10 mt-auto w-full border-t border-white/5 bg-white/[0.01] p-8 pt-6">
-            <Link
-              href={`/sign-up?plan=pro&billing=${isYearly ? "yearly" : "monthly"}`}
-              className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 text-[14px] font-extrabold text-white transition-all hover:bg-white/10"
-            >
-              Get Started
-            </Link>
-            <p className="mb-1 text-[11px] font-bold tracking-widest text-zinc-400 uppercase">
-              Best for:
-            </p>
-            <p className="text-[13px] leading-tight font-medium text-zinc-300">
-              Startup teams, agencies, and product researchers.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── LIFETIME DEAL SECTION ── */}
-      <div className="mt-16 w-full max-w-[1100px]">
-        <div className="mb-8 text-center">
-          <span className="mb-3 inline-block rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1 text-[11px] font-black tracking-[0.25em] text-amber-400 uppercase">
-            ⚡ Limited Early-Believer Offer
-          </span>
-          <h3 className="mb-3 text-[32px] font-extrabold tracking-tight text-white md:text-[40px]">
-            Lifetime Access
-          </h3>
-          <p className="mx-auto max-w-lg text-[15px] font-medium text-zinc-400">
-            One payment. No subscriptions. Monthly credits that reset forever on
-            your anniversary — plus permanent rollover top-ups at founder rates.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* FOUNDER LTD */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/20 bg-[#141414] shadow-2xl transition-all hover:border-amber-400/40">
-            <div className="absolute inset-0 bg-gradient-to-b from-amber-400/5 to-transparent" />
-            <div className="relative z-10 p-8 pb-4">
-              <div className="mb-4 flex items-center gap-2">
-                <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
-                  Tier 1 — Founder
+          <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm transition-all duration-300 hover:border-amber-400/80 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <span className="rounded-full border border-amber-300/80 bg-amber-50 px-3 py-1 font-mono text-xs font-bold text-amber-900 dark:border-amber-700/50 dark:bg-amber-950 dark:text-amber-200">
+                  Tier 1 — Founder LTD
+                </span>
+                <span className="font-mono text-xs font-semibold text-zinc-500">
+                  Pay Once
                 </span>
               </div>
-              <div className="mb-1 flex items-baseline gap-2">
-                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+              <h3 className="mb-2 text-2xl font-bold text-zinc-950 dark:text-white">
+                Founder Pass
+              </h3>
+              <p className="mb-6 text-xs text-zinc-600 sm:text-sm dark:text-zinc-300">
+                Ideal for solo founders and builders who want continuous market
+                validation without monthly SaaS subscriptions.
+              </p>
+
+              <div className="mb-2 flex items-baseline gap-2">
+                <span className="font-mono text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
                   $149
                 </span>
-                <span className="text-[14px] font-semibold text-zinc-400">
-                  one-time
+                <span className="text-sm font-semibold text-zinc-500">
+                  one-time payment
                 </span>
               </div>
-              <p className="mb-6 text-[13px] font-medium text-zinc-500">
-                Perfect for solopreneurs who want to lock in early.
+              <p className="mb-6 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                ✓ Saves $199+ in your first year alone
               </p>
+
+              <div className="space-y-6 border-t border-zinc-100 pt-6 dark:border-zinc-800">
+                <div>
+                  <span className="font-mono text-xs font-bold tracking-wider text-amber-800 uppercase dark:text-amber-300">
+                    Recurring Allowance
+                  </span>
+                  <ul className="mt-3 space-y-3">
+                    <FeatureItem
+                      label="30 Reddit scans / month renewed forever"
+                      highlight
+                    />
+                    <FeatureItem label="Credits refresh automatically each month forever" />
+                    <FeatureItem label="20% permanent discount on extra credit top-ups" />
+                  </ul>
+                </div>
+
+                <div>
+                  <span className="font-mono text-xs font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+                    Founder Perks
+                  </span>
+                  <ul className="mt-3 space-y-3">
+                    <FeatureItem label="Deep pain-point extraction & clustering" />
+                    <FeatureItem label="Subreddit activity heatmaps & sentiment" />
+                    <FeatureItem label="Early access to upcoming niche scrapers" />
+                    <FeatureItem label="Exclusive Founder badge on your account ✨" />
+                    <FeatureItem label="Upgrade to Pro LTD for $150 difference anytime" />
+                  </ul>
+                </div>
+              </div>
             </div>
 
-            <div className="relative z-10 flex-1 px-8 pb-4">
-              <SectionHeader
-                icon={<Magnet className="h-3.5 w-3.5" />}
-                label="MONTHLY CREDITS"
-              />
-              <ul className="mb-8 space-y-4">
-                <FeatureItem label="30 Reddit scans / month — forever" />
-                <FeatureItem label="Credits reset on your anniversary date" />
-                <FeatureItem label="20% discount on extra credit top-ups" />
-              </ul>
-              <SectionHeader
-                icon={<RotateCw className="h-3.5 w-3.5" />}
-                label="FEATURES"
-              />
-              <ul className="space-y-4">
-                <FeatureItem label="Basic + Deep pain-point extraction" />
-                <FeatureItem label="Subreddit heatmaps" />
-                <FeatureItem label="Early access to new scrapers" />
-                <FeatureItem label="Founder badge on your account ✨" />
-                <FeatureItem label="Upgrade to Pro for just $150 later" />
-              </ul>
-            </div>
-
-            <div className="relative z-10 mt-auto w-full border-t border-amber-400/10 bg-amber-400/[0.03] p-8 pt-6">
+            <div className="mt-8 border-t border-zinc-100 pt-6 dark:border-zinc-800">
               <Link
                 href="/sign-up?plan=founder-ltd"
-                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-amber-400/60 bg-transparent text-[14px] font-extrabold text-amber-400 transition-all hover:bg-amber-400/10"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-zinc-300 bg-zinc-50 text-sm font-bold text-zinc-900 transition-all duration-200 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-950 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
               >
-                Get Founder Access
+                Claim Founder Access ($149)
               </Link>
-              <p className="text-center text-[11px] font-bold text-zinc-500">
-                One-time · No recurring fees · Unlock on signup
+              <p className="mt-3 text-center text-[11px] font-medium text-zinc-400">
+                Lifetime entitlement · Instant activation · No renewal fees
               </p>
             </div>
           </div>
 
-          {/* PROFESSIONAL LTD */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-amber-400/60 bg-[#141414] shadow-[0_0_60px_rgba(251,191,36,0.08)]">
-            <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg border-b border-l border-amber-400/30 bg-linear-to-r from-amber-500 to-amber-400 px-4 py-1.5 text-[10px] font-black tracking-widest text-black uppercase shadow-lg">
-              <span>💎</span> Best Value
+          {/* PROFESSIONAL LTD - FEATURED */}
+          <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border-2 border-amber-400 bg-gradient-to-b from-amber-50/40 via-white to-white p-8 shadow-xl shadow-amber-500/10 dark:border-amber-400 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900">
+            <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-2xl bg-amber-400 px-4 py-1.5 text-[11px] font-black tracking-wider text-amber-950 uppercase shadow-xs">
+              <span>💎</span>
+              <span>Best Lifetime Value</span>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-b from-amber-400/8 to-transparent" />
 
-            <div className="relative z-10 p-8 pb-4">
-              <div className="mb-4 flex items-center gap-2">
-                <span className="rounded-full border border-amber-400/60 bg-amber-400/15 px-3 py-0.5 text-[10px] font-black tracking-widest text-amber-400 uppercase">
-                  Tier 2 — Professional
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <span className="rounded-full border border-amber-400 bg-amber-200/70 px-3 py-1 font-mono text-xs font-extrabold text-amber-950 dark:bg-amber-900/60 dark:text-amber-100">
+                  Tier 2 — Professional LTD
                 </span>
               </div>
-              <div className="mb-1 flex items-baseline gap-2">
-                <span className="text-[48px] leading-none font-extrabold tracking-tight text-white">
+              <h3 className="mb-2 text-2xl font-bold text-zinc-950 dark:text-white">
+                Studio Master
+              </h3>
+              <p className="mb-6 text-xs text-zinc-600 sm:text-sm dark:text-zinc-300">
+                For active market researchers, growth agencies, and studios
+                running deep weekly competitor teardowns.
+              </p>
+
+              <div className="mb-2 flex items-baseline gap-2">
+                <span className="font-mono text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
                   $299
                 </span>
-                <span className="text-[14px] font-semibold text-zinc-400">
-                  one-time
+                <span className="text-sm font-semibold text-zinc-500">
+                  one-time payment
                 </span>
               </div>
-              <p className="mb-1 text-[12px] font-semibold text-amber-400">
-                Already a Founder? Upgrade for just $150.
+              <p className="mb-6 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                ✓ Saves $529+ annually vs monthly Pro plan
               </p>
-              <p className="mb-6 text-[13px] font-medium text-zinc-500">
-                For serious builders who want the full arsenal.
-              </p>
+
+              <div className="space-y-6 border-t border-amber-200 pt-6 dark:border-zinc-800">
+                <div>
+                  <span className="font-mono text-xs font-bold tracking-wider text-amber-900 uppercase dark:text-amber-300">
+                    Power Allowance
+                  </span>
+                  <ul className="mt-3 space-y-3">
+                    <FeatureItem
+                      label="100 Reddit scans / month renewed forever"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="Credits refresh automatically each month forever"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="40% permanent discount on extra credit top-ups"
+                      highlight
+                    />
+                  </ul>
+                </div>
+
+                <div>
+                  <span className="font-mono text-xs font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+                    Studio Arsenal
+                  </span>
+                  <ul className="mt-3 space-y-3">
+                    <FeatureItem
+                      label="Everything in Founder Pass included"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="Trend Velocity Scoring Engine"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="Advanced AI mining depth (200+ comments/thread)"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="Multi-platform intelligence scrapers (early access)"
+                      highlight
+                    />
+                    <FeatureItem
+                      label="Pro VIP Founder badge & priority roadmap voting 💎"
+                      highlight
+                    />
+                  </ul>
+                </div>
+              </div>
             </div>
 
-            <div className="relative z-10 flex-1 px-8 pb-4">
-              <SectionHeader
-                icon={<Magnet className="h-3.5 w-3.5" />}
-                label="MONTHLY CREDITS"
-                spotlight
-              />
-              <ul className="mb-8 space-y-4">
-                <FeatureItem label="100 Reddit scans / month — forever" spotlight />
-                <FeatureItem label="Credits reset on your anniversary date" spotlight />
-                <FeatureItem label="40% discount on extra credit top-ups" spotlight />
-              </ul>
-              <SectionHeader
-                icon={<RotateCw className="h-3.5 w-3.5" />}
-                label="FEATURES"
-                spotlight
-              />
-              <ul className="space-y-4">
-                <FeatureItem label="Everything in Founder" spotlight />
-                <FeatureItem label="Advanced AI mining depth" spotlight />
-                <FeatureItem label="Trend Velocity engine" spotlight />
-                <FeatureItem label="Phase 7 & 8 scrapers (early access)" spotlight />
-                <FeatureItem label="Pro Founder badge 💎" spotlight />
-                <FeatureItem label="Priority support & feature requests" spotlight />
-              </ul>
-            </div>
-
-            <div className="relative z-10 mt-auto w-full border-t border-amber-400/20 bg-amber-400/[0.05] p-8 pt-6">
+            <div className="mt-8 border-t border-amber-200 pt-6 dark:border-zinc-800">
               <Link
                 href="/sign-up?plan=professional-ltd"
-                className="mb-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-amber-400 text-[14px] font-extrabold text-black shadow-lg shadow-amber-400/20 transition-all hover:bg-amber-300"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-amber-400 text-sm font-bold text-amber-950 shadow-md shadow-amber-400/20 transition-all duration-300 hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-400/30 active:scale-[0.98]"
               >
-                Get Professional Access <ArrowRight className="h-4 w-4" />
+                <span>Claim Professional LTD ($299)</span>
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <p className="text-center text-[11px] font-bold text-zinc-500">
-                One-time · No recurring fees · Unlock on signup
+              <p className="mt-3 text-center text-[11px] font-medium text-zinc-500">
+                One-time payment · Guaranteed lifetime maintenance & updates
               </p>
             </div>
           </div>
         </div>
-
-        {/* Rollover explanation */}
-          <div className="mt-12 flex w-full max-w-2xl items-center gap-4 rounded-xl border border-white/5 bg-[#141414] p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-400/10 text-amber-400">
-              <Zap className="h-5 w-5 fill-current" />
-            </div>
-            <div className="flex flex-1 flex-col">
-              <span className="text-[14px] font-bold text-white">Buy More, Save More</span>
-              <p className="text-[13px] font-medium text-zinc-400">
-                Need more than your monthly allowance? Purchase permanent rollover scans with your exclusive 20/40% LTD discount.
-              </p>
-            </div>
-          </div>
       </div>
 
-      <div className="relative mx-0 mt-12 flex w-full max-w-[700px] flex-col items-center justify-center overflow-hidden rounded-xl border border-[#7a281c] bg-[#140a08] px-5 py-8 text-center shadow-lg sm:mx-4 sm:px-12">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
-        <h4 className="mb-2 text-[18px] font-extrabold tracking-tight text-white">
-          Secure checkout with Stripe. Instant access.
-        </h4>
+      {/* ── INTERACTIVE FEATURE COMPARISON TOGGLE ── */}
+      <div className="my-6 flex w-full max-w-5xl flex-col items-center">
+        <button
+          type="button"
+          onClick={() => setShowFeatureMatrix(!showFeatureMatrix)}
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-5 py-2.5 text-xs font-bold text-zinc-800 shadow-2xs backdrop-blur-md transition-all hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        >
+          <Layers className="h-3.5 w-3.5 text-[#ff4500]" />
+          <span>
+            {showFeatureMatrix
+              ? "Hide LTD Tier Comparison Matrix"
+              : "View Detailed LTD Tier Comparison"}
+          </span>
+        </button>
+
+        {showFeatureMatrix && (
+          <div className="mt-6 w-full overflow-hidden rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-200 text-xs font-bold tracking-wider text-zinc-400 uppercase dark:border-zinc-800">
+                    <th className="pt-2 pb-4">Feature / Capability</th>
+                    <th className="pt-2 pb-4 text-center">
+                      Founder LTD ($149)
+                    </th>
+                    <th className="pt-2 pb-4 text-center text-amber-600 dark:text-amber-400">
+                      Professional LTD ($299)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 text-xs sm:text-sm dark:divide-zinc-800">
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Monthly Renewable Scans
+                    </td>
+                    <td className="py-3 text-center font-mono font-bold text-zinc-700 dark:text-zinc-300">
+                      30 scans / month
+                    </td>
+                    <td className="py-3 text-center font-mono font-bold text-amber-600 dark:text-amber-400">
+                      100 scans / month
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Subreddits per Scan
+                    </td>
+                    <td className="py-3 text-center text-zinc-700 dark:text-zinc-300">
+                      Up to 10
+                    </td>
+                    <td className="py-3 text-center font-bold text-amber-600 dark:text-amber-400">
+                      Unlimited
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      AI Opportunity Scoring (0-100)
+                    </td>
+                    <td className="py-3 text-center font-bold text-emerald-500">
+                      ✓ Included
+                    </td>
+                    <td className="py-3 text-center font-bold text-emerald-500">
+                      ✓ Included
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Willingness-to-Pay Detection
+                    </td>
+                    <td className="py-3 text-center font-bold text-emerald-500">
+                      ✓ Included
+                    </td>
+                    <td className="py-3 text-center font-bold text-emerald-500">
+                      ✓ Included
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Export Formats
+                    </td>
+                    <td className="py-3 text-center text-zinc-700 dark:text-zinc-300">
+                      CSV, JSON, Notion
+                    </td>
+                    <td className="py-3 text-center text-zinc-900 dark:text-white">
+                      CSV, JSON, Notion, Webhooks
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Trend Velocity Engine
+                    </td>
+                    <td className="py-3 text-center text-zinc-400">—</td>
+                    <td className="py-3 text-center font-bold text-emerald-500">
+                      ✓ Included
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-medium text-zinc-900 dark:text-white">
+                      Top-Up Credit Discount
+                    </td>
+                    <td className="py-3 text-center font-mono text-zinc-700 dark:text-zinc-300">
+                      20% Lifetime Off
+                    </td>
+                    <td className="py-3 text-center font-mono font-bold text-amber-600 dark:text-amber-400">
+                      40% Lifetime Off
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── TRUST & RISK-REVERSAL BANNER ── */}
+      <div className="mt-8 grid w-full max-w-5xl grid-cols-1 gap-4 rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs backdrop-blur-xl sm:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ff4500]/10 text-[#ff4500]">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <h5 className="text-xs font-bold text-zinc-900 sm:text-sm dark:text-white">
+              14-Day Money-Back
+            </h5>
+            <p className="text-[11px] text-zinc-500">
+              Not satisfied? Get 100% refund, no questions asked.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3.5 sm:border-l sm:border-zinc-200 sm:pl-6 dark:sm:border-zinc-800">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Lock className="h-5 w-5" />
+          </div>
+          <div>
+            <h5 className="text-xs font-bold text-zinc-900 sm:text-sm dark:text-white">
+              Bank-Grade Security
+            </h5>
+            <p className="text-[11px] text-zinc-500">
+              Powered by Stripe 256-bit encrypted checkout.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3.5 sm:border-l sm:border-zinc-200 sm:pl-6 dark:sm:border-zinc-800">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <Zap className="h-5 w-5" />
+          </div>
+          <div>
+            <h5 className="text-xs font-bold text-zinc-900 sm:text-sm dark:text-white">
+              Instant Activation
+            </h5>
+            <p className="text-[11px] text-zinc-500">
+              Lifetime scan credits unlock immediately on signup.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function SectionHeader({
-  icon,
-  label,
-  spotlight = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  spotlight?: boolean;
-}) {
-  return (
-    <div className="mt-2 mb-6 flex w-full items-center gap-3">
-      <div className={`${spotlight ? "text-[#ff4500]" : "text-zinc-400"}`}>
-        {icon}
-      </div>
-      <h4
-        className={`text-[11px] font-extrabold tracking-[0.2em] uppercase ${spotlight ? "text-[#ff4500]" : "text-zinc-400"}`}
-      >
-        {label}
-      </h4>
-      <div
-        className={`flex-1 border-t ${spotlight ? "border-[#ff4500]/20" : "border-white/5"}`}
-      ></div>
-    </div>
-  );
-}
-
 function FeatureItem({
   label,
-  spotlight = false,
+  highlight = false,
 }: {
   label: string;
-  spotlight?: boolean;
+  highlight?: boolean;
 }) {
   return (
-    <li className="flex items-start gap-4">
+    <li className="flex items-start gap-3">
       <div
-        className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${spotlight ? "bg-[#ff4500] text-white" : "bg-[#ff4500]/10 text-[#ff4500]"}`}
+        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
+          highlight
+            ? "bg-amber-500 text-white"
+            : "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-400"
+        }`}
       >
-        <Check className="h-2.5 w-2.5" strokeWidth={4} />
+        <Check className="h-2.5 w-2.5" strokeWidth={3.5} />
       </div>
       <span
-        className={`flex-1 text-[13px] leading-snug font-extrabold ${spotlight ? "text-white" : "text-zinc-200"}`}
+        className={`text-xs leading-snug font-medium sm:text-[13px] ${
+          highlight
+            ? "font-semibold text-zinc-900 dark:text-zinc-100"
+            : "text-zinc-600 dark:text-zinc-400"
+        }`}
       >
         {label}
       </span>

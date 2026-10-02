@@ -1,20 +1,25 @@
 import { inngest } from "../client";
 import { db } from "@/lib/db";
-import { painPoint, painPointEmbedding, painPointCluster, scraper } from "@/lib/db/schema";
+import {
+  painPoint,
+  painPointEmbedding,
+  painPointCluster,
+  scraper,
+} from "@/lib/db/schema";
 import { eq, notExists } from "drizzle-orm";
 
 /**
  * Weekly Maintenance: Dead Data Cleanup
- * 
+ *
  * 1. Pain points with no parent scraperId (orphaned by hard-delete bugs)
  * 2. Embeddings in pain_point_embedding with no corresponding pain_point row
  * 3. Empty clusters where sourceCount = 0
  */
 export const cleanupDeadData = inngest.createFunction(
-  { 
-    id: "cleanup-dead-data", 
+  {
+    id: "cleanup-dead-data",
     name: "Cleanup Dead Data",
-    triggers: [{ cron: "0 0 * * 0" }]
+    triggers: [{ cron: "0 0 * * 0" }],
   },
   async ({ step }) => {
     const results = await step.run("purge-orphans", async () => {
@@ -25,10 +30,11 @@ export const cleanupDeadData = inngest.createFunction(
           .delete(painPoint)
           .where(
             notExists(
-              tx.select()
+              tx
+                .select()
                 .from(scraper)
-                .where(eq(scraper.id, painPoint.scraperId))
-            )
+                .where(eq(scraper.id, painPoint.scraperId)),
+            ),
           )
           .returning({ id: painPoint.id });
 
@@ -37,10 +43,11 @@ export const cleanupDeadData = inngest.createFunction(
           .delete(painPointEmbedding)
           .where(
             notExists(
-              tx.select()
+              tx
+                .select()
                 .from(painPoint)
-                .where(eq(painPoint.id, painPointEmbedding.painPointId))
-            )
+                .where(eq(painPoint.id, painPointEmbedding.painPointId)),
+            ),
           )
           .returning({ painPointId: painPointEmbedding.painPointId });
 
@@ -62,5 +69,5 @@ export const cleanupDeadData = inngest.createFunction(
       message: "Cleanup completed successfully",
       stats: results,
     };
-  }
+  },
 );

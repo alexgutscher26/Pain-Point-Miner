@@ -1,223 +1,238 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Bot,
-  Shield,
-  Bell,
-  Target,
-  Activity,
-  MessageSquare,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
+import Link from "next/link";
+
+interface FeatureSuite {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  benefits: { title: string; desc: string }[];
+  previewDetail: {
+    statTitle: string;
+    statValue: string;
+    statSubtitle: string;
+    highlights: string[];
+  };
+}
+
+const features: FeatureSuite[] = [
+  {
+    id: "mining",
+    badge: "Competitor & Pain Mining",
+    title: "Semantic Pain & Churn Miner",
+    subtitle:
+      "Turn noisy Reddit discussions into structured customer dossiers and actionable product briefs.",
+    benefits: [
+      {
+        title: "Intent and Sentiment Filters",
+        desc: "Filters out jokes, memes, and spam to extract verified struggles and repeated manual workarounds.",
+      },
+      {
+        title: "Competitor Churn Intelligence",
+        desc: "Tracks complaints about incumbents like HubSpot, Jira, and Stripe to uncover high-friction gaps.",
+      },
+      {
+        title: "One-Click Data Export",
+        desc: "Export opportunity dossiers and direct user permalinks to CSV, JSON, and Notion with complete metadata.",
+      },
+    ],
+    previewDetail: {
+      statTitle: "Complaints Classified",
+      statValue: "48,920+",
+      statSubtitle: "Reddit threads scanned and indexed across 1,240 niches",
+      highlights: [
+        "Unfiltered customer pain points",
+        "Willingness to pay dollar estimates",
+        "Direct permalink verification",
+      ],
+    },
+  },
+  {
+    id: "velocity",
+    badge: "Demand Velocity",
+    title: "Trend Velocity & Growth Tracking",
+    subtitle:
+      "Verify whether market frustration is accelerating before investing months into building software.",
+    benefits: [
+      {
+        title: "Volume Growth Analysis",
+        desc: "Measures complaint frequency trends across months to confirm durable market demand.",
+      },
+      {
+        title: "Opportunity Score Index",
+        desc: "Weights upvotes, comment density, and emotional urgency to grade validation potential from 0 to 100.",
+      },
+      {
+        title: "Emerging Topic Detection",
+        desc: "Identifies early spikes in discussions when new pricing hikes or platform policy changes trigger user churn.",
+      },
+    ],
+    previewDetail: {
+      statTitle: "Validation Accuracy",
+      statValue: "94.2%",
+      statSubtitle:
+        "Correlation with verified customer demand in post-launch surveys",
+      highlights: [
+        "Historical 12-month trendlines",
+        "Engagement velocity scoring",
+        "Automated niche clustering",
+      ],
+    },
+  },
+  {
+    id: "alerts",
+    badge: "Continuous Radar",
+    title: "Automated Webhooks & Instant Alerts",
+    subtitle:
+      "Receive real-time notifications the moment target buyers complain about an incumbent or request an alternative.",
+    benefits: [
+      {
+        title: "Real-Time Webhooks",
+        desc: "Dispatch custom JSON payloads to Make, Zapier, or your API server as fresh complaints emerge.",
+      },
+      {
+        title: "Team Notifications",
+        desc: "Deliver formatted pain point summaries directly to Slack or Discord channels.",
+      },
+      {
+        title: "Custom Keyword Triggers",
+        desc: "Track bespoke competitor mentions and niche keywords across multiple communities simultaneously.",
+      },
+    ],
+    previewDetail: {
+      statTitle: "Alert Delivery",
+      statValue: "< 90s",
+      statSubtitle:
+        "Average notification speed from thread publication to your inbox",
+      highlights: [
+        "Granular threshold controls",
+        "Digest summary frequencies",
+        "Direct outreach permalinks",
+      ],
+    },
+  },
+];
 
 export function Toolkit() {
-  return (
-    <section className="flex w-full flex-col items-center bg-[#000] px-6 py-32">
-      <div className="mb-24 max-w-2xl text-center">
-        <h2 className="mb-6 text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-          FEATURES
-        </h2>
-        <h3 className="mb-6 text-[40px] leading-tight font-extrabold tracking-tight text-white md:text-[56px]">
-          Your complete <span className="text-[#ff4500]">Reddit research</span>{" "}
-          toolkit
-        </h3>
-        <p className="text-[18px] leading-relaxed font-medium text-zinc-400">
-          Everything you need to validate SaaS ideas by analyzing data from
-          Reddit.
-        </p>
-      </div>
+  const [activeTab, setActiveTab] = useState<number>(0);
+  const activeFeature = features[activeTab];
 
-      <div className="mb-32 grid w-full max-w-[1200px] grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* Left Column (Feature list) - taking up 5 columns */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-10 lg:col-span-5">
-          {([
-            {
-              icon: <Target className="h-5 w-5 text-indigo-400" />,
-              title: "Keyword Targeting",
-              desc: "Monitor specific niche terms",
-            },
-            {
-              icon: <Bot className="h-5 w-5 text-amber-500" />,
-              title: "AI Problem Extraction",
-              desc: "Find underlying frustrations",
-            },
-            {
-              icon: <Shield className="h-5 w-5 text-emerald-400" />,
-              title: "Demand Signals",
-              desc: "Validate by upvotes & volume",
-            },
-            {
-              icon: <MessageSquare className="h-5 w-5 text-sky-400" />,
-              title: "Language Analysis",
-              desc: "See exact user phrasing",
-            },
-            {
-              icon: <Bell className="h-5 w-5 text-[#ff4500]" />,
-              title: "Niche Discovery",
-              desc: "Uncover underserved topics",
-            },
-            {
-              icon: <Activity className="h-5 w-5 text-fuchsia-400" />,
-              title: "Trend Analytics",
-              desc: "Track complaint frequencies",
-            },
-          ] as const).map((feature) => (
-            <div key={feature.title} className="flex flex-col items-start gap-4">
-              <div className="rounded-lg border border-white/[0.05] bg-[#0f0f0f] p-2.5 shadow-inner">
-                {feature.icon}
-              </div>
-              <div>
-                <h4 className="mb-1.5 text-[17px] font-extrabold text-white">
-                  {feature.title}
-                </h4>
-                <p className="text-[14px] leading-relaxed font-medium text-zinc-400">
-                  {feature.desc}
-                </p>
-              </div>
-            </div>
+  return (
+    <section
+      id="features"
+      className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-16 sm:px-6 sm:py-24"
+    >
+      {/* Section Header */}
+      <div className="mb-14 flex max-w-[720px] flex-col items-center text-center">
+        <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1 text-xs font-semibold text-[#ff4500] shadow-2xs backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Complete Research Suite</span>
+        </div>
+        <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          Everything you need to outposition competitors
+        </h2>
+        <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
+          Replace subjective assumptions with verified customer feedback mined
+          directly from authentic community discussions.
+        </p>
+
+        {/* Feature Navigation Tabs */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-100/90 p-1.5 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/90">
+          {features.map((feat, idx) => (
+            <button
+              key={feat.id}
+              type="button"
+              onClick={() => setActiveTab(idx)}
+              className={`cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-200 sm:text-sm ${
+                activeTab === idx
+                  ? "bg-white text-zinc-950 shadow-sm dark:bg-zinc-800 dark:text-white"
+                  : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+              }`}
+            >
+              {feat.badge}
+            </button>
           ))}
         </div>
-
-        {/* Right Column (Placeholder Image Box) - taking up 7 columns */}
-        <div className="lg:col-span-7">
-          <div className="group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-[32px] border-2 border-white/[0.03] bg-[#0a0a0a] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-            {/* Subltle glow */}
-            <div className="pointer-events-none absolute top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ff4500]/10 blur-[120px]" />
-            <div className="absolute inset-x-8 bottom-0 flex h-[80%] flex-col rounded-t-[20px] border-x-2 border-t-2 border-white/[0.05] bg-[#0f0f0f] shadow-2xl transition-transform duration-700 group-hover:translate-y-2">
-              <div className="flex h-12 w-full items-center gap-3 border-b border-white/[0.05] px-6">
-                <div className="flex gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/80"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/80"></div>
-                </div>
-              </div>
-              <div className="flex flex-1 gap-6 p-6">
-                <div className="hidden h-full w-1/4 flex-col gap-4 sm:flex">
-                  <div className="h-8 w-full rounded-md bg-white/[0.03]"></div>
-                  <div className="h-8 w-full rounded-md border border-[#ff4500]/50 bg-[#ff4500]/20"></div>
-                  <div className="h-8 w-full rounded-md bg-white/[0.03]"></div>
-                </div>
-                <div className="flex w-full flex-col gap-4 sm:w-3/4">
-                  <div className="h-5 w-1/3 rounded-full bg-white/[0.1]"></div>
-                  <div className="h-24 w-full rounded-lg bg-white/[0.03]"></div>
-                  <div className="w-full flex-1 rounded-lg bg-white/[0.03]"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Second part of toolkit */}
-      <div className="mt-16 mb-24 max-w-2xl text-center">
-        <h2 className="mb-6 text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-          MORE APPS
-        </h2>
-        <h3 className="mb-6 text-[40px] leading-tight font-extrabold tracking-tight text-white md:text-[56px]">
-          Everything you need to{" "}
-          <span className="text-[#ff4500]">validate ideas</span>
-        </h3>
-        <p className="text-[18px] leading-relaxed font-medium text-zinc-400">
-          Understand real user problems, find niches, and make data-driven
-          product decisions effortlessly.
-        </p>
-      </div>
+      {/* Main Feature Display Card */}
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-8 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-10 lg:grid-cols-12 dark:border-zinc-800 dark:bg-zinc-900">
+        {/* Left: Detailed Benefit List */}
+        <div className="flex flex-col justify-between lg:col-span-7">
+          <div>
+            <span className="mb-2 inline-block font-mono text-xs font-bold tracking-wider text-[#ff4500] uppercase">
+              {activeFeature.badge}
+            </span>
+            <h3 className="mb-3 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+              {activeFeature.title}
+            </h3>
+            <p className="mb-8 text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-300">
+              {activeFeature.subtitle}
+            </p>
 
-      <div className="grid w-full max-w-[1100px] grid-cols-1 gap-8 md:grid-cols-3">
-        {/* Card 1: Integrations */}
-        <div className="group relative flex h-80 flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
-          <div className="absolute bottom-4 left-8 z-10 mb-8 flex origin-bottom-left items-center gap-2 transition-transform group-hover:scale-110">
-            <div className="z-30 flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 bg-[#0a0a0a] shadow-lg">
-              <span className="text-sm font-black tracking-wider text-[#ff4500]">
-                slack
-              </span>
-            </div>
-            <div className="z-20 -ml-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 bg-[#0a0a0a] shadow-lg">
-              <span className="text-sm font-black tracking-wider text-amber-500">
-                zap
-              </span>
-            </div>
-            <div className="z-10 -ml-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 bg-[#ff4500] shadow-lg">
-              <span className="text-[10px] font-extrabold tracking-wider text-white">
-                hub
-              </span>
+            <div className="space-y-4">
+              {activeFeature.benefits.map((b) => (
+                <div key={b.title} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#ff4500]" />
+                  <div>
+                    <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
+                      {b.title}
+                    </h4>
+                    <p className="text-xs leading-relaxed text-zinc-600 sm:text-sm dark:text-zinc-300">
+                      {b.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <h4 className="mb-3 text-[20px] font-extrabold text-white">
-            Structured Reports
-          </h4>
-          <p className="flex-1 text-[15px] font-medium text-zinc-400">
-            Export insights into Notion, Docs, or Slack to share precisely what
-            to build next.
-          </p>
-        </div>
-
-        {/* Card 2: Alerts */}
-        <div className="group relative flex h-80 flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-[#ff4500]/30">
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#ff4500]/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
-
-          <h4 className="mb-3 text-[20px] font-extrabold text-[#ff4500]">
-            Weekly digests
-          </h4>
-          <p className="flex-1 text-[15px] font-medium text-zinc-400">
-            Wake up to a fresh list of structured pain points and validation
-            signals straight to your inbox.
-          </p>
-
-          <div className="absolute -bottom-4 -left-4 h-32 w-[120%] rounded-t-xl border border-white/5 bg-[#000] px-6 py-4 shadow-[0_-10px_30px_rgba(255,69,0,0.1)] transition-transform duration-500 group-hover:-translate-y-2">
-            <div className="mt-2 mb-4 flex items-center justify-between">
-              <span className="text-[13px] font-bold tracking-widest text-white uppercase">
-                Trend Report
-              </span>
-              <span className="rounded bg-[#ff4500] px-2.5 py-1 text-[11px] font-bold text-white">
-                HOT
-              </span>
-            </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="relative h-full w-[75%] rounded-full bg-[#ff4500]"></div>
-            </div>
+          <div className="mt-8 pt-4">
+            <Link
+              href="/dashboard/search"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#ff4500] hover:text-[#e03d00]"
+            >
+              <span>Test this scanner live</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
 
-        {/* Card 3: Sentiment Tracker */}
-        <div className="group relative flex h-80 flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
-          <div className="absolute right-8 bottom-8 left-8 flex h-24 items-end gap-[3px] transition-transform duration-500 group-hover:-translate-y-2">
-            {[
-              { h: 3, id: "h1" },
-              { h: 5, id: "h2" },
-              { h: 4, id: "h3" },
-              { h: 7, id: "h4" },
-              { h: 5, id: "h5" },
-              { h: 8, id: "h6" },
-              { h: 4, id: "h7" },
-              { h: 9, id: "h8" },
-              { h: 7, id: "h9" },
-            ].map((bar) => (
+        {/* Right: Tactile Metric & Signal Card */}
+        <div className="flex flex-col justify-center rounded-2xl border border-zinc-100 bg-zinc-50 p-6 lg:col-span-5 dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="mb-6 border-b border-zinc-200 pb-4 dark:border-zinc-800">
+            <span className="font-mono text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400">
+              {activeFeature.previewDetail.statTitle}
+            </span>
+            <div className="mt-1 font-mono text-4xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+              {activeFeature.previewDetail.statValue}
+            </div>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              {activeFeature.previewDetail.statSubtitle}
+            </p>
+          </div>
+
+          <div className="space-y-2.5">
+            <span className="font-mono text-[11px] font-bold text-zinc-400 uppercase">
+              Core Capabilities:
+            </span>
+            {activeFeature.previewDetail.highlights.map((h) => (
               <div
-                key={bar.id}
-                className="flex-1 rounded-t-[2px] bg-red-500 opacity-20"
-                style={{ height: `${bar.h * 10}%` }}
-              ></div>
+                key={h}
+                className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              >
+                <div className="h-1.5 w-1.5 rounded-full bg-[#ff4500]" />
+                <span>{h}</span>
+              </div>
             ))}
-            <div className="absolute right-0 bottom-0 flex h-24 w-[40px] items-end gap-1">
-              <div
-                className="flex-1 rounded-t-[2px] bg-[#ff4500]"
-                style={{ height: "70%" }}
-              ></div>
-              <div
-                className="flex-1 rounded-t-[2px] bg-[#ff4500]"
-                style={{ height: "100%" }}
-              ></div>
-            </div>
           </div>
-
-          <h4 className="mb-3 text-[20px] font-extrabold text-white">
-            Pain Point Tracker
-          </h4>
-          <p className="flex-1 text-[15px] font-medium text-zinc-400">
-            Track the volume of specific complaints over time to prioritize
-            features by demand.
-          </p>
         </div>
       </div>
     </section>

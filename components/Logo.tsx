@@ -25,7 +25,12 @@ export function LogoIcon({ className }: { className?: string }) {
 export function Logo({ className, iconClassName, withText = true }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className={cn("flex size-8 items-center justify-center rounded bg-[#ff4500] shadow-[0_4px_15px_rgba(255,69,0,0.4)]", iconClassName)}>
+      <div
+        className={cn(
+          "flex size-8 items-center justify-center rounded bg-[#ff4500] shadow-[0_4px_15px_rgba(255,69,0,0.4)]",
+          iconClassName,
+        )}
+      >
         <LogoIcon className="h-5 w-5 text-white" />
       </div>
       {withText && (

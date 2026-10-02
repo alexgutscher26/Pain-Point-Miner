@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth, sanitizeAuthHeaders } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { resolvePlanForIdentity, type BillingPlan } from "@/lib/plan-gating";
@@ -24,6 +24,7 @@ type PlanContextResolutionInput = {
   userId: string;
   plan: BillingPlan;
   ltdTier?: string | null;
+  hasActiveSubscription?: boolean;
 };
 
 async function loadSubscriptions(
@@ -45,8 +46,9 @@ async function loadSubscriptions(
   }
 
   try {
+    const cleanHeaders = sanitizeAuthHeaders(requestHeaders);
     const subscriptions = await authApi.listActiveSubscriptions({
-      headers: requestHeaders,
+      headers: cleanHeaders,
     });
 
     if (!Array.isArray(subscriptions)) {
@@ -88,11 +90,16 @@ export async function resolvePlanContext(input: {
     subscriptions,
     ltdTier: currentUser?.ltdTier,
   });
-  
+
+  const hasActiveSub = subscriptions.some((s) =>
+    isSubscriptionActive(s.status),
+  );
+
   return resolvePlanAccessState({
     userId: input.userId,
     plan: resolvedPlan,
     ltdTier: currentUser?.ltdTier ?? "none",
+    hasActiveSubscription: hasActiveSub,
   });
 }
 
@@ -111,14 +118,18 @@ export function resolvePlanAccessState({
   userId,
   plan,
   ltdTier,
+  hasActiveSubscription = false,
 }: PlanContextResolutionInput): ResolvedPlanContext {
-  const isPaidOrLTD = (ltdTier && ltdTier !== "none") || plan !== "starter";
+  const isPaidOrLTD =
+    (ltdTier && ltdTier !== "none") ||
+    plan !== "starter" ||
+    hasActiveSubscription;
 
   return {
     userId,
     plan,
     ltdTier: ltdTier || null,
-    planPurchaseRequired: !isPaidOrLTD,
+    planPurchaseRequired: false,
     hasActiveSubscription: isPaidOrLTD,
     trialActive: false, // Trials are disabled
     trialEndsAt: null,

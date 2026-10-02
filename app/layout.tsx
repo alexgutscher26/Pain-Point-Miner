@@ -6,10 +6,11 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { defaultMetadata } from "@/lib/seo";
 import { UserJotWidget } from "@/components/userjot-widget";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
+import { CookieConsentBanner } from "@/components/ui/cookie-consent-banner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,9 +32,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getServerSession(requestHeaders);
 
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
@@ -42,6 +41,25 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
+        {/* Automatically clean up any stale development service workers */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for(let registration of registrations) {
+                    registration.unregister();
+                  }
+                });
+                if (window.caches) {
+                  caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                  });
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -49,6 +67,7 @@ export default async function RootLayout({
         <UserJotWidget user={session?.user ?? null} />
         <Toaster />
         <Analytics />
+        <CookieConsentBanner />
         {children}
       </body>
     </html>

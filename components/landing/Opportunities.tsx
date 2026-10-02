@@ -1,115 +1,186 @@
 "use client";
 
+import { useState } from "react";
+import { Sparkles } from "lucide-react";
+
+interface SocialMockPost {
+  platform: "reddit" | "twitter";
+  source: string;
+  user: string;
+  handle: string;
+  time: string;
+  title?: string;
+  content: string;
+  budget: string;
+  stats: string;
+}
+
+const redditPosts: SocialMockPost[] = [
+  {
+    platform: "reddit",
+    source: "r/SaaS",
+    user: "Marcus Vance",
+    handle: "u/marcus_vance",
+    time: "3 hours ago",
+    title: "How do you automate enterprise custom billing?",
+    content:
+      "We spend 8 hours every month reconciling custom enterprise contracts that Stripe Billing does not handle natively. A simple contract sync tool would save us massive developer time. I would pay $99 monthly just to automate this.",
+    budget: "$99/mo committed",
+    stats: "48 upvotes • 22 comments",
+  },
+  {
+    platform: "reddit",
+    source: "r/sales",
+    user: "Dan Miller",
+    handle: "u/dan_sales_ops",
+    time: "5 hours ago",
+    title: "HubSpot pricing jump for small outbound sequences is ridiculous",
+    content:
+      "Just got told we need the Pro tier ($600/mo) for basic email sequences. We just need a lightweight pipeline and 3 sequence steps. Would switch our 8-person team in a heartbeat.",
+    budget: "$79/mo ready",
+    stats: "112 upvotes • 45 comments",
+  },
+  {
+    platform: "reddit",
+    source: "r/productivity",
+    user: "Elena Rostova",
+    handle: "u/elena_ops",
+    time: "1 day ago",
+    title:
+      "Is there a tool to generate weekly client PDF metrics automatically?",
+    content:
+      "Every Friday I copy screenshots from five different platforms into slide decks for client deliverables. It takes 4 hours. If a tool compiled these metrics automatically and formatted a branded PDF, I would buy it today.",
+    budget: "$49/mo ready",
+    stats: "76 upvotes • 31 comments",
+  },
+];
+
+const twitterPosts: SocialMockPost[] = [
+  {
+    platform: "twitter",
+    source: "Twitter (X)",
+    user: "Alex Rivera",
+    handle: "@alex_rivera",
+    time: "4 hours ago",
+    content:
+      "I spend 4 hours every Friday manually pulling client analytics from Sheets to PDF. Someone build a tool to auto email PDF summaries directly to client lists. I will pay $49 monthly gladly.",
+    budget: "$49/mo committed",
+    stats: "142 likes • 18 reposts",
+  },
+  {
+    platform: "twitter",
+    source: "Twitter (X)",
+    user: "Devon Bailey",
+    handle: "@devon_saas",
+    time: "7 hours ago",
+    content:
+      "Pricing tier changes at competitor suites is a massive bottleneck. Everyone in my community is complaining about custom contracts mapping. Huge opportunity for a specialized syncer.",
+    budget: "High urgency",
+    stats: "94 likes • 12 reposts",
+  },
+  {
+    platform: "twitter",
+    source: "Twitter (X)",
+    user: "Maya Patel",
+    handle: "@maya_outreach",
+    time: "1 day ago",
+    content:
+      "Cold outreach bounce lists are a nightmare to manage. We need automated list cleaning linked directly to custom SMTP providers. Ready to subscribe tomorrow.",
+    budget: "$39/mo ready",
+    stats: "68 likes • 9 reposts",
+  },
+];
+
 export function Opportunities() {
+  const [activeTab, setActiveTab] = useState<"reddit" | "twitter">("reddit");
+  const posts = activeTab === "reddit" ? redditPosts : twitterPosts;
+
   return (
-    <section className="flex w-full flex-col items-center border-t-2 border-white/[0.02] bg-[#000] px-6 py-32">
-      <div className="mb-24 max-w-2xl text-center">
-        <h2 className="mb-6 text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-          UNDERSTAND YOUR MARKET
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-16 sm:px-6 sm:py-24">
+      {/* Header */}
+      <div className="mb-14 flex max-w-[720px] flex-col items-center text-center">
+        <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1 text-xs font-semibold text-[#ff4500] shadow-2xs backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Verified Buyer Intent</span>
+        </div>
+        <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          Real buyers asking for solutions right now
         </h2>
-        <h3 className="mb-6 text-[40px] leading-tight font-extrabold tracking-tight text-white md:text-[56px]">
-          Find <span className="text-[#ff4500]">real user problems</span>
-        </h3>
-        <p className="text-[18px] leading-relaxed font-medium text-zinc-400">
-          Discover underlying frustrations, competitor complaints, and active
-          requests for solutions in your niche.
+        <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
+          See live quotes from founders, operators, and marketing teams publicly
+          declaring what software they want and how much they are ready to pay.
         </p>
+
+        {/* Tab Selector */}
+        <div className="mt-8 inline-flex rounded-2xl border border-zinc-200 bg-zinc-100/90 p-1 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/90">
+          <button
+            type="button"
+            onClick={() => setActiveTab("reddit")}
+            className={`flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+              activeTab === "reddit"
+                ? "bg-white text-zinc-950 shadow-sm dark:bg-zinc-800 dark:text-white"
+                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+            }`}
+          >
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#ff4500] text-[9px] font-black text-white">
+              r/
+            </div>
+            <span>Reddit Discussions</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("twitter")}
+            className={`flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2 text-xs font-bold transition-all sm:text-sm ${
+              activeTab === "twitter"
+                ? "bg-white text-zinc-950 shadow-sm dark:bg-zinc-800 dark:text-white"
+                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+            }`}
+          >
+            <span className="font-bold text-zinc-900 dark:text-white">𝕏</span>
+            <span>Twitter (X) Posts</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Card 1 */}
-        <div className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
-          <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-blue-500/10 blur-[80px] transition-colors"></div>
-
-          <h3 className="mb-4 text-[22px] font-extrabold text-white">
-            Underlying frustrations
-          </h3>
-          <p className="mb-10 flex-1 text-[15px] leading-relaxed font-medium text-zinc-400">
-            See users actively complaining about workflows that your software
-            could automate or simplify.
-          </p>
-
-          <div className="relative z-10 mt-auto rounded-xl border-2 border-white/[0.03] bg-[#141414] p-6 shadow-inner">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[11px] font-extrabold tracking-widest text-blue-400 uppercase">
-                r/SaaS
+      {/* Cards Grid */}
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+        {posts.map((post, idx) => (
+          <div
+            key={idx}
+            className="flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#ff4500]/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div>
+              <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-zinc-900 dark:text-white">
+                    {post.source}
+                  </span>
+                  <span className="text-[11px] text-zinc-400">
+                    • {post.time}
+                  </span>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  {post.budget}
+                </span>
               </div>
-              <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
-                2 hrs ago
-              </span>
+
+              {post.title && (
+                <h4 className="mb-2 text-sm font-bold text-zinc-950 dark:text-white">
+                  {post.title}
+                </h4>
+              )}
+
+              <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+                "{post.content}"
+              </p>
             </div>
-            <div className="mb-3 text-[15px] leading-snug font-extrabold tracking-tight text-white">
-              How do you guys automate this without losing your mind?
-            </div>
-            <div className="text-[13px] leading-relaxed font-medium text-zinc-400">
-              I&apos;ve been spending 10 hours a week on this. Is there a better
-              way? Feeling burnt out trying to string 4 different tools together
-              manually...
+
+            <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px] text-zinc-400 dark:border-zinc-800">
+              <span className="font-mono">{post.handle}</span>
+              <span>{post.stats}</span>
             </div>
           </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
-          <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-amber-500/10 blur-[80px] transition-colors"></div>
-
-          <h3 className="mb-4 text-[22px] font-extrabold text-white">
-            Competitor weaknesses
-          </h3>
-          <p className="mb-10 flex-1 text-[15px] leading-relaxed font-medium text-zinc-400">
-            Discover exactly what features are lacking or broken in competing
-            tools to position yourself better.
-          </p>
-
-          <div className="relative z-10 mt-auto rounded-xl border-2 border-white/[0.03] bg-[#141414] p-6 shadow-inner">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[11px] font-extrabold tracking-widest text-amber-500 uppercase">
-                r/marketing
-              </div>
-              <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
-                5 hrs ago
-              </span>
-            </div>
-            <div className="mb-3 text-[15px] leading-snug font-extrabold tracking-tight text-white">
-              Looking for a [Competitor] alternative
-            </div>
-            <div className="text-[13px] leading-relaxed font-medium text-zinc-400">
-              Their prices just doubled and support is terrible. Need something
-              else fast that actually responds when things break. Any ideas?
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border-2 border-white/[0.03] bg-[#0f0f0f] p-8 shadow-2xl transition-colors hover:border-white/[0.08]">
-          <div className="pointer-events-none absolute top-0 right-0 h-48 w-48 rounded-full bg-[#9333ea]/10 blur-[80px] transition-colors"></div>
-
-          <h3 className="mb-4 text-[22px] font-extrabold text-white">
-            Feature requests
-          </h3>
-          <p className="mb-10 flex-1 text-[15px] leading-relaxed font-medium text-zinc-400">
-            Validate roadmaps based on users explicitly asking &quot;Is there a
-            tool that does X?&quot;
-          </p>
-
-          <div className="relative z-10 mt-auto rounded-xl border-2 border-white/[0.03] bg-[#141414] p-6 shadow-inner">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="rounded-full border border-[#9333ea]/20 bg-[#9333ea]/10 px-3 py-1 text-[11px] font-extrabold tracking-widest text-[#9333ea] uppercase">
-                r/productivity
-              </div>
-              <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
-                1 day ago
-              </span>
-            </div>
-            <div className="mb-3 text-[15px] leading-snug font-extrabold tracking-tight text-white">
-              Tool needed to extract Reddit insights?
-            </div>
-            <div className="text-[13px] leading-relaxed font-medium text-zinc-400">
-              I want to find SaaS ideas from subreddits without reading them
-              manually. Does this exist? Would pay good money for this.
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );
