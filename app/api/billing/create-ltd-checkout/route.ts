@@ -1,17 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import Stripe from "stripe";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia" as any,
+  apiVersion: "2025-01-27.acacia" as Stripe.LatestApiVersion,
 });
 
 export async function POST(req: Request) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
+    const session = await getServerSession(req.headers);
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -44,31 +45,41 @@ export async function POST(req: Request) {
     }
 
     if (!priceId) {
-      const missing = tier === "founder"
-        ? "STRIPE_PRICE_LTD_FOUNDER"
-        : currentUser?.ltdTier === "founder"
-        ? "STRIPE_PRICE_LTD_UPGRADE"
-        : "STRIPE_PRICE_LTD_PROFESSIONAL";
+      const missing =
+        tier === "founder"
+          ? "STRIPE_PRICE_LTD_FOUNDER"
+          : currentUser?.ltdTier === "founder"
+            ? "STRIPE_PRICE_LTD_UPGRADE"
+            : "STRIPE_PRICE_LTD_PROFESSIONAL";
       console.error(`[LTD Checkout] Missing env var: ${missing}`);
       return NextResponse.json(
-        { message: `Server misconfiguration: ${missing} is not set in .env.local` },
-        { status: 500 }
+        {
+          message: `Server misconfiguration: ${missing} is not set in .env.local`,
+        },
+        { status: 500 },
       );
     }
 
-    const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST";
-    console.log(`[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`);
+    const stripeMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_")
+      ? "LIVE"
+      : "TEST";
+    console.log(
+      `[LTD Checkout] Stripe mode: ${stripeMode} | Tier: ${tier} | PriceId: ${priceId}`,
+    );
 
     // Validate the stored customer ID against the current Stripe environment.
     // It may be a stale Test-mode ID when running in Live mode (or vice versa).
-    let validCustomerId: string | undefined = session.user.stripeCustomerId || undefined;
+    let validCustomerId: string | undefined =
+      session.user.stripeCustomerId || undefined;
     if (validCustomerId) {
       try {
         const existing = await stripe.customers.retrieve(validCustomerId);
         if ((existing as any).deleted) validCustomerId = undefined;
       } catch (err: any) {
         if (err.code === "resource_missing") {
-          console.warn(`[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`);
+          console.warn(
+            `[LTD Checkout] Stale customer ID ${validCustomerId} — falling back to email.`,
+          );
           validCustomerId = undefined;
         } else {
           throw err;
@@ -82,7 +93,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "payment",
       allow_promotion_codes: true,
-      success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true`,
+      success_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BETTER_AUTH_URL}/dashboard/billing?canceled=true`,
       metadata: {
         userId: session.user.id,

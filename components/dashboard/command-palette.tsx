@@ -50,13 +50,13 @@ export function CommandPalette() {
 
   // Fetch reports for the palette
   const fetchReports = useCallback(async () => {
-    if (reports.length > 0) return; 
+    if (reports.length > 0) return;
     setIsLoading(true);
     try {
       const response = await fetch("/api/reports?days=all");
       if (response.ok) {
         const data = await response.json();
-        setReports(data.slice(0, 50)); 
+        setReports(data.slice(0, 50));
       }
     } catch (e) {
       console.error("Failed to fetch reports for command palette", e);
@@ -93,7 +93,10 @@ export function CommandPalette() {
 
   const handleScan = (keyword: string) => {
     // Save to recent searches
-    const updated = [keyword, ...recentSearches.filter((k) => k !== keyword)].slice(0, 5);
+    const updated = [
+      keyword,
+      ...recentSearches.filter((k) => k !== keyword),
+    ].slice(0, 5);
     setRecentSearches(updated);
     localStorage.setItem("recent_scans", JSON.stringify(updated));
     router.push(`/dashboard/search?q=${encodeURIComponent(keyword)}`);
@@ -113,36 +116,49 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput 
-        placeholder="Type / to scan or search reports..." 
+      <CommandInput
+        placeholder="Type / to scan or search reports..."
         value={inputValue}
         onValueChange={setInputValue}
       />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        
+
         {inputValue && (
           <CommandGroup heading="Actions">
-            <CommandItem onSelect={handleSelectScan} className="bg-[#ff4500]/5!">
+            <CommandItem
+              onSelect={handleSelectScan}
+              className="bg-[#ff4500]/5!"
+            >
               <Search className="mr-2 h-4 w-4 text-[#ff4500]" />
-              <span>Scan for <strong className="text-white">"{inputValue}"</strong></span>
+              <span>
+                Scan for <strong className="text-white">"{inputValue}"</strong>
+              </span>
               <CommandShortcut>⏎</CommandShortcut>
             </CommandItem>
           </CommandGroup>
         )}
 
         <CommandGroup heading="Commands">
-          <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/search"))}>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push("/dashboard/search"))}
+          >
             <Plus className="mr-2 h-4 w-4 text-[#ff4500]" />
             <span>New Scan</span>
             <CommandShortcut>/scan</CommandShortcut>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/settings"))}>
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => router.push("/dashboard/settings"))
+            }
+          >
             <Settings className="mr-2 h-4 w-4 text-zinc-500" />
             <span>Settings</span>
             <CommandShortcut>/settings</CommandShortcut>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/billing"))}>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push("/dashboard/billing"))}
+          >
             <CreditCard className="mr-2 h-4 w-4 text-zinc-500" />
             <span>Billing</span>
             <CommandShortcut>/billing</CommandShortcut>
@@ -154,7 +170,10 @@ export function CommandPalette() {
         {recentSearches.length > 0 && !inputValue && (
           <CommandGroup heading="Recent Searches">
             {recentSearches.map((keyword) => (
-              <CommandItem key={keyword} onSelect={() => runCommand(() => handleScan(keyword))}>
+              <CommandItem
+                key={keyword}
+                onSelect={() => runCommand(() => handleScan(keyword))}
+              >
                 <History className="mr-2 h-4 w-4 text-zinc-500" />
                 <span>{keyword}</span>
               </CommandItem>
@@ -165,14 +184,16 @@ export function CommandPalette() {
         {reports.length > 0 && (
           <CommandGroup heading="Investigations">
             {reports.map((report) => (
-              <CommandItem 
-                key={report.id} 
+              <CommandItem
+                key={report.id}
                 onSelect={() => handleSelectReport(report.id)}
-                value={report.niche + " " + report.id} 
+                value={report.niche + " " + report.id}
               >
                 <FileText className="mr-2 h-4 w-4 text-[#ff4500]" />
-                <span className="truncate text-white font-medium italic">{report.niche}</span>
-                <span className="ml-auto text-[10px] font-mono opacity-40 uppercase tracking-tighter">
+                <span className="truncate font-medium text-white italic">
+                  {report.niche}
+                </span>
+                <span className="ml-auto font-mono text-[10px] tracking-tighter uppercase opacity-40">
                   {report.status === "Completed" ? report.date : report.status}
                 </span>
               </CommandItem>

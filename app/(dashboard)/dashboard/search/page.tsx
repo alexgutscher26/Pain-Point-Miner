@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -13,10 +13,12 @@ import {
   Loader2,
   Lock,
   Database,
-  HelpCircle,
+  Flame,
+  Compass,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MINING_PRESETS, type MiningDepth } from "@/lib/mining-presets";
+import { ScanWizard } from "@/components/dashboard/scan-wizard";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +39,7 @@ type SearchDraft = {
   keyword: string;
   subreddits: string;
   customPatterns: string;
-  miningDepth: "basic" | "deep" | "advanced";
+  miningDepth: MiningDepth;
   timeWindow: TimeWindow;
   savedAt: string;
 };
@@ -122,11 +124,26 @@ const COMMON_SUBREDDITS_BY_LOCALE: Record<string, string[]> = {
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [scanMode, setScanMode] = useState<"quick" | "wizard">("quick");
   const [miningDepth, setMiningDepth] = useState<MiningDepth>("basic");
   const [timeWindow, setTimeWindow] = useState<TimeWindow>(DEFAULT_TIME_WINDOW);
   const [keyword, setKeyword] = useState("");
   const [subreddits, setSubreddits] = useState("");
   const [customPatterns, setCustomPatterns] = useState("");
+
+  const selectedSubredditList = useMemo(() => {
+    return subreddits
+      .split(",")
+      .map((s) => s.trim().replace(/^r\//i, ""))
+      .filter(Boolean);
+  }, [subreddits]);
+
+  const removeSubreddit = (sub: string) => {
+    const updated = selectedSubredditList.filter(
+      (s) => s.toLowerCase() !== sub.toLowerCase(),
+    );
+    setSubreddits(updated.map((s) => `r/${s}`).join(", "));
+  };
   const [suggestedSubreddits, setSuggestedSubreddits] = useState<
     SubredditSuggestion[]
   >([]);
@@ -278,13 +295,16 @@ export default function SearchPage() {
     };
   }, []);
 
+  const visibleCommunitiesKey = visibleCommunities.join(",");
+
   useEffect(() => {
     let cancelled = false;
     async function loadMetadata() {
-      if (visibleCommunities.length === 0) return;
+      if (!visibleCommunitiesKey) return;
       try {
-        const query = visibleCommunities.join(",");
-        const res = await fetch(`/api/subreddits/metadata?names=${query}`);
+        const res = await fetch(
+          `/api/subreddits/metadata?names=${visibleCommunitiesKey}`,
+        );
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && data.subreddits) {
@@ -300,7 +320,7 @@ export default function SearchPage() {
     return () => {
       cancelled = true;
     };
-  }, [visibleCommunities]);
+  }, [visibleCommunitiesKey]);
 
   const handleSuggestSubreddits = async () => {
     if (trialEnded) {
@@ -462,12 +482,12 @@ export default function SearchPage() {
   return (
     <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
       <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
-        <DialogContent className="border-2 border-white/15 bg-[#111] text-white">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black">
-              Plan Required
+        <DialogContent className="max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="font-mono text-lg font-black text-zinc-950 uppercase dark:text-white">
+              Lifetime Access Required
             </DialogTitle>
-            <DialogDescription className="font-mono text-zinc-300">
+            <DialogDescription className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
               {planDialogMessage}
             </DialogDescription>
           </DialogHeader>
@@ -475,511 +495,511 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setPlanDialogOpen(false)}
-              className="border border-white/20 bg-white/5 px-4 py-2 font-mono text-sm font-bold tracking-wide uppercase"
+              className="dark:hover:bg-zinc-850 cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-2 font-mono text-xs font-bold tracking-wide text-zinc-700 uppercase transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
             >
               Close
             </button>
             <Link
               href="/dashboard/billing"
-              className="border border-[#ff8a57] bg-[#ff4500] px-4 py-2 font-mono text-sm font-bold tracking-wide text-white uppercase"
+              className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#ff4500] px-4 py-2 font-mono text-xs font-black tracking-wide text-white uppercase shadow-xs transition-all hover:bg-[#e03d00]"
             >
-              Purchase Plan
+              View LTD Deals
             </Link>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
-        {/* Main Form Area */}
-        <div className="space-y-10 lg:col-span-2">
-          {trialEnded ? (
-            <div className="border border-amber-400/35 bg-amber-500/8 px-5 py-4">
-              <p className="mb-1 font-mono text-[11px] font-black tracking-widest text-amber-300 uppercase">
-                Action Required
-              </p>
-              <p className="text-sm font-semibold text-amber-100">
-                Upgrade to a paid plan to unlock new scans and AI suggestions.
-              </p>
-            </div>
-          ) : null}
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <div className="h-px w-8 bg-[#ff4500]"></div>
-              <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-                New Investigation
-              </p>
-            </div>
-            <h2 className="mb-4 text-3xl leading-none font-black tracking-tight text-white">
-              What are we looking for?
-            </h2>
-            <p className="max-w-xl text-sm font-medium text-zinc-400">
-              Define the niche or problem space you want to explore across
-              Reddit communities. Our AI will extract high-intent pain points.
-            </p>
-          </div>
 
-          <div className="space-y-8">
-            {/* Keyword Input */}
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
-                Keyword or Niche
-                <div className="h-1.5 w-1.5 bg-[#ff4500]"></div>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder="e.g. cold email, property management, SaaS churn"
-                  className="relative z-10 w-full border-2 border-white/15 bg-[#0c0c0c] px-4 py-4 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors placeholder:text-zinc-700 focus:border-[#ff4500]/70 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Subreddits Input */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
-                  Target Subreddits{" "}
-                  <span className="font-mono text-[9px] text-zinc-600">
-                    (Optional)
-                  </span>
-                </label>
-                <button
-                  onClick={handleSuggestSubreddits}
-                  disabled={isSuggesting || !keyword}
-                  className="group/suggest flex items-center gap-1.5 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:text-[#ff8c00] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSuggesting ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-3 w-3 transition-transform group-hover/suggest:scale-125" />
-                  )}
-                  Auto-Suggest (
-                  {Math.max(1, Math.min(defaultSubredditCount, 15))})
-                </button>
-              </div>
-              <div className="group relative">
-                <input
-                  type="text"
-                  value={subreddits}
-                  onChange={(e) => setSubreddits(e.target.value)}
-                  placeholder="r/sales, r/realestate, r/entrepreneur"
-                  className="relative z-10 w-full border-2 border-white/15 bg-[#0c0c0c] px-4 py-4 pl-12 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors placeholder:text-zinc-700 focus:border-[#ff4500]/70 focus:outline-none"
-                />
-                <Target className="pointer-events-none absolute top-1/2 left-4 z-20 h-5 w-5 -translate-y-1/2 text-zinc-600" />
-              </div>
-
-              {suggestedSubreddits.length > 0 && (
-                <div className="animate-in fade-in slide-in-from-top-2 space-y-3 duration-500">
-                  <p className="mb-1 font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
-                    AI & Reddit Discovery Results
-                  </p>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {suggestedSubreddits.map((sub) => (
-                      <button
-                        key={sub.name}
-                        onClick={() => addSubreddit(sub.name)}
-                        className="group/item relative flex flex-col border border-[#ff4500]/30 bg-[#ff4500]/5 p-4 text-left shadow-[2px_2px_0px_0px_rgba(255,69,0,0.1)] transition-all hover:border-[#ff4500]/60 hover:bg-[#ff4500]/10"
-                      >
-                        <div className="mb-2 flex items-center justify-between">
-                          <span className="font-mono text-sm font-black text-white transition-colors group-hover/item:text-[#ff8a57]">
-                            r/{sub.name}
-                          </span>
-                          <span className="font-mono text-[10px] font-bold text-[#ff8a57]">
-                            {Intl.NumberFormat("en-US", {
-                              notation: "compact",
-                              maximumFractionDigits: 1,
-                            }).format(sub.subscribers)}{" "}
-                            subs
-                          </span>
-                        </div>
-                        <p className="line-clamp-2 h-8 text-[11px] leading-relaxed font-medium text-zinc-400">
-                          {sub.description || "No description provided."}
-                        </p>
-                        <div className="mt-2 flex items-center gap-1 font-mono text-[9px] font-black text-[#ff4500] uppercase opacity-0 transition-opacity group-hover/item:opacity-100">
-                          <CheckCircle2 className="h-2.5 w-2.5" />
-                          Add to Scan
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                <p className="mb-1 w-full font-mono text-[9px] font-black tracking-widest text-zinc-600 uppercase">
-                  Common Core Communities ({defaultLocale})
-                </p>
-                {visibleCommunities.map((sub) => {
-                  const subs = subredditMetadata[sub.toLowerCase()];
-                  const formattedSubs = subs
-                    ? Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(subs)
-                    : null;
-                  return (
-                    <button
-                      key={sub}
-                      onClick={() => addSubreddit(sub)}
-                      className="border border-white/15 bg-white/2 px-3 py-1.5 font-mono text-[11px] font-bold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white flex items-center gap-1.5"
-                    >
-                      <span>+ r/{sub}</span>
-                      {formattedSubs && (
-                        <span className="rounded bg-white/10 px-1 py-0.5 text-[9px] text-zinc-500 group-hover:bg-[#ff4500]/20 group-hover:text-[#ff4500]">
-                          {formattedSubs}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
-                Max {MINING_PRESETS[miningDepth].subreddits} subreddits for{" "}
-                {MINING_PRESETS[miningDepth].name}. Separate multiple with
-                commas.
-              </p>
-            </div>
-
-            <div
-              className={`space-y-3 transition-opacity duration-300 ${!hasCustomPatternsEntitlement && "opacity-75"}`}
+      {/* Scan Mode Switcher & Presets Header */}
+      <div className="mb-8 flex flex-col gap-4 border-b border-zinc-200/80 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+            <button
+              type="button"
+              onClick={() => setScanMode("quick")}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
+                scanMode === "quick"
+                  ? "bg-white text-zinc-950 shadow-xs dark:bg-zinc-800 dark:text-white"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              }`}
             >
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
-                  Custom Intelligence Patterns{" "}
-                  <span className="font-mono text-[9px] text-zinc-600">
-                    (Optional)
-                  </span>
-                </label>
-                {!hasCustomPatternsEntitlement && (
-                  <Link
-                    href="/dashboard/billing"
-                    className="flex items-center gap-1.5 font-mono text-[9px] font-black tracking-widest text-amber-500 uppercase transition-colors hover:text-amber-400"
-                  >
-                    <Lock className="h-3 w-3" />
-                    Pro Only
-                  </Link>
-                )}
-              </div>
-              <div className="group relative">
-                <input
-                  type="text"
-                  value={customPatterns}
-                  onChange={(e) => setCustomPatterns(e.target.value)}
-                  disabled={!hasCustomPatternsEntitlement}
-                  placeholder={
-                    hasCustomPatternsEntitlement
-                      ? "e.g. mentions of HubSpot, frustration with pricing, legal compliance"
-                      : "Upgrade to Pro to unlock custom signals"
-                  }
-                  className={`relative z-10 w-full border-2 bg-[#0c0c0c] px-4 py-4 pl-12 text-base font-medium text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,0.6)] transition-colors focus:outline-none ${
-                    hasCustomPatternsEntitlement
-                      ? "border-white/15 placeholder:text-zinc-700 focus:border-amber-400/70"
-                      : "cursor-not-allowed border-amber-500/20 placeholder:text-zinc-800"
-                  }`}
-                />
-                <Sparkles
-                  className={`pointer-events-none absolute top-1/2 left-4 z-20 h-5 w-5 -translate-y-1/2 transition-colors ${
-                    hasCustomPatternsEntitlement
-                      ? "text-amber-500/60"
-                      : "text-zinc-800"
-                  }`}
-                />
+              <Zap className="h-3.5 w-3.5 text-[#ff4500]" />
+              <span>Quick Scan</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setScanMode("wizard")}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-1.5 font-mono text-xs font-bold uppercase transition-all ${
+                scanMode === "wizard"
+                  ? "bg-[#ff4500] text-white shadow-xs"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              }`}
+            >
+              <Compass className="h-3.5 w-3.5" />
+              <span>Guided Wizard</span>
+            </button>
+          </div>
+        </div>
 
-                {!hasCustomPatternsEntitlement && (
-                  <div
-                    className="pointer-events-none absolute inset-x-0 -bottom-2 z-20 flex justify-center"
-                    aria-hidden="true"
+        <span className="font-mono text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
+          {scanMode === "wizard"
+            ? "Step-by-step guided mining setup"
+            : "Direct 1-page search configuration"}
+        </span>
+      </div>
+
+      {scanMode === "wizard" ? (
+        <div className="mx-auto max-w-4xl">
+          <ScanWizard
+            keyword={keyword}
+            setKeyword={setKeyword}
+            subreddits={subreddits}
+            setSubreddits={setSubreddits}
+            selectedSubredditList={selectedSubredditList}
+            onAddSubreddit={addSubreddit}
+            onRemoveSubreddit={removeSubreddit}
+            miningDepth={miningDepth}
+            setMiningDepth={setMiningDepth}
+            timeWindow={timeWindow}
+            setTimeWindow={setTimeWindow}
+            customPatterns={customPatterns}
+            setCustomPatterns={setCustomPatterns}
+            isSearching={isLoading}
+            onStartScan={handleStartMining}
+            allowedDepths={billing?.entitlements.allowedMiningDepths}
+            maxSubredditsLimit={
+              billing?.entitlements.maxSubredditsPerSearch ?? 10
+            }
+            onOpenUpgradeModal={(msg) => {
+              if (msg) setPlanDialogMessage(msg);
+              setPlanDialogOpen(true);
+            }}
+            estimatedCredits={MINING_PRESETS[miningDepth].estimatedCredits}
+            currentPlan={billing?.plan}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-10">
+          {/* Main Form Area */}
+          <div className="space-y-8 lg:col-span-2">
+            {trialEnded ? (
+              <div className="flex items-center justify-between gap-4 rounded-2xl border border-amber-500/25 bg-amber-500/5 px-5 py-4 dark:bg-amber-500/10">
+                <div>
+                  <p className="mb-1 font-mono text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                    Action Required
+                  </p>
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    Unlock unlimited investigations with a Lifetime Deal.
+                  </p>
+                </div>
+                <Link
+                  href="/dashboard/billing"
+                  className="shrink-0 rounded-xl bg-amber-500 px-4 py-2 font-mono text-xs font-black text-black uppercase transition-colors hover:bg-amber-400"
+                >
+                  View LTD
+                </Link>
+              </div>
+            ) : null}
+
+            <div>
+              <div className="mb-2 inline-flex items-center gap-2 font-mono text-[10px] font-bold tracking-widest text-[#ff4500] uppercase">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#ff4500]"></span>
+                Investigation Parameters
+              </div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+                Configure Market Radar
+              </h2>
+              <p className="mt-1 text-[14px] leading-relaxed font-medium text-zinc-500 dark:text-zinc-400">
+                Define the problem space, competitors, or niche to mine across
+                Reddit communities.
+              </p>
+            </div>
+
+            <div className="space-y-7">
+              {/* Keyword Input */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
+                  Target Keyword or Problem Niche
+                  <span className="text-[#ff4500]">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder="e.g. cold email deliverability, property management software, Stripe billing churn..."
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-[15px] font-medium text-zinc-900 shadow-2xs transition-all placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Subreddits Input */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
+                    Target Communities
+                    <span className="font-mono text-[9px] text-zinc-400">
+                      (Optional)
+                    </span>
+                  </label>
+                  <button
+                    onClick={handleSuggestSubreddits}
+                    disabled={isSuggesting || !keyword}
+                    className="group/suggest flex cursor-pointer items-center gap-1.5 font-mono text-[10px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:text-[#e03d00] disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    <div className="border border-amber-500/30 bg-[#111] px-3 py-1 shadow-xl">
-                      <p className="font-mono text-[8px] font-black tracking-tighter text-amber-500/80 uppercase">
-                        Restricted Parameter
-                      </p>
+                    {isSuggesting ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3 w-3 transition-transform group-hover/suggest:scale-125" />
+                    )}
+                    Auto-Discover Subreddits
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={subreddits}
+                    onChange={(e) => setSubreddits(e.target.value)}
+                    placeholder="r/sales, r/entrepreneur, r/SaaS, r/smallbusiness"
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3.5 pl-11 text-[15px] font-medium text-zinc-900 shadow-2xs transition-all placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white"
+                  />
+                  <Target className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                </div>
+
+                {suggestedSubreddits.length > 0 && (
+                  <div className="animate-in fade-in slide-in-from-top-2 space-y-2.5 rounded-xl border border-zinc-200/80 bg-zinc-50/70 p-4 duration-300 dark:border-zinc-800 dark:bg-zinc-900/60">
+                    <p className="font-mono text-[9px] font-black tracking-widest text-zinc-400 uppercase">
+                      AI Discovered Communities
+                    </p>
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                      {suggestedSubreddits.map((sub) => (
+                        <button
+                          key={sub.name}
+                          type="button"
+                          onClick={() => addSubreddit(sub.name)}
+                          className="group/item flex cursor-pointer flex-col rounded-lg border border-zinc-200/80 bg-white p-3 text-left shadow-2xs transition-all hover:border-[#ff4500]/40 hover:bg-[#ff4500]/5 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-[#ff4500]/40"
+                        >
+                          <div className="mb-1 flex items-center justify-between">
+                            <span className="font-mono text-xs font-black text-zinc-900 transition-colors group-hover/item:text-[#ff4500] dark:text-zinc-100">
+                              r/{sub.name}
+                            </span>
+                            <span className="font-mono text-[9px] font-bold text-[#ff4500]">
+                              {Intl.NumberFormat("en-US", {
+                                notation: "compact",
+                                maximumFractionDigits: 1,
+                              }).format(sub.subscribers)}{" "}
+                              subs
+                            </span>
+                          </div>
+                          <p className="line-clamp-2 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                            {sub.description || "No description provided."}
+                          </p>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
-              </div>
-              <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
-                {hasCustomPatternsEntitlement
-                  ? "Comma-separated signals you want the AI to specifically hunt for."
-                  : "Precision targeting for niche problems is a Pro-tier exclusive."}
-              </p>
-            </div>
 
-            <div className="space-y-4">
-              <label className="block font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
-                Expert Discovery Presets
-              </label>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                {(["basic", "deep", "advanced"] as const).map((depth) => {
-                  const preset = MINING_PRESETS[depth];
-                  const isAllowed = billing
-                    ? billing.entitlements.allowedMiningDepths.includes(depth)
-                    : true;
-                  const isActive = miningDepth === depth;
-
-                  return (
-                    <button
-                      key={depth}
-                      onClick={() => setMiningDepth(depth)}
-                      disabled={!isAllowed}
-                      className={`group relative flex flex-col gap-4 overflow-hidden border-2 p-6 text-left transition-all disabled:cursor-not-allowed disabled:opacity-45 ${
-                        isActive
-                          ? "border-[#ff4500]/70 bg-[#ff4500]/10 shadow-[4px_4px_0px_0px_rgba(255,69,0,0.3)]"
-                          : "border-white/15 bg-[#0c0c0c] hover:border-white/35"
-                      }`}
-                    >
-                      <div className="flex w-full items-center justify-between">
-                        <div
-                          className={`border p-3 ${
-                            isActive
-                              ? "border-[#ff8a57] bg-[#ff4500] text-white"
-                              : "border-white/15 bg-white/5 text-zinc-500"
-                          }`}
-                        >
-                          {depth === "basic" ? (
-                            <Zap className="h-5 w-5" />
-                          ) : (
-                            <Sparkles className="h-5 w-5" />
-                          )}
-                        </div>
-                        <div
-                          className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                            isActive ? "border-[#ff4500]" : "border-zinc-800"
-                          }`}
-                        >
-                          {isActive && (
-                            <div className="h-2.5 w-2.5 rounded-full bg-[#ff4500]"></div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="mb-1 flex items-center gap-2">
-                          <p
-                            className={`font-mono text-[12px] font-black tracking-widest uppercase ${
-                              isActive ? "text-white" : "text-zinc-400"
-                            }`}
-                          >
-                            {preset.name}
-                          </p>
-                          <span className="border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[9px] font-black text-zinc-500">
-                            {preset.estimatedCredits} CR
+                {/* Common Core Subreddits */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="mr-1 font-mono text-[10px] font-semibold text-zinc-400 uppercase">
+                    Popular:
+                  </span>
+                  {visibleCommunities.map((sub) => {
+                    const subs = subredditMetadata[sub.toLowerCase()];
+                    const formattedSubs = subs
+                      ? Intl.NumberFormat("en-US", {
+                          notation: "compact",
+                          maximumFractionDigits: 1,
+                        }).format(subs)
+                      : null;
+                    return (
+                      <button
+                        key={sub}
+                        type="button"
+                        onClick={() => addSubreddit(sub)}
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-[10px] font-semibold text-zinc-600 transition-all hover:border-[#ff4500]/40 hover:text-[#ff4500] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:border-[#ff4500]/40 dark:hover:text-[#ff4500]"
+                      >
+                        <span>+ r/{sub}</span>
+                        {formattedSubs && (
+                          <span className="text-[9px] text-zinc-400">
+                            ({formattedSubs})
                           </span>
-                        </div>
-                        <p className="text-[11px] leading-relaxed font-bold text-zinc-500">
-                          {preset.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-auto grid grid-cols-2 gap-2 border-t border-white/5 pt-4">
-                        <div className="space-y-1">
-                          <p className="font-mono text-[8px] font-black text-zinc-600 uppercase">
-                            Subreddits
-                          </p>
-                          <p className="text-[10px] font-bold text-zinc-400">
-                            {preset.subreddits} communities
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="font-mono text-[8px] font-black text-zinc-600 uppercase">
-                            Analysis
-                          </p>
-                          <p className="text-[10px] font-bold text-zinc-400">
-                            {preset.sortModes} mode
-                            {preset.sortModes > 1 ? "s" : ""}
-                          </p>
-                        </div>
-                      </div>
-
-                      {!isAllowed && (
-                        <div className="absolute top-0 right-0 p-2">
-                          <span className="inline-flex items-center gap-1 border border-amber-400/35 bg-amber-500/10 px-2 py-0.5 font-mono text-[8px] font-black tracking-widest text-amber-400 uppercase">
-                            <Lock className="h-2.5 w-2.5" />
-                            Upgrade
-                          </span>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              {billing ? (
-                <div className="flex flex-col justify-between gap-4 pt-2 sm:flex-row sm:items-center">
-                  <p className="font-mono text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
-                    Plan: {billing.plan.toUpperCase()} | Monthly Credit Pool:{" "}
-                    {billing.usage.monthlyScansUsed.toFixed(1)}
-                    {billing.usage.monthlyScansLimit === null
-                      ? "/Unlimited"
-                      : `/${billing.usage.monthlyScansLimit.toFixed(1)}`}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPlanDialogMessage(
-                        "Credits (CR) represent the resource intensity of a scan. Basic = 0.5 CR, Deep = 2 CR, Advanced = 5 CR. Your monthly plan gives you a fixed pool of credits that reset every 30 days. No hidden fees, just value-based mining.",
-                      );
-                      setPlanDialogOpen(true);
-                    }}
-                    className="flex items-center gap-1.5 font-mono text-[9px] font-black tracking-widest text-[#ff4500] uppercase transition-colors hover:text-[#ff8a57]"
-                  >
-                    <HelpCircle className="h-3 w-3" />
-                    How do credits work?
-                  </button>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="space-y-4">
-              <label className="block font-mono text-[11px] font-black tracking-widest text-zinc-400 uppercase">
-                Time Window
-              </label>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                {(["24h", "7d", "30d", "90d"] as const).map((window) => (
-                  <button
-                    key={window}
-                    type="button"
-                    onClick={() => setTimeWindow(window)}
-                    className={`border-2 px-4 py-4 text-left transition-colors ${
-                      timeWindow === window
-                        ? "border-amber-400/60 bg-amber-500/10 shadow-[3px_3px_0px_0px_rgba(245,158,11,0.18)]"
-                        : "border-white/15 bg-[#0c0c0c] hover:border-white/35"
-                    }`}
-                  >
-                    <p
-                      className={`font-mono text-[11px] font-black tracking-widest uppercase ${
-                        timeWindow === window
-                          ? "text-amber-300"
-                          : "text-zinc-400"
-                      }`}
-                    >
-                      {getTimeWindowLabel(window)}
-                    </p>
-                    <p className="mt-1 text-[11px] font-bold text-zinc-500">
-                      Restrict discovery to this recency window.
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-6 sm:flex-row">
-              <div className="flex flex-col items-center gap-6 sm:flex-row">
-                <div className="flex items-center gap-3 font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
-                  <Clock className="h-4 w-4" />
-                  Est. time: {MINING_PRESETS[miningDepth].timeEstimate}
-                </div>
-                <div className="flex items-center gap-3 font-mono text-[11px] font-bold tracking-widest text-[#ff4500] uppercase">
-                  <Database className="h-4 w-4" />
-                  Est. cost: {MINING_PRESETS[miningDepth].estimatedCredits} CR
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="font-mono text-[11px] font-bold tracking-widest text-zinc-500 uppercase">
-                Min score default: {minimumOpportunityScore}+
-              </div>
-              <div className="flex w-full items-center gap-4 sm:w-auto">
-                <button
-                  onClick={handleSaveDraft}
-                  disabled={isLoading}
-                  className="flex-1 font-mono text-[12px] font-black tracking-widest text-zinc-400 uppercase transition-colors hover:text-white disabled:opacity-50 sm:flex-none"
-                  type="button"
-                >
-                  {draftSavedAt ? "Update Draft" : "Save Draft"}
-                </button>
-                {isAtScanLimit || trialEnded ? (
-                  <div className="flex flex-col items-center gap-2 sm:items-end">
-                    <p className="font-serif text-[13px] text-amber-300 italic">
-                      {trialEnded
-                        ? "Upgrade your plan to unlock new investigations."
-                        : "Scan limit reached — upgrade to Growth or Pro to continue."}
-                    </p>
+
+              {/* Custom Intelligence Patterns */}
+              <div
+                className={`space-y-2 transition-opacity duration-300 ${!hasCustomPatternsEntitlement && "opacity-80"}`}
+              >
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 font-mono text-[11px] font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
+                    Custom Intelligence Patterns
+                    <span className="font-mono text-[9px] text-zinc-400">
+                      (Optional)
+                    </span>
+                  </label>
+                  {!hasCustomPatternsEntitlement && (
                     <Link
                       href="/dashboard/billing"
-                      className="group flex flex-1 items-center justify-center gap-3 border border-[#ff8a57] bg-[#ff4500] px-8 py-3.5 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-95 sm:flex-none"
+                      className="inline-flex items-center gap-1 font-mono text-[9px] font-black tracking-widest text-amber-600 uppercase transition-colors hover:text-amber-500"
                     >
-                      {trialEnded ? "Unlock New Scans" : "Upgrade to Continue"}
-                      <Sparkles className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <Lock className="h-3 w-3" />
+                      Studio LTD Feature
                     </Link>
-                  </div>
-                ) : (
+                  )}
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={customPatterns}
+                    onChange={(e) => setCustomPatterns(e.target.value)}
+                    disabled={!hasCustomPatternsEntitlement}
+                    placeholder={
+                      hasCustomPatternsEntitlement
+                        ? "e.g. mentions of HubSpot, pricing complaints, manual CSV exports, API rate limits..."
+                        : "Unlock custom search patterns with Studio LTD Pass"
+                    }
+                    className={`w-full rounded-xl border bg-white px-4 py-3.5 pl-11 text-[15px] font-medium text-zinc-900 shadow-2xs transition-all focus:outline-none dark:bg-zinc-950 dark:text-white ${
+                      hasCustomPatternsEntitlement
+                        ? "border-zinc-200 placeholder:text-zinc-400 focus:border-[#ff4500] focus:ring-4 focus:ring-[#ff4500]/10 dark:border-zinc-800"
+                        : "cursor-not-allowed border-amber-300/60 placeholder:text-zinc-400 dark:border-amber-500/30"
+                    }`}
+                  />
+                  <Sparkles
+                    className={`pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 ${
+                      hasCustomPatternsEntitlement
+                        ? "text-[#ff4500]"
+                        : "text-amber-500"
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Discovery Presets */}
+              <div className="space-y-3">
+                <label className="block font-mono text-[11px] font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
+                  Mining Depth & Resolution
+                </label>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  {(["basic", "deep", "advanced", "ultra"] as const).map(
+                    (depth) => {
+                      const preset = MINING_PRESETS[depth];
+                      const isAllowed = billing
+                        ? billing.entitlements.allowedMiningDepths.includes(
+                            depth,
+                          )
+                        : true;
+                      const isActive = miningDepth === depth;
+
+                      return (
+                        <button
+                          key={depth}
+                          type="button"
+                          onClick={() => setMiningDepth(depth)}
+                          disabled={!isAllowed}
+                          className={`group relative flex cursor-pointer flex-col justify-between rounded-xl border p-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+                            isActive
+                              ? "border-[#ff4500] bg-[#ff4500]/5 shadow-xs dark:bg-[#ff4500]/10"
+                              : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                          }`}
+                        >
+                          <div>
+                            <div className="mb-3 flex items-center justify-between">
+                              <div
+                                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                                  isActive
+                                    ? "bg-[#ff4500] text-white"
+                                    : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+                                }`}
+                              >
+                                {depth === "basic" ? (
+                                  <Zap className="h-4 w-4" />
+                                ) : depth === "ultra" ? (
+                                  <Flame className="h-4 w-4" />
+                                ) : (
+                                  <Sparkles className="h-4 w-4" />
+                                )}
+                              </div>
+                              <span className="font-mono text-[10px] font-black text-[#ff4500]">
+                                {preset.estimatedCredits} CR
+                              </span>
+                            </div>
+
+                            <p
+                              className={`font-mono text-xs font-black uppercase ${
+                                isActive
+                                  ? "text-zinc-950 dark:text-white"
+                                  : "text-zinc-800 dark:text-zinc-200"
+                              }`}
+                            >
+                              {preset.name}
+                            </p>
+                            <p className="mt-1 text-[11px] leading-relaxed font-medium text-zinc-500 dark:text-zinc-400">
+                              {preset.description}
+                            </p>
+                          </div>
+
+                          <div className="dark:border-zinc-850 mt-4 flex items-center justify-between border-t border-zinc-100 pt-2.5 font-mono text-[9px] text-zinc-400 dark:text-zinc-500">
+                            <span>{preset.subreddits} Subreddits</span>
+                            <span>{preset.timeEstimate}</span>
+                          </div>
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
+
+              {/* Time Window */}
+              <div className="space-y-3">
+                <label className="block font-mono text-[11px] font-bold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
+                  Recency Window
+                </label>
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                  {(["24h", "7d", "30d", "90d"] as const).map((window) => (
+                    <button
+                      key={window}
+                      type="button"
+                      onClick={() => setTimeWindow(window)}
+                      className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
+                        timeWindow === window
+                          ? "border-[#ff4500] bg-[#ff4500]/5 text-zinc-950 dark:bg-[#ff4500]/10 dark:text-white"
+                          : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                      }`}
+                    >
+                      <p
+                        className={`font-mono text-[11px] font-black uppercase ${
+                          timeWindow === window
+                            ? "text-[#ff4500]"
+                            : "text-zinc-700 dark:text-zinc-300"
+                        }`}
+                      >
+                        {getTimeWindowLabel(window)}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-zinc-400 dark:text-zinc-500">
+                        Scan depth filter
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Footer Action Bar */}
+              <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-200/80 pt-6 sm:flex-row dark:border-zinc-800">
+                <div className="flex items-center gap-4 font-mono text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-zinc-400" />
+                    Est: {MINING_PRESETS[miningDepth].timeEstimate}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-[#ff4500]">
+                    <Database className="h-3.5 w-3.5" />
+                    Cost: {MINING_PRESETS[miningDepth].estimatedCredits} CR
+                  </span>
+                </div>
+
+                <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
+                  <button
+                    onClick={handleSaveDraft}
+                    disabled={isLoading}
+                    className="cursor-pointer font-mono text-[11px] font-bold text-zinc-400 uppercase transition-colors hover:text-zinc-800 disabled:opacity-50 dark:hover:text-zinc-200"
+                    type="button"
+                  >
+                    {draftSavedAt ? "Update Draft" : "Save Draft"}
+                  </button>
+
                   <button
                     onClick={handleStartMining}
                     disabled={isLoading}
-                    className="group flex flex-1 items-center justify-center gap-3 border border-[#ff8a57] bg-[#ff4500] px-8 py-3.5 font-mono text-[12px] font-black tracking-wider text-white uppercase transition-colors hover:bg-[#ff571a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-75 sm:flex-none"
+                    className="group flex flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#ff4500] px-7 py-3 font-mono text-xs font-black tracking-wider text-white uppercase shadow-xs transition-all hover:bg-[#e03d00] hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
                   >
                     {isLoading ? (
                       <>
-                        Processing <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Analyzing Stream...</span>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       </>
                     ) : (
                       <>
-                        Start Mining
-                        <Rocket className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <span>Start Mining</span>
+                        <Rocket className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                       </>
                     )}
                   </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Info Sidebar */}
-        <div className="space-y-8">
-          <div className="relative overflow-hidden border-2 border-white/15 bg-[#0c0c0c] p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.65)]">
-            <h4 className="mb-8 flex items-center gap-3 text-lg font-black tracking-tight text-white">
-              <Zap className="h-6 w-6 text-[#ff4500]" />
-              Expert Tips
-            </h4>
-
-            <div className="space-y-8">
-              <div className="flex gap-4">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
-                </div>
-                <div>
-                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
-                    Be Specific
-                  </p>
-                  <p className="text-[12px] leading-relaxed text-zinc-500">
-                    Instead of &quot;marketing&quot;, use &quot;B2B marketing
-                    for AI startups&quot;.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
-                </div>
-                <div>
-                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
-                    Focus on Frustration
-                  </p>
-                  <p className="text-[12px] leading-relaxed text-zinc-500">
-                    Our AI looks for patterns like &quot;I hate when...&quot; or
-                    &quot;Why is it so hard to...&quot;.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ff4500]/35 bg-[#ff4500]/10">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-[#ff4500]" />
-                </div>
-                <div>
-                  <p className="mb-1 text-[13px] font-black tracking-tight text-white uppercase">
-                    Subreddit Context
-                  </p>
-                  <p className="text-[12px] leading-relaxed text-zinc-500">
-                    Narrowing down to specific niche subreddits gives higher
-                    quality pain points.
-                  </p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Info Sidebar */}
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900/70">
+              <h4 className="mb-6 flex items-center gap-2 text-sm font-extrabold tracking-tight text-zinc-950 uppercase dark:text-white">
+                <Zap className="h-4 w-4 text-[#ff4500]" />
+                Mining Guidelines
+              </h4>
+
+              <div className="space-y-5">
+                <div className="flex gap-3.5">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#ff4500]/10 text-[#ff4500]">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      Use High-Intent Queries
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                      Instead of broad keywords like &quot;CRM&quot;, query
+                      &quot;HubSpot migration friction&quot; or &quot;Pipedrive
+                      billing limits&quot;.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3.5">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#ff4500]/10 text-[#ff4500]">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      Target Real Buyer Frustration
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                      Our semantic parser searches for &quot;I switched
+                      from...&quot;, &quot;anyone else tired of...&quot;, and
+                      explicit budget mentions.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3.5">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#ff4500]/10 text-[#ff4500]">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      Narrow by Vertical
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+                      Subreddits like{" "}
+                      <code className="font-mono text-[10px] text-[#ff4500]">
+                        r/sales
+                      </code>{" "}
+                      or{" "}
+                      <code className="font-mono text-[10px] text-[#ff4500]">
+                        r/sysadmin
+                      </code>{" "}
+                      yield 3x higher willingness-to-pay signals.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

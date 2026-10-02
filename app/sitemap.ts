@@ -1,5 +1,14 @@
 import { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/seo";
+import { getAllPreminedNiches } from "@/lib/premined-niches";
+
+const featureSlugs = [
+  "pain-point-mining",
+  "idea-validation",
+  "market-discovery",
+  "keyword-monitoring",
+  "sentiment-analysis",
+];
 
 const freeTools = [
   "pain-point-miner",
@@ -18,6 +27,30 @@ const resources = [
   "reddit-tools",
 ];
 
+const blogPosts = [
+  "solving-customer-pain-points-saas-blueprint",
+  "reddit-vs-interviews-vs-surveys",
+  "id-pay-for-this-test",
+  "why-validated-ideas-still-fail",
+  "how-to-validate-saas-idea-reddit",
+  "analyzed-10000-reddit-complaints",
+  "most-repeated-saas-complaint-this-month",
+  "phrases-before-id-pay-for-this",
+  "churn-patterns-in-developer-tools",
+  "ai-wrapper-fatigue-reddit-sentiment",
+  "finding-high-intent-b2b-micro-saas-niches",
+  "automating-user-research-with-ai-scrapers",
+  "why-saas-founders-cant-stop-bleeding-users",
+  "slack-alerts-hot-pain-points",
+  "desperation-score-explained",
+  "track-competitor-complaints-reddit",
+  "reddit-to-notion-10-minutes",
+  "best-subreddits-b2b-saas-ideas-2026",
+  "where-marketers-complain-online",
+  "best-subreddits-fintech-billing-tool",
+  "where-freelancers-agencies-vent-tools",
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const toolsEntries = freeTools.map((slug) => ({
     url: `${siteUrl}/free-tools/${slug}`,
@@ -33,25 +66,86 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  const blogEntries = blogPosts.map((slug) => ({
+    url: `${siteUrl}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
+  const featureEntries = featureSlugs.map((slug) => ({
+    url: `${siteUrl}/features/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }));
+
+  const niches = getAllPreminedNiches();
+  const nicheEntries = niches.map((n) => ({
+    url: `${siteUrl}/niches/${n.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
   return [
     {
       url: siteUrl,
       lastModified: new Date(),
       changeFrequency: "daily",
-      priority: 1,
+      priority: 1.0,
+    },
+    {
+      url: `${siteUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/docs`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/case-studies`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/niches`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/free-tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${siteUrl}/resources`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${siteUrl}/privacy`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${siteUrl}/terms`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "yearly",
       priority: 0.3,
     },
+    ...featureEntries,
+    ...blogEntries,
+    ...nicheEntries,
     ...toolsEntries,
     ...resourcesEntries,
   ];
