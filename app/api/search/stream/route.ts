@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { scraper, scraperRun, painPoint } from "@/lib/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { normalizeRunStatus, type RunStatus } from "@/lib/run-status";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
@@ -12,7 +12,8 @@ const querySchema = z.object({
 });
 
 const POLL_INTERVAL_MS = 2_000;
-const MAX_DURATION_MS = 5 * 60 * 1_000; // 5 minutes max
+const MAX_DURATION_MS = 5 * 60 * 1_000; // 5 minutes max SSE connection
+const STALE_RUN_THRESHOLD_MS = 30 * 60 * 1_000; // 30 min → treat as failed
 
 type StreamEvent = {
   phase: RunStatus;
@@ -81,7 +82,7 @@ function phaseToMessage(
 }
 
 export async function GET(req: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getServerSession(await headers());
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -109,12 +110,17 @@ export async function GET(req: Request) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (event: StreamEvent) => {
-        const data = `data: ${JSON.stringify(event)}\n\n`;
-        controller.enqueue(encoder.encode(data));
-      };
-
       let isTerminal = false;
+
+      const send = (event: StreamEvent) => {
+        if (isTerminal) return;
+        try {
+          const data = `data: ${JSON.stringify(event)}\n\n`;
+          controller.enqueue(encoder.encode(data));
+        } catch {
+          isTerminal = true;
+        }
+      };
 
       const poll = async () => {
         try {
@@ -131,7 +137,18 @@ export async function GET(req: Request) {
             columns: { id: true },
           });
 
-          const phase = normalizeRunStatus(latestRun?.status);
+          let phase = normalizeRunStatus(latestRun?.status);
+
+          // Detect stale runs: non-terminal for > 30 minutes → treat as failed
+          const isNonTerminal =
+            phase !== "completed" && phase !== "failed" && phase !== "canceled";
+          const runAgeMs = latestRun?.startedAt
+            ? Date.now() - latestRun.startedAt.getTime()
+            : 0;
+          if (isNonTerminal && runAgeMs > STALE_RUN_THRESHOLD_MS) {
+            phase = "failed";
+          }
+
           const painPointCount = results.length;
           const subreddits = scraperRecord.subreddits ?? [];
           const timeWindow = getTimeWindowLabel(
@@ -167,27 +184,41 @@ export async function GET(req: Request) {
             phase === "canceled"
           ) {
             isTerminal = true;
+            if (interval) clearInterval(interval);
+            try {
+              controller.close();
+            } catch {
+              // already closed
+            }
           }
         } catch (err) {
           console.error("SSE poll error:", err);
         }
       };
 
+      let interval: ReturnType<typeof setInterval> | null = null;
+
       // Initial send
       await poll();
 
-      const interval = setInterval(async () => {
-        if (isTerminal || Date.now() - startedAt > MAX_DURATION_MS) {
-          clearInterval(interval);
-          controller.close();
-          return;
-        }
-        await poll();
-      }, POLL_INTERVAL_MS);
+      if (!isTerminal) {
+        interval = setInterval(async () => {
+          if (isTerminal || Date.now() - startedAt > MAX_DURATION_MS) {
+            if (interval) clearInterval(interval);
+            try {
+              controller.close();
+            } catch {
+              // already closed
+            }
+            return;
+          }
+          await poll();
+        }, POLL_INTERVAL_MS);
+      }
 
       // Cleanup if client disconnects
       req.signal.addEventListener("abort", () => {
-        clearInterval(interval);
+        if (interval) clearInterval(interval);
         try {
           controller.close();
         } catch {
