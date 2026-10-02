@@ -1,113 +1,100 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { apiJson, apiError, getCorrelationId } from "@/lib/api-error";
+import { describe, it, expect } from "vitest";
+import { getCorrelationId, apiJson, apiError } from "@/lib/api-error";
 
 describe("api-error", () => {
-  const MOCK_UUID = "mock-uuid-1234-5678";
+  describe("getCorrelationId", () => {
+    it("extracts correlationId from x-correlation-id header", () => {
+      const req = new Request("http://localhost", {
+        headers: { "x-correlation-id": "test-id-123" }
+      });
+      const id = getCorrelationId(req);
+      expect(id).toBe("test-id-123");
+    });
 
-  beforeEach(() => {
-    // Mock crypto.randomUUID without stubGlobal
-    vi.spyOn(crypto, 'randomUUID').mockReturnValue(MOCK_UUID);
-  });
+    it("trims whitespace from correlationId", () => {
+      const req = new Request("http://localhost", {
+        headers: { "x-correlation-id": "  test-id-123  " }
+      });
+      const id = getCorrelationId(req);
+      expect(id).toBe("test-id-123");
+    });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+    it("generates random UUID when header is missing", () => {
+      const req = new Request("http://localhost");
+      const id = getCorrelationId(req);
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
+    it("generates random UUID when header is empty string", () => {
+      const req = new Request("http://localhost", {
+        headers: { "x-correlation-id": "" }
+      });
+      const id = getCorrelationId(req);
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
+    it("generates random UUID when header is only whitespace", () => {
+      const req = new Request("http://localhost", {
+        headers: { "x-correlation-id": "   " }
+      });
+      const id = getCorrelationId(req);
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
   });
 
   describe("apiJson", () => {
-    it("returns a generic json response with 200 status and generated correlation id", async () => {
-      const response = apiJson({ test: "data" });
-
-      expect(response.status).toBe(200);
-      expect(response.headers.get("x-correlation-id")).toBe(MOCK_UUID);
-
-      const body = await response.json();
-      expect(body).toEqual({ test: "data" });
+    it("returns NextResponse with body and status", async () => {
+      const res = apiJson({ foo: "bar" }, 201, "my-id") as any;
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body).toEqual({ foo: "bar" });
+      expect(res.headers.get("x-correlation-id")).toBe("my-id");
     });
 
-    it("uses provided status, correlationId, and extraHeaders", async () => {
-      const response = apiJson(
-        { msg: "custom" },
-        201,
-        "custom-corr-id",
-        { "x-custom-header": "value" }
-      );
-
-      expect(response.status).toBe(201);
-      expect(response.headers.get("x-correlation-id")).toBe("custom-corr-id");
-      expect(response.headers.get("x-custom-header")).toBe("value");
-
-      const body = await response.json();
-      expect(body).toEqual({ msg: "custom" });
+    it("generates correlationId if not provided", async () => {
+      const res = apiJson({ foo: "bar" }) as any;
+      expect(res.status).toBe(200); // default status
+      const id = res.headers.get("x-correlation-id");
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     });
 
-    it("trims whitespace from provided correlation id or generates a new one if empty", () => {
-      const respWithWhitespace = apiJson({}, 200, "  padded-id  ");
-      expect(respWithWhitespace.headers.get("x-correlation-id")).toBe("padded-id");
-
-      const respEmpty = apiJson({}, 200, "   ");
-      expect(respEmpty.headers.get("x-correlation-id")).toBe(MOCK_UUID);
-    });
-  });
-
-  describe("getCorrelationId", () => {
-    it("returns existing correlation id from headers", () => {
-      const req = new Request("https://example.com", {
-        headers: {
-          "x-correlation-id": "existing-id",
-        },
-      });
-      expect(getCorrelationId(req)).toBe("existing-id");
-    });
-
-    it("generates a new correlation id if header is missing", () => {
-      const req = new Request("https://example.com");
-      expect(getCorrelationId(req)).toBe(MOCK_UUID);
-    });
-
-    it("generates a new correlation id if header is empty whitespace", () => {
-      const req = new Request("https://example.com", {
-        headers: {
-          "x-correlation-id": "   ",
-        },
-      });
-      expect(getCorrelationId(req)).toBe(MOCK_UUID);
+    it("includes extraHeaders", async () => {
+      const res = apiJson({ foo: "bar" }, 200, "my-id", { "x-custom": "value" }) as any;
+      expect(res.headers.get("x-custom")).toBe("value");
     });
   });
 
   describe("apiError", () => {
-    it("returns correctly formatted error response without details", async () => {
-      const response = apiError(404, "NOT_FOUND", "Resource not found");
-
-      expect(response.status).toBe(404);
-      expect(response.headers.get("x-correlation-id")).toBe(MOCK_UUID);
-
-      const body = await response.json();
+    it("returns correct error body and status", async () => {
+      const res = apiError(400, "VALIDATION_ERROR", "Invalid input", undefined, "error-id") as any;
+      expect(res.status).toBe(400);
+      const body = await res.json();
       expect(body).toEqual({
-        code: "NOT_FOUND",
-        message: "Resource not found",
+        code: "VALIDATION_ERROR",
+        message: "Invalid input"
       });
+      expect(res.headers.get("x-correlation-id")).toBe("error-id");
     });
 
-    it("returns correctly formatted error response with details and custom headers", async () => {
-      const response = apiError(
-        400,
-        "VALIDATION_ERROR",
-        "Invalid input",
-        { field: "email", error: "Required" },
-        "error-corr-id",
-        { "x-retry": "false" }
-      );
-
-      expect(response.status).toBe(400);
-      expect(response.headers.get("x-correlation-id")).toBe("error-corr-id");
-      expect(response.headers.get("x-retry")).toBe("false");
-
-      const body = await response.json();
+    it("includes details if provided", async () => {
+      const res = apiError(422, "VALIDATION_ERROR", "Invalid input", { field: "email" }, "error-id") as any;
+      const body = await res.json();
       expect(body).toEqual({
         code: "VALIDATION_ERROR",
         message: "Invalid input",
-        details: { field: "email", error: "Required" },
+        details: { field: "email" }
       });
+    });
+
+    it("generates correlationId if not provided", async () => {
+      const res = apiError(500, "INTERNAL_SERVER_ERROR", "Server error") as any;
+      const id = res.headers.get("x-correlation-id");
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
+    it("includes extraHeaders", async () => {
+      const res = apiError(403, "FORBIDDEN", "No access", undefined, "my-id", { "x-custom-err": "err-value" }) as any;
+      expect(res.headers.get("x-custom-err")).toBe("err-value");
     });
   });
 });

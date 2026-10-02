@@ -1,237 +1,302 @@
 # RPP — Reddit Pain-Point Miner
 
-[![codecov](https://codecov.io/gh/alexgutscher26/Pain-Point-Miner/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/alexgutscher26/Pain-Point-Miner)
+<div align="center">
 
-An AI-powered market research engine that mines Reddit conversations to uncover validated SaaS opportunities. It finds posts discussing real problems, extracts semantic pain points with AI, clusters them into market opportunities, and scores them by monetization potential.
+![RPP Banner](https://raw.githubusercontent.com/alexgutscher26/Pain-Point-Miner/master/public/rpp.png)
 
-## What It Does
+**An AI-powered market intelligence engine that mines Reddit conversations to uncover validated, high-conviction SaaS opportunities.**
 
-1. **Search** — Enter a keyword or niche (e.g. "cold email", "property management") and target subreddits.
-2. **Mine** — The engine fetches posts and comments in parallel, filtering for problem-signal patterns.
-3. **Extract** — AI (via OpenRouter) analyzes each post to extract pain intensity, urgency, monetization score, market maturity, sentiment, budget signals, and tried solutions.
-4. **Embed & Cluster** — Every pain point gets a vector embedding (1536-dim). Similar pain points are automatically grouped into clusters using PGVector cosine similarity.
-5. **Score & Report** — Opportunities are scored with a weighted formula and surfaced on a real-time dashboard with trend detection.
+[![CI Status](https://github.com/alexgutscher26/Pain-Point-Miner/actions/workflows/ci.yml/badge.svg)](https://github.com/alexgutscher26/Pain-Point-Miner/actions)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle-ORM-C5F74F?logo=drizzle)](https://orm.drizzle.team/)
+[![PGVector](https://img.shields.io/badge/PGVector-1536_Dimensions-336791?logo=postgresql)](https://github.com/pgvector/pgvector)
+[![Tested with Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?logo=vitest)](https://vitest.dev/)
+[![Runtime: Bun](https://img.shields.io/badge/Runtime-Bun-f472b6?logo=bun)](https://bun.sh/)
 
-## Tech Stack
+[Features](#-key-features) • [Architecture](#-architecture) • [Quickstart](#-getting-started) • [Environment Setup](#-environment-variables) • [Database Setup](#-database--migrations) • [Scripts](#-scripts-reference) • [Security](#-security--compliance)
 
-- **Framework**: Next.js 16 (App Router), React 19, TypeScript 5
-- **Styling**: Tailwind CSS 4, Shadcn UI, Radix primitives
-- **Database**: PostgreSQL (Neon) + Drizzle ORM + PGVector
-- **AI**: OpenRouter (Gemini 2.0 Flash, GPT-4o) for extraction; `text-embedding-3-small` for embeddings
-- **Auth**: Better Auth (email/password, OAuth)
-- **Payments**: Stripe (subscription billing, usage-based credits)
-- **Charts**: Recharts
-- **Testing**: Vitest
-- **Linting**: ESLint 9, Prettier
+</div>
 
-## Project Structure
+---
+
+## 💡 Overview
+
+Building software without validated demand is risky. **RPP (Reddit Pain-Point Miner)** eliminates the guesswork by actively monitoring target niche subreddits, analyzing authentic discussions, and extracting structured problem signals using state-of-the-art LLMs.
+
+Every extracted pain point is embedded into a high-dimensional vector space, clustered by semantic similarity, scored across monetization and urgency metrics, and surfaced through a real-time analytics dashboard.
+
+---
+
+## 🚀 Key Features
+
+- 🔍 **Deep Multi-Subreddit Mining**: Target multiple communities simultaneously with automated post and comment hierarchy extraction.
+- 🧠 **AI-Powered Semantic Extraction**: Leverages OpenRouter (Gemini 2.0 Flash / GPT-4o) to extract pain intensity, urgency, monetization potential, market maturity, and existing alternative solutions.
+- 📐 **Vector Embeddings & Semantic Clustering**: Generates 1536-dimensional embeddings (`text-embedding-3-small`) with PGVector cosine distance indexing to automatically cluster recurring market complaints.
+- ⚡ **Real-Time Live SSE Streaming**: Live progress updates via Server-Sent Events (`/api/search/stream`) with automatic polling fallback.
+- 📊 **Opportunity Scoring Algorithm**: Multi-factor weighted formula factoring pain severity, urgency, monetization willingness, market saturation, and community engagement.
+- 📈 **Trend Detection & Momentum**: Tracks historical keyword frequency and identifies rising vs. fading opportunities over time.
+- ⏱️ **Automated Scheduled Scans**: Built-in cron / Inngest integration for automated background monitoring with quota enforcement.
+- 💳 **Stripe Subscription & Credit Gating**: Tiered billing plans (Starter, Growth, Pro) with usage-based quota tracking and webhook synchronization.
+- 📬 **Email Digests & Notifications**: Automated weekly digest reports and transaction emails powered by Loops and React Email.
+- 🛡️ **Enterprise-Grade Security**: Better Auth session management, strict Zod schema validation, Drizzle parameterized queries, and 24-hour AI deduplication caching.
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer"]
+        UI["Next.js 16 Web Application"]
+        SSE["SSE Stream Hook (useMiningStream)"]
+        Dash["Interactive Analytics Dashboard (Recharts)"]
+    end
+
+    subgraph API ["Next.js App Router API"]
+        SearchAPI["POST /api/search"]
+        StreamAPI["GET /api/search/stream"]
+        CronAPI["POST /api/search/scheduled"]
+        AuthAPI["Better Auth Handler (/api/auth)"]
+    end
+
+    subgraph Pipeline ["Mining & Intelligence Pipeline"]
+        Scraper["Reddit Scraper (OAuth + PullPush Fallback)"]
+        Dedup["24h Idempotency Cache Guard"]
+        AI["LLM Extraction Engine (OpenRouter)"]
+        Embedder["Vector Embeddings (1536-dim)"]
+        Cluster["Semantic Clustering Engine (Cosine Similarity)"]
+    end
+
+    subgraph Storage ["Data & External Services"]
+        DB[("Neon PostgreSQL + PGVector")]
+        OpenRouter["OpenRouter API"]
+        Reddit["Reddit API"]
+        Stripe["Stripe Payments"]
+        Loops["Loops Email Engine"]
+    end
+
+    UI -->|Start Scan| SearchAPI
+    SSE -->|Live Updates| StreamAPI
+    SearchAPI --> Scraper
+    CronAPI --> Scraper
+    Scraper --> Reddit
+    Scraper --> Dedup
+    Dedup --> AI
+    AI --> OpenRouter
+    AI --> Embedder
+    Embedder --> Cluster
+    Cluster --> DB
+    Dash --> DB
+    AuthAPI --> DB
+    UI --> Stripe
+    CronAPI --> Loops
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Domain                        | Technology                                                                                                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework**                 | [Next.js 16 (App Router)](https://nextjs.org/)                                                                                                          |
+| **Runtime & Package Manager** | [Bun](https://bun.sh/) (or Node.js 20+)                                                                                                                 |
+| **UI & Styling**              | [React 19](https://react.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Shadcn UI](https://ui.shadcn.com/), [Radix UI](https://www.radix-ui.com/) |
+| **Database & Vector Search**  | [Neon Serverless PostgreSQL](https://neon.tech/) + [PGVector](https://github.com/pgvector/pgvector) + [Drizzle ORM](https://orm.drizzle.team/)          |
+| **AI & Embeddings**           | [OpenRouter](https://openrouter.ai/) (`gemini-2.0-flash`, `gpt-4o`, `text-embedding-3-small`)                                                           |
+| **Authentication**            | [Better Auth](https://better-auth.com/) (Email/Password, OAuth, Workspaces)                                                                             |
+| **Payments & Billing**        | [Stripe](https://stripe.com/) (Subscription Management & Webhooks)                                                                                      |
+| **Background Jobs & Email**   | [Inngest](https://www.inngest.com/), [Loops](https://loops.so/), [React Email](https://react.email/)                                                    |
+| **Data Visualization**        | [Recharts](https://recharts.org/)                                                                                                                       |
+| **Testing & Quality**         | [Vitest](https://vitest.dev/), [ESLint 9](https://eslint.org/), [Prettier](https://prettier.io/)                                                        |
+
+---
+
+## 📁 Project Structure
 
 ```
-app/
-  (auth)/              # Sign-in / sign-up pages
-  (dashboard)/         # Dashboard, search, analysis, reports, settings, billing
-  api/
-    auth/              # Better Auth handler
-    search/            # Mining API: start scan, status polling, SSE stream
-    reports/           # Report CRUD
-    billing/           # Stripe entitlements
-    settings/          # User preferences
-components/
-  dashboard/           # Dashboard-specific components
-  landing/             # Marketing landing page sections
-  ui/                  # Shadcn UI primitives
-hooks/
-  use-mining-stream.ts # SSE hook for real-time mining progress
-lib/
-  ai.ts               # AI pain point extraction via OpenRouter
-  embeddings.ts        # Vector embedding generation + semantic search (PGVector)
-  clustering.ts        # Auto-clustering pain points by similarity
-  mining-runner.ts     # Full mining pipeline orchestrator
-  reddit.ts            # Reddit API client (OAuth + PullPush fallback)
-  reddit-idempotency.ts# 24h dedup guard for AI processing
-  plan-gating.ts       # Billing plan entitlements + usage tracking
-  plan-resolver.ts     # Resolve user's active plan from subscriptions
-  dashboard-metrics.ts # Opportunity scoring + market badges
-  trend-detection.ts   # Trend direction detection for keywords
-  scheduler.ts         # Frequency-based scraper scheduling
-  run-status.ts        # Mining run phase normalization
-  auth.ts / auth-client.ts # Better Auth server + client config
-  seo.ts               # SEO metadata defaults
-  db/
-    schema.ts          # Drizzle schema (all tables)
-    relations.ts       # Drizzle relation definitions
-    index.ts           # Database client
+.
+├── app/
+│   ├── (auth)/                # Authentication views (sign-in, sign-up)
+│   ├── (dashboard)/           # Dashboard, investigation explorer, clusters, reports, billing
+│   ├── api/
+│   │   ├── auth/              # Better Auth endpoint
+│   │   ├── search/            # Mining execution, SSE stream, scheduled scans
+│   │   ├── reports/           # Saved opportunity reports CRUD
+│   │   ├── billing/           # Stripe checkout, portal, and webhook handlers
+│   │   ├── cron/              # Automated maintenance crons
+│   │   └── inngest/           # Inngest background event handlers
+│   ├── layout.tsx             # Root application shell & providers
+│   └── page.tsx               # High-converting landing page
+├── components/
+│   ├── dashboard/             # Metric cards, opportunity matrices, pain point tables
+│   ├── landing/               # Hero, feature showcases, interactive demo, pricing tables
+│   └── ui/                  # Accessible Shadcn/Radix UI components
+├── emails/                    # React Email templates (digests, notifications)
+├── hooks/                     # Custom React hooks (useMiningStream, useDebounce, etc.)
+├── lib/
+│   ├── ai.ts                  # AI extraction engine with structured OpenRouter prompts
+│   ├── clustering.ts          # PGVector cluster assignment & centroid calculations
+│   ├── dashboard-metrics.ts   # Opportunity score computation & market badge algorithms
+│   ├── embeddings.ts          # 1536-dim vector embedding generator & semantic similarity
+│   ├── mining-runner.ts       # Orchestrator for Reddit search, extraction, and clustering
+│   ├── plan-gating.ts         # Plan limits, scan depth access, and usage quota enforcement
+│   ├── plan-resolver.ts       # Subscription tier resolver (Starter, Growth, Pro)
+│   ├── reddit.ts              # Resilient Reddit API client with OAuth & exponential backoff
+│   ├── reddit-idempotency.ts  # 24h AI deduplication caching layer
+│   ├── trend-detection.ts     # Historical keyword velocity and momentum tracking
+│   └── db/
+│       ├── index.ts           # Neon / Postgres connection pool instance
+│       ├── schema.ts          # Complete Drizzle database schema definitions
+│       └── relations.ts       # Relational mapping definitions
+└── test/                      # Comprehensive Vitest test suite
 ```
 
-## Getting Started
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
-- PostgreSQL database with PGVector extension (Neon recommended)
-- OpenRouter API key
-- Reddit API credentials (client ID + secret)
+Ensure you have the following installed and configured:
 
-### 1. Install dependencies
+- **[Bun](https://bun.sh/)** (v1.1+ recommended) or **Node.js** (v20+)
+- **PostgreSQL Database** with `pgvector` enabled (e.g. [Neon](https://neon.tech))
+- **OpenRouter API Key** for LLM extraction and vector embeddings
+- **Reddit API App Credentials** (Script/App Client ID & Secret from [Reddit Apps](https://www.reddit.com/prefs/apps))
+
+### 1. Clone & Install Dependencies
 
 ```bash
-npm install
+git clone https://github.com/alexgutscher26/Pain-Point-Miner.git
+cd Pain-Point-Miner
+
+# Install dependencies via Bun
+bun install
 ```
 
-### 2. Configure environment
+### 2. Configure Environment Variables
 
-Copy the example and fill in your values:
+Create a `.env.local` file by copying `.env.example`:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Required variables:
+Populate the required environment variables:
 
-| Variable               | Description                                               |
-| ---------------------- | --------------------------------------------------------- |
-| `DATABASE_URL`         | PostgreSQL connection string (must have PGVector enabled) |
-| `BETTER_AUTH_SECRET`   | Random secret for session signing                         |
-| `BETTER_AUTH_URL`      | App URL (e.g. `http://localhost:3000`)                    |
-| `OPENROUTER_API_KEY`   | OpenRouter API key for AI extraction + embeddings         |
-| `REDDIT_CLIENT_ID`     | Reddit app client ID for OAuth API access                 |
-| `REDDIT_CLIENT_SECRET` | Reddit app client secret                                  |
+```env
+# Database (PostgreSQL with pgvector)
+DATABASE_URL="postgresql://user:password@ep-xyz.neon.tech/neondb?sslmode=require"
 
-Optional variables:
+# Better Auth
+BETTER_AUTH_SECRET="your-32-byte-random-auth-secret"
+BETTER_AUTH_URL="http://localhost:3000"
 
-| Variable                | Default          | Description                              |
-| ----------------------- | ---------------- | ---------------------------------------- |
-| `REDDIT_USER_AGENT`     | `RPPScanner/1.0` | Custom Reddit user-agent                 |
-| `DEFAULT_BILLING_PLAN`  | `starter`        | Default plan for new users               |
-| `STRIPE_SECRET_KEY`     | —                | Stripe secret key for billing            |
-| `STRIPE_WEBHOOK_SECRET` | —                | Stripe webhook signing secret            |
-| `CRON_SECRET`           | —                | Shared secret for scheduled scan trigger |
+# OpenRouter AI
+OPENROUTER_API_KEY="sk-or-v1-..."
 
-### 3. Set up the database
+# Reddit API
+REDDIT_CLIENT_ID="your_reddit_client_id"
+REDDIT_CLIENT_SECRET="your_reddit_client_secret"
+REDDIT_USER_AGENT="RPPScanner/1.0 (by /u/your_reddit_user)"
 
-Generate and run migrations:
+# Stripe (Billing & Subscriptions)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+
+# Email (Loops)
+LOOPS_API_KEY="loops_api_key_..."
+
+# Automation & Cron
+CRON_SECRET="your-random-cron-secret-key"
+```
+
+### 3. Database & Migrations
+
+Push the Drizzle schema to your PostgreSQL database:
 
 ```bash
-npx drizzle-kit push
+# Push schema directly
+bun run db:push
+
+# Or generate and run migrations
+bun run db:generate
+bun run db:migrate
 ```
 
-Or if you prefer migration files:
+To inspect your database visually in Drizzle Studio:
 
 ```bash
-npx drizzle-kit generate
-npx drizzle-kit migrate
+bun run db:studio
 ```
 
-### 4. Run the dev server
+### 4. Start Development Server
 
 ```bash
-npm run dev
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Scripts
+---
 
-| Command         | Description               |
-| --------------- | ------------------------- |
-| `npm run dev`   | Start development server  |
-| `npm run build` | Production build          |
-| `npm run start` | Start production server   |
-| `npm run lint`  | Run ESLint                |
-| `npm run test`  | Run Vitest test suite     |
-| `npm run write` | Format code with Prettier |
+## 📜 Scripts Reference
 
-## Architecture
+| Command                | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
+| `bun dev`              | Launch Next.js development server with hot reload     |
+| `bun run build`        | Compile optimized production build                    |
+| `bun run start`        | Launch Next.js production server                      |
+| `bun test`             | Execute full Vitest test suite                        |
+| `bun run lint`         | Run ESLint 9 static code analysis                     |
+| `bun run format`       | Format entire codebase using Prettier                 |
+| `bun run format:check` | Verify formatting consistency without modifying files |
+| `bun run ai:eval`      | Run AI extraction evaluation benchmarking script      |
+| `bun run email`        | Launch local React Email preview server               |
+| `bun run db:push`      | Synchronize Drizzle schema directly with database     |
+| `bun run db:migrate`   | Execute pending database migration files              |
+| `bun run db:studio`    | Launch Drizzle Studio database visualizer             |
 
-### Mining Pipeline
+---
 
-When a user starts a scan, the pipeline executes:
+## 🧠 Scoring & Clustering Details
 
-```
-Search API (POST /api/search)
-  └─> Create scraper record
-  └─> executeMiningRun() [fire-and-forget]
-        ├─ Phase: SCANNING
-        │    └─ Fetch posts from all subreddits (parallel via Promise.allSettled)
-        │    └─ Deduplicate + filter by time window
-        ├─ Phase: EXTRACTING
-        │    └─ Fetch comments for top posts (parallel via Promise.allSettled)
-        │    └─ AI extraction per post (OpenRouter)
-        │    └─ Insert pain points + comments into DB
-        │    └─ Embed + cluster each pain point (fire-and-forget)
-        ├─ Phase: CLUSTERING
-        │    └─ Mark run as clustering while background embeds finish
-        └─ Phase: COMPLETED
-             └─ Finalize scraperRun record
-```
+### Opportunity Score Formula
 
-### Real-Time Progress (SSE)
+Opportunities are calculated in `lib/dashboard-metrics.ts` based on four weighted dimensions:
 
-The analysis page streams live progress via Server-Sent Events:
+1. **Base Severity & Demand (60%)**:
+   - Pain Intensity ($35\%$)
+   - Urgency Score ($25\%$)
+   - Willingness to Pay / Monetization ($30\%$)
+   - Workaround Complexity ($10\%$)
+2. **Market Saturation & Maturity**:
+   - _Blue Ocean_ (no mature dominant tool found): **+10 point bonus**
+   - _Red Ocean Disruption_ (established competitors with high dissatisfaction): **+8 point bonus**
+3. **Sentiment Multiplier**:
+   - `desperate` ($\times 1.10$), `angry` ($\times 1.15$), `frustrated` ($\times 1.05$)
+4. **Validation Signal Strength**:
+   - Log-normalized Reddit engagement ($40\%$ upvotes, $35\%$ comment depth, $25\%$ keyword occurrences)
 
-- **Endpoint**: `GET /api/search/stream?id=<scraperId>`
-- **Client hook**: `useMiningStream(scraperId)` — auto-falls back to polling if SSE fails.
-- **Phases**: `scanning` → `extracting` → `clustering` → `completed`
-- **Messages**: Contextual status like "Scanning r/SaaS and 2 more...", "Extracted 4 opportunities. Clustering insights..."
+---
 
-### Embedding & Clustering
+## 🔒 Security & Compliance
 
-- Every pain point is embedded via OpenRouter (`text-embedding-3-small`, 1536 dimensions).
-- Embeddings are stored in the `pain_point_embedding` table using PGVector's `vector(1536)` type.
-- `findSimilarPainPoints()` runs cosine-distance queries (`<=>` operator) for semantic search.
-- The clustering worker finds the nearest existing cluster centroid (threshold: 0.82 similarity). If no match, it creates a new `painPointCluster`.
+RPP is architected with strict security controls:
 
-### Billing & Plan Gating
+- **Parameterized Database Access**: Zero raw SQL strings; all database operations use Drizzle ORM query builders.
+- **Strict Tenant Isolation**: Multi-tenant workspace scoping enforced at the query level.
+- **Timing-Safe Webhook Signatures**: Stripe webhooks and Cron triggers enforce timing-safe signature verification.
+- **Prompt Injection Boundaries**: Scraped data is encapsulated in explicit boundary delimiters before being processed by OpenRouter.
 
-Three tiers managed by `lib/plan-gating.ts`:
+For complete details on our threat model, vulnerability reporting guidelines, and response SLAs, please see [SECURITY.md](file:///c:/Users/gutsc/OneDrive/Desktop/Pain-Point-Miner/SECURITY.md).
 
-- **Starter**: 10 scans/month, 3 subreddits, basic depth only.
-- **Growth**: 50 scans/month, 10 subreddits, basic + advanced depth, saved reports.
-- **Pro**: Unlimited scans, unlimited subreddits, all depths, trend detection.
+---
 
-Plans are resolved from Stripe subscriptions via `resolvePlanForIdentity()` with support for env-based overrides and trial periods.
+## 📄 License
 
-### Scoring
-
-Opportunity scores are computed in `lib/dashboard-metrics.ts`:
-
-- **Pain Intensity** (35%) + **Urgency** (25%) + **Monetization** (30%) weighted base.
-- **Market maturity bonus**: Blue Ocean (low maturity) gets +10, Red Ocean disruption gets +8.
-- **Sentiment modifier**: `desperate` ×1.1, `angry` ×1.15, `frustrated` ×1.05.
-- **Validation signal**: log-normalized upvotes (40%) + comments (35%) + mentions (25%).
-
-## Scheduled Reddit Scans
-
-Recurring scans run via `POST /api/search/scheduled`, triggered by a cron job.
-
-### Scheduler env vars
-
-| Variable                            | Default | Description                         |
-| ----------------------------------- | ------- | ----------------------------------- |
-| `CRON_SECRET`                       | —       | Required. Shared secret for auth.   |
-| `SCHEDULED_BATCH_LIMIT`             | `5`     | Scrapers processed per trigger      |
-| `SCHEDULED_MAX_POSTS_PER_SUBREDDIT` | `180`   | Post cap per subreddit per run      |
-| `SCHEDULED_MAX_SUBREDDITS`          | `10`    | Subreddit count cap per run         |
-| `SCHEDULED_PROCESSING_LIMIT`        | `8`     | Posts sent to AI extraction per run |
-
-### GitHub Actions
-
-Workflow: `.github/workflows/scheduled-reddit-scan.yml`
-
-Required repository secrets:
-
-- `APP_BASE_URL` — Deployed app URL (e.g. `https://your-app.vercel.app`)
-- `CRON_SECRET` — Same value as the server env var
-
-## Deployment
-
-Optimized for [Vercel](https://vercel.com):
-
-1. Connect your GitHub repo to Vercel.
-2. Set all environment variables in the Vercel dashboard.
-3. Ensure your Neon database has PGVector enabled (`CREATE EXTENSION IF NOT EXISTS vector;`).
-4. Deploy. The app handles migrations via `drizzle-kit push` during setup.
-
-## License
-
-Private. All rights reserved.
+Proprietary. All rights reserved &copy; Alex Gutscher.

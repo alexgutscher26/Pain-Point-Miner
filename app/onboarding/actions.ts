@@ -3,13 +3,11 @@
 import { db } from "@/lib/db";
 import { userPreferences } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 
 export async function completeOnboardingAction() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession(await headers());
 
   if (!session) {
     throw new Error("Unauthorized");

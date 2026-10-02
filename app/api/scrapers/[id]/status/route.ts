@@ -7,7 +7,7 @@ import { normalizeRunStatus } from "@/lib/run-status";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const authContext = await requireApiContext(req);
   if (!authContext.ok) {
@@ -30,23 +30,43 @@ export async function GET(
     });
 
     if (!currentScraper) {
-      console.warn(`[Onboarding-Status] Scraper ${id} not found for user ${userId}`);
-      return apiError(404, "NOT_FOUND", "Scraper not found", undefined, correlationId);
+      console.warn(
+        `[Onboarding-Status] Scraper ${id} not found for user ${userId}`,
+      );
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Scraper not found",
+        undefined,
+        correlationId,
+      );
     }
 
     const latestRun = currentScraper.scraperRuns?.[0];
     const rawStatus = latestRun?.status;
     const status = normalizeRunStatus(rawStatus);
 
-    console.log(`[Onboarding-Status] Scraper ${id} raw status: ${rawStatus}, normalized: ${status}`);
+    console.log(
+      `[Onboarding-Status] Scraper ${id} raw status: ${rawStatus}, normalized: ${status}`,
+    );
 
-    return apiJson({
-      status, // 'completed', 'failed', 'running', etc.
-      count: latestRun?.newPainPoints || 0,
-      finishedAt: latestRun?.finishedAt,
-    }, 200, correlationId);
+    return apiJson(
+      {
+        status, // 'completed', 'failed', 'running', etc.
+        count: latestRun?.newPainPoints || 0,
+        finishedAt: latestRun?.finishedAt,
+      },
+      200,
+      correlationId,
+    );
   } catch (error) {
     console.error("Scraper status API Error:", error);
-    return apiError(500, "INTERNAL_SERVER_ERROR", "Internal Server Error", undefined, correlationId);
+    return apiError(
+      500,
+      "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      undefined,
+      correlationId,
+    );
   }
 }

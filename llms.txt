@@ -1,65 +1,60 @@
-# RPP (Reddit ThreddIQ)
+# ThreddIQ — Reddit SaaS Pain Point Miner & Market Intelligence Engine
 
-> RPP is a Next.js application that discovers Reddit pain points, extracts structured opportunities with AI, and surfaces them in a dashboard with scheduled scanning support.
+> ThreddIQ is an AI-powered SaaS market intelligence platform built with Next.js App Router, Postgres/Drizzle ORM, and advanced LLM semantic extraction pipelines. It monitors 100k+ subreddits, extracts verified customer frustrations and willingness-to-pay budget signals, clusters them into structured pain pillars, and delivers actionable opportunity scores for SaaS founders and product teams.
 
-Use this file as the navigation index for understanding product intent, runtime entry points, API surface, and core mining/data pipeline code.
+Use this file as the navigation index for understanding product architecture, public routing matrix, API surfaces, database models, and AI mining pipelines.
 
-## Documentation
+## Public Marketing & Content Matrix
 
-- [Project README](README.md): Setup, local development, and scheduled scan environment/secrets overview.
-- [Product Roadmap and Spec](todo.md): Combined MVP specification and multi-phase implementation roadmap.
-- [Security Policy](SECURITY.md): Security reporting policy template.
+- [Landing Page](app/page.tsx): Main marketing page with interactive demo, value proposition, and pricing.
+- [Blog Index](app/blog/page.tsx): Research studies, teardowns, and SaaS idea validation guides.
+- [Documentation Center](app/docs/page.tsx): Developer documentation, API guides, and scoring mechanics.
+- [Case Studies](app/case-studies/page.tsx): Founder teardowns and validated revenue case studies.
+- [Pre-Mined Niches Directory](app/niches/page.tsx): Pre-computed Reddit opportunity reports across high-demand verticals.
+- [Free Tools Hub](app/free-tools/page.tsx): Lightweight public utilities for quick pain point scoring.
+- [Resources Directory](app/resources/page.tsx): Curated subreddit guides and industry monitoring playbooks.
+- [Dynamic XML Sitemap](app/sitemap.ts): Search engine index covering all public marketing, niche, and content URLs.
+- [Robots Directives](app/robots.ts): Crawl instructions protecting private dashboard segments while indexing public content.
 
-## Application Entry Points
+## Product Features & Modules
 
-- [App Layout](app/layout.tsx): Root application shell and shared providers/styles.
-- [Landing Page](app/page.tsx): Public marketing and product positioning entry point.
-- [Global Error Boundary](app/global-error.tsx): Top-level runtime error boundary.
-- [Not Found Boundary](app/not-found.tsx): Application-level 404 handling.
+- [AI Pain Point Mining](app/features/pain-point-mining): Semantic clustering of 1,000+ rants into root causes.
+- [SaaS Idea Validation](app/features/idea-validation): Upvote-weighted demand signals and opportunity scoring.
+- [Market Discovery](app/features/market-discovery): Problem density mapping across 100k+ subreddits.
+- [Keyword Monitoring](app/features/keyword-monitoring): Real-time keyword alerts and competitor mention tracking.
+- [Sentiment Analysis](app/features/sentiment-analysis): Emotional intensity, budget signals, and desperation index scoring.
 
-## API Surface
+## Core API Surface
 
-- [Search API](app/api/search/route.ts): Main search/mining request orchestration endpoint.
-- [Scheduled Search API](app/api/search/scheduled/route.ts): Batch scheduler trigger endpoint for recurring scans.
-- [Search Stream API](app/api/search/stream/route.ts): Streaming updates for scan progress/results.
-- [Search Status API](app/api/search/status/route.ts): Mining run status endpoint.
-- [Suggest Subreddits API](app/api/search/suggest-subreddits/route.ts): Subreddit suggestion endpoint.
-- [Reports API](app/api/reports/route.ts): Report collection read/write operations.
-- [Settings API](app/api/settings/route.ts): Workspace/account settings endpoint.
-- [Billing Entitlements API](app/api/billing/entitlements/route.ts): Subscription entitlement checks.
+- [Mining Search API](app/api/search/route.ts): Main search/mining orchestration endpoint.
+- [Scheduled Batch API](app/api/search/scheduled/route.ts): Background batch scheduler trigger endpoint for recurring scans.
+- [Live Stream API](app/api/search/stream/route.ts): Server-Sent Events (SSE) stream for real-time mining progress and results.
+- [Dynamic OpenGraph API](app/api/og/route.tsx): Edge-rendered dynamic social share images (1200x630).
+- [Search Status API](app/api/search/status/route.ts): Mining run status and progress verification endpoint.
+- [Subreddit Suggestions](app/api/search/suggest-subreddits/route.ts): Intelligent subreddit recommendations by keyword/vertical.
+- [Reports API](app/api/reports/route.ts): Report persistence and retrieval endpoints.
+- [Settings API](app/api/settings/route.ts): User workspace preferences and webhook configuration.
+- [Billing Entitlements API](app/api/billing/entitlements/route.ts): Stripe subscription entitlement checks.
 
-## Core Mining and AI Pipeline
+## AI & Data Extraction Pipeline
 
-- [Mining Runner](lib/mining-runner.ts): Reddit ingestion and extraction orchestration.
-- [Reddit Client](lib/reddit.ts): Reddit API fetch and normalization utilities.
-- [AI Integration](lib/ai.ts): LLM prompt/extraction integration layer.
-- [Embeddings](lib/embeddings.ts): Vector embedding generation for semantic grouping.
-- [Clustering](lib/clustering.ts): Similarity clustering logic for pain points/opportunities.
-- [Trend Detection](lib/trend-detection.ts): Trend scoring and signal aggregation logic.
-- [Run Status](lib/run-status.ts): Runtime scan progress/state tracking helpers.
-- [Scheduler Utilities](lib/scheduler.ts): Scheduling helper logic for recurring scans.
-- [Reddit Idempotency](lib/reddit-idempotency.ts): Duplicate-run protections for Reddit items.
+- [Mining Runner](lib/mining-runner.ts): Reddit ingestion orchestration and async worker pipeline.
+- [Reddit Client](lib/reddit.ts): Reddit API integration, rate limiting, and normalization.
+- [AI Engine](lib/ai.ts): Multi-model LLM extraction prompts and structured JSON parsing.
+- [Vector Embeddings](lib/embeddings.ts): Semantic embeddings generation for topic grouping.
+- [Clustering Logic](lib/clustering.ts): Unsupervised clustering of related pain points and opportunities.
+- [Trend Scoring](lib/trend-detection.ts): Upvote velocity, mention volume, and desperation signal aggregation.
+- [Pre-Mined Niches Dataset](lib/premined-niches.ts): Static database of high-opportunity SaaS niches.
 
-## Data Model and Persistence
+## Persistence & Data Schema
 
-- [Drizzle Schema](lib/db/schema.ts): Core PostgreSQL schema for users, scans, and opportunities.
-- [Drizzle Relations](lib/db/relations.ts): ORM relation mappings.
-- [Database Client](lib/db/index.ts): Database connection and Drizzle initialization.
-- [Migration 0001](drizzle/0001_reddit_ai_idempotency.sql): Initial idempotency-related migration.
-- [Drizzle Config](drizzle.config.ts): Migration and schema configuration.
+- [Drizzle Schema](lib/db/schema.ts): PostgreSQL tables for users, workspaces, scans, opportunities, and subscriptions.
+- [Database Client](lib/db/index.ts): Connection pooling and query builders.
+- [Drizzle Config](drizzle.config.ts): Migration scripts and schema generation settings.
 
-## Configuration and Operations
+## Operations & Quality
 
-- [Package Manifest](package.json): Runtime dependencies and scripts.
-- [Next Config](next.config.ts): Next.js runtime/build configuration.
-- [TypeScript Config](tsconfig.json): Project compiler/type-check settings.
-- [ESLint Config](eslint.config.mjs): Lint rules and quality gates.
-- [Vitest Config](vitest.config.ts): Test runner configuration.
-- [Environment Template](.env.example): Required environment variable template.
-- [Scheduled Scan Workflow](.github/workflows/scheduled-reddit-scan.yml): GitHub Actions cron trigger for scheduled scans.
-
-## Optional
-
-- [Dashboard Search Hero](components/dashboard/dashboard-search-hero.tsx): Primary search UX component composition.
-- [Mining Stream Hook](hooks/use-mining-stream.ts): Client-side streaming hook for live mining updates.
-- [UI Component Registry](components.json): Shadcn/base UI component registry metadata.
+- [Next.js Config](next.config.ts): App configuration and security headers.
+- [TypeScript Config](tsconfig.json): Strict type definitions.
+- [Vitest Config](vitest.config.ts): Unit and integration test suites.
+- [ESLint Config](eslint.config.mjs): Strict quality and formatting rules.
