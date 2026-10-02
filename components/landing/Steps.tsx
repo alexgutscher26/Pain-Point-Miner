@@ -1,97 +1,82 @@
-import { Target } from "lucide-react";
+"use client";
+
+import {
+  Sparkles,
+} from "lucide-react";
 
 export function Steps() {
+  const steps = [
+    {
+      num: "01",
+      title: "Select niche or target competitor",
+      description:
+        "Enter a product category, specific incumbent (e.g. HubSpot, Notion, Stripe), or subreddits like r/SaaS and r/marketing.",
+      badge: "Targeting",
+      detail: "1,240+ Subreddits Indexed",
+    },
+    {
+      num: "02",
+      title: "AI isolates verified friction & budgets",
+      description:
+        "Our semantic pipeline filters out spam and noise, extracting verbatim complaints, competitor vulnerabilities, and willingness to pay.",
+      badge: "Extraction",
+      detail: "94.2% Signal Accuracy",
+    },
+    {
+      num: "03",
+      title: "Build and market with unfair clarity",
+      description:
+        "Export opportunity dossiers, grab authentic copy hooks for your landing page, and build features users have already committed budget for.",
+      badge: "Execution",
+      detail: "Direct CSV / Notion Export",
+    },
+  ];
+
   return (
-    <section className="flex w-full flex-col items-center bg-[#000] px-6 py-32">
-      <div className="mb-20 max-w-2xl text-center">
-        <h2 className="mb-6 text-[12px] font-bold tracking-[0.2em] text-[#ff4500] uppercase">
-          HOW IT WORKS
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col items-center px-4 py-16 sm:px-6 sm:py-24">
+      <div className="mb-14 flex max-w-[680px] flex-col items-center text-center">
+        <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1 text-xs font-semibold text-[#ff4500] shadow-2xs backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Execution Pipeline</span>
+        </div>
+        <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl dark:text-white">
+          From raw Reddit thread to validated roadmap in 3 steps
         </h2>
-        <h3 className="mb-6 text-[40px] leading-tight font-extrabold tracking-tight text-white md:text-[56px]">
-          Validate your <span className="text-[#ff4500]">SaaS ideas</span>
-          <br /> in 3 simple steps
-        </h3>
-        <p className="text-[18px] font-medium text-zinc-400">
-          Enter a niche, and we&apos;ll do the deep research to extract the real
-          problems your potential users are actively trying to solve.
+        <p className="text-base leading-relaxed font-normal text-zinc-600 sm:text-lg dark:text-zinc-300">
+          Replace weeks of inconclusive customer interviews with hundreds of
+          unprompted, authentic buyer discussions.
         </p>
       </div>
 
-      <div className="grid w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
-        {/* Step 1 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-white/[0.03] bg-[#0f0f0f] p-8 shadow-xl transition-colors hover:border-white/[0.08]">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded bg-[#ff4500] text-[13px] font-bold text-white shadow-[0_4px_15px_rgba(255,69,0,0.5)]">
-            1
-          </div>
+      <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+        {steps.map((step) => (
+          <div
+            key={step.num}
+            className="group flex flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#ff4500]/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div>
+              <div className="mb-6 flex items-center justify-between">
+                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-zinc-100 font-mono text-xs font-bold text-zinc-900 transition-colors group-hover:bg-[#ff4500] group-hover:text-white dark:bg-zinc-800 dark:text-white">
+                  {step.num}
+                </span>
+                <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+                  {step.badge}
+                </span>
+              </div>
 
-          <div className="mb-8 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border border-white/[0.03] bg-black shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            {/* Search text box mockup */}
-            <div className="flex w-[80%] items-center gap-2 rounded-full border border-white/5 bg-[#1a1a1a] px-5 py-3 shadow-lg">
-              <span className="text-[15px] font-bold text-[#ff4500]">#</span>
-              <span className="animate-pulse border-r-2 border-[#ff4500] pr-1.5 text-[15px] font-medium tracking-wide text-white">
-                SaaS marketing
-              </span>
+              <h3 className="mb-2 text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+                {step.title}
+              </h3>
+              <p className="text-xs leading-relaxed text-zinc-600 sm:text-sm dark:text-zinc-300">
+                {step.description}
+              </p>
+            </div>
+
+            <div className="mt-8 border-t border-zinc-100 pt-3 font-mono text-[11px] text-zinc-400 dark:border-zinc-800">
+              {step.detail}
             </div>
           </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-white">
-            1. Define your niche
-          </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-400">
-            Enter a keyword like &quot;SEO tools&quot; or &quot;property
-            management&quot; to target the exact subreddits relevant to your
-            SaaS.
-          </p>
-        </div>
-
-        {/* Step 2 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-white/[0.03] bg-[#0f0f0f] p-8 shadow-xl transition-colors hover:border-white/[0.08]">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded bg-[#ff4500] text-[13px] font-bold text-white shadow-[0_4px_15px_rgba(255,69,0,0.5)]">
-            2
-          </div>
-
-          <div className="relative mb-8 flex h-40 w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/[0.03] bg-black shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent to-[#ff4500]/5"></div>
-            {/* Feed mockup */}
-            <div className="w-[75%] translate-x-4 rounded-lg border border-white/[0.05] bg-[#1a1a1a] p-3 shadow-lg">
-              <div className="mb-1.5 h-1.5 w-[60%] rounded bg-zinc-700"></div>
-              <div className="h-1.5 w-full rounded bg-zinc-800"></div>
-            </div>
-            <div className="w-[75%] -translate-x-4 rounded-lg border border-white/[0.05] bg-[#1a1a1a] p-3 opacity-60 shadow-lg">
-              <div className="mb-1.5 h-1.5 w-[40%] rounded bg-zinc-700"></div>
-              <div className="h-1.5 w-[90%] rounded bg-zinc-800"></div>
-            </div>
-          </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-white">
-            2. We analyze discussions
-          </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-400">
-            Our system scans recent discussions, identifies repeated
-            frustrations, and clusters similar complaints automatically.
-          </p>
-        </div>
-
-        {/* Step 3 */}
-        <div className="group flex flex-col items-start rounded-[24px] border border-white/[0.03] bg-[#0f0f0f] p-8 shadow-xl transition-colors hover:border-white/[0.08]">
-          <div className="mb-8 flex h-7 w-7 items-center justify-center rounded bg-[#ff4500] text-[13px] font-bold text-white shadow-[0_4px_15px_rgba(255,69,0,0.5)]">
-            3
-          </div>
-
-          <div className="relative mb-8 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border border-white/[0.03] bg-black shadow-inner transition-transform duration-500 group-hover:scale-[1.02]">
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent to-[#ff4500]/10"></div>
-            {/* Ping mockup */}
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#ff4500]/30 bg-black shadow-[0_0_30px_rgba(255,69,0,0.2)]">
-              <Target className="h-8 w-8 text-[#ff4500]" />
-              <div className="absolute top-1 right-1 h-4 w-4 animate-pulse rounded-full border-2 border-black bg-red-500"></div>
-            </div>
-          </div>
-          <h3 className="mb-3 text-[22px] font-extrabold tracking-tight text-white">
-            3. Review Pain Points
-          </h3>
-          <p className="text-[15px] leading-relaxed font-medium text-zinc-400">
-            Get structured reports detailing common pain points, demand signals,
-            and user language to validate your next feature.
-          </p>
-        </div>
+        ))}
       </div>
     </section>
   );

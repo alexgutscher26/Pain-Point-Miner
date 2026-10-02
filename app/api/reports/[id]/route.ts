@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
-import { scraper, scraperRun } from "@/lib/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import {
+  scraper,
+  scraperRun,
+  workspace,
+  workspaceMember,
+} from "@/lib/db/schema";
+import { and, eq, desc, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { apiError, apiJson } from "@/lib/api-error";
-import { requireApiContext, workspaceScope } from "@/lib/api-auth";
+import { requireApiContext } from "@/lib/api-auth";
 import {
   buildLatestTrendInsights,
   formatTrendChangePercent,
@@ -18,9 +24,12 @@ import {
 import { getPlanEntitlements } from "@/lib/plan-gating";
 import { resolveCurrentPlan, resolvePlanContext } from "@/lib/plan-resolver";
 import { getTimeWindowLabel, normalizeTimeWindow } from "@/lib/time-window";
+import { getModelForDepth, AI_MODEL_LABELS } from "@/lib/ai";
+import type { MiningDepth } from "@/lib/mining-presets";
+import { isDemoReportId, getDemoReport } from "@/lib/demo-data";
 
 const reportParamsSchema = z.object({
-  id: z.string().uuid("Invalid report id"),
+  id: z.string().trim().min(1, "Invalid report id"),
 });
 const updateReportSchema = z.object({
   saved: z.boolean(),
@@ -180,7 +189,7 @@ export async function GET(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {
@@ -195,22 +204,65 @@ export async function GET(
   const { id } = parsedParams.data;
 
   try {
+    if (isDemoReportId(id)) {
+      const demo = getDemoReport();
+      return apiJson(
+        {
+          id: demo.id,
+          title: demo.title,
+          subreddits: demo.subreddits,
+          createdAt: demo.createdAt,
+          reportId: demo.id,
+          saved: demo.saved,
+          category: demo.category,
+          customPatterns: [],
+          miningDepth: demo.miningDepth,
+          aiModel: "OpenAI GPT-4o",
+          timeWindow: "90d",
+          timeWindowLabel: "Last 90d",
+          trend: null,
+          metrics: [
+            {
+              label: "Pain Points",
+              value: "2",
+              sub: "Extracted by AI",
+              icon: "AlertTriangle",
+              color: "text-blue-500",
+              bg: "bg-blue-500/10",
+            },
+            {
+              label: "Posts Analyzed",
+              value: "142",
+              sub: `Across ${demo.subreddits.length} subreddits`,
+              icon: "MessageSquare",
+              color: "text-amber-500",
+              bg: "bg-amber-500/10",
+            },
+            {
+              label: "Opportunity Score",
+              value: "84/100",
+              sub: "High Viability",
+              icon: "Flame",
+              color: "text-emerald-500",
+              bg: "bg-emerald-500/10",
+            },
+          ],
+          saasOpportunities: [],
+          topPainPoints: demo.topPainPoints,
+          isTeaser: false,
+          isDemo: true,
+        },
+        200,
+        correlationId,
+      );
+    }
+
     const planContext = await resolvePlanContext({
       userId,
       email: userEmail,
       requestHeaders: req.headers,
     });
-    if (planContext.planPurchaseRequired) {
-      return apiError(
-        403,
-        "PLAN_REQUIRED",
-        "Start your 2-day trial with a credit card to unlock full analysis reports.",
-        {
-          trialEnded: true,
-        },
-        correlationId,
-      );
-    }
+    const isTeaser = planContext.planPurchaseRequired;
     const plan = await resolveCurrentPlan({
       userId,
       email: userEmail,
@@ -218,12 +270,9 @@ export async function GET(
     });
     const entitlements = getPlanEntitlements(plan);
 
-    const currentScraper = await db.query.scraper.findFirst({
-      where: and(
-        eq(scraper.id, id),
-        eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId),
-      ),
+    let targetScraperId = id;
+    let currentScraper = await db.query.scraper.findFirst({
+      where: and(eq(scraper.id, targetScraperId), isNull(scraper.deletedAt)),
       with: {
         scraperRuns: {
           orderBy: [desc(scraperRun.startedAt)],
@@ -258,6 +307,88 @@ export async function GET(
     });
 
     if (!currentScraper) {
+      // Check if `id` was a scraperRun id
+      const runRecord = await db.query.scraperRun.findFirst({
+        where: eq(scraperRun.id, id),
+        columns: { id: true, scraperId: true },
+      });
+      if (runRecord?.scraperId) {
+        targetScraperId = runRecord.scraperId;
+        currentScraper = await db.query.scraper.findFirst({
+          where: and(
+            eq(scraper.id, targetScraperId),
+            isNull(scraper.deletedAt),
+          ),
+          with: {
+            scraperRuns: {
+              orderBy: [desc(scraperRun.startedAt)],
+              limit: 1,
+            },
+            painPoints: {
+              with: {
+                painPointCluster: {
+                  columns: {
+                    id: true,
+                    estimatedTamUsdAnnual: true,
+                    budgetSignalCount: true,
+                    competitorIntel: true,
+                  },
+                },
+                painPointComments: {
+                  columns: {
+                    body: true,
+                    score: true,
+                  },
+                  orderBy: (comment, { desc }) => [desc(comment.score)],
+                  limit: 12,
+                },
+                painPointFeedback: {
+                  columns: {
+                    vote: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    if (!currentScraper) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
+    // Authorize: User must be report owner OR member/owner of the report's workspace
+    let hasAccess = currentScraper.userId === userId;
+    if (!hasAccess && currentScraper.workspaceId) {
+      const member = await db.query.workspaceMember.findFirst({
+        where: and(
+          eq(workspaceMember.workspaceId, currentScraper.workspaceId),
+          eq(workspaceMember.userId, userId),
+        ),
+      });
+      if (member) {
+        hasAccess = true;
+      } else {
+        const ownedWorkspace = await db.query.workspace.findFirst({
+          where: and(
+            eq(workspace.id, currentScraper.workspaceId),
+            eq(workspace.ownerId, userId),
+          ),
+        });
+        if (ownedWorkspace) {
+          hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
       return apiError(
         404,
         "NOT_FOUND",
@@ -275,10 +406,7 @@ export async function GET(
     const painPoints = currentScraper.painPoints as unknown as DBPainPoint[];
 
     const trendHistoryRows = await db.query.scraper.findMany({
-      where: and(
-        eq(scraper.userId, userId),
-        workspaceScope(scraper.workspaceId, workspaceId),
-      ),
+      where: and(eq(scraper.userId, userId), isNull(scraper.deletedAt)),
       orderBy: [desc(scraper.createdAt)],
       with: {
         painPoints: {
@@ -384,7 +512,11 @@ export async function GET(
       .slice(0, 5);
 
     // Format the response to match what the frontend expects
+    const scraperMiningDepth = (currentScraper.miningDepth ??
+      "basic") as MiningDepth;
+    const aiModelId = getModelForDepth(scraperMiningDepth);
     const response = {
+      isTeaser,
       title: currentScraper.keywords?.[0] || "Unknown Investigation",
       date: new Date(currentScraper.createdAt).toLocaleDateString("en-US", {
         month: "short",
@@ -395,6 +527,8 @@ export async function GET(
       saved: currentScraper.reportSaved ?? false,
       category: currentScraper.reportCategory || "Uncategorized",
       customPatterns: currentScraper.customPatterns || [],
+      miningDepth: scraperMiningDepth,
+      aiModel: AI_MODEL_LABELS[aiModelId] ?? aiModelId,
       timeWindow: normalizeTimeWindow(currentScraper.timeWindow),
       timeWindowLabel: getTimeWindowLabel(
         normalizeTimeWindow(currentScraper.timeWindow),
@@ -432,8 +566,8 @@ export async function GET(
           value: latestRun?.postsFetched?.toString() || "0",
           sub: `Across ${currentScraper.subreddits?.length || 0} subreddits`,
           icon: "MessageSquare",
-          color: "text-purple-500",
-          bg: "bg-purple-500/10",
+          color: "text-amber-500",
+          bg: "bg-amber-500/10",
         },
         {
           label: "Opportunity Score",
@@ -467,64 +601,103 @@ export async function GET(
             (b.urgency ?? 0) - (a.urgency ?? 0) ||
             (b.score ?? 0) - (a.score ?? 0),
         )
-        .map((pp) => ({
-          userLanguage: buildUserLanguageReport({
+        .map((pp, idx) => {
+          if (isTeaser && idx >= 2) {
+            return {
+              userLanguage: null,
+              id: pp.id,
+              title: `Unlock Frustration #${idx + 1}`,
+              validationScore: 0,
+              urgency: "Locked",
+              intensity: 0,
+              monetization: 0,
+              maturity: 0,
+              mentions: 0,
+              description:
+                "Upgrade to a paid plan to unlock full AI description, intensity/urgency breakdown, and Golden Quotes.",
+              subreddits: pp.subreddit ? [pp.subreddit] : [],
+              sentiment: "Neutral",
+              budgetSignals: [],
+              hasWillingnessToPay: false,
+              budgetSignalSummary: "Locked",
+              cluster: null,
+              switchingCosts: "Locked",
+              triedSolutions: [],
+              difficulty: "side_project",
+              communityVoices: [
+                "Upgrade to a paid plan to unlock user comments and golden quotes.",
+              ],
+              language: [],
+              postUrl: null,
+              angles: [],
+            };
+          }
+          return {
+            userLanguage: buildUserLanguageReport({
+              title: pp.title,
+              body: pp.body,
+              triedSolutions: pp.triedSolutions,
+              quotes: (pp.painPointComments ?? []).map(
+                (comment) => comment.body,
+              ),
+            }),
+            id: pp.id,
             title: pp.title,
-            body: pp.body,
-            triedSolutions: pp.triedSolutions,
-            quotes: (pp.painPointComments ?? []).map((comment) => comment.body),
-          }),
-          id: pp.id,
-          title: pp.title,
-          validationScore: toValidationScore(pp),
-          urgency:
-            pp.urgency >= 8
-              ? "Extreme Urgency"
-              : pp.urgency >= 5
-                ? "High Urgency"
-                : "Medium/Low",
-          intensity: pp.score,
-          monetization: pp.monetizationScore,
-          maturity: pp.marketMaturity,
-          mentions: Math.max(1, pp.mentionCount || 0),
-          description: pp.body,
-          subreddits: [pp.subreddit],
-          sentiment: pp.sentiment,
-          budgetSignals: pp.budgetSignals,
-          hasWillingnessToPay: pp.hasWillingnessToPay,
-          budgetSignalSummary:
-            pp.budgetSignals.length > 0
-              ? summarizeBudgetSignal(pp.budgetSignals[0])
+            validationScore: toValidationScore(pp),
+            urgency:
+              pp.urgency >= 8
+                ? "Extreme Urgency"
+                : pp.urgency >= 5
+                  ? "High Urgency"
+                  : "Medium/Low",
+            intensity: pp.score,
+            monetization: pp.monetizationScore,
+            maturity: pp.marketMaturity,
+            mentions: Math.max(1, pp.mentionCount || 0),
+            description: pp.body,
+            subreddits: [pp.subreddit],
+            sentiment: pp.sentiment,
+            budgetSignals: pp.budgetSignals,
+            hasWillingnessToPay: pp.hasWillingnessToPay,
+            budgetSignalSummary:
+              pp.budgetSignals.length > 0
+                ? summarizeBudgetSignal(pp.budgetSignals[0])
+                : null,
+            cluster: pp.painPointCluster
+              ? {
+                  id: pp.painPointCluster.id,
+                  estimatedTamUsdAnnual:
+                    pp.painPointCluster.estimatedTamUsdAnnual ?? null,
+                  budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
+                  competitorIntel: isTeaser
+                    ? []
+                    : (pp.painPointCluster.competitorIntel ?? []),
+                }
               : null,
-          cluster: pp.painPointCluster
-            ? {
-                id: pp.painPointCluster.id,
-                estimatedTamUsdAnnual:
-                  pp.painPointCluster.estimatedTamUsdAnnual ?? null,
-                budgetSignalCount: pp.painPointCluster.budgetSignalCount ?? 0,
-                competitorIntel: pp.painPointCluster.competitorIntel ?? [],
-              }
-            : null,
-          switchingCosts: pp.switchingCosts,
-          triedSolutions: pp.triedSolutions || [],
-          difficulty: pp.difficulty || "weekend_project",
-          communityVoices:
-            (pp.painPointComments ?? [])
-              .map((comment) => cleanQuote(comment.body))
-              .filter(Boolean)
-              .slice(0, 3).length > 0
-              ? (pp.painPointComments ?? [])
-                  .map((comment) => cleanQuote(comment.body))
-                  .filter(Boolean)
-                  .slice(0, 3)
-              : [pp.body],
-          language: pp.triedSolutions || [],
-          postUrl: pp.postUrl,
-          angles: [
-            "Solution for " + pp.title,
-            "Cost-effective alternative to existing tools",
-          ],
-        })),
+            switchingCosts: pp.switchingCosts,
+            triedSolutions: pp.triedSolutions || [],
+            difficulty: pp.difficulty || "weekend_project",
+            communityVoices:
+              (pp.painPointComments ?? [])
+                .map((comment) => cleanQuote(comment.body))
+                .filter(Boolean)
+                .slice(0, 3).length > 0
+                ? (pp.painPointComments ?? [])
+                    .map((comment) => cleanQuote(comment.body))
+                    .filter(Boolean)
+                    .slice(0, 3)
+                : [pp.body],
+            language: pp.triedSolutions || [],
+            postUrl: pp.postUrl,
+            angles: [
+              pp.triedSolutions && pp.triedSolutions.length > 0
+                ? `Modern automated alternative to ${pp.triedSolutions[0]}`
+                : `Dedicated single-purpose solution for ${pp.title.toLowerCase()}`,
+              `Lightweight workflow tool tuned for r/${pp.subreddit} teams`,
+              `Self-serve micro-SaaS eliminating manual ${pp.title.toLowerCase()} overhead`,
+            ],
+          };
+        }),
       saasOpportunities: entitlements.hasSaasOpportunities
         ? saasOpportunities
         : [],
@@ -551,7 +724,7 @@ export async function PATCH(
   if (!authContext.ok) {
     return authContext.response;
   }
-  const { correlationId, userId, userEmail, workspaceId } = authContext.context;
+  const { correlationId, userId, userEmail } = authContext.context;
 
   const parsedParams = reportParamsSchema.safeParse(await params);
   if (!parsedParams.success) {
@@ -599,6 +772,70 @@ export async function PATCH(
       );
     }
 
+    let targetScraperId = id;
+    let existingScraper = await db.query.scraper.findFirst({
+      where: and(eq(scraper.id, targetScraperId), isNull(scraper.deletedAt)),
+    });
+
+    if (!existingScraper) {
+      const runRecord = await db.query.scraperRun.findFirst({
+        where: eq(scraperRun.id, id),
+        columns: { id: true, scraperId: true },
+      });
+      if (runRecord?.scraperId) {
+        targetScraperId = runRecord.scraperId;
+        existingScraper = await db.query.scraper.findFirst({
+          where: and(
+            eq(scraper.id, targetScraperId),
+            isNull(scraper.deletedAt),
+          ),
+        });
+      }
+    }
+
+    if (!existingScraper) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
+    let hasAccess = existingScraper.userId === userId;
+    if (!hasAccess && existingScraper.workspaceId) {
+      const member = await db.query.workspaceMember.findFirst({
+        where: and(
+          eq(workspaceMember.workspaceId, existingScraper.workspaceId),
+          eq(workspaceMember.userId, userId),
+        ),
+      });
+      if (member) {
+        hasAccess = true;
+      } else {
+        const ownedWorkspace = await db.query.workspace.findFirst({
+          where: and(
+            eq(workspace.id, existingScraper.workspaceId),
+            eq(workspace.ownerId, userId),
+          ),
+        });
+        if (ownedWorkspace) {
+          hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
+      return apiError(
+        404,
+        "NOT_FOUND",
+        "Report not found",
+        undefined,
+        correlationId,
+      );
+    }
+
     const updated = await db
       .update(scraper)
       .set({
@@ -607,13 +844,7 @@ export async function PATCH(
         reportCategory: category ?? "Uncategorized",
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          eq(scraper.id, id),
-          eq(scraper.userId, userId),
-          workspaceScope(scraper.workspaceId, workspaceId),
-        ),
-      )
+      .where(eq(scraper.id, targetScraperId))
       .returning({
         id: scraper.id,
         reportSaved: scraper.reportSaved,

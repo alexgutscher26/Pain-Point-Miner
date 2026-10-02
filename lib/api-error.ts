@@ -16,6 +16,7 @@ export interface ApiErrorBody {
 }
 
 const CORRELATION_ID_HEADER = "x-correlation-id";
+const REQUEST_ID_HEADER = "x-request-id";
 
 function resolveCorrelationId(correlationId?: string) {
   if (correlationId && correlationId.trim().length > 0) {
@@ -26,7 +27,9 @@ function resolveCorrelationId(correlationId?: string) {
 
 export function getCorrelationId(req: Request) {
   return resolveCorrelationId(
-    req.headers.get(CORRELATION_ID_HEADER) ?? undefined,
+    req.headers.get(REQUEST_ID_HEADER) ??
+      req.headers.get(CORRELATION_ID_HEADER) ??
+      undefined,
   );
 }
 
@@ -41,6 +44,7 @@ export function apiJson<T>(
     status,
     headers: {
       [CORRELATION_ID_HEADER]: id,
+      [REQUEST_ID_HEADER]: id,
       ...extraHeaders,
     },
   });

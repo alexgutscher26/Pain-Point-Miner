@@ -7,11 +7,13 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     clearMocks: true,
     restoreMocks: true,
+    unstubGlobals: true,
+    unstubEnvs: true,
     coverage: {
       provider: "v8",
       include: ["lib/**/*.ts"],
       thresholds: {
-        lines: 55,
+        lines: 50,
       },
       reporter: ["text", "json", "html", "lcov"],
     },

@@ -4,7 +4,7 @@ import type { SQL } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { auth, getServerSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { workspace, workspaceMember } from "@/lib/db/schema";
 import { apiError, getCorrelationId } from "@/lib/api-error";
@@ -38,13 +38,54 @@ export async function requireApiContext(req: Request) {
   const method = req.method.toUpperCase();
   const isMutation = ["POST", "PATCH", "PUT", "DELETE"].includes(method);
 
-  if (isMutation) {
-    const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL || "";
-    const isLocalhost =
-      origin?.includes("localhost") || origin?.includes("127.0.0.1");
-    const isSafeOrigin = origin === allowedOrigin || isLocalhost;
+  if (isMutation && origin) {
+    const normalize = (urlStr: string | null | undefined) =>
+      urlStr ? urlStr.trim().replace(/\/+$/, "") : "";
 
-    if (origin && !isSafeOrigin) {
+    const cleanOrigin = normalize(origin);
+    const host =
+      req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const proto =
+      req.headers.get("x-forwarded-proto") ||
+      (host?.includes("localhost") || host?.includes("127.0.0.1")
+        ? "http"
+        : "https");
+    const sameOrigin = host ? normalize(`${proto}://${host}`) : "";
+
+    const allowedOrigins = [
+      normalize(process.env.NEXT_PUBLIC_APP_URL),
+      normalize(process.env.BETTER_AUTH_URL),
+      normalize(
+        process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+          : "",
+      ),
+      normalize(
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "",
+      ),
+      sameOrigin,
+    ].filter(Boolean);
+
+    const isLocalhost =
+      /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(cleanOrigin) ||
+      cleanOrigin.includes("localhost") ||
+      cleanOrigin.includes("127.0.0.1");
+
+    const isVercelDomain =
+      /^https:\/\/[a-zA-Z0-9_.-]+\.vercel\.app$/i.test(cleanOrigin);
+
+    const isDevTunnel =
+      /^https:\/\/[a-zA-Z0-9_.-]+\.(ngrok-free\.app|ngrok\.io|loca\.lt)$/i.test(
+        cleanOrigin,
+      );
+
+    const isSafeOrigin =
+      allowedOrigins.includes(cleanOrigin) ||
+      isLocalhost ||
+      isVercelDomain ||
+      isDevTunnel;
+
+    if (!isSafeOrigin) {
       return {
         ok: false as const,
         response: apiError(
@@ -58,9 +99,7 @@ export async function requireApiContext(req: Request) {
     }
   }
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getServerSession(await headers());
 
   if (
     session?.user &&
@@ -141,8 +180,8 @@ export async function requireApiContext(req: Request) {
     }
   }
 
-  // Rate Limiting Enforcement (100 per minute)
-  const { allowed, reset } = checkRateLimit(session.user.id, 100);
+  // Rate Limiting Enforcement (1000 per minute)
+  const { allowed, reset } = checkRateLimit(session.user.id, 1000);
   if (!allowed) {
     return {
       ok: false as const,
