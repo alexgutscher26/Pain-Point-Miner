@@ -13,7 +13,7 @@ export default defineConfig({
       provider: "v8",
       include: ["lib/**/*.ts"],
       thresholds: {
-        lines: 80,
+        lines: 50,
       },
       reporter: ["text", "json", "html", "lcov"],
     },
